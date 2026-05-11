@@ -256,15 +256,18 @@
   const latest = await loadLatest();
   if (latest === null) {
     // tabla no existe, ya mostró el mensaje
-  } else if (isStale(latest)) {
-    // Sin datos de hoy → regenerar automáticamente
-    const ageMsg = latest
-      ? `El último análisis tiene ${Math.round((Date.now()-new Date(latest.generated_at))/3600000)}h — se necesita uno de hoy.`
-      : 'No hay análisis todavía.';
-    body.innerHTML = `<div class="loading-msg"><span class="spinner"></span>${ageMsg} Obteniendo datos actuales...</div>`;
-    await triggerRefresh();
+  } else if (!latest) {
+    body.innerHTML = `<div class="loading-msg">No hay análisis todavía. Hacé click en "Actualizar análisis" para generarlo.</div>`;
   } else {
+    // Siempre mostrar los datos disponibles, aunque sean viejos
     renderIntel(latest);
+    if (isStale(latest)) {
+      const hoursOld = Math.round((Date.now() - new Date(latest.generated_at)) / 3600000);
+      const staleBar = document.createElement('div');
+      staleBar.style.cssText = 'background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#7a6000;';
+      staleBar.innerHTML = `⚠ Datos de hace ${hoursOld}h. Hacé click en "Actualizar análisis" para obtener el análisis de hoy.`;
+      body.prepend(staleBar);
+    }
   }
 
   document.getElementById('btn-refresh').addEventListener('click', triggerRefresh);
