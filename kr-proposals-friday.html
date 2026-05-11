@@ -219,13 +219,8 @@
       return;
     }
 
-    // Disparar writeback inmediato via backend local
-    try {
-      await fetch('http://localhost:8081/writeback', { method: 'POST' });
-      OKR_toast('✓ Aprobado. Escribiendo valores en Etendo...', 'success');
-    } catch (e) {
-      OKR_toast('Aprobado. El writeback correrá automáticamente en 5 minutos.', 'success');
-    }
+    await OKR_triggerJob('writeback');
+    OKR_toast('✓ Aprobado. Escribiendo valores en Etendo...', 'success');
     setTimeout(() => location.href = 'dashboard.html', 1800);
   });
 
@@ -234,15 +229,14 @@
     btn.disabled = true;
     btn.textContent = '⏳ Calculando...';
     try {
-      const res  = await fetch(`http://localhost:8081/generate-proposals?team=${team}`, { method: 'POST' });
-      const data = await res.json();
-      if (res.status === 409 || data.reason === 'already_running') {
-        OKR_toast('El agente ya está corriendo, esperá que termine', 'error');
+      const r = await OKR_triggerJob('friday');
+      if (!r.ok) {
+        OKR_toast('Error al disparar el agente (' + (r.error || r.status) + ')', 'error');
         btn.disabled = false;
         btn.textContent = '⚡ Recalcular con el agente';
         return;
       }
-      OKR_toast('Agente corriendo — las propuestas aparecerán en unos segundos', 'success');
+      OKR_toast('Agente corriendo — las propuestas aparecerán en unos minutos', 'success');
       const since = new Date().toISOString();
       const poll = setInterval(async () => {
         const { data: rows } = await sb.from('kr_proposals')

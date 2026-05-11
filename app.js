@@ -186,3 +186,42 @@
 
   window.OKR_renderTopbar = renderTopbar;
 })();
+
+// ─── GitHub Actions trigger ───────────────────────────────────────────────────
+// Reemplaza las llamadas a localhost:8081 — dispara un workflow_dispatch en GitHub
+// job: 'monday' | 'friday' | 'generate_backlog' | 'daily_sweep' | 'writeback' | 'market_intel'
+// inputs: objeto opcional, ej. { next_week: 'true' }
+window.OKR_triggerJob = async function(job, inputs) {
+  const cfg   = window.OKR_CONFIG || {};
+  const token = cfg.github_token;
+  const repo  = cfg.github_repo;
+
+  if (!token || token === 'REEMPLAZAR_CON_TOKEN') {
+    console.warn('[OKR] github_token no configurado en config.js');
+    return { ok: false, error: 'token_missing' };
+  }
+
+  const body = {
+    ref: 'main',
+    inputs: Object.assign({ job }, inputs || {}),
+  };
+
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${repo}/actions/workflows/cron.yml/dispatches`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept':        'application/vnd.github+json',
+          'Content-Type':  'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    // 204 = disparado OK; cualquier otro código es error
+    return { ok: res.status === 204, status: res.status };
+  } catch(e) {
+    return { ok: false, error: e.message };
+  }
+};

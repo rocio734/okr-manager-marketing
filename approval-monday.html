@@ -325,7 +325,7 @@
     // Delegar generación de tasks al backend (evita exponer API keys en el browser)
     try {
       const team = window.OKR_CONFIG?.team || 'marketing';
-      await fetch(`http://localhost:8081/generate-backlog?team=${encodeURIComponent(team)}`, { method: 'POST' });
+      await OKR_triggerJob('generate_backlog');
     } catch(e) {
       console.warn('Backend no disponible para generar backlog:', e);
     }
@@ -339,15 +339,14 @@
     btn.disabled = true;
     btn.textContent = '⏳ Generando...';
     try {
-      const res  = await fetch(`http://localhost:8081/generate-initiatives?team=${team}`, { method: 'POST' });
-      const data = await res.json();
-      if (res.status === 409 || data.reason === 'already_running') {
-        OKR_toast('El agente ya está corriendo, esperá que termine', 'error');
+      const r = await OKR_triggerJob('monday');
+      if (!r.ok) {
+        OKR_toast('Error al disparar el agente (' + (r.error || r.status) + ')', 'error');
         btn.disabled = false;
         btn.textContent = '⚡ Regenerar con el agente';
         return;
       }
-      OKR_toast('Agente corriendo — las iniciativas aparecerán en unos segundos', 'success');
+      OKR_toast('Agente corriendo — las iniciativas aparecerán en unos minutos', 'success');
       const since = new Date().toISOString();
       const poll = setInterval(async () => {
         const { data: rows } = await sb.from('initiatives')

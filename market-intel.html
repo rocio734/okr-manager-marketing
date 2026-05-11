@@ -216,7 +216,8 @@
     body.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Obteniendo datos del mercado en este momento...</div>';
     try {
       const since = new Date().toISOString();
-      await fetch(`http://localhost:8081/market-intel?team=${encodeURIComponent(team)}`, { method: 'POST' });
+      const r = await OKR_triggerJob('market_intel');
+      if (!r.ok) { OKR_toast('Error al disparar el job (' + (r.error || r.status) + ')', 'error'); btn.disabled = false; btn.textContent = '⚡ Actualizar análisis'; return; }
       const poll = setInterval(async () => {
         const { data } = await sb.from('market_intel')
           .select('*').eq('team', team)

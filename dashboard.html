@@ -212,7 +212,8 @@
           btnNext.innerHTML = '<span class="spinner"></span>Generando iniciativas...';
           try {
             const since = new Date().toISOString();
-            await fetch('http://localhost:8081/generate-initiatives?team=' + encodeURIComponent(team) + '&next_week=1', { method: 'POST' });
+            const r = await OKR_triggerJob('monday', { next_week: 'true' });
+            if (!r.ok) { OKR_toast('Error al disparar el agente (' + (r.error || r.status) + ')', 'error'); btnNext.disabled = false; btnNext.textContent = '▶ Generar iniciativas — semana siguiente'; return; }
             btnNext.innerHTML = '<span class="spinner"></span>Esperando al agente...';
             const poll = setInterval(async () => {
               const { data } = await sb.from('initiatives')
@@ -223,12 +224,7 @@
                 await render();
               }
             }, 3000);
-            setTimeout(() => { clearInterval(poll); btnNext.disabled = false; btnNext.textContent = '▶ Generar iniciativas — semana siguiente'; }, 120000);
-          } catch (e) {
-            OKR_toast('Backend no disponible.', 'error');
-            btnNext.disabled = false;
-            btnNext.textContent = '▶ Generar iniciativas — semana siguiente';
-          }
+            setTimeout(() => { clearInterval(poll); btnNext.disabled = false; btnNext.textContent = '▶ Generar iniciativas — semana siguiente'; }, 300000);
         };
       }
     } else {
@@ -277,10 +273,11 @@
     btn.innerHTML = '<span class="spinner"></span>Generando propuestas...';
 
     try {
-      await fetch('http://localhost:8081/generate-proposals?team=' + encodeURIComponent(team), { method: 'POST' });
+      const r = await OKR_triggerJob('friday');
+      if (!r.ok) { btn.disabled = false; btn.textContent = 'Proponer valores de KR'; OKR_toast('Error al disparar el agente (' + (r.error || r.status) + ')', 'error'); return; }
     } catch (e) {
       btn.disabled = false; btn.textContent = 'Proponer valores de KR';
-      OKR_toast('Backend no disponible. Corré ./start.sh primero.', 'error');
+      OKR_toast('Error al conectar con GitHub Actions.', 'error');
       return;
     }
     btn.innerHTML = '<span class="spinner"></span>Analizando evidencia de la semana...';
@@ -325,10 +322,11 @@
     const btn = document.getElementById('btn-generate');
     btn.disabled = true;
     try {
-      await fetch('http://localhost:8081/generate-initiatives?team=' + encodeURIComponent(team), { method: 'POST' });
+      const r = await OKR_triggerJob('monday');
+      if (!r.ok) { btn.disabled = false; OKR_toast('Error al disparar el agente (' + (r.error || r.status) + ')', 'error'); return; }
     } catch (e) {
       btn.disabled = false;
-      OKR_toast('Backend no disponible. Corré ./start.sh primero.', 'error');
+      OKR_toast('Error al conectar con GitHub Actions.', 'error');
       return;
     }
     btn.innerHTML = '<span class="spinner"></span>El agente está generando iniciativas...';
