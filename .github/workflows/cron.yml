@@ -71,6 +71,7 @@ jobs:
           ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
           RESEND_API_KEY:       ${{ secrets.RESEND_API_KEY }}
           SERPAPI_KEY:          ${{ secrets.SERPAPI_KEY }}
+          OPENAI_API_KEY:       ${{ secrets.OPENAI_API_KEY }}
           OKR_APPROVER_EMAIL:   ${{ vars.OKR_APPROVER_EMAIL }}
           OKR_SITE_URL:         ${{ vars.OKR_SITE_URL }}
         run: |

@@ -21,6 +21,7 @@ ETENDO_BASE = os.environ.get("ETENDO_BASE_URL") or os.environ.get("ETENDO_BASE",
 SUPABASE_URL  = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY")
 OPENAI_KEY    = os.environ.get("OPENAI_API_KEY")
+ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY")
 RESEND_KEY    = os.environ.get("RESEND_API_KEY")
 
 APPROVER_EMAIL = os.environ.get("OKR_APPROVER_EMAIL", "rocio.altamirano@smfconsulting.es")
@@ -130,7 +131,7 @@ def llm_call(prompt, max_tokens=2000):
         method="POST",
         headers={
             "Authorization": f"Bearer {OPENAI_KEY}",
-            "Content-Type": "application/json",
+            "Content-Type":  "application/json",
         },
     )
     try:
