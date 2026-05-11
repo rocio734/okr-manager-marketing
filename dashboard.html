@@ -225,6 +225,11 @@
               }
             }, 3000);
             setTimeout(() => { clearInterval(poll); btnNext.disabled = false; btnNext.textContent = '▶ Generar iniciativas — semana siguiente'; }, 300000);
+          } catch (e) {
+            OKR_toast('Error al disparar el agente.', 'error');
+            btnNext.disabled = false;
+            btnNext.textContent = '▶ Generar iniciativas — semana siguiente';
+          }
         };
       }
     } else {
