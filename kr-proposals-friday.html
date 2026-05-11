@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Manager — Viernes · Aprobar nuevos KRs</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .kr-card { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  .kr-card .left .label { font-size: 11px; opacity: 0.55; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .kr-card .left .name { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .kr-values { display: flex; gap: 18px; align-items: center; margin: 10px 0 14px; }
+  .kr-values .val { font-size: 22px; font-weight: 800; }
+  .kr-values .arrow { font-size: 22px; opacity: 0.5; }
+  .kr-values .new   { color: #FFD700; }
+  .kr-values input.edit-value { font-size: 22px; font-weight: 800; max-width: 140px; padding: 6px 10px; }
+  .rationale { font-size: 13px; line-height: 1.6; opacity: 0.88; }
+  .rationale h3 { margin-top: 0; }
+  .actions-row { display: flex; gap: 8px; margin-top: 12px; }
+  .summary-bar { position: sticky; bottom: 16px; background: rgba(15,15,26,0.96); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 14px 18px; margin-top: 28px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(8px); }
+  .kr-block.state-approved { border-color: rgba(72,199,142,0.4); background: rgba(72,199,142,0.05); }
+  .kr-block.state-rejected  { opacity: 0.45; border-color: rgba(255,107,107,0.3); }
+  .btn-approve { background: rgba(72,199,142,0.15); color: #48c78e; border: 1px solid rgba(72,199,142,0.4); }
+  .btn-approve.active { background: #48c78e; color: #0f0f1a; }
+  .btn-reject  { background: transparent; color: #ff6b6b; border: 1px solid rgba(255,107,107,0.4); }
+  .btn-reject.active  { background: #ff6b6b; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<div class="container">
+  <h1>Viernes — Aprobar nuevos KRs</h1>
+  <p class="lead">El agente analizó los avances de la semana y propone estos nuevos valores. Podés ajustarlos a mano antes de aprobar. Al aprobar, los nuevos valores se escriben en Etendo automáticamente.</p>
+
+  <div id="not-approver" style="display:none;">
+    <div class="empty">
+      Para aprobar tenés que iniciar sesión como aprobador.<br>
+      Click en "Iniciar sesión" arriba a la derecha.
+    </div>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div id="krs-block"></div>
+
+    <div class="summary-bar">
+      <div><span id="summary" class="muted">—</span></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" id="btn-generate" style="background:rgba(201,100,66,0.15);color:#e8a87c;border:1px solid rgba(201,100,66,0.4);">⚡ Recalcular con el agente</button>
+        <button class="btn btn-primary" id="btn-apply">Aprobar y escribir en Etendo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="empty" style="display:none;">
+    <div class="empty">
+      No hay propuestas pendientes esta semana.
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" id="btn-generate-empty">⚡ Calcular propuestas de KR con el agente</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  await OKR_renderTopbar('friday');
+
+  const sb = OKR_SB;
+  const team = window.OKR_CONFIG.team;
+  if (!sb) {
+    document.getElementById('content').innerHTML = '<div class="empty">Supabase no configurado.</div>';
+    document.getElementById('content').style.display = '';
+    return;
+  }
+
+  if (!await OKR_auth.isApprover()) {
+    document.getElementById('not-approver').style.display = '';
+    return;
+  }
+
+  // Cycle pendiente de KR approval
+  const { data: cycles } = await sb
+    .from('cycles').select('*')
+    .eq('team', team).eq('status', 'pending_kr_approval')
+    .order('week_start', { ascending: false }).limit(1);
+
+  if (!cycles || !cycles.length) {
+    document.getElementById('empty').style.display = '';
+    return;
+  }
+  const cycle = cycles[0];
+
+  const { data: proposals } = await sb
+    .from('kr_proposals').select('*')
+    .eq('cycle_id', cycle.id).eq('status', 'pending_approval')
+    .order('kr_id');
+
+  if (!proposals || !proposals.length) {
+    document.getElementById('empty').style.display = '';
+    return;
+  }
+
+  // Estado pending: id -> { action, value }
+  const pending = {};
+  proposals.forEach(p => { pending[p.id] = { action: 'pending', value: p.proposed_value }; });
+
+  const root = document.getElementById('krs-block');
+  root.innerHTML = proposals.map(propRow).join('');
+  document.getElementById('content').style.display = '';
+  refreshSummary();
+
+  function propRow(p) {
+    return `
+      <div class="card kr-block" data-id="${p.id}">
+        <div class="kr-card">
+          <div class="left">
+            <div class="label">${OKR_fmt.escapeHtml(p.kr_id)}</div>
+            <div class="name">${OKR_fmt.escapeHtml(p.kr_name)}</div>
+            <div class="kr-values">
+              <div><div class="hint">Valor actual</div><div class="val">${p.current_value ?? '—'}</div></div>
+              <div class="arrow">→</div>
+              <div>
+                <div class="hint">Valor propuesto</div>
+                <input class="edit-value" type="number" step="any" data-act="value" value="${p.proposed_value ?? ''}">
+              </div>
+            </div>
+            <div class="actions-row">
+              <button class="btn btn-sm btn-approve" data-act="set-approve">✓ Aprobar</button>
+              <button class="btn btn-sm btn-reject"  data-act="set-reject">✗ Rechazar</button>
+            </div>
+          </div>
+          <div class="right">
+            <div class="rationale">
+              <h3>Justificación del agente</h3>
+              <div style="white-space:pre-wrap;">${OKR_fmt.escapeHtml(p.rationale || '—')}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  root.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.matches('[data-act="set-approve"]')) {
+      const card = t.closest('.kr-block');
+      const id = Number(card.dataset.id);
+      pending[id].action = 'approve';
+      card.classList.remove('state-rejected'); card.classList.add('state-approved');
+      card.querySelector('[data-act="set-approve"]').classList.add('active');
+      card.querySelector('[data-act="set-reject"]').classList.remove('active');
+      refreshSummary();
+    } else if (t.matches('[data-act="set-reject"]')) {
+      const card = t.closest('.kr-block');
+      const id = Number(card.dataset.id);
+      pending[id].action = 'reject';
+      card.classList.remove('state-approved'); card.classList.add('state-rejected');
+      card.querySelector('[data-act="set-reject"]').classList.add('active');
+      card.querySelector('[data-act="set-approve"]').classList.remove('active');
+      refreshSummary();
+    }
+  });
+
+  root.addEventListener('input', (e) => {
+    if (e.target.matches('[data-act="value"]')) {
+      const card = e.target.closest('.kr-block');
+      const id = Number(card.dataset.id);
+      pending[id].value = e.target.value === '' ? null : Number(e.target.value);
+    }
+  });
+
+  function refreshSummary() {
+    const ap  = Object.values(pending).filter(p => p.action === 'approve').length;
+    const re  = Object.values(pending).filter(p => p.action === 'reject').length;
+    const pen = Object.values(pending).filter(p => p.action === 'pending').length;
+    document.getElementById('summary').textContent = `${ap} a aplicar · ${re} rechazadas · ${pen} sin decisión`;
+  }
+
+  document.getElementById('btn-apply').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-apply');
+    const toApply = Object.values(pending).filter(p => p.action === 'approve').length;
+    if (toApply === 0) {
+      OKR_toast('Aprobá al menos un KR para continuar.', 'error');
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Procesando...';
+
+    const me = await OKR_auth.getUser();
+    const myEmail = me ? me.email : null;
+    const nowIso = new Date().toISOString();
+
+    const updates = [];
+    for (const [id, p] of Object.entries(pending)) {
+      if (p.action === 'approve') {
+        updates.push(sb.from('kr_proposals').update({
+          status: 'approved',
+          proposed_value: p.value,
+          approved_at: nowIso, approved_by_email: myEmail,
+        }).eq('id', Number(id)));
+      } else if (p.action === 'reject') {
+        updates.push(sb.from('kr_proposals').update({ status: 'rejected' }).eq('id', Number(id)));
+      }
+      // pending → no se toca, no se actualiza en Etendo
+    }
+    updates.push(sb.from('cycles').update({
+      status: 'closed', closed_at: nowIso
+    }).eq('id', cycle.id));
+
+    const results = await Promise.all(updates);
+    const errors = results.filter(r => r.error);
+    if (errors.length) {
+      OKR_toast(errors[0].error.message, 'error');
+      btn.disabled = false; btn.textContent = 'Aprobar y escribir en Etendo';
+      return;
+    }
+
+    // Disparar writeback inmediato via backend local
+    try {
+      await fetch('http://localhost:8081/writeback', { method: 'POST' });
+      OKR_toast('✓ Aprobado. Escribiendo valores en Etendo...', 'success');
+    } catch (e) {
+      OKR_toast('Aprobado. El writeback correrá automáticamente en 5 minutos.', 'success');
+    }
+    setTimeout(() => location.href = 'dashboard.html', 1800);
+  });
+
+  // ── Botón "Calcular propuestas de KR" (barra principal + estado vacío) ────
+  async function runGenerateProposals(btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Calculando...';
+    try {
+      const res  = await fetch(`http://localhost:8081/generate-proposals?team=${team}`, { method: 'POST' });
+      const data = await res.json();
+      if (res.status === 409 || data.reason === 'already_running') {
+        OKR_toast('El agente ya está corriendo, esperá que termine', 'error');
+        btn.disabled = false;
+        btn.textContent = '⚡ Recalcular con el agente';
+        return;
+      }
+      OKR_toast('Agente corriendo — las propuestas aparecerán en unos segundos', 'success');
+      const since = new Date().toISOString();
+      const poll = setInterval(async () => {
+        const { data: rows } = await sb.from('kr_proposals')
+          .select('id').eq('cycle_id', cycle?.id || 0)
+          .eq('status', 'pending_approval').gte('created_at', since).limit(1);
+        if (rows && rows.length) { clearInterval(poll); location.reload(); }
+      }, 3000);
+      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Recalcular con el agente'; }, 120000);
+    } catch (e) {
+      OKR_toast('Backend local no disponible. Corré: python3 scripts/local_backend.py', 'error');
+      btn.disabled = false;
+      btn.textContent = '⚡ Recalcular con el agente';
+    }
+  }
+  document.getElementById('btn-generate')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
+  document.getElementById('btn-generate-empty')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
+})();
+</script>
+</body>
+</html>

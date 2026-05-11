@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Manager — Lunes · Aprobar iniciativas</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .approve-init { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: start; padding: 16px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.03); }
+  .approve-init.rejected { opacity: 0.45; }
+  .approve-init .body input.title-edit { font-size: 15px; font-weight: 700; background: transparent; border: 1px dashed transparent; padding: 6px 8px; }
+  .approve-init .body input.title-edit:focus { border-color: rgba(255,215,0,0.4); background: rgba(255,255,255,0.05); }
+  .approve-init .body textarea.plan-edit { font-size: 13px; opacity: 0.85; line-height: 1.55; min-height: 60px; margin-top: 6px; background: transparent; border: 1px dashed transparent; }
+  .approve-init .body textarea.plan-edit:focus { border-color: rgba(255,215,0,0.4); background: rgba(255,255,255,0.05); }
+  .approve-init .meta { font-size: 11px; opacity: 0.55; margin-top: 6px; }
+  .approve-init .meta strong { color: #FFD700; opacity: 0.85; }
+  .approve-init .actions { display:flex; flex-direction:column; gap:6px; min-width:90px; }
+  .approve-init.state-approved { border-color: rgba(72,199,142,0.4); background: rgba(72,199,142,0.05); }
+  .approve-init.state-rejected { opacity:0.45; border-color: rgba(255,80,80,0.3); }
+  .btn-approve { background: rgba(72,199,142,0.15); color: #48c78e; border: 1px solid rgba(72,199,142,0.4); }
+  .btn-approve:hover, .btn-approve.active { background: #48c78e; color: #0f0f1a; }
+  .btn-reject  { background: transparent; color: #ff6b6b; border: 1px solid rgba(255,107,107,0.4); }
+  .btn-reject:hover, .btn-reject.active  { background: #ff6b6b; color: #fff; }
+  .add-manual-form { background: rgba(79,195,247,0.06); border: 1px dashed rgba(79,195,247,0.4); border-radius: 10px; padding: 14px; margin-top: 10px; }
+  .add-manual-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .approve-actions { position: sticky; bottom: 16px; background: rgba(15,15,26,0.96); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 14px 18px; margin-top: 28px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(8px); }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<div class="container">
+  <h1>Lunes — Aprobar iniciativas</h1>
+  <p class="lead">Revisá las iniciativas propuestas para esta semana. Podés editarlas in-line, agregar manuales o rechazarlas. Cuando termines, click en "Aprobar batch" para arrancar el ciclo.</p>
+
+  <div id="not-approver" style="display:none;">
+    <div class="empty">
+      Para aprobar tenés que iniciar sesión como aprobador.<br>
+      Click en "Iniciar sesión" arriba a la derecha.
+    </div>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div id="krs-block"></div>
+
+    <div class="approve-actions">
+      <div>
+        <span id="summary" class="muted">—</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" id="btn-generate" style="background:rgba(201,100,66,0.15);color:#e8a87c;border:1px solid rgba(201,100,66,0.4);">⚡ Regenerar con el agente</button>
+        <button class="btn btn-ghost" id="btn-cancel">Descartar cambios</button>
+        <button class="btn btn-primary" id="btn-approve-batch">Aprobar batch</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="empty" style="display:none;">
+    <div class="empty">
+      No hay iniciativas pendientes de aprobación esta semana.
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" id="btn-generate-empty">⚡ Generar iniciativas con el agente</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  await OKR_renderTopbar('monday');
+
+  const sb = OKR_SB;
+  const team = window.OKR_CONFIG.team;
+
+  if (!sb) {
+    document.getElementById('content').innerHTML = '<div class="empty">Supabase no configurado.</div>';
+    document.getElementById('content').style.display = '';
+    return;
+  }
+
+  // Solo aprobador
+  if (!await OKR_auth.isApprover()) {
+    document.getElementById('not-approver').style.display = '';
+    return;
+  }
+
+  // Cycle pendiente
+  const { data: cycles } = await sb
+    .from('cycles').select('*')
+    .eq('team', team).eq('status', 'pending_initiative_approval')
+    .order('week_start', { ascending: false }).limit(1);
+
+  if (!cycles || !cycles.length) {
+    document.getElementById('empty').style.display = '';
+    return;
+  }
+  const cycle = cycles[0];
+
+  // Iniciativas propuestas
+  const { data: inits } = await sb
+    .from('initiatives').select('*')
+    .eq('cycle_id', cycle.id).in('status', ['proposed'])
+    .order('kr_id').order('created_at');
+
+  if (!inits || !inits.length) {
+    document.getElementById('empty').style.display = '';
+    return;
+  }
+
+  // Agrupar por KR
+  const byKr = {};
+  inits.forEach(i => {
+    byKr[i.kr_id] = byKr[i.kr_id] || { kr_id: i.kr_id, kr_name: i.kr_name, items: [] };
+    byKr[i.kr_id].items.push(i);
+  });
+
+  const root = document.getElementById('krs-block');
+  root.innerHTML = Object.values(byKr).map(kr => `
+    <div class="card kr-block" data-kr="${kr.kr_id}">
+      <div class="kr-meta">${OKR_fmt.escapeHtml(kr.kr_id)}</div>
+      <h2>${OKR_fmt.escapeHtml(kr.kr_name)}</h2>
+      <div style="margin-top:12px;">${kr.items.map(initRow).join('')}</div>
+      <button class="btn btn-sm" data-act="add-manual" data-kr-id="${OKR_fmt.escapeHtml(kr.kr_id)}" data-kr-name="${OKR_fmt.escapeHtml(kr.kr_name)}">+ Agregar iniciativa manual</button>
+      <div class="add-manual-slot"></div>
+    </div>
+  `).join('');
+
+  // Estado pendiente: lo que vamos a guardar al apretar "Aprobar batch"
+  const pending = {};   // id -> {action: pending|approve|reject, title?, plan?}
+  const newOnes = [];   // {tmp_id, kr_id, kr_name, title, plan}
+
+  inits.forEach(i => { pending[i.id] = { action: 'pending', title: i.title, plan: i.execution_plan }; });
+  document.getElementById('content').style.display = '';
+  refreshSummary();
+
+  function initRow(i) {
+    return `
+      <div class="approve-init" data-id="${i.id}">
+        <div class="body">
+          <input type="text" class="title-edit" data-field="title" value="${OKR_fmt.escapeHtml(i.title)}" maxlength="240">
+          <textarea class="plan-edit" data-field="plan" placeholder="Plan de ejecución...">${OKR_fmt.escapeHtml(i.execution_plan || '')}</textarea>
+          <div class="meta">
+            ${i.bottleneck ? `<strong>Bottleneck:</strong> ${OKR_fmt.escapeHtml(i.bottleneck)} · ` : ''}
+            ${i.fundamento ? `<strong>Fundamento:</strong> ${OKR_fmt.escapeHtml(i.fundamento)}` : ''}
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-sm btn-approve" data-act="set-approve">✓ Aprobar</button>
+          <button class="btn btn-sm btn-reject"  data-act="set-reject">✗ Rechazar</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Listeners
+  root.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.matches('[data-act="set-approve"]')) {
+      const wrap = t.closest('.approve-init');
+      const id = wrap.dataset.id;
+      pending[id].action = 'approve';
+      wrap.classList.remove('state-rejected'); wrap.classList.add('state-approved');
+      wrap.querySelector('[data-act="set-approve"]').classList.add('active');
+      wrap.querySelector('[data-act="set-reject"]').classList.remove('active');
+      refreshSummary();
+    } else if (t.matches('[data-act="set-reject"]')) {
+      const wrap = t.closest('.approve-init');
+      const id = wrap.dataset.id;
+      pending[id].action = 'reject';
+      wrap.classList.remove('state-approved'); wrap.classList.add('state-rejected');
+      wrap.querySelector('[data-act="set-reject"]').classList.add('active');
+      wrap.querySelector('[data-act="set-approve"]').classList.remove('active');
+      refreshSummary();
+    } else if (t.matches('[data-act="add-manual"]')) {
+      const block = t.closest('.kr-block');
+      const slot = block.querySelector('.add-manual-slot');
+      slot.innerHTML = `
+        <div class="add-manual-form">
+          <label>Título</label>
+          <input type="text" data-field="title" maxlength="240" placeholder="Ej: Lanzar A/B test en landing /agentic">
+          <div class="row">
+            <div>
+              <label>Plan de ejecución</label>
+              <textarea data-field="plan" placeholder="Pasos concretos..."></textarea>
+            </div>
+            <div>
+              <label>Bottleneck (opcional)</label>
+              <textarea data-field="bottleneck"></textarea>
+            </div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:6px;">
+            <button class="btn btn-success btn-sm" data-act="save-manual">Guardar</button>
+            <button class="btn btn-ghost btn-sm" data-act="cancel-manual">Cancelar</button>
+          </div>
+        </div>
+      `;
+    } else if (t.matches('[data-act="cancel-manual"]')) {
+      t.closest('.add-manual-form').remove();
+    } else if (t.matches('[data-act="save-manual"]')) {
+      const form = t.closest('.add-manual-form');
+      const block = t.closest('.kr-block');
+      const title = form.querySelector('[data-field="title"]').value.trim();
+      const plan  = form.querySelector('[data-field="plan"]').value.trim();
+      const bot   = form.querySelector('[data-field="bottleneck"]').value.trim();
+      if (!title) { OKR_toast('Falta título', 'error'); return; }
+      const trigger = block.querySelector('[data-act="add-manual"]');
+      const krId   = trigger.dataset.krId;
+      const krName = trigger.dataset.krName;
+      const tmpId = 'tmp-' + Math.random().toString(36).slice(2, 10);
+      newOnes.push({ tmp_id: tmpId, kr_id: krId, kr_name: krName, title, plan, bottleneck: bot });
+      // Render in-place
+      const node = document.createElement('div');
+      node.className = 'approve-init';
+      node.dataset.tmp = tmpId;
+      node.innerHTML = `
+        <div class="body">
+          <div class="init-title">${OKR_fmt.escapeHtml(title)} <span class="badge badge-suggested">manual</span></div>
+          ${plan ? `<div class="init-plan">${OKR_fmt.escapeHtml(plan)}</div>` : ''}
+        </div>
+        <div><button class="btn btn-sm" data-act="remove-manual" data-tmp="${tmpId}">Quitar</button></div>
+      `;
+      form.remove();
+      block.querySelector('.add-manual-slot').appendChild(node);
+      refreshSummary();
+    } else if (t.matches('[data-act="remove-manual"]')) {
+      const tmp = t.dataset.tmp;
+      const idx = newOnes.findIndex(n => n.tmp_id === tmp);
+      if (idx >= 0) newOnes.splice(idx, 1);
+      t.closest('.approve-init').remove();
+      refreshSummary();
+    }
+  });
+
+  // Capturar ediciones in-line
+  root.addEventListener('input', (e) => {
+    const wrap = e.target.closest('.approve-init');
+    if (!wrap || !wrap.dataset.id) return;
+    const id = wrap.dataset.id;
+    const field = e.target.dataset.field;
+    if (field === 'title') pending[id].title = e.target.value;
+    if (field === 'plan')  pending[id].plan  = e.target.value;
+  });
+
+  function refreshSummary() {
+    const approved  = Object.values(pending).filter(p => p.action === 'approve').length + newOnes.length;
+    const rejected  = Object.values(pending).filter(p => p.action === 'reject').length;
+    const pendingN  = Object.values(pending).filter(p => p.action === 'pending').length;
+    document.getElementById('summary').textContent =
+      `${approved} aprobadas · ${rejected} rechazadas · ${pendingN} sin decisión · ${newOnes.length} manuales`;
+  }
+
+  document.getElementById('btn-cancel').addEventListener('click', () => {
+    if (confirm('¿Descartar cambios y volver al dashboard?')) location.href = 'dashboard.html';
+  });
+
+  document.getElementById('btn-approve-batch').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-approve-batch');
+    const approved = Object.values(pending).filter(p => p.action === 'approve').length + newOnes.length;
+    if (approved === 0) {
+      OKR_toast('Aprobá al menos una iniciativa para continuar.', 'error');
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Procesando...';
+
+    const me = await OKR_auth.getUser();
+    const myEmail = me ? me.email : null;
+    const nowIso = new Date().toISOString();
+
+    // 1) Update existentes
+    const updates = [];
+    for (const [id, p] of Object.entries(pending)) {
+      if (p.action === 'approve') {
+        updates.push(sb.from('initiatives').update({
+          status: 'approved',
+          title: p.title,
+          execution_plan: p.plan,
+          approved_at: nowIso,
+          approved_by_email: myEmail,
+        }).eq('id', Number(id)));
+      } else if (p.action === 'reject') {
+        updates.push(sb.from('initiatives').update({
+          status: 'rejected',
+          rejection_reason: 'Rechazada en aprobación de lunes',
+        }).eq('id', Number(id)));
+      }
+      // pending → no se toca, queda como proposed
+    }
+
+    // 2) Insert manuales
+    const inserts = newOnes.map(n => sb.from('initiatives').insert({
+      cycle_id: cycle.id,
+      kr_id: n.kr_id, kr_name: n.kr_name,
+      title: n.title, execution_plan: n.plan,
+      bottleneck: n.bottleneck || null,
+      status: 'approved',
+      created_by: 'human',
+      created_by_email: myEmail,
+      approved_at: nowIso,
+      approved_by_email: myEmail,
+    }));
+
+    // 3) Cycle a in_progress
+    const cycleUpdate = sb.from('cycles').update({ status: 'in_progress' }).eq('id', cycle.id);
+
+    const results = await Promise.all([...updates, ...inserts, cycleUpdate]);
+    const errors = results.filter(r => r.error);
+
+    if (errors.length) {
+      OKR_toast('Algunos cambios fallaron: ' + errors[0].error.message, 'error');
+      btn.disabled = false; btn.textContent = 'Aprobar batch';
+      return;
+    }
+
+    const approvedIds = Object.entries(pending)
+      .filter(([, p]) => p.action === 'approve')
+      .map(([id]) => Number(id));
+
+    OKR_toast(`✓ ${approvedIds.length} iniciativas aprobadas. Generando backlog...`, 'success');
+    btn.textContent = 'Generando tasks...';
+
+    // Delegar generación de tasks al backend (evita exponer API keys en el browser)
+    try {
+      const team = window.OKR_CONFIG?.team || 'marketing';
+      await fetch(`http://localhost:8081/generate-backlog?team=${encodeURIComponent(team)}`, { method: 'POST' });
+    } catch(e) {
+      console.warn('Backend no disponible para generar backlog:', e);
+    }
+
+    OKR_toast('Tasks en generación. Revisá el dashboard en unos segundos.', 'success');
+    setTimeout(() => location.href = 'dashboard.html', 2000);
+  });
+
+  // ── Botón "Generar/Regenerar iniciativas" (barra + estado vacío) ──────────
+  async function runGenerateInitiatives(btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Generando...';
+    try {
+      const res  = await fetch(`http://localhost:8081/generate-initiatives?team=${team}`, { method: 'POST' });
+      const data = await res.json();
+      if (res.status === 409 || data.reason === 'already_running') {
+        OKR_toast('El agente ya está corriendo, esperá que termine', 'error');
+        btn.disabled = false;
+        btn.textContent = '⚡ Regenerar con el agente';
+        return;
+      }
+      OKR_toast('Agente corriendo — las iniciativas aparecerán en unos segundos', 'success');
+      const since = new Date().toISOString();
+      const poll = setInterval(async () => {
+        const { data: rows } = await sb.from('initiatives')
+          .select('id').eq('status', 'proposed').gte('created_at', since).limit(1);
+        if (rows && rows.length) { clearInterval(poll); location.reload(); }
+      }, 3000);
+      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Regenerar con el agente'; }, 120000);
+    } catch (e) {
+      OKR_toast('Backend local no disponible. Corré: python3 scripts/local_backend.py', 'error');
+      btn.disabled = false;
+      btn.textContent = '⚡ Regenerar con el agente';
+    }
+  }
+  document.getElementById('btn-generate')?.addEventListener('click', e => runGenerateInitiatives(e.currentTarget));
+  document.getElementById('btn-generate-empty')?.addEventListener('click', e => runGenerateInitiatives(e.currentTarget));
+})();
+</script>
+</body>
+</html>

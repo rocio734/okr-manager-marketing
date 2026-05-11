@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Manager — Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .action-banner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; background:rgba(255,215,0,0.07); border:1px solid rgba(255,215,0,0.25); border-radius:12px; padding:16px 20px; margin-bottom:24px; }
+  .action-banner .msg { font-size:15px; }
+  .action-banner .msg strong { color:#FFD700; }
+  .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.2); border-top-color:#FFD700; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<div class="container">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;">
+    <h1 style="margin:0;">Dashboard semanal</h1>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-ghost" id="btn-prev-week" style="padding:6px 14px;">← Anterior</button>
+      <span id="week-nav-label" style="font-size:13px;color:#555;min-width:80px;text-align:center;"></span>
+      <button class="btn btn-ghost" id="btn-next-week" style="padding:6px 14px;">Siguiente →</button>
+    </div>
+  </div>
+
+  <div id="action-area"></div>
+  <div id="cycle-info" class="card" style="display:none;">
+    <div id="cycle-info-body"></div>
+  </div>
+  <div id="krs-block">
+    <div class="loading">Cargando...</div>
+  </div>
+
+  <div id="next-week-area" style="margin-top:32px;display:none;">
+    <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#555;font-weight:700;margin-bottom:12px;">Siguiente semana</div>
+    <div class="action-banner" style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);">
+      <div class="msg" style="color:#888;">Podés preparar las iniciativas de la próxima semana mientras la actual sigue en curso.</div>
+      <button class="btn btn-ghost" id="btn-generate-next">▶ Generar iniciativas — semana siguiente</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  await OKR_renderTopbar('dashboard');
+
+  const sb     = OKR_SB;
+  const team   = window.OKR_CONFIG.team;
+  const isApp  = await OKR_auth.isApprover();
+  const root   = document.getElementById('krs-block');
+  const area   = document.getElementById('action-area');
+
+  if (!sb) {
+    root.innerHTML = '<div class="empty">Supabase no configurado.</div>';
+    return;
+  }
+
+  // viewOffset: semanas desde hoy (0 = esta semana, -1 = anterior, +1 = siguiente...)
+  let viewOffset = 0;
+
+  document.getElementById('btn-prev-week').addEventListener('click', () => { viewOffset--; render(); });
+  document.getElementById('btn-next-week').addEventListener('click', () => { viewOffset++; render(); });
+
+  await render();
+
+  async function render() {
+    root.innerHTML = '<div class="loading">Cargando...</div>';
+    area.innerHTML = '';
+
+    // Calcular la semana a mostrar según viewOffset
+    const todayDate  = new Date();
+    const viewDate   = new Date(todayDate);
+    viewDate.setDate(todayDate.getDate() + viewOffset * 7);
+    const viewStr    = viewDate.toISOString().slice(0, 10);
+    const todayStr   = todayDate.toISOString().slice(0, 10);
+    const isThisWeek = viewOffset === 0;
+
+    // Actualizar label de navegación
+    const navLabel = document.getElementById('week-nav-label');
+    navLabel.textContent = isThisWeek ? 'Esta semana' : (viewOffset < 0 ? `hace ${Math.abs(viewOffset)} sem.` : `+${viewOffset} sem.`);
+
+    // Buscar ciclo para la semana visualizada
+    const { data: activeCycles } = await sb.from('cycles').select('*')
+      .eq('team', team).lte('week_start', viewStr).gte('week_end', viewStr)
+      .order('week_start', { ascending: false }).limit(1);
+    const cycle = activeCycles && activeCycles[0];
+
+    // Ciclo futuro (solo cuando estamos viendo esta semana)
+    let nextCycle = null;
+    if (isThisWeek) {
+      const { data: futureCycles } = await sb.from('cycles').select('*')
+        .eq('team', team).neq('status', 'closed')
+        .gt('week_start', todayStr)
+        .order('week_start', { ascending: true }).limit(1);
+      nextCycle = futureCycles && futureCycles[0];
+    }
+
+    // Último ciclo (fallback para mostrar KRs aunque no haya activo)
+    const { data: anyCycles } = await sb.from('cycles').select('*')
+      .eq('team', team).order('week_start', { ascending: false }).limit(1);
+    const lastCycle = anyCycles && anyCycles[0];
+
+    // ── Sin ciclo activo ──────────────────────────────────────────────
+    if (!cycle && isThisWeek) {
+      if (isApp) showGenerateButton(null);
+    }
+
+    // ── Header del ciclo ──────────────────────────────────────────────
+    const info = document.getElementById('cycle-info');
+    if (cycle) {
+      const isCurrentCycle = cycle.week_start <= todayStr && cycle.week_end >= todayStr;
+      const weekTag = isCurrentCycle ? '' : ` <span style="font-size:11px;color:#555;font-weight:400;">(${viewOffset > 0 ? 'próxima semana' : 'semana anterior'})</span>`;
+      document.getElementById('cycle-info-body').innerHTML = `
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <div>
+            <div class="hint">Semana</div>
+            <div style="font-size:18px;font-weight:700;">${OKR_fmt.fmtDate(cycle.week_start)} — ${OKR_fmt.fmtDate(cycle.week_end)}${weekTag}</div>
+          </div>
+          <div>
+            <div class="hint">Estado</div>
+            <span class="badge badge-${cycleBadge(cycle.status)}">${cycle.status.replace(/_/g,' ')}</span>
+          </div>
+        </div>
+      `;
+      info.style.display = '';
+    } else {
+      info.style.display = 'none';
+    }
+
+    // ── Banners según estado (solo ciclo activo o visible) ───────────
+    if (cycle && cycle.status === 'pending_initiative_approval' && isApp) {
+      area.innerHTML = `
+        <div class="action-banner">
+          <div class="msg">Las iniciativas están listas. <strong>Revisalas y aprobá el batch</strong> para arrancar la semana.</div>
+          <a href="approval-monday.html" class="btn btn-primary">Revisar iniciativas →</a>
+        </div>`;
+    }
+    if (cycle && cycle.status === 'in_progress' && isApp && isThisWeek) {
+      area.innerHTML = `
+        <div class="action-banner">
+          <div class="msg">Ciclo activo. Cuando estés lista, <strong>proponé los nuevos valores de KR</strong> basándote en las iniciativas completadas.</div>
+          <button class="btn btn-primary" id="btn-propose">Proponer valores de KR</button>
+        </div>`;
+      document.getElementById('btn-propose').addEventListener('click', () => proposeKRs(cycle));
+    }
+    if (cycle && cycle.status === 'pending_kr_approval' && isApp) {
+      area.innerHTML = `
+        <div class="action-banner">
+          <div class="msg">Los nuevos valores de KR están listos. <strong>Revisalos y aprobá</strong> para escribirlos en Etendo.</div>
+          <a href="kr-proposals-friday.html" class="btn btn-primary">Revisar propuestas →</a>
+        </div>`;
+    }
+
+    // ── KRs + iniciativas ─────────────────────────────────────────────
+    const displayCycle = cycle || lastCycle;
+    const krSnapshot   = (displayCycle && displayCycle.kr_snapshot) || [];
+    const initsByKr    = {};
+
+    if (cycle) {
+      const { data: inits } = await sb.from('initiatives').select('*')
+        .eq('cycle_id', cycle.id)
+        .in('status', ['approved','suggested_completed','completed'])
+        .order('created_at', { ascending: true });
+      (inits || []).forEach(i => {
+        initsByKr[i.kr_id] = initsByKr[i.kr_id] || [];
+        initsByKr[i.kr_id].push(i);
+      });
+    }
+
+    if (!krSnapshot.length) {
+      root.innerHTML = '<div class="loading">Cargando KRs desde Etendo...</div>';
+      try {
+        const res = await fetch('http://localhost:8081/krs?team=' + encodeURIComponent(team));
+        const liveKrs = await res.json();
+        if (liveKrs && liveKrs.length) { renderKrCards(liveKrs, {}); return; }
+      } catch (e) { /* backend no disponible */ }
+      root.innerHTML = `<div class="empty">${cycle ? 'Sin KRs en el snapshot.' : 'No hay ciclo para esta semana.'}</div>`;
+      return;
+    }
+
+    renderKrCards(krSnapshot, initsByKr);
+
+    // ── Sección "Siguiente semana" (solo cuando vemos esta semana) ────
+    const nwa = document.getElementById('next-week-area');
+    if (isThisWeek && cycle && cycle.status !== 'closed') {
+      nwa.style.display = '';
+      const existingMsg = nwa.querySelector('.msg');
+      const btnNext     = nwa.querySelector('#btn-generate-next');
+
+      if (nextCycle) {
+        btnNext.style.display = 'none';
+        const weekLabel = OKR_fmt.fmtDate(nextCycle.week_start) + ' — ' + OKR_fmt.fmtDate(nextCycle.week_end);
+        const statusLabels = {
+          pending_initiative_approval: 'Iniciativas listas para aprobar',
+          in_progress:                 'Ciclo en curso',
+          pending_kr_approval:         'KRs listos para revisar',
+        };
+        const label = statusLabels[nextCycle.status] || nextCycle.status.replace(/_/g, ' ');
+        existingMsg.innerHTML = `Semana siguiente <strong>${weekLabel}</strong>: ${label}
+          <button class="btn btn-ghost" style="margin-left:10px;" onclick="document.getElementById('btn-next-week').click()">Ver →</button>`;
+      } else {
+        btnNext.style.display = '';
+        btnNext.onclick = async () => {
+          btnNext.disabled = true;
+          btnNext.innerHTML = '<span class="spinner"></span>Generando iniciativas...';
+          try {
+            const since = new Date().toISOString();
+            await fetch('http://localhost:8081/generate-initiatives?team=' + encodeURIComponent(team) + '&next_week=1', { method: 'POST' });
+            btnNext.innerHTML = '<span class="spinner"></span>Esperando al agente...';
+            const poll = setInterval(async () => {
+              const { data } = await sb.from('initiatives')
+                .select('id').eq('status', 'proposed').gte('created_at', since).limit(1);
+              if (data && data.length) {
+                clearInterval(poll);
+                OKR_toast('✓ Iniciativas listas', 'success');
+                await render();
+              }
+            }, 3000);
+            setTimeout(() => { clearInterval(poll); btnNext.disabled = false; btnNext.textContent = '▶ Generar iniciativas — semana siguiente'; }, 120000);
+          } catch (e) {
+            OKR_toast('Backend no disponible.', 'error');
+            btnNext.disabled = false;
+            btnNext.textContent = '▶ Generar iniciativas — semana siguiente';
+          }
+        };
+      }
+    } else {
+      nwa.style.display = 'none';
+    }
+  }
+
+  function renderKrCards(krs, initsByKr) {
+    // Agrupar KRs por objective
+    const byObj = {};
+    const objOrder = [];
+    for (const kr of krs) {
+      const obj = kr.objective || '(sin objetivo)';
+      if (!byObj[obj]) { byObj[obj] = []; objOrder.push(obj); }
+      byObj[obj].push(kr);
+    }
+
+    root.innerHTML = objOrder.map(obj => `
+      <div style="margin-bottom:32px;">
+        <h2 style="margin:0 0 12px;font-size:16px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;">${OKR_fmt.escapeHtml(obj)}</h2>
+        ${byObj[obj].map(kr => `
+          <div class="card kr-block">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <h3 style="margin:0;font-size:15px;">${OKR_fmt.escapeHtml(kr.name)}</h3>
+              <div style="display:flex;gap:16px;font-size:13px;opacity:0.7;">
+                ${kr.current != null ? `<span>Actual: <strong>${kr.current}</strong></span>` : ''}
+                ${kr.target  != null ? `<span>Target: <strong>${kr.target}</strong></span>`  : ''}
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              ${(initsByKr[kr.id] || []).length
+                ? (initsByKr[kr.id] || []).map(initRow).join('')
+                : `<div class="hint" style="padding:10px 0 4px;">Sin iniciativas aprobadas aún.</div>`
+              }
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  // ── Proponer valores de KR ────────────────────────────────────────
+  async function proposeKRs(cycle) {
+    const btn = document.getElementById('btn-propose');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Generando propuestas...';
+
+    try {
+      await fetch('http://localhost:8081/generate-proposals?team=' + encodeURIComponent(team), { method: 'POST' });
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Proponer valores de KR';
+      OKR_toast('Backend no disponible. Corré ./start.sh primero.', 'error');
+      return;
+    }
+    btn.innerHTML = '<span class="spinner"></span>Analizando evidencia de la semana...';
+    OKR_toast('Generando propuestas con IA...', 'success');
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      const { data } = await sb.from('kr_proposals')
+        .select('id').eq('cycle_id', cycle.id).limit(1);
+      if ((data && data.length) || attempts > 40) {
+        clearInterval(poll);
+        if (data && data.length) {
+          OKR_toast('Propuestas listas. Redirigiendo...', 'success');
+          setTimeout(() => location.href = 'kr-proposals-friday.html', 1000);
+        } else {
+          btn.disabled = false; btn.textContent = 'Proponer valores de KR';
+          OKR_toast('Tiempo agotado. Intentá de nuevo.', 'error');
+        }
+      }
+    }, 3000);
+  }
+
+  // ── Botón generar iniciativas ────────────────────────────────────
+  function showGenerateButton(closedCycle) {
+    const today  = new Date();
+    const dow    = today.getDay();
+    const diff   = (dow === 0 ? -6 : 1 - dow);
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    const label  = monday.toLocaleDateString('es-ES', { day:'2-digit', month:'short' });
+
+    area.innerHTML = `
+      <div class="action-banner">
+        <div class="msg">No hay ciclo activo. <strong>Generá las iniciativas de la semana del ${label}</strong>.</div>
+        <button class="btn btn-primary" id="btn-generate">▶ Generar iniciativas — semana del ${label}</button>
+      </div>`;
+
+    document.getElementById('btn-generate').addEventListener('click', () => generateInits());
+  }
+
+  async function generateInits() {
+    const btn = document.getElementById('btn-generate');
+    btn.disabled = true;
+    try {
+      await fetch('http://localhost:8081/generate-initiatives?team=' + encodeURIComponent(team), { method: 'POST' });
+    } catch (e) {
+      btn.disabled = false;
+      OKR_toast('Backend no disponible. Corré ./start.sh primero.', 'error');
+      return;
+    }
+    btn.innerHTML = '<span class="spinner"></span>El agente está generando iniciativas...';
+
+    OKR_toast('Generando iniciativas con IA...', 'success');
+    // Polling: espera que haya iniciativas en Supabase (no solo el cycle)
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      const { data: cs } = await sb.from('cycles').select('id')
+        .eq('team', team).eq('status', 'pending_initiative_approval').limit(1);
+      if (cs && cs.length) {
+        const { data: inits } = await sb.from('initiatives').select('id')
+          .eq('cycle_id', cs[0].id).limit(1);
+        if (inits && inits.length) {
+          clearInterval(poll);
+          OKR_toast('Iniciativas listas. Redirigiendo...', 'success');
+          setTimeout(() => location.href = 'approval-monday.html', 1000);
+          return;
+        }
+      }
+      if (attempts > 60) {
+        clearInterval(poll);
+        btn.disabled = false;
+        OKR_toast('Tiempo agotado. Intentá de nuevo.', 'error');
+      }
+    }, 3000);
+  }
+
+  // Escuchar cuando un ciclo pasa a closed para mostrar botón de nueva semana
+  if (sb) {
+    sb.channel('cycles-changes')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cycles' }, () => render())
+      .subscribe();
+  }
+
+  function initRow(i) {
+    const completed = ['completed','suggested_completed'].includes(i.status);
+    return `
+      <a href="initiative.html?id=${i.id}" class="initiative" style="text-decoration:none;color:inherit;">
+        <div class="init-body">
+          <div class="init-title ${completed ? 'completed' : ''}">${OKR_fmt.escapeHtml(i.title)}</div>
+          ${i.execution_plan ? `<div class="init-plan">${OKR_fmt.escapeHtml(i.execution_plan).slice(0,200)}${i.execution_plan.length>200?'…':''}</div>` : ''}
+          <div class="init-meta">${i.created_by==='human'?'✱ manual · ':''}${OKR_fmt.timeAgo(i.created_at)}</div>
+        </div>
+        <div class="init-actions">
+          <span class="badge badge-${i.status.replace('suggested_completed','suggested')}">${i.status.replace(/_/g,' ')}</span>
+        </div>
+      </a>`;
+  }
+
+  function cycleBadge(s) {
+    if (s === 'closed')                     return 'completed';
+    if (s === 'pending_initiative_approval') return 'proposed';
+    if (s === 'pending_kr_approval')         return 'suggested';
+    return 'approved';
+  }
+
+})();
+</script>
+</body>
+</html>

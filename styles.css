@@ -1,0 +1,178 @@
+/* =============================================================================
+   OKR Manager — estilos compartidos (mismo lenguaje visual que las presentations)
+   ============================================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #0f0f1a;
+  color: #fff;
+  min-height: 100vh;
+}
+
+a { color: #FFD700; text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font-family: 'Courier New', monospace; font-size: 0.9em; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; }
+
+/* ─── Top bar ─────────────────────────────────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #1a1a2e;
+}
+.topbar .brand { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+.topbar .brand .sub { font-size: 13px; font-weight: 400; opacity: 0.7; margin-left: 8px; }
+.topbar nav { display: flex; gap: 4px; }
+.topbar nav a {
+  color: #1a1a2e; padding: 7px 14px; border-radius: 16px;
+  font-size: 13px; font-weight: 700;
+}
+.topbar nav a:hover { background: rgba(0,0,0,0.1); text-decoration: none; }
+.topbar nav a.active { background: #1a1a2e; color: #FFD700; }
+.topbar .auth { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.topbar .auth button {
+  background: rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.25); color: #1a1a2e;
+  padding: 6px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.topbar .auth button:hover { background: rgba(0,0,0,0.25); }
+
+/* ─── Layout ──────────────────────────────────────────────────────────── */
+.container { max-width: 1200px; margin: 32px auto; padding: 0 32px 80px; }
+
+h1 { font-size: 30px; font-weight: 800; margin-bottom: 12px; }
+h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #FFD700; margin-bottom: 8px; margin-top: 18px; }
+
+.lead { font-size: 15px; opacity: 0.75; margin-bottom: 24px; line-height: 1.6; }
+.muted { opacity: 0.55; }
+.hint { font-size: 12px; opacity: 0.55; }
+
+/* ─── Cards / boxes ───────────────────────────────────────────────────── */
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 16px;
+}
+.card.kr-block { border-left: 4px solid #FFD700; padding-left: 18px; }
+.card.kr-block h2 { font-size: 18px; }
+.card.kr-block .kr-meta {
+  font-size: 11px; opacity: 0.55; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width: 800px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* ─── Initiative item ─────────────────────────────────────────────────── */
+.initiative {
+  display: flex; gap: 14px; padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; margin-bottom: 10px;
+  background: rgba(255,255,255,0.025);
+  transition: background 0.15s;
+}
+.initiative:hover { background: rgba(255,255,255,0.05); }
+.initiative .init-body { flex: 1; }
+.initiative .init-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.initiative .init-title.completed { text-decoration: line-through; opacity: 0.5; }
+.initiative .init-plan { font-size: 13px; opacity: 0.8; line-height: 1.55; margin-top: 6px; }
+.initiative .init-meta { font-size: 11px; opacity: 0.55; margin-top: 6px; letter-spacing: 0.5px; }
+.initiative .init-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+
+/* ─── Status badges ───────────────────────────────────────────────────── */
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 10px;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+}
+.badge-proposed   { background: rgba(255,215,0,0.18);   color: #FFD700; border: 1px solid rgba(255,215,0,0.4); }
+.badge-approved   { background: rgba(79,195,247,0.18);  color: #4FC3F7; border: 1px solid rgba(79,195,247,0.4); }
+.badge-completed  { background: rgba(165,214,167,0.22); color: #A5D6A7; border: 1px solid rgba(165,214,167,0.4); }
+.badge-suggested  { background: rgba(206,147,216,0.18); color: #CE93D8; border: 1px solid rgba(206,147,216,0.4); }
+.badge-rejected   { background: rgba(255,107,107,0.18); color: #FF6B6B; border: 1px solid rgba(255,107,107,0.4); }
+.badge-cancelled  { background: rgba(120,120,120,0.2);  color: #aaa;    border: 1px solid rgba(150,150,150,0.4); }
+
+/* ─── Buttons ─────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-block; padding: 7px 14px;
+  border-radius: 14px; border: 1px solid rgba(255,215,0,0.4);
+  background: rgba(255,215,0,0.1); color: #FFD700;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: inherit; letter-spacing: 0.3px;
+}
+.btn:hover { background: rgba(255,215,0,0.22); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary { background: #FFD700; color: #1a1a2e; border-color: #FFD700; }
+.btn-primary:hover { background: #FFB700; }
+.btn-danger { border-color: rgba(255,107,107,0.4); background: rgba(255,107,107,0.1); color: #FF6B6B; }
+.btn-danger:hover { background: rgba(255,107,107,0.22); }
+.btn-success { border-color: rgba(165,214,167,0.4); background: rgba(165,214,167,0.1); color: #A5D6A7; }
+.btn-success:hover { background: rgba(165,214,167,0.22); }
+.btn-ghost { background: transparent; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+
+/* ─── Forms ───────────────────────────────────────────────────────────── */
+input[type=text], input[type=email], input[type=number], textarea, select {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,215,0,0.2);
+  color: #fff;
+  font-family: inherit; font-size: 13px;
+  padding: 8px 12px; border-radius: 6px;
+  width: 100%;
+}
+textarea { min-height: 60px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: #FFD700; }
+label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 4px; display: block; }
+
+/* ─── Toast notifications ─────────────────────────────────────────────── */
+.toast-stack {
+  position: fixed; top: 80px; right: 20px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  background: rgba(15, 15, 26, 0.95);
+  border: 1px solid rgba(255,215,0,0.4);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  max-width: 360px;
+  animation: toastIn 0.25s ease-out;
+}
+.toast.success { border-color: rgba(165,214,167,0.5); }
+.toast.error   { border-color: rgba(255,107,107,0.5); }
+@keyframes toastIn {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ─── Loading ─────────────────────────────────────────────────────────── */
+.loading {
+  text-align: center; padding: 60px 20px; opacity: 0.6;
+  font-size: 14px; letter-spacing: 1px;
+}
+
+/* ─── Empty states ────────────────────────────────────────────────────── */
+.empty {
+  text-align: center; padding: 60px 20px; opacity: 0.55; font-size: 14px;
+  border: 2px dashed rgba(255,215,0,0.18);
+  border-radius: 12px;
+}
+
+/* ─── Modal (auth) ────────────────────────────────────────────────────── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999;
+  display: none; align-items: center; justify-content: center;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: #1a1a2e; border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 14px; padding: 28px 32px; max-width: 420px; width: 90%;
+}
+.modal h2 { color: #FFD700; }
+.modal p { font-size: 13px; opacity: 0.75; margin-bottom: 16px; line-height: 1.55; }
+.modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }

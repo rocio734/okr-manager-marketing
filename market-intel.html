@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Manager — Visión del Mercado</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .intel-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:28px; }
+  .intel-ts { font-size:12px; color:#555; }
+
+  .intel-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+  @media(max-width:700px){ .intel-grid { grid-template-columns:1fr; } }
+
+  .intel-card { background:#1a1a2e; border:1px solid #2a2a3e; border-radius:12px; padding:20px 22px; }
+  .intel-card h3 { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#555; font-weight:700; margin-bottom:14px; }
+
+  .resumen { background:#0f1520; border:1px solid rgba(255,215,0,0.2); border-radius:12px; padding:18px 22px; margin-bottom:24px; font-size:15px; line-height:1.7; color:#ccc; }
+  .resumen strong { color:#FFD700; }
+
+  /* Competidores */
+  .comp-row { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid #1e1e30; }
+  .comp-row:last-child { border-bottom:none; }
+  .comp-name { font-weight:700; font-size:14px; min-width:80px; color:#fff; }
+  .comp-body { flex:1; font-size:13px; color:#888; line-height:1.5; }
+  .comp-diff { font-size:12px; color:#4FC3F7; margin-top:3px; }
+  .threat { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:700; flex-shrink:0; }
+  .threat-alta  { background:#1a0505; border:1px solid #e5737340; color:#e57373; }
+  .threat-media { background:#1a1000; border:1px solid #ffb74d40; color:#ffb74d; }
+  .threat-baja  { background:#001a10; border:1px solid #10a37f40; color:#10a37f; }
+
+  /* Oportunidades */
+  .opp-item { padding:12px 0; border-bottom:1px solid #1e1e30; }
+  .opp-item:last-child { border-bottom:none; }
+  .opp-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .opp-canal { font-size:10px; padding:2px 8px; border-radius:4px; background:#0984e320; border:1px solid #0984e340; color:#74b9ff; font-weight:700; }
+  .opp-impacto { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:700; }
+  .imp-alto  { background:#001a10; border:1px solid #10a37f40; color:#6ee7b7; }
+  .imp-medio { background:#1a1000; border:1px solid #ffb74d30; color:#ffb74d; }
+  .imp-bajo  { background:#1a1a1a; border:1px solid #33333340; color:#666; }
+  .opp-desc  { font-size:14px; color:#ccc; margin-bottom:4px; }
+  .opp-accion { font-size:12px; color:#10a37f; }
+  .opp-accion::before { content:'→ '; }
+
+  /* Acciones semana */
+  .action-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid #1e1e30; }
+  .action-item:last-child { border-bottom:none; }
+  .action-urgencia { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:700; flex-shrink:0; white-space:nowrap; }
+  .urg-hoy        { background:#1a0505; border:1px solid #e5737340; color:#e57373; }
+  .urg-esta_semana { background:#1a1000; border:1px solid #ffb74d40; color:#ffb74d; }
+  .urg-este_mes   { background:#001020; border:1px solid #0984e330; color:#74b9ff; }
+  .action-body { flex:1; }
+  .action-text { font-size:14px; color:#ccc; }
+  .action-resp { font-size:11px; color:#555; margin-top:3px; }
+
+  /* SERP */
+  .serp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  @media(max-width:700px){ .serp-grid { grid-template-columns:1fr; } }
+  .serp-item { background:#0d0d1a; border:1px solid #1e1e30; border-radius:8px; padding:12px 14px; }
+  .serp-query { font-size:11px; color:#555; margin-bottom:6px; }
+  .serp-etendo { font-size:12px; margin-bottom:4px; }
+  .serp-top { font-size:11px; color:#444; line-height:1.6; }
+
+  /* SERP - posición badge */
+  .pos-badge { display:inline-block; padding:1px 6px; border-radius:3px; font-size:11px; font-weight:700; }
+  .pos-top3  { background:#001a10; border:1px solid #10a37f40; color:#10a37f; }
+  .pos-top10 { background:#1a1000; border:1px solid #ffb74d30; color:#ffb74d; }
+  .pos-out   { background:#1a0505; border:1px solid #e5737330; color:#e57373; }
+
+  .loading-msg { color:#555; font-size:14px; padding:40px 0; text-align:center; }
+  .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.15); border-top-color:#FFD700; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<div class="container">
+  <div class="intel-header">
+    <h1>Visión del Mercado</h1>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="intel-ts" id="intel-ts">—</span>
+      <button class="btn btn-primary" id="btn-refresh">⚡ Actualizar análisis</button>
+    </div>
+  </div>
+
+  <div id="intel-body">
+    <div class="loading-msg">Cargando último análisis...</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  await OKR_renderTopbar('market-intel');
+
+  const sb   = OKR_SB;
+  const team = window.OKR_CONFIG?.team || 'marketing';
+  const body = document.getElementById('intel-body');
+
+  function esc(s) { return OKR_fmt.escapeHtml(String(s || '')); }
+
+  function renderIntel(row) {
+    if (!row) {
+      body.innerHTML = '<div class="loading-msg">No hay análisis todavía. Hacé click en "Actualizar análisis" para generar uno.</div>';
+      return;
+    }
+    const a = row.analysis || {};
+    const ts = row.generated_at ? new Date(row.generated_at).toLocaleString('es-ES') : '—';
+    document.getElementById('intel-ts').textContent = `Último análisis: ${ts}`;
+
+    const serp = row.serp_data || [];
+
+    body.innerHTML = `
+
+      ${a.resumen_ejecutivo ? `
+      <div class="resumen">${esc(a.resumen_ejecutivo)}</div>` : ''}
+
+      <div class="intel-grid">
+
+        <!-- Posición Etendo -->
+        ${a.posicion_etendo ? `
+        <div class="intel-card">
+          <h3>Posición de Etendo</h3>
+          ${(a.posicion_etendo.fortalezas||[]).length ? `
+            <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#10a37f;margin-bottom:8px;font-weight:700;">Fortalezas</div>
+            ${(a.posicion_etendo.fortalezas||[]).map(f=>`<div style="font-size:13px;color:#aaa;padding:4px 0;border-bottom:1px solid #1e1e30;">✓ ${esc(f)}</div>`).join('')}
+          ` : ''}
+          ${(a.posicion_etendo.brechas||[]).length ? `
+            <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#e57373;margin:14px 0 8px;font-weight:700;">Brechas</div>
+            ${(a.posicion_etendo.brechas||[]).map(b=>`<div style="font-size:13px;color:#aaa;padding:4px 0;border-bottom:1px solid #1e1e30;">✗ ${esc(b)}</div>`).join('')}
+          ` : ''}
+        </div>` : ''}
+
+        <!-- Acciones esta semana -->
+        ${(a.acciones_semana||[]).length ? `
+        <div class="intel-card">
+          <h3>Acciones esta semana</h3>
+          ${(a.acciones_semana||[]).map(ac=>`
+            <div class="action-item">
+              <span class="action-urgencia urg-${esc(ac.urgencia)}">${esc(ac.urgencia).replace('_',' ')}</span>
+              <div class="action-body">
+                <div class="action-text">${esc(ac.accion)}</div>
+                <div class="action-resp">${esc(ac.responsable)}</div>
+              </div>
+            </div>`).join('')}
+        </div>` : ''}
+
+      </div>
+
+      <!-- Competidores -->
+      ${(a.competidores||[]).length ? `
+      <div class="intel-card" style="margin-bottom:16px;">
+        <h3>Competidores detectados</h3>
+        ${(a.competidores||[]).map(c=>`
+          <div class="comp-row">
+            <div class="comp-name">${esc(c.nombre)}</div>
+            <div class="comp-body">
+              <div>${esc(c.movimiento_detectado)}</div>
+              <div class="comp-diff">${esc(c.diferenciador_vs_etendo)}</div>
+            </div>
+            <span class="threat threat-${esc(c.amenaza)}">${esc(c.amenaza)}</span>
+          </div>`).join('')}
+      </div>` : ''}
+
+      <!-- Oportunidades -->
+      ${(a.oportunidades||[]).length ? `
+      <div class="intel-card" style="margin-bottom:16px;">
+        <h3>Oportunidades detectadas</h3>
+        ${(a.oportunidades||[]).map(o=>`
+          <div class="opp-item">
+            <div class="opp-top">
+              <span class="opp-canal">${esc(o.canal)}</span>
+              <span class="opp-impacto imp-${esc(o.impacto)}">${esc(o.impacto)}</span>
+            </div>
+            <div class="opp-desc">${esc(o.descripcion)}</div>
+            <div class="opp-accion">${esc(o.accion_concreta)}</div>
+          </div>`).join('')}
+      </div>` : ''}
+
+      <!-- SERP data -->
+      ${serp.length ? `
+      <div class="intel-card">
+        <h3>Posicionamiento Google (España)</h3>
+        <div class="serp-grid">
+          ${serp.map(r=>{
+            const posClass = !r.etendo_position ? 'pos-out' : r.etendo_position<=3 ? 'pos-top3' : 'pos-top10';
+            const posText  = !r.etendo_position ? 'fuera top10' : `#${r.etendo_position}`;
+            return `
+            <div class="serp-item">
+              <div class="serp-query">${esc(r.label)} — "${esc(r.query)}"</div>
+              <div class="serp-etendo">Etendo: <span class="pos-badge ${posClass}">${posText}</span></div>
+              <div class="serp-top">${(r.top5||[]).slice(0,3).map(x=>`${x.pos}. ${esc(x.title.slice(0,50))}`).join('<br>')}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+    `;
+  }
+
+  const MAX_AGE_HOURS = 24; // datos frescos = menos de 24h
+
+  function isStale(row) {
+    if (!row?.generated_at) return true;
+    const age = (Date.now() - new Date(row.generated_at)) / 3600000;
+    return age > MAX_AGE_HOURS;
+  }
+
+  async function triggerRefresh() {
+    const btn = document.getElementById('btn-refresh');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Analizando mercado...';
+    body.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Obteniendo datos del mercado en este momento...</div>';
+    try {
+      const since = new Date().toISOString();
+      await fetch(`http://localhost:8081/market-intel?team=${encodeURIComponent(team)}`, { method: 'POST' });
+      const poll = setInterval(async () => {
+        const { data } = await sb.from('market_intel')
+          .select('*').eq('team', team)
+          .gte('generated_at', since)
+          .order('generated_at', { ascending: false }).limit(1);
+        if (data && data.length) {
+          clearInterval(poll);
+          renderIntel(data[0]);
+          btn.disabled = false;
+          btn.textContent = '⚡ Actualizar análisis';
+          OKR_toast('✓ Análisis del día listo', 'success');
+        }
+      }, 3000);
+      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Actualizar análisis'; }, 120000);
+    } catch (e) {
+      body.innerHTML = '<div class="loading-msg">Backend no disponible. Corré ./start.sh primero.</div>';
+      btn.disabled = false;
+      btn.textContent = '⚡ Actualizar análisis';
+    }
+  }
+
+  // Cargar último análisis — si está desactualizado, regenerar automáticamente
+  async function loadLatest() {
+    if (!sb) { body.innerHTML = '<div class="loading-msg">Supabase no configurado.</div>'; return null; }
+    try {
+      const { data } = await sb.from('market_intel')
+        .select('*').eq('team', team)
+        .order('generated_at', { ascending: false }).limit(1);
+      return data && data[0];
+    } catch (e) {
+      body.innerHTML = '<div class="loading-msg">Tabla market_intel no encontrada. Ejecutá <code>sql/market_intel_table.sql</code> en Supabase y recargá.</div>';
+      return null;
+    }
+  }
+
+  const latest = await loadLatest();
+  if (latest === null) {
+    // tabla no existe, ya mostró el mensaje
+  } else if (isStale(latest)) {
+    // Sin datos de hoy → regenerar automáticamente
+    const ageMsg = latest
+      ? `El último análisis tiene ${Math.round((Date.now()-new Date(latest.generated_at))/3600000)}h — se necesita uno de hoy.`
+      : 'No hay análisis todavía.';
+    body.innerHTML = `<div class="loading-msg"><span class="spinner"></span>${ageMsg} Obteniendo datos actuales...</div>`;
+    await triggerRefresh();
+  } else {
+    renderIntel(latest);
+  }
+
+  document.getElementById('btn-refresh').addEventListener('click', triggerRefresh);
+
+  // Realtime: si llega nuevo análisis, actualizar automáticamente
+  sb?.channel('market-intel-live')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'market_intel' }, payload => {
+      if (payload.new?.team === team) renderIntel(payload.new);
+    })
+    .subscribe();
+})();
+</script>
+</body>
+</html>

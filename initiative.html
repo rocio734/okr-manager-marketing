@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Manager — Iniciativa</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .task-row { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; margin-bottom: 6px; background: rgba(255,255,255,0.025); }
+  .task-row.done .task-title { text-decoration: line-through; opacity: 0.5; }
+  .task-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #FFD700; cursor: pointer; }
+  .task-row .task-title { font-size: 13px; }
+  .task-row input.evidence-input { font-size: 11px; padding: 4px 8px; max-width: 220px; }
+
+  .progress-entry { padding: 12px 14px; background: rgba(255,255,255,0.04); border-left: 3px solid rgba(255,215,0,0.5); border-radius: 4px; margin-bottom: 8px; }
+  .progress-entry .author { font-size: 12px; font-weight: 700; color: #FFD700; }
+  .progress-entry .when   { font-size: 10px; opacity: 0.5; margin-left: 8px; }
+  .progress-entry .body   { font-size: 13px; line-height: 1.55; opacity: 0.92; margin-top: 4px; white-space: pre-wrap; }
+  .progress-entry .files  { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .progress-entry .files a { font-size: 11px; padding: 3px 8px; background: rgba(79,195,247,0.1); border: 1px solid rgba(79,195,247,0.3); border-radius: 6px; color: #4FC3F7; }
+
+  .progress-form { display: grid; gap: 8px; padding: 14px; border: 1px dashed rgba(255,215,0,0.3); border-radius: 10px; }
+  .progress-form .row { display: grid; grid-template-columns: 200px 1fr; gap: 8px; }
+  .progress-form button { justify-self: start; }
+
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 14px 0; }
+  .meta-grid .meta-item { font-size: 13px; }
+  .meta-grid .meta-item h3 { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<div class="container">
+  <p><a href="dashboard.html">← Dashboard</a></p>
+
+  <div id="root">
+    <div class="loading">Cargando iniciativa...</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  await OKR_renderTopbar('dashboard');
+
+  const sb = OKR_SB;
+  const root = document.getElementById('root');
+  const id = Number(new URLSearchParams(location.search).get('id'));
+  if (!id) { root.innerHTML = '<div class="empty">Falta el id en la URL.</div>'; return; }
+
+  let init, tasks = [], entries = [];
+
+  async function load() {
+    const [a, b, c] = await Promise.all([
+      sb.from('initiatives').select('*').eq('id', id).single(),
+      sb.from('tasks').select('*').eq('initiative_id', id).order('created_at'),
+      sb.from('progress_entries').select('*').eq('initiative_id', id).order('created_at'),
+    ]);
+    if (a.error) { root.innerHTML = `<div class="empty">No se encontró: ${OKR_fmt.escapeHtml(a.error.message)}</div>`; return false; }
+    init = a.data; tasks = b.data || []; entries = c.data || [];
+    return true;
+  }
+
+  if (!await load()) return;
+  render();
+
+  function render() {
+    const isApproverPromise = OKR_auth.isApprover();
+    isApproverPromise.then(isApp => doRender(isApp));
+  }
+
+  function doRender(isApp) {
+    const completed = ['completed','suggested_completed'].includes(init.status);
+    root.innerHTML = `
+      <h1 ${completed ? 'style="text-decoration:line-through;opacity:0.6;"' : ''}>${OKR_fmt.escapeHtml(init.title)}</h1>
+      <p class="lead">
+        <span class="badge badge-${init.status.replace('suggested_completed','suggested')}">${init.status.replace(/_/g,' ')}</span>
+        <span class="muted" style="margin-left:8px;">KR: ${OKR_fmt.escapeHtml(init.kr_name)} · ${OKR_fmt.escapeHtml(init.kr_id)}</span>
+      </p>
+
+      <div class="card">
+        <h3>Plan de ejecución</h3>
+        <div style="white-space:pre-wrap;font-size:14px;line-height:1.65;">${OKR_fmt.escapeHtml(init.execution_plan || '—')}</div>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <h3>Bottleneck</h3>
+            <div>${OKR_fmt.escapeHtml(init.bottleneck || '—')}</div>
+          </div>
+          <div class="meta-item">
+            <h3>Fundamento</h3>
+            <div>${OKR_fmt.escapeHtml(init.fundamento || '—')}</div>
+          </div>
+        </div>
+
+        ${isApp ? renderApproverActions() : ''}
+      </div>
+
+      <div class="card">
+        <h3>Backlog de tasks</h3>
+        ${tasks.length ? tasks.map(taskRow).join('') : '<div class="hint">El agente todavía no generó tasks. Generadas automáticamente al aprobar la iniciativa.</div>'}
+      </div>
+
+      <div class="card">
+        <h3>Avances y material (${entries.length})</h3>
+        <div id="entries-list">
+          ${entries.length ? entries.map(entryRow).join('') : '<div class="hint">Sin avances todavía. Sé el primero en cargar uno.</div>'}
+        </div>
+
+        <form class="progress-form" id="entry-form" style="margin-top:14px;">
+          <div class="row">
+            <input type="text" name="author" placeholder="Tu nombre" required maxlength="60">
+            <input type="email" name="email"  placeholder="Email (opcional)" maxlength="120">
+          </div>
+          <textarea name="body" placeholder="¿Qué avanzaste? ¿Qué material agregás?" required maxlength="3000"></textarea>
+          <div class="row">
+            <input type="file" name="file" multiple>
+            <button class="btn btn-primary" type="submit">Cargar avance</button>
+          </div>
+          <div class="hint">Los archivos se suben a Supabase Storage en bucket <code>progress</code>.</div>
+        </form>
+      </div>
+    `;
+
+    bindHandlers(isApp);
+  }
+
+  function renderApproverActions() {
+    const buttons = [];
+    if (init.status === 'suggested_completed') {
+      buttons.push('<button class="btn btn-success btn-sm" data-act="confirm-completed">Confirmar como completada</button>');
+      buttons.push('<button class="btn btn-sm" data-act="reopen">Re-abrir</button>');
+    } else if (init.status === 'approved') {
+      buttons.push('<button class="btn btn-success btn-sm" data-act="mark-completed">Marcar completada</button>');
+      buttons.push('<button class="btn btn-danger btn-sm" data-act="cancel">Cancelar iniciativa</button>');
+    }
+    if (!buttons.length) return '';
+    return `<div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;">${buttons.join('')}</div>`;
+  }
+
+  function taskRow(t) {
+    const done = t.status === 'done';
+    return `
+      <div class="task-row ${done ? 'done' : ''}" data-id="${t.id}">
+        <input type="checkbox" data-act="toggle-task" ${done ? 'checked' : ''}>
+        <div class="task-title">${OKR_fmt.escapeHtml(t.title)}${t.description ? ` <span class="muted" style="font-size:11px;">— ${OKR_fmt.escapeHtml(t.description)}</span>` : ''}</div>
+        <input type="text" class="evidence-input" data-act="evidence" placeholder="Link evidencia..." value="${OKR_fmt.escapeHtml(t.evidence_url || '')}">
+      </div>
+    `;
+  }
+
+  function entryRow(e) {
+    const files = (e.attachment_urls || []).map(u =>
+      `<a href="${OKR_fmt.escapeHtml(u)}" target="_blank" rel="noopener">📎 archivo</a>`
+    ).join('');
+    return `
+      <div class="progress-entry">
+        <span class="author">${OKR_fmt.escapeHtml(e.author_name)}</span>
+        <span class="when">${OKR_fmt.escapeHtml(OKR_fmt.timeAgo(e.created_at))}</span>
+        <div class="body">${OKR_fmt.escapeHtml(e.body)}</div>
+        ${files ? `<div class="files">${files}</div>` : ''}
+      </div>
+    `;
+  }
+
+  function bindHandlers(isApp) {
+    // Approver buttons
+    root.addEventListener('click', async (e) => {
+      const t = e.target;
+      if (t.matches('[data-act="confirm-completed"]')) {
+        await sb.from('initiatives').update({
+          status: 'completed', completed_at: new Date().toISOString()
+        }).eq('id', id);
+        OKR_toast('Marcada como completada', 'success'); reloadAndRender();
+      } else if (t.matches('[data-act="reopen"]')) {
+        await sb.from('initiatives').update({ status: 'approved', completed_at: null }).eq('id', id);
+        OKR_toast('Re-abierta', 'success'); reloadAndRender();
+      } else if (t.matches('[data-act="mark-completed"]')) {
+        await sb.from('initiatives').update({
+          status: 'completed', completed_at: new Date().toISOString()
+        }).eq('id', id);
+        OKR_toast('Marcada como completada', 'success'); reloadAndRender();
+      } else if (t.matches('[data-act="cancel"]')) {
+        if (!confirm('¿Cancelar esta iniciativa?')) return;
+        await sb.from('initiatives').update({ status: 'cancelled' }).eq('id', id);
+        OKR_toast('Cancelada', 'success'); reloadAndRender();
+      }
+    });
+
+    // Task toggle (anyone can do it)
+    root.addEventListener('change', async (e) => {
+      if (e.target.matches('[data-act="toggle-task"]')) {
+        const row = e.target.closest('.task-row');
+        const taskId = Number(row.dataset.id);
+        const newStatus = e.target.checked ? 'done' : 'pending';
+        const completed_at = e.target.checked ? new Date().toISOString() : null;
+        const { error } = await sb.from('tasks').update({ status: newStatus, completed_at }).eq('id', taskId);
+        if (error) { OKR_toast(error.message, 'error'); e.target.checked = !e.target.checked; return; }
+        row.classList.toggle('done', e.target.checked);
+      }
+    });
+
+    // Evidence url save on blur
+    root.addEventListener('change', async (e) => {
+      if (e.target.matches('[data-act="evidence"]')) {
+        const row = e.target.closest('.task-row');
+        const taskId = Number(row.dataset.id);
+        await sb.from('tasks').update({ evidence_url: e.target.value.trim() || null }).eq('id', taskId);
+        OKR_toast('Evidencia guardada', 'success');
+      }
+    });
+
+    // Submit progress entry
+    const form = document.getElementById('entry-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const author = (fd.get('author') || '').trim();
+      const email  = (fd.get('email')  || '').trim();
+      const body   = (fd.get('body')   || '').trim();
+      const files  = form.querySelector('input[type="file"]').files;
+      if (!author || !body) return;
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true; submitBtn.textContent = 'Subiendo...';
+
+      // Upload files
+      const urls = [];
+      for (const f of files) {
+        const safeName = `${id}/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
+        const { error: upErr } = await sb.storage.from('progress').upload(safeName, f, { upsert: false });
+        if (upErr) { OKR_toast('Error subiendo: ' + upErr.message, 'error'); continue; }
+        const { data: pub } = sb.storage.from('progress').getPublicUrl(safeName);
+        if (pub && pub.publicUrl) urls.push(pub.publicUrl);
+      }
+
+      const { error } = await sb.from('progress_entries').insert({
+        initiative_id: id,
+        author_name: author, author_email: email || null,
+        body, attachment_urls: urls,
+      });
+
+      submitBtn.disabled = false; submitBtn.textContent = 'Cargar avance';
+      if (error) { OKR_toast(error.message, 'error'); return; }
+      OKR_toast('Avance cargado', 'success');
+      form.reset();
+      reloadAndRender();
+    });
+  }
+
+  async function reloadAndRender() {
+    if (await load()) render();
+  }
+})();
+</script>
+</body>
+</html>
