@@ -4,7 +4,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ENV  = ROOT.parent / ".env"
-CONFIGS_DIR = ROOT.parent / "reports" / "okr_coach_configs"
+# Buscar configs: primero en config/ (dentro del repo), luego en reports/okr_coach_configs/ (local)
+CONFIGS_DIR = ROOT / "config" if (ROOT / "config").exists() else ROOT.parent / "reports" / "okr_coach_configs"
 
 # Cargar .env
 if ENV.exists():

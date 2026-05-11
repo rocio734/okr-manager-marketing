@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "configured_at": "2026-05-04T14:40:10.433383",
+  "etendo": {
+    "base_url": "https://futit-staff.etendo.cloud",
+    "user": "Rocio Altamirano",
+    "user_id": "E0E19E030E18448D9BCEB77CEE386652",
+    "role_id": "11A221E338C54D01BCA31700C0395C73"
+  },
+  "period": {
+    "id": "1DE7A083B91946B898B5D33F47B3DEC7",
+    "name": "Q2 2026"
+  },
+  "team": {
+    "id": "DC3572B9E6124FB6968958A498244925",
+    "name": "Marketing"
+  },
+  "email": {
+    "recipient": "rocio.altamirano@smfconsulting.es"
+  },
+  "metric_integrations": []
+}
