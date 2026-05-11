@@ -118,36 +118,43 @@ def sb_request(method, path, body=None):
         return json.loads(text) if text else None
 
 
-def llm_call(prompt, max_tokens=2000):
-    """Llamada a OpenAI API. Devuelve el texto de la respuesta."""
+def llm_call(prompt, max_tokens=2000, retries=3):
+    """Llamada a OpenAI API con reintentos ante errores 5xx."""
+    import time
     body = {
         "model": "gpt-4.1",
         "max_tokens": max_tokens,
         "messages": [{"role": "user", "content": prompt}],
     }
-    req = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
-        data=json.dumps(body).encode(),
-        method="POST",
-        headers={
-            "Authorization": f"Bearer {OPENAI_KEY}",
-            "Content-Type":  "application/json",
-        },
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=90) as r:
-            resp = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        err_body = e.read().decode()
-        raise RuntimeError(f"OpenAI API {e.code}: {err_body}") from e
-    text = resp["choices"][0]["message"]["content"].strip()
-    # Quitar fences
-    if text.startswith("```"):
-        text = text.split("```", 2)[1]
-        if text.startswith("json"):
-            text = text[4:].strip()
-        text = text.rstrip("`").strip()
-    return text
+    last_err = None
+    for attempt in range(retries):
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=json.dumps(body).encode(),
+            method="POST",
+            headers={
+                "Authorization": f"Bearer {OPENAI_KEY}",
+                "Content-Type":  "application/json",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=90) as r:
+                resp = json.loads(r.read())
+            text = resp["choices"][0]["message"]["content"].strip()
+            if text.startswith("```"):
+                text = text.split("```", 2)[1]
+                if text.startswith("json"):
+                    text = text[4:].strip()
+                text = text.rstrip("`").strip()
+            return text
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode()
+            last_err = RuntimeError(f"OpenAI API {e.code}: {err_body}")
+            if e.code < 500:
+                raise last_err  # 4xx no reintentamos
+            print(f"  [llm_call] intento {attempt+1}/{retries} falló con {e.code}, reintentando...")
+            time.sleep(5 * (attempt + 1))
+    raise last_err
 
 
 def send_email(to_email, subject, html):
