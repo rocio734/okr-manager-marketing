@@ -4,7 +4,9 @@ on:
   schedule:
     # Lunes 9am España (UTC+2 en verano = 7 UTC)
     - cron: '0 7 * * 1'
-    # Diario 8pm España = 18 UTC
+    # Diario 7:30am España = 5:30 UTC — market intel
+    - cron: '30 5 * * *'
+    # Diario 8pm España = 18 UTC — daily sweep
     - cron: '0 18 * * *'
     # Viernes 5pm España = 15 UTC
     - cron: '0 15 * * 5'
@@ -17,7 +19,7 @@ on:
         required: true
         default: 'monday'
         type: choice
-        options: [monday, generate_backlog, daily_sweep, friday, writeback]
+        options: [monday, generate_backlog, daily_sweep, friday, writeback, market_intel]
 
 jobs:
   run:
@@ -27,6 +29,9 @@ jobs:
 
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
+
+      - name: Install Python dependencies
+        run: pip install anthropic httpx requests python-dotenv
 
       - name: Install Playwright (solo para writeback)
         if: github.event.schedule == '*/5 * * * *' || github.event.inputs.job == 'writeback'
@@ -42,6 +47,7 @@ jobs:
           else
             case "${{ github.event.schedule }}" in
               "0 7 * * 1")    echo "job=monday"            >> $GITHUB_OUTPUT ;;
+              "30 5 * * *")   echo "job=market_intel"      >> $GITHUB_OUTPUT ;;
               "0 18 * * *")   echo "job=daily_sweep"       >> $GITHUB_OUTPUT ;;
               "0 15 * * 5")   echo "job=friday"            >> $GITHUB_OUTPUT ;;
               "*/5 * * * *")  echo "job=writeback"         >> $GITHUB_OUTPUT ;;
@@ -56,15 +62,16 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
           RESEND_API_KEY:       ${{ secrets.RESEND_API_KEY }}
+          SERPAPI_KEY:          ${{ secrets.SERPAPI_KEY }}
           OKR_APPROVER_EMAIL:   ${{ vars.OKR_APPROVER_EMAIL }}
           OKR_SITE_URL:         ${{ vars.OKR_SITE_URL }}
         run: |
+          cd scripts
           case "${{ steps.pick.outputs.job }}" in
-            monday)            python scripts/job_monday.py ;;
-            generate_backlog)  python scripts/job_generate_backlog.py ;;
-            daily_sweep)
-                               python scripts/job_generate_backlog.py
-                               python scripts/job_daily_sweep.py ;;
-            friday)            python scripts/job_friday.py ;;
-            writeback)         python scripts/job_writeback.py ;;
+            monday)            python job_monday.py --team marketing ;;
+            generate_backlog)  python job_generate_backlog.py ;;
+            daily_sweep)       python job_generate_backlog.py && python job_daily_sweep.py ;;
+            friday)            python job_friday.py --team marketing ;;
+            writeback)         python job_writeback.py ;;
+            market_intel)      python job_market_intel.py --team marketing ;;
           esac
