@@ -166,7 +166,7 @@
     if (cycle) {
       const { data: inits } = await sb.from('initiatives').select('*')
         .eq('cycle_id', cycle.id)
-        .in('status', ['approved','suggested_completed','completed'])
+        .in('status', ['proposed','approved','in_progress','suggested_completed','completed','rejected'])
         .order('created_at', { ascending: true });
       (inits || []).forEach(i => {
         initsByKr[i.kr_id] = initsByKr[i.kr_id] || [];
