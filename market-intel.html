@@ -212,12 +212,16 @@
   async function triggerRefresh() {
     const btn = document.getElementById('btn-refresh');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Analizando mercado...';
-    body.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Obteniendo datos del mercado en este momento...</div>';
+    btn.innerHTML = '<span class="spinner"></span>Disparando análisis...';
     try {
       const since = new Date().toISOString();
       const r = await OKR_triggerJob('market_intel');
-      if (!r.ok) { OKR_toast('Error al disparar el job (' + (r.error || r.status) + ')', 'error'); btn.disabled = false; btn.textContent = '⚡ Actualizar análisis'; return; }
+      if (!r.ok) {
+        OKR_toast('Error al disparar el job (' + (r.error || r.status) + ')', 'error');
+        btn.disabled = false; btn.textContent = '⚡ Actualizar análisis'; return;
+      }
+      OKR_toast('✓ Job disparado — el análisis llegará en ~5 minutos', 'success');
+      btn.innerHTML = '<span class="spinner"></span>Esperando análisis...';
       const poll = setInterval(async () => {
         const { data } = await sb.from('market_intel')
           .select('*').eq('team', team)
@@ -230,12 +234,12 @@
           btn.textContent = '⚡ Actualizar análisis';
           OKR_toast('✓ Análisis del día listo', 'success');
         }
-      }, 3000);
-      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Actualizar análisis'; }, 120000);
+      }, 5000);
+      // 10 minutos de espera máxima
+      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Actualizar análisis'; OKR_toast('El análisis tardó más de lo esperado. Recargá la página en unos minutos.', 'error'); }, 600000);
     } catch (e) {
-      body.innerHTML = '<div class="loading-msg">Backend no disponible. Corré ./start.sh primero.</div>';
-      btn.disabled = false;
-      btn.textContent = '⚡ Actualizar análisis';
+      OKR_toast('Error al conectar con GitHub Actions.', 'error');
+      btn.disabled = false; btn.textContent = '⚡ Actualizar análisis';
     }
   }
 
