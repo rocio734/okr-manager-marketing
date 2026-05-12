@@ -39,6 +39,12 @@ jobs:
       - name: Install Python dependencies
         run: pip install anthropic httpx requests python-dotenv
 
+      - name: Install Playwright (solo para writeback)
+        if: github.event.schedule == '*/5 * * * *' || github.event.inputs.job == 'writeback'
+        run: |
+          pip install playwright
+          playwright install chromium --with-deps
+
       - name: Decide which script to run
         id: pick
         run: |
