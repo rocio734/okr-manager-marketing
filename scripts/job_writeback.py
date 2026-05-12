@@ -49,20 +49,17 @@ def etendo_login():
 
 
 def update_kr(jwt, kr_id, new_value):
-    """Actualiza currentValue de un KR via datasource API."""
-    body = urllib.parse.urlencode({
-        "_operationType": "update",
-        "id": kr_id,
-        "currentValue": str(new_value),
-    }).encode()
+    """Actualiza currentValue de un KR via REST PUT (sin CSRF)."""
+    body = json.dumps({"id": kr_id, "currentValue": new_value}).encode()
     req = urllib.request.Request(
         f"{ETENDO_BASE}/api/datasource/SMFOKR_Okr_Kr",
-        data=body, method="POST",
+        data=body, method="PUT",
     )
     req.add_header("Authorization", f"Bearer {jwt}")
-    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    req.add_header("Content-Type", "application/json")
     with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read())
+        text = r.read().decode()
+        return json.loads(text) if text else {"response": {"status": 0}}
 
 
 def main():
