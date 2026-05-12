@@ -3,10 +3,10 @@
 Writeback — corre cada 5 minutos.
 
 Busca kr_proposals status=approved sin applied_at. Para cada uno escribe el nuevo
-valor en Etendo via SmartClient (JSESSIONID + CSRF obtenidos con Playwright).
+valor en Etendo via Playwright (login + role switch + POST JSON con csrfToken).
 Marca status=applied.
 """
-import os, sys, json, urllib.request, urllib.parse
+import os, sys, json, time, urllib.request
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -23,8 +23,9 @@ SUPABASE_URL  = os.environ["SUPABASE_URL"]
 SUPABASE_KEY  = os.environ["SUPABASE_SERVICE_KEY"]
 ETENDO_USER   = os.environ["ETENDO_USERNAME"]
 ETENDO_PASS   = os.environ["ETENDO_PASSWORD"]
-# URL del staff UI clásico (SmartClient) — diferente al API base
 ETENDO_WRITE_BASE = os.environ.get("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
+ETENDO_ROLE   = "11A221E338C54D01BCA31700C0395C73"
+ETENDO_CLIENT = "DE79A16C6D0B44BEBC66581DAA1AB308"
 
 
 def sb(method, path, body=None):
@@ -42,51 +43,28 @@ def sb(method, path, body=None):
         return json.loads(t) if t else None
 
 
-def login_and_get_session():
-    """Loguea en staff UI con Playwright, devuelve (jsessionid, csrf_token)."""
-    login_url = f"{ETENDO_WRITE_BASE}/security/Login"
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        ctx = browser.new_context()
-        page = ctx.new_page()
-        page.goto(login_url, wait_until="domcontentloaded", timeout=60000)
-        # Set Command hidden field
-        page.evaluate("() => { const c = document.querySelector('input[name=\"Command\"]'); if(c) c.value='LOGIN'; }")
-        page.fill('input#user', ETENDO_USER, timeout=30000)
-        page.fill('input#password', ETENDO_PASS, timeout=10000)
-        # El botón es type="button" id="buttonOK", no type="submit"
-        page.click('button#buttonOK', timeout=10000)
-        page.wait_for_load_state("networkidle", timeout=60000)
-        csrf = page.evaluate(
-            "() => (window.OB && OB.User && OB.User.csrfToken) || null"
-        )
-        cookies = ctx.cookies()
-        jsess = next((c["value"] for c in cookies if c["name"] == "JSESSIONID"), None)
-        browser.close()
-    if not jsess:
-        raise RuntimeError(f"No se obtuvo JSESSIONID. csrf={csrf!r}")
-    if not csrf:
-        raise RuntimeError(f"No se obtuvo CSRF token. jsess={jsess!r}")
-    return jsess, csrf
-
-
-def update_kr(jsess, csrf, kr_id, new_value):
-    """Actualiza currentValue de un KR via SmartClient datasource."""
-    body = urllib.parse.urlencode({
-        "_operationType": "update",
-        "id": kr_id,
-        "currentValue": str(new_value),
-        "csrfToken": csrf,
-    }).encode()
-    req = urllib.request.Request(
-        f"{ETENDO_WRITE_BASE}/org.openbravo.service.datasource/SMFOKR_Okr_Kr",
-        data=body, method="POST",
-    )
-    req.add_header("Cookie", f"JSESSIONID={jsess}")
-    req.add_header("Content-Type", "application/x-www-form-urlencoded")
-    req.add_header("X-Requested-With", "XMLHttpRequest")
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read())
+def update_kr_via_page(page, kr_id, new_value):
+    """Actualiza currentValue de un KR desde el contexto del browser (CSRF correcto)."""
+    result = page.evaluate(f"""async () => {{
+        const body = {{
+            dataSource: 'isc_OBViewDataSource_0',
+            operationType: 'update',
+            componentId: 'isc_OBViewForm_0',
+            data: {{ id: '{kr_id}', currentValue: {new_value} }},
+            oldValues: {{}},
+            csrfToken: OB.User.csrfToken,
+        }};
+        const r = await fetch('/etendo/org.openbravo.service.datasource/SMFOKR_Okr_Kr', {{
+            method: 'POST',
+            headers: {{'Content-Type': 'application/json;charset=UTF-8'}},
+            credentials: 'include',
+            body: JSON.stringify(body),
+        }});
+        const text = await r.text();
+        return {{ httpStatus: r.status, body: text }};
+    }}""")
+    resp = json.loads(result["body"]) if result.get("body") else {}
+    return resp
 
 
 def main():
@@ -96,26 +74,88 @@ def main():
         return
     print(f"{len(pending)} propuestas a aplicar.")
 
-    jsess, csrf = login_and_get_session()
-    print("  Login staff UI OK")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        ctx = browser.new_context(viewport={"width": 1400, "height": 900})
+        page = ctx.new_page()
 
-    for p in pending:
-        kr_name = p.get("kr_name") or p.get("kr_id", "?")[:8]
-        try:
-            res = update_kr(jsess, csrf, p["kr_id"], p["proposed_value"])
-            status_ok = res.get("response", {}).get("status") == 0
-            if not status_ok:
-                raise RuntimeError(f"Respuesta inesperada: {json.dumps(res)[:200]}")
-            sb("PATCH", f"kr_proposals?id=eq.{p['id']}", {
-                "status": "applied",
-                "applied_at": "now()",
-            })
-            print(f"  ✓ KR {kr_name}: → {p['proposed_value']}")
-        except Exception as e:
-            sb("PATCH", f"kr_proposals?id=eq.{p['id']}", {
-                "apply_error": str(e)[:500],
-            })
-            print(f"  ✗ Error en {kr_name}: {e}")
+        # Login via fetch desde el browser context
+        page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
+        time.sleep(2)
+        login_result = page.evaluate(f"""async () => {{
+            const body = new URLSearchParams();
+            body.append('user', {json.dumps(ETENDO_USER)});
+            body.append('password', {json.dumps(ETENDO_PASS)});
+            body.append('Command', 'Login');
+            const r = await fetch('/etendo/secureApp/LoginHandler.html', {{
+                method: 'POST',
+                headers: {{'Content-Type': 'application/x-www-form-urlencoded'}},
+                credentials: 'include',
+                body: body.toString()
+            }});
+            return {{status: r.status, body: (await r.text()).slice(0, 100)}};
+        }}""")
+        print(f"  Login: {login_result.get('status')}")
+        time.sleep(2)
+
+        # Cargar home para inicializar SmartClient
+        page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
+        page.wait_for_load_state("networkidle", timeout=30000)
+        time.sleep(3)
+
+        # Cambiar rol a Futit empleados
+        switch_result = page.evaluate(f"""async () => {{
+            const body = new URLSearchParams();
+            body.append('Command', 'CHANGE_PROFILE');
+            body.append('inpRole', '{ETENDO_ROLE}');
+            body.append('inpClient', '{ETENDO_CLIENT}');
+            body.append('inpOrg', '0');
+            body.append('inpWarehouse', '04D337E3F7CB454692AD30149ED229B8');
+            body.append('inpLanguage', 'es_ES');
+            const r = await fetch('/etendo/secureApp/MainHelper.html', {{
+                method: 'POST',
+                headers: {{'Content-Type': 'application/x-www-form-urlencoded'}},
+                credentials: 'include',
+                body: body.toString()
+            }});
+            return {{status: r.status}};
+        }}""")
+        print(f"  Role switch: {switch_result.get('status')}")
+        time.sleep(2)
+
+        # Recargar para aplicar el rol nuevo
+        page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
+        page.wait_for_load_state("networkidle", timeout=30000)
+        time.sleep(3)
+
+        info = page.evaluate("""() => ({
+            csrfToken: (typeof OB !== 'undefined' && OB.User && OB.User.csrfToken) || null,
+            roleId: (typeof OB !== 'undefined' && OB.User && OB.User.roleId) || null,
+        })""")
+        print(f"  CSRF OK: {bool(info.get('csrfToken'))}, Role: {(info.get('roleId') or '')[:12]}")
+
+        if not info.get("csrfToken"):
+            raise RuntimeError("No se obtuvo CSRF token después del login")
+
+        for p_item in pending:
+            kr_name = p_item.get("kr_name") or p_item.get("kr_id", "?")[:12]
+            try:
+                res = update_kr_via_page(page, p_item["kr_id"], p_item["proposed_value"])
+                status_ok = res.get("response", {}).get("status") == 0
+                if not status_ok:
+                    raise RuntimeError(f"Respuesta: {json.dumps(res)[:200]}")
+                sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}", {
+                    "status": "applied",
+                    "applied_at": "now()",
+                })
+                print(f"  ✓ {kr_name}: → {p_item['proposed_value']}")
+            except Exception as e:
+                sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}", {
+                    "apply_error": str(e)[:500],
+                })
+                print(f"  ✗ Error en {kr_name}: {e}")
+
+        browser.close()
 
 
 if __name__ == "__main__":
