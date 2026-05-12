@@ -3,13 +3,10 @@
 Writeback — corre cada 5 minutos.
 
 Busca kr_proposals status=approved sin applied_at. Para cada uno escribe el nuevo
-valor en Etendo via SmartClient (CSRF token vía Playwright login). Marca status=applied.
-
-Reusa la lógica de scripts/okr_load_q2_2026_smartclient.py.
+valor en Etendo via JWT API (sin Playwright). Marca status=applied.
 """
-import os, sys, json, urllib.request
+import os, sys, json, urllib.request, urllib.parse
 from pathlib import Path
-from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
 ENV  = ROOT.parent / ".env"
@@ -20,12 +17,13 @@ if ENV.exists():
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
-SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
-ETENDO_USER  = os.environ["ETENDO_USERNAME"]
-ETENDO_PASS  = os.environ["ETENDO_PASSWORD"]
-ETENDO_LOGIN_URL = os.environ.get("ETENDO_LOGIN_URL", "https://staff-ui.etendo.cloud/etendo/security/Login.html")
-ETENDO_BASE_UI   = os.environ.get("ETENDO_BASE_UI",   "https://staff-ui.etendo.cloud/etendo")
+SUPABASE_URL  = os.environ["SUPABASE_URL"]
+SUPABASE_KEY  = os.environ["SUPABASE_SERVICE_KEY"]
+ETENDO_USER   = os.environ["ETENDO_USERNAME"]
+ETENDO_PASS   = os.environ["ETENDO_PASSWORD"]
+ETENDO_BASE   = os.environ.get("ETENDO_BASE_URL") or os.environ.get("ETENDO_BASE", "https://futit-staff.etendo.cloud")
+ETENDO_ROLE   = os.environ.get("ETENDO_WRITEBACK_ROLE_ID", "11A221E338C54D01BCA31700C0395C73")
+
 
 def sb(method, path, body=None):
     url = f"{SUPABASE_URL}/rest/v1/{path}"
@@ -41,50 +39,31 @@ def sb(method, path, body=None):
         t = r.read().decode()
         return json.loads(t) if t else None
 
-def login_and_get_session():
-    """Loguea con Playwright, devuelve (jsessionid, csrf_token, cookies)."""
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        ctx = browser.new_context()
-        page = ctx.new_page()
-        page.goto(ETENDO_LOGIN_URL, wait_until="networkidle")
-        page.fill('input[name="user"]', ETENDO_USER)
-        page.fill('input[name="password"]', ETENDO_PASS)
-        page.click('button[type="submit"]')
-        page.wait_for_load_state("networkidle")
-        # Extraer CSRF token
-        csrf = page.evaluate("() => (window.OB && OB.User && OB.User.csrfToken) || null")
-        cookies = ctx.cookies()
-        jsess = next((c["value"] for c in cookies if c["name"] == "JSESSIONID"), None)
-        browser.close()
-    if not csrf or not jsess:
-        raise RuntimeError(f"No se obtuvieron csrf/jsess: csrf={csrf!r} jsess={jsess!r}")
-    return jsess, csrf
 
-def update_kr(jsess, csrf, kr_id, new_value):
-    """Update via SmartClient datasource."""
-    url = f"{ETENDO_BASE_UI}/org.openbravo.service.datasource/Okr_Kr"
-    payload = {
-        "operationType": "update",
-        "data": {
-            "id": kr_id,
-            "currentvalue": new_value,
-        },
-        "csrfToken": csrf,
-    }
-    body = ("dataSource=Okr_Kr&operationType=update&data=" +
-            urllib.parse.quote(json.dumps(payload["data"])) +
-            f"&csrfToken={urllib.parse.quote(csrf)}").encode()
+def etendo_login():
+    body = json.dumps({"username": ETENDO_USER, "password": ETENDO_PASS, "role": ETENDO_ROLE}).encode()
+    req  = urllib.request.Request(f"{ETENDO_BASE}/api/auth/login", data=body, method="POST")
+    req.add_header("Content-Type", "application/json")
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read())["token"]
+
+
+def update_kr(jwt, kr_id, new_value):
+    """Actualiza currentValue de un KR via datasource API."""
+    body = urllib.parse.urlencode({
+        "_operationType": "update",
+        "id": kr_id,
+        "currentValue": str(new_value),
+    }).encode()
     req = urllib.request.Request(
-        url, data=body, method="POST",
-        headers={
-            "Cookie": f"JSESSIONID={jsess}",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json",
-        },
+        f"{ETENDO_BASE}/api/datasource/SMFOKR_Okr_Kr",
+        data=body, method="POST",
     )
+    req.add_header("Authorization", f"Bearer {jwt}")
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read())
+
 
 def main():
     pending = sb("GET", "kr_proposals?status=eq.approved&applied_at=is.null&select=*")
@@ -92,21 +71,28 @@ def main():
         print("Sin propuestas approved sin aplicar.")
         return
     print(f"{len(pending)} propuestas a aplicar.")
-    jsess, csrf = login_and_get_session()
+
+    jwt = etendo_login()
+    print("  Login Etendo OK")
+
     for p in pending:
+        kr_name = p.get("kr_name") or p.get("kr_id", "?")[:8]
         try:
-            res = update_kr(jsess, csrf, p["kr_id"], p["proposed_value"])
+            res = update_kr(jwt, p["kr_id"], p["proposed_value"])
+            status_ok = res.get("response", {}).get("status") == 0
+            if not status_ok:
+                raise RuntimeError(f"Respuesta inesperada: {json.dumps(res)[:200]}")
             sb("PATCH", f"kr_proposals?id=eq.{p['id']}", {
                 "status": "applied",
                 "applied_at": "now()",
             })
-            print(f"  ✓ KR {p['kr_name']}: {p['current_value']} → {p['proposed_value']}")
+            print(f"  ✓ KR {kr_name}: → {p['proposed_value']}")
         except Exception as e:
             sb("PATCH", f"kr_proposals?id=eq.{p['id']}", {
                 "apply_error": str(e)[:500],
             })
-            print(f"  ✗ Error en {p['kr_name']}: {e}")
+            print(f"  ✗ Error en {kr_name}: {e}")
+
 
 if __name__ == "__main__":
-    import urllib.parse
     main()
