@@ -2,9 +2,12 @@
 """
 Writeback — corre cada 5 minutos.
 
-Busca kr_proposals status=approved sin applied_at. Para cada uno escribe el nuevo
-valor en Etendo via Playwright (login + role switch + POST JSON con csrfToken).
-Marca status=applied.
+Busca kr_proposals status=approved sin applied_at. Para cada uno:
+1. Actualiza currentValue en el KR (SMFOKR_Okr_Kr)
+2. Crea un registro en Key Result Updates (SMFOKR_Kr_Update) con el nuevo valor,
+   status 'on_track' y un comentario automático.
+Todo via Playwright (login + role switch + POST JSON con csrfToken).
+Marca status=applied cuando ambas operaciones tienen éxito.
 """
 import os, sys, json, time, urllib.request
 from pathlib import Path
@@ -26,6 +29,7 @@ ETENDO_PASS   = os.environ["ETENDO_PASSWORD"]
 ETENDO_WRITE_BASE = os.environ.get("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
 ETENDO_ROLE   = "11A221E338C54D01BCA31700C0395C73"
 ETENDO_CLIENT = "DE79A16C6D0B44BEBC66581DAA1AB308"
+OKR_WINDOW_ID = "8A46E42D104E47A7A00720608286262F"
 
 
 def sb(method, path, body=None):
@@ -45,24 +49,62 @@ def sb(method, path, body=None):
 
 def update_kr_via_page(page, kr_id, new_value):
     """Actualiza currentValue de un KR desde el contexto del browser (CSRF correcto)."""
-    result = page.evaluate(f"""async () => {{
-        const body = {{
-            dataSource: 'isc_OBViewDataSource_0',
-            operationType: 'update',
-            componentId: 'isc_OBViewForm_0',
-            data: {{ id: '{kr_id}', currentValue: {new_value} }},
-            oldValues: {{}},
-            csrfToken: OB.User.csrfToken,
-        }};
-        const r = await fetch('/etendo/org.openbravo.service.datasource/SMFOKR_Okr_Kr', {{
-            method: 'POST',
-            headers: {{'Content-Type': 'application/json;charset=UTF-8'}},
-            credentials: 'include',
-            body: JSON.stringify(body),
-        }});
-        const text = await r.text();
-        return {{ httpStatus: r.status, body: text }};
-    }}""")
+    result = page.evaluate(
+        """async (args) => {
+            const { kr_id, new_value } = args;
+            const body = {
+                dataSource: 'isc_OBViewDataSource_0',
+                operationType: 'update',
+                componentId: 'isc_OBViewForm_0',
+                data: { id: kr_id, currentValue: new_value },
+                oldValues: {},
+                csrfToken: OB.User.csrfToken,
+            };
+            const r = await fetch('/etendo/org.openbravo.service.datasource/SMFOKR_Okr_Kr', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json;charset=UTF-8'},
+                credentials: 'include',
+                body: JSON.stringify(body),
+            });
+            const text = await r.text();
+            return { httpStatus: r.status, body: text };
+        }""",
+        {"kr_id": kr_id, "new_value": new_value},
+    )
+    resp = json.loads(result["body"]) if result.get("body") else {}
+    return resp
+
+
+def create_kr_update_via_page(page, kr_id, kr_name, new_value, comment):
+    """Crea un registro en SMFOKR_Kr_Update (tab 'Key Result Updates' del KR)."""
+    result = page.evaluate(
+        """async (args) => {
+            const { kr_id, kr_name, new_value, comment } = args;
+            const body = {
+                dataSource: 'isc_OBViewDataSource_3',
+                operationType: 'add',
+                componentId: 'isc_OBViewForm_3',
+                data: {
+                    keyResult: kr_id,
+                    'keyResult$_identifier': kr_name,
+                    currentValue: new_value,
+                    comment: comment,
+                    status: 'on_track',
+                },
+                oldValues: {},
+                csrfToken: OB.User.csrfToken,
+            };
+            const r = await fetch('/etendo/org.openbravo.service.datasource/SMFOKR_Kr_Update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json;charset=UTF-8'},
+                credentials: 'include',
+                body: JSON.stringify(body),
+            });
+            const text = await r.text();
+            return { httpStatus: r.status, body: text };
+        }""",
+        {"kr_id": kr_id, "kr_name": kr_name, "new_value": new_value, "comment": comment},
+    )
     resp = json.loads(result["body"]) if result.get("body") else {}
     return resp
 
@@ -137,18 +179,37 @@ def main():
         if not info.get("csrfToken"):
             raise RuntimeError("No se obtuvo CSRF token después del login")
 
+        # Abrir ventana OKR para inicializar los view datasources (necesario para SMFOKR_Kr_Update)
+        page.evaluate(f"() => OB.Layout.ViewManager.openView('{OKR_WINDOW_ID}')")
+        time.sleep(3)
+
         for p_item in pending:
             kr_name = p_item.get("kr_name") or p_item.get("kr_id", "?")[:12]
             try:
+                # 1. Actualizar currentValue en el KR
                 res = update_kr_via_page(page, p_item["kr_id"], p_item["proposed_value"])
                 status_ok = res.get("response", {}).get("status") == 0
                 if not status_ok:
-                    raise RuntimeError(f"Respuesta: {json.dumps(res)[:200]}")
+                    raise RuntimeError(f"KR update falló: {json.dumps(res)[:200]}")
+
+                # 2. Crear registro en Key Result Updates con el nuevo valor
+                comment = f"Actualización automática OKR Manager — valor aprobado: {p_item['proposed_value']}"
+                upd_res = create_kr_update_via_page(
+                    page,
+                    p_item["kr_id"],
+                    kr_name,
+                    p_item["proposed_value"],
+                    comment,
+                )
+                upd_ok = upd_res.get("response", {}).get("status") == 0
+                if not upd_ok:
+                    print(f"  ⚠ Kr_Update no creado para {kr_name}: {json.dumps(upd_res)[:150]}")
+
                 sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}", {
                     "status": "applied",
                     "applied_at": "now()",
                 })
-                print(f"  ✓ {kr_name}: → {p_item['proposed_value']}")
+                print(f"  ✓ {kr_name}: → {p_item['proposed_value']}" + (" (sin update history)" if not upd_ok else ""))
             except Exception as e:
                 sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}", {
                     "apply_error": str(e)[:500],
