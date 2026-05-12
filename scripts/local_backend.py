@@ -91,7 +91,7 @@ class Handler(BaseHTTPRequestHandler):
                 args.append("--next-week")
             self._run(args)
         elif parsed.path == "/generate-proposals":
-            self._run(["job_friday.py", "--team", team])
+            self._run(["job_friday.py", "--team", team, "--any-status"])
         elif parsed.path == "/writeback":
             self._run(["job_writeback.py"])
         elif parsed.path == "/market-intel":

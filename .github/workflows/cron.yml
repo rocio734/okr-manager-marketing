@@ -84,7 +84,7 @@ jobs:
             monday)            python job_monday.py --team marketing $NEXT_WEEK_FLAG ;;
             generate_backlog)  python job_generate_backlog.py ;;
             daily_sweep)       python job_generate_backlog.py && python job_daily_sweep.py ;;
-            friday)            python job_friday.py --team marketing ;;
+            friday)            python job_friday.py --team marketing --any-status ;;
             writeback)         python job_writeback.py ;;
             market_intel)      python job_market_intel.py --team marketing ;;
           esac

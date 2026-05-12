@@ -268,14 +268,23 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--team", help="Filtrar por team (slug)")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--any-status", action="store_true",
+                    help="Buscar ciclo por fecha actual en lugar de requerir status=in_progress")
     args = ap.parse_args()
 
-    q = "cycles?status=eq.in_progress&select=*"
-    if args.team:
-        q += f"&team=eq.{args.team}"
+    if args.any_status:
+        today = date.today().isoformat()
+        q = f"cycles?week_start=lte.{today}&week_end=gte.{today}&select=*&order=week_start.desc&limit=1"
+        if args.team:
+            q += f"&team=eq.{args.team}"
+    else:
+        q = "cycles?status=eq.in_progress&select=*"
+        if args.team:
+            q += f"&team=eq.{args.team}"
+
     cycles = sb_request("GET", q)
     if not cycles:
-        print("Sin cycles in_progress.")
+        print("Sin cycles activos para esta semana.")
         return
 
     # Obtener datos externos una sola vez (son compartidos entre KRs)
