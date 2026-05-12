@@ -50,15 +50,12 @@ def login_and_get_session():
         ctx = browser.new_context()
         page = ctx.new_page()
         page.goto(login_url, wait_until="domcontentloaded", timeout=60000)
-        page.fill('input[name="user"]', ETENDO_USER, timeout=30000)
-        page.fill('input[name="password"]', ETENDO_PASS, timeout=10000)
-        # Click submit — puede ser button o input[type=submit]
-        page.evaluate("""() => {
-            const btn = document.querySelector('button[type="submit"]') ||
-                        document.querySelector('input[type="submit"]') ||
-                        document.querySelector('button');
-            if (btn) btn.click();
-        }""")
+        # Set Command hidden field
+        page.evaluate("() => { const c = document.querySelector('input[name=\"Command\"]'); if(c) c.value='LOGIN'; }")
+        page.fill('input#user', ETENDO_USER, timeout=30000)
+        page.fill('input#password', ETENDO_PASS, timeout=10000)
+        # El botón es type="button" id="buttonOK", no type="submit"
+        page.click('button#buttonOK', timeout=10000)
         page.wait_for_load_state("networkidle", timeout=60000)
         csrf = page.evaluate(
             "() => (window.OB && OB.User && OB.User.csrfToken) || null"
