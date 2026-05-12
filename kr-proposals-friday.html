@@ -191,30 +191,30 @@
     btn.disabled = true; btn.textContent = 'Procesando...';
 
     const me = await OKR_auth.getUser();
-    const myEmail = me ? me.email : null;
-    const nowIso = new Date().toISOString();
-
-    const updates = [];
-    for (const [id, p] of Object.entries(pending)) {
-      if (p.action === 'approve') {
-        updates.push(sb.from('kr_proposals').update({
-          status: 'approved',
-          proposed_value: p.value,
-          approved_at: nowIso, approved_by_email: myEmail,
-        }).eq('id', Number(id)));
-      } else if (p.action === 'reject') {
-        updates.push(sb.from('kr_proposals').update({ status: 'rejected' }).eq('id', Number(id)));
-      }
-      // pending → no se toca, no se actualiza en Etendo
+    if (!me || !me.email) {
+      OKR_toast('Sesión expirada. Cerrá sesión y volvé a entrar.', 'error');
+      btn.disabled = false; btn.textContent = 'Aprobar y escribir en Etendo';
+      return;
     }
-    updates.push(sb.from('cycles').update({
-      status: 'closed', closed_at: nowIso
-    }).eq('id', cycle.id));
 
-    const results = await Promise.all(updates);
-    const errors = results.filter(r => r.error);
-    if (errors.length) {
-      OKR_toast(errors[0].error.message, 'error');
+    const approveIds = [];
+    const rejectIds  = [];
+    for (const [id, p] of Object.entries(pending)) {
+      if (p.action === 'approve') approveIds.push(Number(id));
+      else if (p.action === 'reject') rejectIds.push(Number(id));
+    }
+
+    // Usar RPC con SECURITY DEFINER para bypassear RLS
+    const { error } = await sb.rpc('approve_kr_proposals', {
+      p_approve_ids: approveIds,
+      p_reject_ids:  rejectIds,
+      p_cycle_id:    cycle.id,
+      p_approver:    me.email,
+    });
+
+    if (error) {
+      const msg = error.message || 'Error al aprobar';
+      OKR_toast(msg.includes('Unauthorized') ? 'Sin permisos: iniciá sesión de nuevo.' : msg, 'error');
       btn.disabled = false; btn.textContent = 'Aprobar y escribir en Etendo';
       return;
     }

@@ -193,7 +193,8 @@ def main():
                     raise RuntimeError(f"KR update falló: {json.dumps(res)[:200]}")
 
                 # 2. Crear registro en Key Result Updates con el nuevo valor
-                comment = f"Actualización automática OKR Manager — valor aprobado: {p_item['proposed_value']}"
+                rationale = (p_item.get("rationale") or "").strip()
+                comment = rationale if rationale else f"Valor aprobado: {p_item['proposed_value']}"
                 upd_res = create_kr_update_via_page(
                     page,
                     p_item["kr_id"],
