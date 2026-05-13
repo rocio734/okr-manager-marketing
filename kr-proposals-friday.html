@@ -83,6 +83,42 @@
     return;
   }
 
+  // ── Botones "Calcular/Recalcular propuestas" — adjuntar ANTES de los return tempranos ──
+  async function runGenerateProposals(btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Calculando...';
+    try {
+      const r = await OKR_triggerJob('friday');
+      if (!r.ok) {
+        OKR_toast('Error al disparar el agente (' + (r.error || r.status) + ')', 'error');
+        btn.disabled = false;
+        btn.textContent = btn.id === 'btn-generate-empty' ? '⚡ Calcular propuestas de KR con el agente' : '⚡ Recalcular con el agente';
+        return;
+      }
+      OKR_toast('✓ Agente disparado en GitHub Actions — las propuestas aparecerán en ~3 minutos', 'success');
+      btn.textContent = '⏳ Esperando resultados (~3 min)...';
+      const since = new Date().toISOString();
+      const cycleIdForPoll = typeof cycle !== 'undefined' ? cycle.id : 0;
+      const poll = setInterval(async () => {
+        const { data: rows } = await sb.from('kr_proposals')
+          .select('id').eq('status', 'pending_approval').gte('created_at', since).limit(1);
+        if (rows && rows.length) { clearInterval(poll); location.reload(); }
+      }, 5000);
+      setTimeout(() => {
+        clearInterval(poll);
+        btn.disabled = false;
+        btn.textContent = btn.id === 'btn-generate-empty' ? '⚡ Calcular propuestas de KR con el agente' : '⚡ Recalcular con el agente';
+        OKR_toast('El agente tardó más de lo esperado. Recargá la página en unos minutos.', 'error');
+      }, 300000);
+    } catch (e) {
+      OKR_toast('Error al conectar con GitHub Actions.', 'error');
+      btn.disabled = false;
+      btn.textContent = btn.id === 'btn-generate-empty' ? '⚡ Calcular propuestas de KR con el agente' : '⚡ Recalcular con el agente';
+    }
+  }
+  document.getElementById('btn-generate')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
+  document.getElementById('btn-generate-empty')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
+
   // Cycle pendiente de KR approval
   const { data: cycles } = await sb
     .from('cycles').select('*')
@@ -224,36 +260,6 @@
     setTimeout(() => location.href = 'dashboard.html', 1800);
   });
 
-  // ── Botón "Calcular propuestas de KR" (barra principal + estado vacío) ────
-  async function runGenerateProposals(btn) {
-    btn.disabled = true;
-    btn.textContent = '⏳ Calculando...';
-    try {
-      const r = await OKR_triggerJob('friday');
-      if (!r.ok) {
-        OKR_toast('Error al disparar el agente (' + (r.error || r.status) + ')', 'error');
-        btn.disabled = false;
-        btn.textContent = '⚡ Recalcular con el agente';
-        return;
-      }
-      OKR_toast('✓ Agente disparado en GitHub Actions — las propuestas aparecerán en ~3 minutos', 'success');
-      btn.textContent = '⏳ Esperando resultados (~3 min)...';
-      const since = new Date().toISOString();
-      const poll = setInterval(async () => {
-        const { data: rows } = await sb.from('kr_proposals')
-          .select('id').eq('cycle_id', cycle?.id || 0)
-          .eq('status', 'pending_approval').gte('created_at', since).limit(1);
-        if (rows && rows.length) { clearInterval(poll); location.reload(); }
-      }, 5000);
-      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Recalcular con el agente'; OKR_toast('El agente tardó más de lo esperado. Recargá la página en unos minutos.', 'error'); }, 300000);
-    } catch (e) {
-      OKR_toast('Error al conectar con GitHub Actions.', 'error');
-      btn.disabled = false;
-      btn.textContent = '⚡ Recalcular con el agente';
-    }
-  }
-  document.getElementById('btn-generate')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
-  document.getElementById('btn-generate-empty')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
 })();
 </script>
 </body>
