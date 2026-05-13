@@ -302,59 +302,49 @@
     btn.disabled = true; btn.textContent = 'Procesando...';
 
     const me = await OKR_auth.getUser();
-    const myEmail = me ? me.email : null;
-    const nowIso = new Date().toISOString();
+    if (!me || !me.email) {
+      OKR_toast('Sesión expirada. Cerrá sesión y volvé a entrar.', 'error');
+      btn.disabled = false; btn.textContent = 'Aprobar batch';
+      return;
+    }
+    const myEmail = me.email;
 
-    // 1) Update existentes
-    const updates = [];
+    const approveIds = [];
+    const rejectIds  = [];
+    const edits      = [];
     for (const [id, p] of Object.entries(pending)) {
       if (p.action === 'approve') {
-        updates.push(sb.from('initiatives').update({
-          status: 'approved',
-          title: p.title,
-          execution_plan: p.plan,
-          approved_at: nowIso,
-          approved_by_email: myEmail,
-        }).eq('id', Number(id)));
+        approveIds.push(Number(id));
+        edits.push({ id: Number(id), title: p.title, execution_plan: p.plan });
       } else if (p.action === 'reject') {
-        updates.push(sb.from('initiatives').update({
-          status: 'rejected',
-          rejection_reason: 'Rechazada en aprobación de lunes',
-        }).eq('id', Number(id)));
+        rejectIds.push(Number(id));
       }
-      // pending → no se toca, queda como proposed
     }
 
-    // 2) Insert manuales
-    const inserts = newOnes.map(n => sb.from('initiatives').insert({
-      cycle_id: cycle.id,
+    const manualInits = newOnes.map(n => ({
       kr_id: n.kr_id, kr_name: n.kr_name,
-      title: n.title, execution_plan: n.plan,
-      bottleneck: n.bottleneck || null,
-      status: 'approved',
-      created_by: 'human',
-      created_by_email: myEmail,
-      approved_at: nowIso,
-      approved_by_email: myEmail,
+      title: n.title, execution_plan: n.plan || '',
+      bottleneck: n.bottleneck || '',
     }));
 
-    // 3) Cycle a in_progress
-    const cycleUpdate = sb.from('cycles').update({ status: 'in_progress' }).eq('id', cycle.id);
+    // Usar RPC con SECURITY DEFINER para bypassear RLS (mismo patrón que friday)
+    const { error } = await sb.rpc('approve_initiatives_batch', {
+      p_approve_ids:  approveIds,
+      p_reject_ids:   rejectIds,
+      p_cycle_id:     cycle.id,
+      p_approver:     myEmail,
+      p_edits:        edits,
+      p_manual_inits: manualInits,
+    });
 
-    const results = await Promise.all([...updates, ...inserts, cycleUpdate]);
-    const errors = results.filter(r => r.error);
-
-    if (errors.length) {
-      OKR_toast('Algunos cambios fallaron: ' + errors[0].error.message, 'error');
+    if (error) {
+      const msg = error.message || 'Error al aprobar';
+      OKR_toast(msg.includes('Unauthorized') ? 'Sin permisos: iniciá sesión de nuevo.' : msg, 'error');
       btn.disabled = false; btn.textContent = 'Aprobar batch';
       return;
     }
 
-    const approvedIds = Object.entries(pending)
-      .filter(([, p]) => p.action === 'approve')
-      .map(([id]) => Number(id));
-
-    OKR_toast(`✓ ${approvedIds.length} iniciativas aprobadas. Generando backlog...`, 'success');
+    OKR_toast(`✓ ${approveIds.length} iniciativas aprobadas. Generando backlog...`, 'success');
     btn.textContent = 'Generando tasks...';
 
     // Delegar generación de tasks al backend (evita exponer API keys en el browser)
