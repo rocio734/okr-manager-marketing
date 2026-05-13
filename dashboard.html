@@ -334,10 +334,9 @@
       OKR_toast('Error al conectar con GitHub Actions.', 'error');
       return;
     }
-    btn.innerHTML = '<span class="spinner"></span>El agente está generando iniciativas...';
+    btn.innerHTML = '<span class="spinner"></span>Esperando resultados (~3 min)...';
 
-    OKR_toast('Generando iniciativas con IA...', 'success');
-    // Polling: espera que haya iniciativas en Supabase (no solo el cycle)
+    OKR_toast('✓ Agente disparado en GitHub Actions — las iniciativas aparecerán en ~3 minutos', 'success');
     let attempts = 0;
     const poll = setInterval(async () => {
       attempts++;
@@ -353,10 +352,11 @@
           return;
         }
       }
-      if (attempts > 60) {
+      if (attempts > 100) {
         clearInterval(poll);
         btn.disabled = false;
-        OKR_toast('Tiempo agotado. Intentá de nuevo.', 'error');
+        btn.textContent = '⚡ Generar iniciativas con el agente';
+        OKR_toast('El agente tardó más de lo esperado. Recargá la página en unos minutos.', 'error');
       }
     }, 3000);
   }

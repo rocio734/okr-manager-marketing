@@ -236,17 +236,18 @@
         btn.textContent = '⚡ Recalcular con el agente';
         return;
       }
-      OKR_toast('Agente corriendo — las propuestas aparecerán en unos minutos', 'success');
+      OKR_toast('✓ Agente disparado en GitHub Actions — las propuestas aparecerán en ~3 minutos', 'success');
+      btn.textContent = '⏳ Esperando resultados (~3 min)...';
       const since = new Date().toISOString();
       const poll = setInterval(async () => {
         const { data: rows } = await sb.from('kr_proposals')
           .select('id').eq('cycle_id', cycle?.id || 0)
           .eq('status', 'pending_approval').gte('created_at', since).limit(1);
         if (rows && rows.length) { clearInterval(poll); location.reload(); }
-      }, 3000);
-      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Recalcular con el agente'; }, 120000);
+      }, 5000);
+      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Recalcular con el agente'; OKR_toast('El agente tardó más de lo esperado. Recargá la página en unos minutos.', 'error'); }, 300000);
     } catch (e) {
-      OKR_toast('Backend local no disponible. Corré: python3 scripts/local_backend.py', 'error');
+      OKR_toast('Error al conectar con GitHub Actions.', 'error');
       btn.disabled = false;
       btn.textContent = '⚡ Recalcular con el agente';
     }
