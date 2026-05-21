@@ -419,6 +419,7 @@ def main():
 
     LOG("Cargando leads del CRM para contexto de parsing…")
     all_leads = get_all_leads(jwt)
+    leads_by_id = {l["id"]: l for l in all_leads if l.get("id")}
     leads_snapshot = [
         {
             "id":      l.get("id", ""),
@@ -428,6 +429,7 @@ def main():
             ).strip() or "(sin nombre)",
             "company": l.get("company") or "",
             "status":  l.get("leadStatus") or "",
+            "summary": l.get("summary") or "",
         }
         for l in all_leads
         if l.get("id")
@@ -484,9 +486,9 @@ def main():
             if new_status:
                 payload["leadStatus"] = new_status
 
-            # Prepend note to existing summary
-            existing = get_single_lead(jwt, lead_id)
-            if existing and note:
+            # Prepend note to existing summary (use already-loaded lead data)
+            if note:
+                existing = leads_by_id.get(lead_id, {})
                 old = (existing.get("summary") or "").strip()
                 ts  = datetime.now().strftime("%d/%m/%Y")
                 payload["summary"] = (
