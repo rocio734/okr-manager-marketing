@@ -152,7 +152,9 @@ def build_html(leads, today_str):
         company     = lead.get("company") or "—"
         name        = lead_name(lead)
         raw_summary = lead.get("summary") or lead.get("interest") or ""
-        summary     = raw_summary[:120] + ("…" if len(raw_summary) > 120 else "")
+        # Mostrar solo la última actualización (primera línea si hay timestamps [DD/MM/YYYY])
+        first_line  = raw_summary.strip().splitlines()[0].strip() if raw_summary.strip() else ""
+        summary     = first_line[:120] + ("…" if len(first_line) > 120 else "") if first_line else "—"
         txt_c, bg_c = badge_colors.get(status_raw, ("#374151", "#f3f4f6"))
 
         rows_html += f"""
