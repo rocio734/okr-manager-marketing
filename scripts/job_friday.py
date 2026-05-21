@@ -7,7 +7,8 @@ Fuentes de datos consideradas:
   - Iniciativas/tasks/progress_entries del ciclo (Supabase)
   - CRM Etendo: leads, strategic_fit, meetings, pipeline, deals
   - Google Search Console: impresiones, clics orgánicos non-brand
-  - Google Ads: spend, conversiones, CPL (vía Sheet si disponible)
+  - Google Analytics 4: sesiones CPC, key events, tasa de conversión
+  - Google Ads: spend, conversiones, CPL por campaña
   - Market intel reciente (Supabase)
 """
 import argparse, json, os, urllib.request, urllib.parse
@@ -29,7 +30,18 @@ def _crm_token():
 
 
 def fetch_crm_snapshot():
-    """Devuelve métricas clave del CRM para la semana actual."""
+    """Devuelve métricas clave del CRM para la semana actual.
+
+    Campos confirmados en ECLM_Lead:
+      - leadStatus: in_progress | proposal_sent | negotiation | won_deal | lost_deal | disqualified | cold_archived
+      - strategicFit: strategic_fit_yes | strategic_fit_no | (vacío)   ← campo correcto (NO leadQualy)
+      - scorePurchaseIntention: 1–5                                      ← campo correcto (NO purchaseIntentionScore)
+      - scoreIndex: número
+      - leadScore: número
+      - meetingDate: fecha reunión agendada
+      - creationDate: fecha creación
+      - firstContactDate: fecha primer contacto
+    """
     jwt = _crm_token()
     if not jwt:
         return {}
@@ -49,41 +61,57 @@ def fetch_crm_snapshot():
             if len(batch) < 100:
                 break
 
-        active = [l for l in leads if (l.get("leadStatus") or "") not in ("lost_deal", "won_deal", "disqualified")]
-        fit_yes = [l for l in active if l.get("strategicFit") == "strategic_fit_yes"]
-        meetings = [l for l in leads if l.get("meetingDate")]
-        won = [l for l in leads if l.get("leadStatus") == "won_deal"]
-        negotiation = [l for l in active if l.get("leadStatus") in ("negotiation", "proposal_sent")]
-        proposal_sent = [l for l in active if l.get("leadStatus") == "proposal_sent"]
-        hot = [l for l in fit_yes if (l.get("purchaseIntentionScore") or 0) >= 3]
+        INACTIVE = {"lost_deal", "won_deal", "disqualified", "cold_archived"}
+        active        = [l for l in leads if (l.get("leadStatus") or "") not in INACTIVE]
+        fit_yes       = [l for l in active if l.get("strategicFit") == "strategic_fit_yes"]
+        # scorePurchaseIntention es el campo real en el CRM (confirmado 2026-05-20)
+        hot           = [l for l in fit_yes if int(l.get("scorePurchaseIntention") or 0) >= 3]
+        won           = [l for l in leads if l.get("leadStatus") == "won_deal"]
+        negotiation   = [l for l in active if l.get("leadStatus") == "negotiation"]
+        # % hot con propuesta: cuántos hot leads tienen propuesta activa (en negotiation)
+        proposal_sent = [l for l in hot if l.get("leadStatus") == "negotiation"]
+        meetings      = [l for l in leads if l.get("meetingDate")]
+        unclassified  = [l for l in active if not l.get("strategicFit") or l.get("strategicFit") == "unclassified"]
 
-        # Tiempo primer contacto (promedio de los últimos 10 leads con fecha)
+        # Score promedio de los leads fit (para medir calidad del pipeline)
+        spi_values = [int(l.get("scorePurchaseIntention") or 0) for l in fit_yes if l.get("scorePurchaseIntention")]
+        avg_spi = round(sum(spi_values) / len(spi_values), 1) if spi_values else None
+
+        # Tiempo primer contacto (promedio últimos 50 leads con ambas fechas)
+        from datetime import datetime as dt
         contact_times = []
         for l in leads[:50]:
-            created = l.get("creationDate") or l.get("created_at", "")
-            first_contact = l.get("firstContactDate") or l.get("firstContact", "")
-            if created and first_contact:
+            created = l.get("creationDate") or ""
+            first_c = l.get("firstContactDate") or ""
+            if created and first_c:
                 try:
-                    from datetime import datetime
-                    c = datetime.fromisoformat(created[:19])
-                    f = datetime.fromisoformat(first_contact[:19])
-                    diff_h = (f - c).total_seconds() / 3600
+                    diff_h = (dt.fromisoformat(first_c[:19]) - dt.fromisoformat(created[:19])).total_seconds() / 3600
                     if 0 <= diff_h <= 720:
                         contact_times.append(diff_h)
                 except Exception:
                     pass
         avg_contact_h = round(sum(contact_times) / len(contact_times), 1) if contact_times else None
 
+        # Leads fit creados en los últimos 30 días (para CPL real = Ads spend / fit leads)
+        cutoff_30d = (dt.today() - timedelta(days=29)).strftime("%Y-%m-%d")
+        new_fit_30d = [
+            l for l in fit_yes
+            if (l.get("creationDate") or "")[:10] >= cutoff_30d
+        ]
+
         return {
             "total_leads_active":    len(active),
             "strategic_fit_yes":     len(fit_yes),
+            "hot_leads":             len(hot),
+            "unclassified_leads":    len(unclassified),
             "meetings_booked":       len(meetings),
             "won_deals":             len(won),
             "in_negotiation":        len(negotiation),
             "proposals_sent":        len(proposal_sent),
-            "hot_leads_with_fit":    len(hot),
             "pct_hot_with_proposal": round(len(proposal_sent) / len(hot) * 100) if hot else 0,
+            "avg_spi_fit_leads":     avg_spi,
             "avg_first_contact_h":   avg_contact_h,
+            "new_fit_leads_30d":     len(new_fit_30d),   # para CPL real mensual
         }
     except Exception as e:
         print(f"  [CRM] Error: {e}")
@@ -93,77 +121,286 @@ def fetch_crm_snapshot():
 # ── Fetch Search Console ──────────────────────────────────────────────────────
 
 def fetch_search_console():
-    """Devuelve impresiones y clics orgánicos de los últimos 28 días."""
-    creds_file = os.environ.get("SEARCH_CONSOLE_CREDENTIALS_FILE", "")
-    site       = os.environ.get("SEARCH_CONSOLE_SITE", "sc-domain:etendo.software")
-    if not creds_file or not os.path.exists(creds_file):
-        return {}
+    """Devuelve impresiones y clics orgánicos de los últimos 28 días vía OAuth."""
     try:
-        import time, base64
-        with open(creds_file) as f:
-            creds = json.load(f)
-        from cryptography.hazmat.primitives import hashes, serialization
-        from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
+        token = _google_access_token("GOOGLE_REFRESH_TOKEN_GA4_SC")
+        if not token:
+            return {}
 
-        now    = int(time.time())
-        header = base64.urlsafe_b64encode(json.dumps({"alg": "RS256", "typ": "JWT"}).encode()).rstrip(b"=")
-        claim  = base64.urlsafe_b64encode(json.dumps({
-            "iss": creds["client_email"], "scope": "https://www.googleapis.com/auth/webmasters.readonly",
-            "aud": "https://oauth2.googleapis.com/token", "exp": now + 3600, "iat": now,
-        }).encode()).rstrip(b"=")
-        privkey = serialization.load_pem_private_key(creds["private_key"].encode(), password=None)
-        sig = base64.urlsafe_b64encode(privkey.sign(
-            f"{header.decode()}.{claim.decode()}".encode(),
-            asym_padding.PKCS1v15(), hashes.SHA256()
-        )).rstrip(b"=")
-        jwt_tok = f"{header.decode()}.{claim.decode()}.{sig.decode()}"
-
-        tok_req = urllib.request.Request(
-            "https://oauth2.googleapis.com/token",
-            data=urllib.parse.urlencode({"grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", "assertion": jwt_tok}).encode()
-        )
-        with urllib.request.urlopen(tok_req, timeout=10) as r:
-            access_token = json.loads(r.read())["access_token"]
+        env_file = os.path.join(os.path.dirname(__file__), "..", "..", ".env.google")
+        site = "sc-domain:etendo.software"
+        for line in open(env_file).read().splitlines():
+            if line.startswith("SC_SITE"):
+                site = line.split("=", 1)[1].strip().strip('"')
 
         end_date   = date.today() - timedelta(days=3)
         start_date = end_date - timedelta(days=27)
-        payload = json.dumps({
-            "startDate": str(start_date), "endDate": str(end_date),
-            "dimensions": [], "rowLimit": 1,
-        }).encode()
-        sc_req = urllib.request.Request(
-            f"https://www.googleapis.com/webmasters/v3/sites/{urllib.parse.quote(site, safe='')}/searchAnalytics/query",
-            data=payload, method="POST"
-        )
-        sc_req.add_header("Authorization", f"Bearer {access_token}")
-        sc_req.add_header("Content-Type", "application/json")
-        with urllib.request.urlopen(sc_req, timeout=15) as r:
-            totals = json.loads(r.read()).get("rows", [{}])[0]
+        site_enc   = urllib.parse.quote(site, safe="")
+        sc_url     = f"https://searchconsole.googleapis.com/webmasters/v3/sites/{site_enc}/searchAnalytics/query"
 
-        # Non-brand clicks (excluir queries con "etendo")
-        nb_payload = json.dumps({
-            "startDate": str(start_date), "endDate": str(end_date),
-            "dimensions": [], "rowLimit": 1,
-            "dimensionFilterGroups": [{"filters": [{"dimension": "query", "operator": "notContains", "expression": "etendo"}]}],
-        }).encode()
-        sc_req2 = urllib.request.Request(
-            f"https://www.googleapis.com/webmasters/v3/sites/{urllib.parse.quote(site, safe='')}/searchAnalytics/query",
-            data=nb_payload, method="POST"
-        )
-        sc_req2.add_header("Authorization", f"Bearer {access_token}")
-        sc_req2.add_header("Content-Type", "application/json")
-        with urllib.request.urlopen(sc_req2, timeout=15) as r:
-            nb = json.loads(r.read()).get("rows", [{}])[0]
+        def sc_query(extra=None):
+            body = {"startDate": str(start_date), "endDate": str(end_date), "dimensions": [], "rowLimit": 1}
+            if extra:
+                body.update(extra)
+            req = urllib.request.Request(sc_url, data=json.dumps(body).encode(),
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                return json.loads(r.read()).get("rows", [{}])[0]
+
+        totals = sc_query()
+        nb     = sc_query({"dimensionFilterGroups": [{"filters": [
+            {"dimension": "query", "operator": "notContains", "expression": "etendo"}
+        ]}]})
+
+        # Top países esta semana (últimos 7 días)
+        end_w   = date.today() - timedelta(days=1)
+        start_w = end_w - timedelta(days=6)
+        req_w = urllib.request.Request(sc_url,
+            data=json.dumps({"startDate": str(start_w), "endDate": str(end_w),
+                             "dimensions": ["country"], "rowLimit": 5}).encode(),
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+        with urllib.request.urlopen(req_w, timeout=15) as r:
+            top_countries = {
+                row["keys"][0]: {"clicks": row["clicks"], "impressions": row["impressions"]}
+                for row in json.loads(r.read()).get("rows", [])
+            }
 
         return {
-            "period_days":      28,
-            "total_impressions": int(totals.get("impressions", 0)),
-            "total_clicks":     int(totals.get("clicks", 0)),
-            "nonbrand_clicks":  int(nb.get("clicks", 0)),
-            "nonbrand_impressions": int(nb.get("impressions", 0)),
+            "period_days":           28,
+            "total_impressions":     int(totals.get("impressions", 0)),
+            "total_clicks":          int(totals.get("clicks", 0)),
+            "nonbrand_clicks":       int(nb.get("clicks", 0)),
+            "nonbrand_impressions":  int(nb.get("impressions", 0)),
+            "avg_position":          round(totals.get("position", 0), 1),
+            "top_countries_7d":      top_countries,
+            "spain_clicks_7d":       top_countries.get("esp", {}).get("clicks", 0),
+            "argentina_clicks_7d":   top_countries.get("arg", {}).get("clicks", 0),
         }
     except Exception as e:
         print(f"  [SearchConsole] Error: {e}")
+        return {}
+
+
+# ── Google OAuth helper ──────────────────────────────────────────────────────
+
+def _google_access_token(refresh_token_env: str) -> str:
+    """Obtiene access token usando el refresh token guardado en .env.google."""
+    env_file = os.path.join(os.path.dirname(__file__), "..", "..", ".env.google")
+    env_vars = {}
+    if os.path.exists(env_file):
+        for line in open(env_file).read().splitlines():
+            if "=" in line and not line.startswith("#"):
+                k, v = line.split("=", 1)
+                env_vars[k.strip()] = v.strip().strip('"')
+
+    # Fallback: env vars del sistema (GitHub Actions secrets)
+    client_id     = env_vars.get("GOOGLE_OAUTH_CLIENT_ID", "") or os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
+    client_secret = env_vars.get("GOOGLE_OAUTH_CLIENT_SECRET", "") or os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
+    refresh_token = env_vars.get(refresh_token_env, "") or os.environ.get(refresh_token_env, "")
+
+    if not all([client_id, client_secret, refresh_token]):
+        return ""
+
+    resp = urllib.request.urlopen(urllib.request.Request(
+        "https://oauth2.googleapis.com/token",
+        data=urllib.parse.urlencode({
+            "client_id": client_id, "client_secret": client_secret,
+            "refresh_token": refresh_token, "grant_type": "refresh_token",
+        }).encode(),
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    ), timeout=10)
+    return json.loads(resp.read()).get("access_token", "")
+
+
+# ── Fetch GA4 ─────────────────────────────────────────────────────────────────
+
+def fetch_ga4() -> dict:
+    """Sesiones CPC, key events y bounce rate de los últimos 7 días."""
+    try:
+        token = _google_access_token("GOOGLE_REFRESH_TOKEN_GA4_SC")
+        if not token:
+            return {}
+
+        env_file = os.path.join(os.path.dirname(__file__), "..", "..", ".env.google")
+        prop = "353675924"
+        for line in open(env_file).read().splitlines():
+            if line.startswith("GA4_PROPERTY_ID"):
+                prop = line.split("=", 1)[1].strip().strip('"')
+
+        end_date   = date.today() - timedelta(days=1)
+        start_date = end_date - timedelta(days=6)
+
+        def run(payload):
+            req = urllib.request.Request(
+                f"https://analyticsdata.googleapis.com/v1beta/properties/{prop}:runReport",
+                data=json.dumps(payload).encode(),
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req, timeout=15) as r:
+                return json.loads(r.read())
+
+        # Totales CPC
+        r = run({
+            "dateRanges": [{"startDate": str(start_date), "endDate": str(end_date)}],
+            "metrics": [
+                {"name": "sessions"}, {"name": "keyEvents"},
+                {"name": "engagementRate"}, {"name": "bounceRate"},
+            ],
+            "dimensionFilter": {"filter": {"fieldName": "sessionMedium",
+                "stringFilter": {"value": "cpc", "matchType": "EXACT"}}},
+        })
+        row = r.get("rows", [{}])[0].get("metricValues", [{}, {}, {}, {}])
+        total_sessions  = int(row[0].get("value", 0))
+        total_key_events = int(row[1].get("value", 0))
+        engagement_rate = float(row[2].get("value", 0))
+        bounce_rate     = float(row[3].get("value", 0))
+
+        # Por país
+        r2 = run({
+            "dateRanges": [{"startDate": str(start_date), "endDate": str(end_date)}],
+            "dimensions": [{"name": "country"}],
+            "metrics": [{"name": "sessions"}, {"name": "keyEvents"}],
+            "dimensionFilter": {"filter": {"fieldName": "sessionMedium",
+                "stringFilter": {"value": "cpc", "matchType": "EXACT"}}},
+            "orderBys": [{"metric": {"metricName": "sessions"}, "desc": True}],
+            "limit": 5,
+        })
+        by_country = {
+            row["dimensionValues"][0]["value"]: {
+                "sessions":   int(row["metricValues"][0]["value"]),
+                "key_events": int(row["metricValues"][1]["value"]),
+            }
+            for row in r2.get("rows", [])
+        }
+
+        # Ventana 30 días para CPL mensual (consistente con el resto de KRs)
+        start_30 = end_date - timedelta(days=29)
+        r_30 = run({
+            "dateRanges": [{"startDate": str(start_30), "endDate": str(end_date)}],
+            "metrics": [{"name": "keyEvents"}, {"name": "sessions"}],
+            "dimensionFilter": {"filter": {"fieldName": "sessionMedium",
+                "stringFilter": {"value": "cpc", "matchType": "EXACT"}}},
+        })
+        row_30 = r_30.get("rows", [{}])[0].get("metricValues", [{}, {}])
+        monthly_key_events = int(row_30[0].get("value", 0))
+        monthly_sessions   = int(row_30[1].get("value", 0))
+
+        return {
+            "period_days":          7,
+            "cpc_sessions":         total_sessions,
+            "cpc_key_events":       total_key_events,
+            "engagement_rate":      round(engagement_rate * 100, 1),
+            "bounce_rate":          round(bounce_rate * 100, 1),
+            "by_country":           by_country,
+            "argentina_sessions":   by_country.get("Argentina", {}).get("sessions", 0),
+            "argentina_key_events": by_country.get("Argentina", {}).get("key_events", 0),
+            "spain_sessions":       by_country.get("Spain", {}).get("sessions", 0),
+            "spain_key_events":     by_country.get("Spain", {}).get("key_events", 0),
+            "monthly_key_events":   monthly_key_events,
+            "monthly_sessions":     monthly_sessions,
+        }
+    except Exception as e:
+        print(f"  [GA4] Error: {e}")
+        return {}
+
+
+# ── Fetch Google Ads ──────────────────────────────────────────────────────────
+
+def fetch_google_ads() -> dict:
+    """Gasto, conversiones y CPL de campañas activas — últimos 7 días."""
+    try:
+        token = _google_access_token("GOOGLE_REFRESH_TOKEN_ADS")
+        if not token:
+            return {}
+
+        env_file = os.path.join(os.path.dirname(__file__), "..", "..", ".env.google")
+        env_vars = {}
+        for line in open(env_file).read().splitlines():
+            if "=" in line and not line.startswith("#"):
+                k, v = line.split("=", 1)
+                env_vars[k.strip()] = v.strip().strip('"')
+
+        dev_token   = env_vars.get("GOOGLE_ADS_DEVELOPER_TOKEN", "")
+        mcc_id      = env_vars.get("GOOGLE_ADS_MCC_CUSTOMER_ID", "")
+        customer_id = env_vars.get("GOOGLE_ADS_CLIENT_CUSTOMER_ID", "")
+        api_version = env_vars.get("GOOGLE_ADS_API_VERSION", "v20")
+
+        if not all([dev_token, customer_id]):
+            return {}
+
+        end_date   = date.today() - timedelta(days=1)
+        start_date = end_date - timedelta(days=6)
+
+        query = f"""
+            SELECT campaign.name, campaign.status,
+                metrics.cost_micros, metrics.clicks,
+                metrics.impressions, metrics.conversions, metrics.ctr
+            FROM campaign
+            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
+              AND campaign.status = 'ENABLED'
+        """
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "developer-token": dev_token,
+            "Content-Type": "application/json",
+        }
+        if mcc_id:
+            headers["login-customer-id"] = mcc_id
+
+        req = urllib.request.Request(
+            f"https://googleads.googleapis.com/{api_version}/customers/{customer_id}/googleAds:search",
+            data=json.dumps({"query": query}).encode(),
+            headers=headers,
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            results = json.loads(r.read()).get("results", [])
+
+        campaigns = {}
+        total_spend = total_conversions = total_clicks = 0
+        for row in results:
+            name  = row["campaign"]["name"]
+            m     = row["metrics"]
+            spend = int(m.get("costMicros", 0)) / 1_000_000
+            convs = float(m.get("conversions", 0))
+            clicks = int(m.get("clicks", 0))
+            campaigns[name] = {
+                "spend": round(spend, 2),
+                "conversions": round(convs, 1),
+                "clicks": clicks,
+                "cpa": round(spend / convs, 2) if convs > 0 else 0,
+            }
+            total_spend       += spend
+            total_conversions += convs
+            total_clicks      += clicks
+
+        # Ventana 30 días para CPL mensual
+        start_30 = end_date - timedelta(days=29)
+        m_query = f"""
+            SELECT metrics.cost_micros
+            FROM campaign
+            WHERE segments.date BETWEEN '{start_30}' AND '{end_date}'
+              AND campaign.status = 'ENABLED'
+        """
+        req_m = urllib.request.Request(
+            f"https://googleads.googleapis.com/{api_version}/customers/{customer_id}/googleAds:search",
+            data=json.dumps({"query": m_query}).encode(),
+            headers=headers,
+        )
+        with urllib.request.urlopen(req_m, timeout=15) as r:
+            m_results = json.loads(r.read()).get("results", [])
+        monthly_spend = sum(int(row["metrics"].get("costMicros", 0)) for row in m_results) / 1_000_000
+
+        return {
+            "period_days":        7,
+            "total_spend":        round(total_spend, 2),
+            "total_conversions":  round(total_conversions, 1),
+            "total_clicks":       total_clicks,
+            "cpl_ads":            round(total_spend / total_conversions, 2) if total_conversions > 0 else 0,
+            "campaigns":          campaigns,
+            "monthly_spend":      round(monthly_spend, 2),
+        }
+    except Exception as e:
+        print(f"  [GoogleAds] Error: {e}")
         return {}
 
 
@@ -210,28 +447,88 @@ def llm_propose(kr, current_value, evidence, external):
     ext_lines = []
     kr_name_lower = kr["name"].lower()
 
-    crm = external.get("crm", {})
-    sc  = external.get("search_console", {})
-    mi  = external.get("market_intel", {})
+    crm  = external.get("crm", {})
+    sc   = external.get("search_console", {})
+    ga4  = external.get("ga4", {})
+    ads  = external.get("google_ads", {})
+    mi   = external.get("market_intel", {})
 
     if crm:
-        if any(k in kr_name_lower for k in ["lead", "fit", "strategic"]):
-            ext_lines.append(f"  CRM — Leads activos: {crm.get('total_leads_active')} | Strategic fit YES: {crm.get('strategic_fit_yes')}")
+        if any(k in kr_name_lower for k in ["lead", "fit", "strategic", "pipeline"]):
+            ext_lines.append(
+                f"  CRM — Leads activos: {crm.get('total_leads_active')}"
+                f" | Fit YES (strategicFit=strategic_fit_yes): {crm.get('strategic_fit_yes')}"
+                f" | Hot (fit+SPI≥3): {crm.get('hot_leads')}"
+                f" | Sin clasificar: {crm.get('unclassified_leads')}"
+            )
+            if crm.get("avg_spi_fit_leads"):
+                ext_lines.append(f"  CRM — SPI promedio fit leads: {crm.get('avg_spi_fit_leads')} (escala 1–5)")
         if any(k in kr_name_lower for k in ["meeting", "reunión", "contacto"]):
             ext_lines.append(f"  CRM — Meetings registrados: {crm.get('meetings_booked')}")
-        if any(k in kr_name_lower for k in ["propuesta", "negociación", "deal"]):
-            ext_lines.append(f"  CRM — En negociación: {crm.get('in_negotiation')} | Propuestas enviadas: {crm.get('proposals_sent')} | Won: {crm.get('won_deals')}")
-            ext_lines.append(f"  CRM — Hot leads con propuesta: {crm.get('pct_hot_with_proposal')}%")
+        if any(k in kr_name_lower for k in ["propuesta", "negociación", "deal", "cierre"]):
+            ext_lines.append(
+                f"  CRM — En negociación: {crm.get('in_negotiation')}"
+                f" | Propuestas enviadas: {crm.get('proposals_sent')}"
+                f" | Won deals: {crm.get('won_deals')}"
+            )
+            ext_lines.append(f"  CRM — % hot leads con propuesta: {crm.get('pct_hot_with_proposal')}%")
         if "tiempo" in kr_name_lower or "primer contacto" in kr_name_lower:
             ext_lines.append(f"  CRM — Tiempo promedio primer contacto: {crm.get('avg_first_contact_h')} horas")
         if "cpl" in kr_name_lower or "coste" in kr_name_lower:
-            ext_lines.append(f"  CRM — Leads fit YES: {crm.get('strategic_fit_yes')} (denominador para calcular CPL real)")
+            ext_lines.append(
+                f"  CRM — Leads fit YES: {crm.get('strategic_fit_yes')}"
+                f" | Hot leads: {crm.get('hot_leads')} — usar fit_yes como denominador CPL"
+            )
 
     if sc:
         if any(k in kr_name_lower for k in ["impresión", "impresiones", "google search"]):
             ext_lines.append(f"  Search Console (28d) — Impresiones totales: {sc.get('total_impressions'):,} | Non-brand: {sc.get('nonbrand_impressions'):,}")
         if any(k in kr_name_lower for k in ["sesión", "orgánico", "non-brand", "search console"]):
             ext_lines.append(f"  Search Console (28d) — Clics non-brand: {sc.get('nonbrand_clicks'):,} | Totales: {sc.get('total_clicks'):,}")
+
+    if ga4:
+        if any(k in kr_name_lower for k in ["sesión", "tráfico", "visita", "cpc", "paid"]):
+            ext_lines.append(
+                f"  GA4 (7d) — Sesiones CPC: {ga4.get('cpc_sessions')} | Key events: {ga4.get('cpc_key_events')}"
+                f" | Engagement: {ga4.get('engagement_rate')}% | Bounce: {ga4.get('bounce_rate')}%"
+            )
+            ext_lines.append(
+                f"  GA4 (7d) — Argentina: {ga4.get('argentina_sessions')} ses / {ga4.get('argentina_key_events')} conv"
+                f" | España: {ga4.get('spain_sessions')} ses / {ga4.get('spain_key_events')} conv"
+            )
+        if any(k in kr_name_lower for k in ["cpl", "coste", "conversión", "lead pago"]):
+            ext_lines.append(
+                f"  GA4 (7d) — Key events (form_submit_web) reales: {ga4.get('cpc_key_events')}"
+                f" — usar este número como conversiones reales, NO el de Google Ads"
+            )
+
+    if ads:
+        if any(k in kr_name_lower for k in ["cpl", "coste", "gasto", "inversión", "paid", "ads"]):
+            ext_lines.append(
+                f"  Google Ads (7d) — Gasto total: €{ads.get('total_spend')} | Clicks: {ads.get('total_clicks')}"
+                f" | Conv (Ads): {ads.get('total_conversions')} | CPL Ads: €{ads.get('cpl_ads')}"
+            )
+            for camp_name, camp in (ads.get("campaigns") or {}).items():
+                ext_lines.append(
+                    f"    · {camp_name}: €{camp['spend']} | {camp['clicks']} clicks"
+                    f" | {camp['conversions']} conv | CPA €{camp['cpa']}"
+                )
+        if any(k in kr_name_lower for k in ["cpl", "coste"]):
+            # CPL real = gasto Ads 30d / leads strategic_fit_yes creados en CRM últimos 30d
+            # No usamos GA4 key events porque muchos formularios son B2C (Argentina mobile)
+            m_ads_spend  = ads.get("monthly_spend", 0) if ads else 0
+            new_fit_30d  = crm.get("new_fit_leads_30d", 0) if crm else 0
+            real_cpl     = round(m_ads_spend / new_fit_30d, 2) if new_fit_30d > 0 else None
+            if real_cpl:
+                ext_lines.append(
+                    f"  CPL REAL últimos 30 días (€{m_ads_spend} gasto Ads / {new_fit_30d} leads fit en CRM): €{real_cpl}"
+                    f" — usar este como valor del KR (target: €50, baseline: €87)"
+                )
+            elif m_ads_spend > 0:
+                ext_lines.append(
+                    f"  CPL REAL: €{m_ads_spend} gasto Ads / 0 leads fit este mes = sin leads calificados"
+                    f" — valor del KR debe reflejar ausencia de resultados"
+                )
 
     if mi and mi.get("resumen"):
         if any(k in kr_name_lower for k in ["mención", "linkedin", "quora", "orgánico"]):
@@ -293,9 +590,15 @@ def main():
     external = {
         "crm":            fetch_crm_snapshot(),
         "search_console": fetch_search_console(),
+        "ga4":            fetch_ga4(),
+        "google_ads":     fetch_google_ads(),
         "market_intel":   fetch_recent_market_intel(team_slug),
     }
-    print(f"  CRM: {len(external['crm'])} métricas | SC: {len(external['search_console'])} métricas | MI: {'sí' if external['market_intel'].get('resumen') else 'no'}")
+    print(f"  CRM: {len(external['crm'])} métricas"
+          f" | SC: {len(external['search_console'])} métricas"
+          f" | GA4: {len(external['ga4'])} métricas"
+          f" | Ads: {len(external['google_ads'])} métricas"
+          f" | MI: {'sí' if external['market_intel'].get('resumen') else 'no'}")
 
     for cycle in cycles:
         print(f"\n=== Cycle {cycle['id']} — team {cycle['team']} ({cycle['week_start']}..{cycle['week_end']}) ===")
