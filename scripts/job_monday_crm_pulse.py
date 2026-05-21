@@ -146,21 +146,67 @@ def get_hot_leads(jwt):
 
     hot.sort(key=sort_key)
 
-    # Leads activos sin actualización en más de 30 días → sección especial
+    # Detectar leads que necesitan seguimiento:
+    # 1. Sin actualización en 30+ días
+    # 2. Última nota menciona acción futura que ya pasó (llamada viernes, meet agendada, etc.)
     from datetime import timezone
     now = datetime.now(timezone.utc)
     stale = []
+    seen_stale = set()
+
     for l in hot:
+        lid = l.get("id")
         updated_str = l.get("updated") or l.get("updatedAt") or ""
+        days_old = 0
         if updated_str:
             try:
                 from datetime import datetime as _dt
                 updated = _dt.fromisoformat(updated_str.replace("Z", "+00:00"))
                 days_old = (now - updated).days
-                if days_old >= 30:
-                    stale.append((l, days_old))
             except Exception:
                 pass
+
+        # Motivo 1: sin mover 30+ días
+        if days_old >= 30 and lid not in seen_stale:
+            stale.append((l, days_old, f"Sin actualización hace {days_old} días"))
+            seen_stale.add(lid)
+            continue
+
+        # Motivo 2: última nota tiene acción pendiente no resuelta
+        # Usamos la fecha en la propia nota (no updated, que cambia con el scoring)
+        if lid not in seen_stale:
+            latest = _latest_note(
+                (l.get("summary") or ""), (l.get("interest") or "")
+            )
+            latest_lower = latest.lower()
+            PENDING_KEYWORDS = [
+                "viernes", "lunes", "martes", "miércoles", "miercoles",
+                "jueves", "sábado", "sabado", "domingo",
+                "próxima semana", "proxima semana", "esta semana",
+                "la semana que viene", "próximo", "proximo",
+                "agendada", "agendado", "programada", "programado",
+                "pendiente enviar", "pendiente respuesta", "queda pendiente",
+                "voy a enviar", "voy a mandar", "mando esta", "envío esta",
+                "llamada para", "call para", "reunión para", "reunion para",
+                "meet para", "demo para", "propuesta para", "pospuesta para",
+            ]
+            has_pending = any(k in latest_lower for k in PENDING_KEYWORDS)
+            if has_pending:
+                # Intentar parsear fecha al inicio de la nota (ej: "14/5 —")
+                note_days_old = days_old  # fallback: usar updated
+                m = _re.match(r"(\d{1,2})/(\d{1,2})", latest.strip())
+                if m:
+                    try:
+                        day, month = int(m.group(1)), int(m.group(2))
+                        year = now.year if month <= now.month else now.year - 1
+                        from datetime import datetime as _dt2
+                        note_date = _dt2(year, month, day, tzinfo=timezone.utc)
+                        note_days_old = (now - note_date).days
+                    except Exception:
+                        pass
+                if note_days_old >= 5:
+                    stale.append((l, note_days_old, "Acción pendiente sin resolver"))
+                    seen_stale.add(lid)
 
     return hot, stale
 
@@ -258,7 +304,7 @@ def build_html(leads, today_str, stale=None):
     # Sección de leads desactualizados
     if stale:
         stale_rows = ""
-        for lead, days in stale:
+        for lead, days, reason in stale:
             name    = lead_name(lead)
             company = lead.get("company") or "—"
             status  = STATUS_LABELS.get((lead.get("leadStatus") or "").lower(), "—")
@@ -270,12 +316,14 @@ def build_html(leads, today_str, stale=None):
                 <strong>{name}</strong><br>
                 <span style="font-size:11px;color:#92400e;">{company}</span>
               </td>
-              <td style="padding:8px 12px;font-size:12px;color:#92400e;border-bottom:1px solid #fde68a;
-                         text-align:center;white-space:nowrap;">{days} días</td>
+              <td style="padding:8px 12px;font-size:11px;color:#92400e;border-bottom:1px solid #fde68a;
+                         text-align:center;white-space:nowrap;">{days}d sin update</td>
               <td style="padding:8px 12px;font-size:12px;color:#92400e;border-bottom:1px solid #fde68a;
                          text-align:center;">{status}</td>
               <td style="padding:8px 12px;font-size:11px;color:#78350f;border-bottom:1px solid #fde68a;">
-                {note}</td>
+                {note}<br>
+                <span style="color:#b45309;font-style:italic;font-size:10px;">⚠ {reason}</span>
+              </td>
             </tr>"""
         stale_section = f"""
   <tr><td style="padding:0 32px 24px;">
