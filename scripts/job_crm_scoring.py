@@ -122,7 +122,16 @@ def calc_scores(lead):
     interest= (lead.get("interest") or "").strip()
     summary = (lead.get("summary") or "").strip()
 
-    if fn and fn.lower() not in ("unknown","test","prueba","devops"): si += 5;  si_parts.append("firstName+5")
+    TEST_NAMES     = {"unknown","test","prueba","devops","demo","testing","admin"}
+    TEST_COMPANY_KEYWORDS = ["prueba","test","demo","testing","etendo test","devops"]
+
+    is_test_lead = (
+        fn.lower() in TEST_NAMES or
+        any(k in company.lower() for k in TEST_COMPANY_KEYWORDS) or
+        email.startswith("test") or email.startswith("prueba") or email.startswith("devops")
+    )
+
+    if fn and fn.lower() not in TEST_NAMES:                            si += 5;  si_parts.append("firstName+5")
     if ln:                                                             si += 5;  si_parts.append("lastName+5")
     domain = email.split("@")[-1] if "@" in email else ""
     if domain and domain not in GENERIC_DOMAINS and not domain.endswith("etendo.software"):
@@ -130,7 +139,8 @@ def calc_scores(lead):
     elif domain in GENERIC_DOMAINS:
         si += 5;  si_parts.append("emailGeneric+5")
     if phone:                                                          si += 10; si_parts.append("phone+10")
-    if company and company.lower() not in ("sin dato","sin empresa","test"):
+    if company and company.lower() not in ("sin dato","sin empresa","test") and \
+       not any(k in company.lower() for k in TEST_COMPANY_KEYWORDS):
         si += 10; si_parts.append("company+10")
     if country:                                                        si += 5;  si_parts.append("country+5")
     if industry:                                                       si += 10; si_parts.append("industry+10")
@@ -141,7 +151,7 @@ def calc_scores(lead):
     if len(summary) > 80:                                              si += 5;  si_parts.append("summary+5")
 
     txt = (interest + " " + summary).lower()
-    if email.endswith("@etendo.software") or "busca trabajo" in txt:
+    if is_test_lead or email.endswith("@etendo.software") or "busca trabajo" in txt:
         spi = -1
     elif any(k in txt for k in ["demo","presupuesto","urgente","quiero avanzar","implementar ya"]):
         spi = 3
@@ -156,9 +166,10 @@ def calc_scores(lead):
 
     score = si * spi
 
-    is_junk     = not fn and not company and not phone and domain in GENERIC_DOMAINS
+    is_junk     = is_test_lead or (not fn and not company and not phone and domain in GENERIC_DOMAINS)
     status      = (lead.get("leadStatus") or "").lower()
-    has_company = bool(company and company.lower() not in ("sin dato", "sin empresa", "test"))
+    has_company = bool(company and company.lower() not in ("sin dato", "sin empresa", "test")
+                       and not any(k in company.lower() for k in TEST_COMPANY_KEYWORDS))
     is_engaged  = status in ("in_progress","meeting_scheduled","meeting_pending","new") and has_company
 
     ERP_KEYWORDS = ["erp","inventario","finanzas","manufactura","contabilidad","mrp","bi",
