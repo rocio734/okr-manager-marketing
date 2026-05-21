@@ -194,7 +194,7 @@ def get_hot_leads(jwt):
             if has_pending:
                 # Intentar parsear fecha al inicio de la nota (ej: "14/5 —")
                 note_days_old = days_old  # fallback: usar updated
-                m = _re.match(r"(\d{1,2})/(\d{1,2})", latest.strip())
+                m = _re.search(r"(\d{1,2})/(\d{1,2})", latest[:20])
                 if m:
                     try:
                         day, month = int(m.group(1)), int(m.group(2))
