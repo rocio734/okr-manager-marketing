@@ -48,7 +48,7 @@ SMTP_PORT  = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER  = os.getenv("SMTP_USER",  os.getenv("GMAIL_USER",     "victoria.miguez@smfconsulting.es"))
 SMTP_PASS  = os.getenv("SMTP_PASS",  os.getenv("GMAIL_PASSWORD", ""))
 
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 HOT_STATUSES = {
     "new", "in_progress", "meeting_scheduled", "meeting_pending",
@@ -146,10 +146,10 @@ def update_lead(lead_id, payload, sid):
         return None, str(e)
 
 
-# ── Claude parsing ────────────────────────────────────────────────────────────
+# ── OpenAI parsing ───────────────────────────────────────────────────────────
 def parse_reply(reply_text, leads_snapshot):
-    if not ANTHROPIC_API_KEY:
-        LOG("WARN: ANTHROPIC_API_KEY no disponible — usando parsing básico")
+    if not OPENAI_API_KEY:
+        LOG("WARN: OPENAI_API_KEY no disponible — usando parsing básico")
         return _parse_basic(reply_text, leads_snapshot)
 
     leads_list = "\n".join(
@@ -192,28 +192,27 @@ Si no hay leads identificables, devolvé [].
 """
 
     req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
+        "https://api.openai.com/v1/chat/completions",
         data=json.dumps({
-            "model":      "claude-haiku-4-5-20251001",
-            "max_tokens": 1024,
-            "messages":   [{"role": "user", "content": prompt}],
+            "model":       "gpt-4o-mini",
+            "max_tokens":  1024,
+            "temperature": 0,
+            "messages":    [{"role": "user", "content": prompt}],
         }).encode(),
         method="POST",
     )
-    req.add_header("x-api-key", ANTHROPIC_API_KEY)
-    req.add_header("anthropic-version", "2023-06-01")
+    req.add_header("Authorization", f"Bearer {OPENAI_API_KEY}")
     req.add_header("Content-Type", "application/json")
 
     try:
         with urllib.request.urlopen(req) as r:
             resp = json.loads(r.read())
-        raw = resp.get("content", [{}])[0].get("text", "[]").strip()
-        # Strip markdown code fences
+        raw = resp["choices"][0]["message"]["content"].strip()
         raw = re.sub(r"^```(?:json)?\s*", "", raw)
         raw = re.sub(r"\s*```$", "", raw)
         return json.loads(raw)
     except Exception as e:
-        LOG(f"ERROR Claude: {e} — fallback a parsing básico")
+        LOG(f"ERROR OpenAI: {e} — fallback a parsing básico")
         return _parse_basic(reply_text, leads_snapshot)
 
 
