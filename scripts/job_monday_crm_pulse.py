@@ -123,9 +123,20 @@ def get_hot_leads(jwt):
             email.startswith(("test", "prueba", "devops"))
         )
 
+    DISCARD_KEYWORDS = ["descartado", "descartar", "no interesa", "no le interesa",
+                        "no está interesado", "no interesado", "sin interés",
+                        "no continúa", "no continua", "archivado", "cold"]
+
+    def is_discarded_by_note(lead):
+        summary  = (lead.get("summary") or "").strip()
+        interest = (lead.get("interest") or "").strip()
+        latest   = _latest_note(summary, interest).lower()
+        return any(k in latest for k in DISCARD_KEYWORDS)
+
     hot = [l for l in all_leads
            if (l.get("leadStatus") or "").lower() in HOT_STATUSES
-           and not is_test(l)]
+           and not is_test(l)
+           and not is_discarded_by_note(l)]
 
     def sort_key(l):
         s = (l.get("leadStatus") or "").lower()
@@ -134,7 +145,24 @@ def get_hot_leads(jwt):
         return (order, -score)
 
     hot.sort(key=sort_key)
-    return hot
+
+    # Leads activos sin actualización en más de 30 días → sección especial
+    from datetime import timezone
+    now = datetime.now(timezone.utc)
+    stale = []
+    for l in hot:
+        updated_str = l.get("updated") or l.get("updatedAt") or ""
+        if updated_str:
+            try:
+                from datetime import datetime as _dt
+                updated = _dt.fromisoformat(updated_str.replace("Z", "+00:00"))
+                days_old = (now - updated).days
+                if days_old >= 30:
+                    stale.append((l, days_old))
+            except Exception:
+                pass
+
+    return hot, stale
 
 
 # ── Email HTML ────────────────────────────────────────────────────────────────
@@ -175,7 +203,8 @@ def lead_name(lead):
     return name if name else "(sin nombre)"
 
 
-def build_html(leads, today_str):
+def build_html(leads, today_str, stale=None):
+    stale = stale or []
     rows_html = ""
     badge_colors = {
         "negotiation":       ("#166534", "#dcfce7"),
@@ -225,6 +254,57 @@ def build_html(leads, today_str):
     count = len(leads)
     avatar_src = "cid:lucia_avatar" if AVATAR_PATH else \
         "https://ui-avatars.com/api/?name=Lucia&background=0e6df6&color=fff&size=72"
+
+    # Sección de leads desactualizados
+    if stale:
+        stale_rows = ""
+        for lead, days in stale:
+            name    = lead_name(lead)
+            company = lead.get("company") or "—"
+            status  = STATUS_LABELS.get((lead.get("leadStatus") or "").lower(), "—")
+            latest  = _latest_note((lead.get("summary") or ""), (lead.get("interest") or ""))
+            note    = latest[:100] + ("…" if len(latest) > 100 else "") if latest else "—"
+            stale_rows += f"""
+            <tr>
+              <td style="padding:8px 12px;font-size:13px;color:#111827;border-bottom:1px solid #fde68a;">
+                <strong>{name}</strong><br>
+                <span style="font-size:11px;color:#92400e;">{company}</span>
+              </td>
+              <td style="padding:8px 12px;font-size:12px;color:#92400e;border-bottom:1px solid #fde68a;
+                         text-align:center;white-space:nowrap;">{days} días</td>
+              <td style="padding:8px 12px;font-size:12px;color:#92400e;border-bottom:1px solid #fde68a;
+                         text-align:center;">{status}</td>
+              <td style="padding:8px 12px;font-size:11px;color:#78350f;border-bottom:1px solid #fde68a;">
+                {note}</td>
+            </tr>"""
+        stale_section = f"""
+  <tr><td style="padding:0 32px 24px;">
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;overflow:hidden;">
+      <div style="background:#fef3c7;padding:10px 16px;border-bottom:1px solid #fde68a;">
+        <span style="font-size:13px;font-weight:700;color:#92400e;">
+          ⚠️ Requieren actualización urgente ({len(stale)} leads sin mover hace +30 días)
+        </span>
+      </div>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr style="background:#fffbeb;">
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:#92400e;
+                     text-transform:uppercase;">Lead</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:#92400e;
+                     text-transform:uppercase;">Sin mover</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:#92400e;
+                     text-transform:uppercase;">Estado</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:#92400e;
+                     text-transform:uppercase;">Última nota</th>
+        </tr>
+        {stale_rows}
+      </table>
+      <div style="padding:10px 16px;font-size:12px;color:#92400e;">
+        👉 Respondé este email indicando qué pasó con cada uno o si hay que descartarlos.
+      </div>
+    </div>
+  </td></tr>"""
+    else:
+        stale_section = ""
 
     return f"""<!DOCTYPE html>
 <html lang="es">
@@ -309,6 +389,8 @@ def build_html(leads, today_str):
     </div>
   </td></tr>
 
+  {stale_section}
+
   <tr><td style="background:#f8f9fb;padding:16px 32px;border-top:1px solid #e5e7eb;">
     <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
       CRM Pulse automático · {today_str} · Etendo Revenue Org<br>
@@ -321,7 +403,7 @@ def build_html(leads, today_str):
 </body></html>"""
 
 
-def send_pulse(leads, today_str):
+def send_pulse(leads, today_str, stale=None):
     subject = f"[CRM Pulse] {today_str} — {len(leads)} leads activos"
 
     msg = MIMEMultipart("mixed")
@@ -335,7 +417,7 @@ def send_pulse(leads, today_str):
     msg["Message-ID"] = msg_id
 
     related = MIMEMultipart("related")
-    related.attach(MIMEText(build_html(leads, today_str), "html", "utf-8"))
+    related.attach(MIMEText(build_html(leads, today_str, stale), "html", "utf-8"))
 
     if AVATAR_PATH:
         mime_type = "gif" if AVATAR_PATH.suffix.lower() == ".gif" else "jpeg"
@@ -371,14 +453,14 @@ def main():
         LOG("ERROR: JWT login fallido"); return
 
     LOG("Cargando leads activos del CRM…")
-    leads = get_hot_leads(jwt)
-    LOG(f"  {len(leads)} leads en estado activo")
+    leads, stale = get_hot_leads(jwt)
+    LOG(f"  {len(leads)} leads activos | {len(stale)} desactualizados (+30 días)")
 
     if not leads:
         LOG("Sin leads activos — no se envía email."); return
 
-    send_pulse(leads, today_str)
-    LOG(f"Done. {len(leads)} leads, {len(RECIPIENTS)} destinatario(s).")
+    send_pulse(leads, today_str, stale)
+    LOG(f"Done. {len(leads)} leads, {len(stale)} stale, {len(RECIPIENTS)} destinatario(s).")
 
 
 if __name__ == "__main__":
