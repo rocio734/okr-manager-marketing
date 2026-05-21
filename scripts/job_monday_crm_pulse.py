@@ -43,9 +43,10 @@ REPO_ROOT   = SCRIPT_DIR.parent
 
 # Avatar: try local dev path first, then repo-relative
 _AVATAR_CANDIDATES = [
+    REPO_ROOT / "assets" / "lucia_avatar_animated.gif",
+    REPO_ROOT / "assets" / "lucia_avatar.jpeg",
     REPO_ROOT.parent / "influencer" / "Stack fotos" /
         "Cinematic_portrait_photograph,_front-facing,_0°_202605181023.jpeg",
-    REPO_ROOT / "assets" / "lucia_avatar.jpeg",
     Path(os.getenv("LUCIA_AVATAR_PATH", "/nonexistent")),
 ]
 AVATAR_PATH = next((p for p in _AVATAR_CANDIDATES if p.exists()), None)
@@ -294,12 +295,14 @@ def send_pulse(leads, today_str):
     related.attach(MIMEText(build_html(leads, today_str), "html", "utf-8"))
 
     if AVATAR_PATH:
+        mime_type = "gif" if AVATAR_PATH.suffix.lower() == ".gif" else "jpeg"
+        filename  = f"lucia.{mime_type}"
         with open(AVATAR_PATH, "rb") as f:
-            img = MIMEImage(f.read(), "jpeg")
+            img = MIMEImage(f.read(), mime_type)
         img.add_header("Content-ID", "<lucia_avatar>")
-        img.add_header("Content-Disposition", "inline", filename="lucia.jpg")
+        img.add_header("Content-Disposition", "inline", filename=filename)
         related.attach(img)
-        LOG("Avatar adjuntada como CID inline")
+        LOG(f"Avatar adjuntada como CID inline ({mime_type})")
     else:
         LOG("WARN: avatar no encontrada — email sin imagen inline")
 
