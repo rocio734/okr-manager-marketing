@@ -278,18 +278,23 @@ def extract_text(msg):
 
 def strip_quoted(text):
     """Remove quoted reply content, keeping only the top new reply text."""
+    # Cut inline Gmail attribution that appears on the same line as the reply
+    # e.g. "...semana. El jue, 21 may 2026 a las 12:09, Lucía escribió:"
+    text = re.sub(
+        r'\s+(El\s+\w+[,.]?\s+\d{1,2}\s+\w+\s+\d{4}|On\s+\w+[,.]?\s+\w+\s+\d{1,2}[,.]?\s+\d{4}).*',
+        '', text, flags=re.IGNORECASE | re.DOTALL
+    )
+
     QUOTE_STARTS = (">", "On ", "De:", "From:", "Enviado:", "Sent:", "Para:", "To:", "Asunto:", "Subject:")
     lines = []
     for line in text.splitlines():
         stripped = line.strip()
-        # Stop at common quoted-email delimiters
         if stripped.startswith(">"):
             break
         if any(stripped.startswith(p) for p in QUOTE_STARTS[1:]):
             break
         if stripped.lower().startswith("el ") and "escribió:" in stripped.lower():
             break
-        # Stop at separator lines (--- or ___) used by email clients
         if re.match(r"^[-_]{3,}$", stripped):
             break
         lines.append(line)
