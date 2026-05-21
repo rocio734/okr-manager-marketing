@@ -241,8 +241,9 @@ def _parse_basic(reply_text, leads_snapshot):
     for lead in leads_snapshot:
         name_lower    = lead["name"].lower()
         company_lower = (lead["company"] or "").lower()
-        if (len(name_lower) > 2 and name_lower in reply_lower) or \
-           (len(company_lower) > 3 and company_lower in reply_lower):
+        name_match    = len(name_lower) > 3 and bool(re.search(r'\b' + re.escape(name_lower) + r'\b', reply_lower))
+        company_match = len(company_lower) > 4 and bool(re.search(r'\b' + re.escape(company_lower) + r'\b', reply_lower))
+        if name_match or company_match:
             new_status = next(
                 (v for k, v in STATUS_KEYWORDS.items() if k in reply_lower), None
             )
@@ -334,6 +335,12 @@ def fetch_crm_pulse_replies():
         if "Re:" not in subject and "RE:" not in subject:
             mail.store(num, "+FLAGS", "\\Answered")
             LOG(f"  Skipping non-reply: {subject[:60]}")
+            continue
+
+        # Skip our own confirmation emails (sent back to the rep after processing)
+        if "Actualización recibida" in subject or "actualizacion recibida" in subject.lower():
+            mail.store(num, "+FLAGS", "\\Answered")
+            LOG(f"  Skipping confirmation email: {subject[:60]}")
             continue
 
         body = strip_quoted(extract_text(msg))
