@@ -138,6 +138,36 @@ def get_hot_leads(jwt):
 
 
 # ── Email HTML ────────────────────────────────────────────────────────────────
+import re as _re
+
+def _latest_note(summary, interest=""):
+    """
+    Devuelve la nota más reciente del campo summary.
+    Soporta dos formatos:
+      - Cronológico (más viejo primero): '20/4 — texto\n22/4 — texto\n12/5 — texto'
+        → toma la ÚLTIMA línea con contenido
+      - Inverso (reply_checker, más nuevo primero): '[21/05/2026 — sender] texto\nanterior'
+        → toma la PRIMERA línea (empieza con '[')
+    Si no hay summary, usa interest.
+    """
+    text = summary.strip()
+    if not text:
+        text = interest.strip()
+    if not text:
+        return ""
+
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if not lines:
+        return ""
+
+    # Formato inverso: primera línea empieza con '['
+    if lines[0].startswith("["):
+        return lines[0]
+
+    # Formato cronológico: última línea con contenido es la más reciente
+    return lines[-1]
+
+
 def lead_name(lead):
     fn = (lead.get("firstName") or "").strip()
     ln = (lead.get("lastName") or "").strip()
@@ -165,18 +195,9 @@ def build_html(leads, today_str):
         spi         = lead.get("scorePurchaseIntention") or "—"
         company     = lead.get("company") or "—"
         name        = lead_name(lead)
-        raw_summary = (lead.get("summary") or "").strip()
+        raw_summary  = (lead.get("summary") or "").strip()
         raw_interest = (lead.get("interest") or "").strip()
-        # Si hay entradas con fecha [DD/MM/YYYY...], tomar la más reciente
-        import re as _re
-        dated = _re.split(r'\n(?=\[)', raw_summary)
-        if len(dated) > 1:
-            # Hay múltiples entradas con fecha — la primera es la más reciente
-            latest = dated[0].strip()
-        elif raw_summary:
-            latest = raw_summary.splitlines()[0].strip()
-        else:
-            latest = raw_interest.splitlines()[0].strip() if raw_interest else ""
+        latest = _latest_note(raw_summary, raw_interest)
         summary = latest[:120] + ("…" if len(latest) > 120 else "") if latest else "—"
         txt_c, bg_c = badge_colors.get(status_raw, ("#374151", "#f3f4f6"))
 
