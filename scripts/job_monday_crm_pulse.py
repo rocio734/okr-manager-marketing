@@ -111,8 +111,21 @@ def get_hot_leads(jwt):
             break
         start += 100
 
+    TEST_KEYWORDS = ["prueba", "test", "demo", "testing", "devops"]
+
+    def is_test(lead):
+        company = (lead.get("company") or "").lower()
+        fn      = (lead.get("firstName") or "").lower()
+        email   = (lead.get("email") or "").lower()
+        return (
+            any(k in company for k in TEST_KEYWORDS) or
+            fn in {"test", "prueba", "demo", "devops", "unknown"} or
+            email.startswith(("test", "prueba", "devops"))
+        )
+
     hot = [l for l in all_leads
-           if (l.get("leadStatus") or "").lower() in HOT_STATUSES]
+           if (l.get("leadStatus") or "").lower() in HOT_STATUSES
+           and not is_test(l)]
 
     def sort_key(l):
         s = (l.get("leadStatus") or "").lower()
@@ -152,10 +165,19 @@ def build_html(leads, today_str):
         spi         = lead.get("scorePurchaseIntention") or "—"
         company     = lead.get("company") or "—"
         name        = lead_name(lead)
-        raw_summary = lead.get("summary") or lead.get("interest") or ""
-        # Mostrar solo la última actualización (primera línea si hay timestamps [DD/MM/YYYY])
-        first_line  = raw_summary.strip().splitlines()[0].strip() if raw_summary.strip() else ""
-        summary     = first_line[:120] + ("…" if len(first_line) > 120 else "") if first_line else "—"
+        raw_summary = (lead.get("summary") or "").strip()
+        raw_interest = (lead.get("interest") or "").strip()
+        # Si hay entradas con fecha [DD/MM/YYYY...], tomar la más reciente
+        import re as _re
+        dated = _re.split(r'\n(?=\[)', raw_summary)
+        if len(dated) > 1:
+            # Hay múltiples entradas con fecha — la primera es la más reciente
+            latest = dated[0].strip()
+        elif raw_summary:
+            latest = raw_summary.splitlines()[0].strip()
+        else:
+            latest = raw_interest.splitlines()[0].strip() if raw_interest else ""
+        summary = latest[:120] + ("…" if len(latest) > 120 else "") if latest else "—"
         txt_c, bg_c = badge_colors.get(status_raw, ("#374151", "#f3f4f6"))
 
         rows_html += f"""
@@ -200,8 +222,8 @@ def build_html(leads, today_str):
   <tr><td style="background:linear-gradient(135deg,#1e3a5f 0%,#0e6df6 100%);
                  padding:28px 32px;">
     <table cellpadding="0" cellspacing="0" width="100%"><tr>
-      <td width="80" valign="middle" style="padding-right:20px;">
-        <img src="{avatar_src}" width="72" height="72"
+      <td width="120" valign="middle" style="padding-right:20px;">
+        <img src="{avatar_src}" width="100" height="128"
              style="border-radius:50%;border:3px solid rgba(255,255,255,.4);
                     object-fit:cover;display:block;" alt="Lucía">
       </td>
