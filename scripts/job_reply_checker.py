@@ -16,7 +16,9 @@ Env vars requeridas:
 """
 
 import email as email_lib
+import email.header
 import email.utils
+import http.cookiejar
 import imaplib
 import json
 import os
@@ -70,19 +72,23 @@ def login_jwt():
 
 
 def login_sid():
-    body = urllib.parse.urlencode(
+    jar    = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    body   = urllib.parse.urlencode(
         {"user": USERNAME, "password": PASSWORD, "Command": "Login"}
     ).encode()
     req = urllib.request.Request(
         f"{WRITE_URL}/secureApp/LoginHandler.html", data=body, method="POST"
     )
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
-    with urllib.request.urlopen(req) as r:
-        for h, v in r.headers.items():
-            if h.lower() == "set-cookie" and "JSESSIONID" in v:
-                for p in v.split(";"):
-                    if p.strip().startswith("JSESSIONID="):
-                        return p.strip().split("=", 1)[1]
+    try:
+        with opener.open(req) as r:
+            pass
+    except Exception as e:
+        LOG(f"WARN login_sid: {e}")
+    for cookie in jar:
+        if cookie.name == "JSESSIONID":
+            return cookie.value
     return ""
 
 
@@ -271,12 +277,20 @@ def extract_text(msg):
 
 
 def strip_quoted(text):
-    """Remove email quote lines (lines starting with >) to get only the new reply."""
+    """Remove quoted reply content, keeping only the top new reply text."""
+    QUOTE_STARTS = (">", "On ", "De:", "From:", "Enviado:", "Sent:", "Para:", "To:", "Asunto:", "Subject:")
     lines = []
     for line in text.splitlines():
         stripped = line.strip()
-        if stripped.startswith(">") or stripped.startswith("On ") or \
-           stripped.lower().startswith("el ") and "escribió:" in stripped.lower():
+        # Stop at common quoted-email delimiters
+        if stripped.startswith(">"):
+            break
+        if any(stripped.startswith(p) for p in QUOTE_STARTS[1:]):
+            break
+        if stripped.lower().startswith("el ") and "escribió:" in stripped.lower():
+            break
+        # Stop at separator lines (--- or ___) used by email clients
+        if re.match(r"^[-_]{3,}$", stripped):
             break
         lines.append(line)
     return "\n".join(lines).strip()
@@ -291,16 +305,16 @@ def fetch_crm_pulse_replies():
         mail.select("INBOX")
     except Exception as e:
         LOG(f"ERROR IMAP: {e}")
-        return replies
+        return replies, None
 
-    # Search for unread emails with CRM Pulse in subject
-    status, data = mail.search(None, '(UNSEEN SUBJECT "CRM Pulse")')
+    # Search all CRM Pulse emails not yet processed (UNANSWERED flag tracks processed state)
+    status, data = mail.search(None, '(SUBJECT "CRM Pulse" UNANSWERED)')
     if status != "OK":
         mail.logout()
-        return replies
+        return replies, None
 
     msg_nums = data[0].split()
-    LOG(f"  {len(msg_nums)} emails CRM Pulse sin leer")
+    LOG(f"  {len(msg_nums)} emails CRM Pulse sin procesar")
 
     for num in msg_nums:
         status, msg_data = mail.fetch(num, "(RFC822)")
@@ -308,16 +322,18 @@ def fetch_crm_pulse_replies():
             continue
 
         msg     = email_lib.message_from_bytes(msg_data[0][1])
-        subject = msg.get("Subject", "")
+        subject = str(email.header.make_header(email.header.decode_header(msg.get("Subject", ""))))
         sender  = email.utils.parseaddr(msg.get("From", ""))[1]
 
-        # Only process replies (Re: in subject)
+        # Mark non-replies as answered so they don't show up next run
         if "Re:" not in subject and "RE:" not in subject:
+            mail.store(num, "+FLAGS", "\\Answered")
             LOG(f"  Skipping non-reply: {subject[:60]}")
             continue
 
         body = strip_quoted(extract_text(msg))
         if not body or len(body.strip()) < 5:
+            mail.store(num, "+FLAGS", "\\Answered")
             LOG(f"  Skipping empty reply from {sender}")
             continue
 
@@ -329,19 +345,14 @@ def fetch_crm_pulse_replies():
             "body":     body,
         })
 
-    mail.logout()
     return replies, mail
 
 
-def mark_read_and_label(imap_num):
+def mark_processed(mail, imap_num):
     try:
-        mail = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT)
-        mail.login(IMAP_USER, IMAP_PASS)
-        mail.select("INBOX")
-        mail.store(imap_num, "+FLAGS", "\\Seen")
-        mail.logout()
+        mail.store(imap_num, "+FLAGS", "\\Answered")
     except Exception as e:
-        LOG(f"WARN mark_read: {e}")
+        LOG(f"WARN mark_processed: {e}")
 
 
 # ── Confirmation email ────────────────────────────────────────────────────────
@@ -414,11 +425,12 @@ def main():
 
     # Fetch IMAP replies
     LOG("Buscando respuestas en IMAP…")
-    result = fetch_crm_pulse_replies()
-    replies = result[0] if isinstance(result, tuple) else result
+    replies, imap_conn = fetch_crm_pulse_replies()
 
     if not replies:
         LOG("No hay respuestas nuevas.")
+        if imap_conn:
+            imap_conn.logout()
         return
 
     LOG(f"Procesando {len(replies)} respuesta(s)…")
@@ -485,8 +497,10 @@ def main():
                 upd["write_ok"] = False
 
         send_confirmation(sender, updates)
-        mark_read_and_label(reply["imap_num"])
+        mark_processed(imap_conn, reply["imap_num"])
 
+    if imap_conn:
+        imap_conn.logout()
     LOG("Done.")
 
 
