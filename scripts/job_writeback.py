@@ -131,23 +131,26 @@ def main():
         url = (f"{base_url}/etendo/org.openbravo.service.json.jsonrest"
                f"/SMFOKR_Okr_Kr/{kr_id}"
                f"?AD_Role_ID={ETENDO_ROLE}&AD_Client_ID={ETENDO_CLIENT}&AD_Org_ID=0")
-        body = {"data": {"id": kr_id, "currentValue": new_value}}
+        # JSON REST de Etendo: objeto plano, sin wrapper "data"
+        body = {"id": kr_id, "currentValue": new_value}
         r = req_lib.put(url, json=body, headers=rest_headers, timeout=30)
-        print(f"    REST PUT KR: {r.status_code}")
+        snippet = r.text[:300] if r.text else ""
+        print(f"    REST PUT KR: {r.status_code} | {snippet}")
         return r
 
     def rest_add_kr_update(kr_id, kr_name, new_value, comment):
         url = (f"{base_url}/etendo/org.openbravo.service.json.jsonrest"
                f"/SMFOKR_Kr_Update"
                f"?AD_Role_ID={ETENDO_ROLE}&AD_Client_ID={ETENDO_CLIENT}&AD_Org_ID=0")
-        body = {"data": {
+        body = {
             "keyResult": kr_id,
             "currentValue": new_value,
             "comment": comment,
             "status": "on_track",
-        }}
+        }
         r = req_lib.post(url, json=body, headers=rest_headers, timeout=30)
-        print(f"    REST POST KR_Update: {r.status_code}")
+        snippet = r.text[:300] if r.text else ""
+        print(f"    REST POST KR_Update: {r.status_code} | {snippet}")
         return r
 
     # Probar si el REST API con AD_Role_ID funciona
