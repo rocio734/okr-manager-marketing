@@ -70,7 +70,8 @@ def fetch_crm_snapshot():
         negotiation   = [l for l in active if l.get("leadStatus") == "negotiation"]
         # % hot con propuesta: cuántos hot leads tienen propuesta activa (en negotiation)
         proposal_sent = [l for l in hot if l.get("leadStatus") == "negotiation"]
-        meetings      = [l for l in leads if l.get("meetingDate")]
+        cutoff_30d_str = (date.today() - timedelta(days=29)).isoformat()
+        meetings      = [l for l in leads if (l.get("meetingDate") or "")[:10] >= cutoff_30d_str]
         unclassified  = [l for l in active if not l.get("strategicFit") or l.get("strategicFit") == "unclassified"]
 
         # Score promedio de los leads fit (para medir calidad del pipeline)
@@ -503,7 +504,7 @@ def llm_propose(kr, current_value, evidence, external):
             )
 
     if ads:
-        if any(k in kr_name_lower for k in ["cpl", "coste", "gasto", "inversión", "paid", "ads"]):
+        if any(k in kr_name_lower for k in ["cpl", "coste", "gasto", "inversión", "paid", "google ads"]):
             ext_lines.append(
                 f"  Google Ads (7d) — Gasto total: €{ads.get('total_spend')} | Clicks: {ads.get('total_clicks')}"
                 f" | Conv (Ads): {ads.get('total_conversions')} | CPL Ads: €{ads.get('cpl_ads')}"

@@ -4,65 +4,63 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OKR Manager — Lunes · Aprobar iniciativas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="styles.css">
-<style>
-  .approve-init { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: start; padding: 16px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.03); }
-  .approve-init.rejected { opacity: 0.45; }
-  .approve-init .body input.title-edit { font-size: 15px; font-weight: 700; background: transparent; border: 1px dashed transparent; padding: 6px 8px; }
-  .approve-init .body input.title-edit:focus { border-color: rgba(255,215,0,0.4); background: rgba(255,255,255,0.05); }
-  .approve-init .body textarea.plan-edit { font-size: 13px; opacity: 0.85; line-height: 1.55; min-height: 60px; margin-top: 6px; background: transparent; border: 1px dashed transparent; }
-  .approve-init .body textarea.plan-edit:focus { border-color: rgba(255,215,0,0.4); background: rgba(255,255,255,0.05); }
-  .approve-init .meta { font-size: 11px; opacity: 0.55; margin-top: 6px; }
-  .approve-init .meta strong { color: #FFD700; opacity: 0.85; }
-  .approve-init .actions { display:flex; flex-direction:column; gap:6px; min-width:90px; }
-  .approve-init.state-approved { border-color: rgba(72,199,142,0.4); background: rgba(72,199,142,0.05); }
-  .approve-init.state-rejected { opacity:0.45; border-color: rgba(255,80,80,0.3); }
-  .btn-approve { background: rgba(72,199,142,0.15); color: #48c78e; border: 1px solid rgba(72,199,142,0.4); }
-  .btn-approve:hover, .btn-approve.active { background: #48c78e; color: #0f0f1a; }
-  .btn-reject  { background: transparent; color: #ff6b6b; border: 1px solid rgba(255,107,107,0.4); }
-  .btn-reject:hover, .btn-reject.active  { background: #ff6b6b; color: #fff; }
-  .add-manual-form { background: rgba(79,195,247,0.06); border: 1px dashed rgba(79,195,247,0.4); border-radius: 10px; padding: 14px; margin-top: 10px; }
-  .add-manual-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-  .approve-actions { position: sticky; bottom: 16px; background: rgba(15,15,26,0.96); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 14px 18px; margin-top: 28px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(8px); }
-</style>
 </head>
 <body>
 
-<div class="topbar"></div>
+<div class="app-shell">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <a href="dashboard.html" class="sidebar-logo" title="OKR Manager"><img src="assets/etendo_icon.png" alt="Etendo" style="width:28px;height:26px;display:block;"></a>
+    <a href="dashboard.html" class="nav-icon" title="Dashboard">⊞</a>
+    <a href="approval-monday.html" class="nav-icon active" title="Lunes · Iniciativas">◫</a>
+    <a href="kr-proposals-friday.html" class="nav-icon" title="Viernes · KRs">◈</a>
+    <a href="market-intel.html" class="nav-icon" title="Visión del Mercado">◉</a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-avatar" id="sidebar-avatar">—</div>
+  </nav>
 
-<div class="container">
-  <h1>Lunes — Aprobar iniciativas</h1>
-  <p class="lead">Revisá las iniciativas propuestas para esta semana. Podés editarlas in-line, agregar manuales o rechazarlas. Cuando termines, click en "Aprobar batch" para arrancar el ciclo.</p>
+  <!-- Workspace -->
+  <div class="workspace">
+    <header class="topbar"></header>
 
-  <div id="not-approver" style="display:none;">
-    <div class="empty">
-      Para aprobar tenés que iniciar sesión como aprobador.<br>
-      Click en "Iniciar sesión" arriba a la derecha.
-    </div>
-  </div>
+    <main class="content">
+      <h1>Lunes — Aprobar iniciativas</h1>
+      <p class="lead">Revisá las iniciativas propuestas para esta semana. Podés editarlas in-line, agregar manuales o rechazarlas. Cuando termines, click en "Aprobar batch" para arrancar el ciclo.</p>
 
-  <div id="content" style="display:none;">
-    <div id="krs-block"></div>
-
-    <div class="approve-actions">
-      <div>
-        <span id="summary" class="muted">—</span>
+      <div id="not-approver" style="display:none;">
+        <div class="empty">
+          Para aprobar tenés que iniciar sesión como aprobador.<br>
+          Click en "Iniciar sesión" arriba a la derecha.
+        </div>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn" id="btn-generate" style="background:rgba(201,100,66,0.15);color:#e8a87c;border:1px solid rgba(201,100,66,0.4);">⚡ Regenerar con el agente</button>
-        <button class="btn btn-ghost" id="btn-cancel">Descartar cambios</button>
-        <button class="btn btn-primary" id="btn-approve-batch">Aprobar batch</button>
-      </div>
-    </div>
-  </div>
 
-  <div id="empty" style="display:none;">
-    <div class="empty">
-      No hay iniciativas pendientes de aprobación esta semana.
-      <div style="margin-top:16px;">
-        <button class="btn btn-primary" id="btn-generate-empty">⚡ Generar iniciativas con el agente</button>
+      <div id="content" style="display:none;">
+        <div id="krs-block"></div>
+
+        <div class="approve-actions">
+          <div>
+            <span id="summary" class="muted">—</span>
+          </div>
+          <div style="display:flex;gap:var(--sp-2);">
+            <button class="btn btn-secondary" id="btn-generate">⚡ Regenerar con el agente</button>
+            <button class="btn btn-ghost" id="btn-cancel">Descartar cambios</button>
+            <button class="btn btn-primary" id="btn-approve-batch">Aprobar batch</button>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <div id="empty" style="display:none;">
+        <div class="empty">
+          No hay iniciativas pendientes de aprobación esta semana.
+          <div style="margin-top:var(--sp-4);">
+            <button class="btn btn-primary" id="btn-generate-empty">⚡ Generar iniciativas con el agente</button>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
 </div>
 
@@ -158,8 +156,8 @@
     <div class="card kr-block" data-kr="${kr.kr_id}">
       <div class="kr-meta">${OKR_fmt.escapeHtml(kr.kr_id)}</div>
       <h2>${OKR_fmt.escapeHtml(kr.kr_name)}</h2>
-      <div style="margin-top:12px;">${kr.items.map(initRow).join('')}</div>
-      <button class="btn btn-sm" data-act="add-manual" data-kr-id="${OKR_fmt.escapeHtml(kr.kr_id)}" data-kr-name="${OKR_fmt.escapeHtml(kr.kr_name)}">+ Agregar iniciativa manual</button>
+      <div style="margin-top:var(--sp-3);">${kr.items.map(initRow).join('')}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:var(--sp-2);" data-act="add-manual" data-kr-id="${OKR_fmt.escapeHtml(kr.kr_id)}" data-kr-name="${OKR_fmt.escapeHtml(kr.kr_name)}">+ Agregar iniciativa manual</button>
       <div class="add-manual-slot"></div>
     </div>
   `).join('');
@@ -227,7 +225,7 @@
               <textarea data-field="bottleneck"></textarea>
             </div>
           </div>
-          <div style="margin-top:10px;display:flex;gap:6px;">
+          <div style="margin-top:var(--sp-3);display:flex;gap:var(--sp-2);">
             <button class="btn btn-success btn-sm" data-act="save-manual">Guardar</button>
             <button class="btn btn-ghost btn-sm" data-act="cancel-manual">Cancelar</button>
           </div>
@@ -256,7 +254,7 @@
           <div class="init-title">${OKR_fmt.escapeHtml(title)} <span class="badge badge-suggested">manual</span></div>
           ${plan ? `<div class="init-plan">${OKR_fmt.escapeHtml(plan)}</div>` : ''}
         </div>
-        <div><button class="btn btn-sm" data-act="remove-manual" data-tmp="${tmpId}">Quitar</button></div>
+        <div><button class="btn btn-sm btn-danger" data-act="remove-manual" data-tmp="${tmpId}">Quitar</button></div>
       `;
       form.remove();
       block.querySelector('.add-manual-slot').appendChild(node);

@@ -4,43 +4,96 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OKR Manager — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <style>
-  .action-banner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; background:rgba(255,215,0,0.07); border:1px solid rgba(255,215,0,0.25); border-radius:12px; padding:16px 20px; margin-bottom:24px; }
-  .action-banner .msg { font-size:15px; }
-  .action-banner .msg strong { color:#FFD700; }
-  .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.2); border-top-color:#FFD700; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
+  .action-banner .msg strong { color: var(--c-text); }
+  .spinner { display:inline-block; width:15px; height:15px; border:2px solid var(--c-border-strong); border-top-color:var(--c-brand); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
   @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* Week nav */
+  .week-nav { display:flex; align-items:center; gap:var(--sp-2); }
+  #week-nav-label { font-size:var(--fs-13); color:var(--c-text-muted); min-width:90px; text-align:center; }
+
+  /* KR group heading */
+  .kr-obj-heading {
+    font-size: var(--fs-12);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--c-text-muted);
+    margin: var(--sp-6) 0 var(--sp-3);
+    padding-bottom: var(--sp-2);
+    border-bottom: var(--bw-hair) solid var(--c-border);
+  }
+
+  /* Next-week hint area */
+  #next-week-area .section-eyebrow {
+    font-size: var(--fs-11);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--sp-3);
+  }
+
+  /* Page header row */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-5);
+  }
 </style>
 </head>
 <body>
 
-<div class="topbar"></div>
+<div class="app-shell">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <a href="dashboard.html" class="sidebar-logo" title="OKR Manager"><img src="assets/etendo_icon.png" alt="Etendo" style="width:28px;height:26px;display:block;"></a>
+    <a href="dashboard.html" class="nav-icon active" title="Dashboard">⊞</a>
+    <a href="approval-monday.html" class="nav-icon" title="Lunes · Iniciativas">◫</a>
+    <a href="kr-proposals-friday.html" class="nav-icon" title="Viernes · KRs">◈</a>
+    <a href="market-intel.html" class="nav-icon" title="Visión del Mercado">◉</a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-avatar" id="sidebar-avatar">—</div>
+  </nav>
 
-<div class="container">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;">
-    <h1 style="margin:0;">Dashboard semanal</h1>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <button class="btn btn-ghost" id="btn-prev-week" style="padding:6px 14px;">← Anterior</button>
-      <span id="week-nav-label" style="font-size:13px;color:#555;min-width:80px;text-align:center;"></span>
-      <button class="btn btn-ghost" id="btn-next-week" style="padding:6px 14px;">Siguiente →</button>
-    </div>
-  </div>
+  <!-- Workspace -->
+  <div class="workspace">
+    <header class="topbar"></header>
 
-  <div id="action-area"></div>
-  <div id="cycle-info" class="card" style="display:none;">
-    <div id="cycle-info-body"></div>
-  </div>
-  <div id="krs-block">
-    <div class="loading">Cargando...</div>
-  </div>
+    <main class="content">
+      <!-- Page header: title + week navigation -->
+      <div class="page-header">
+        <h1 style="margin:0;">Dashboard semanal</h1>
+        <div class="week-nav">
+          <button class="btn btn-ghost btn-sm" id="btn-prev-week">← Anterior</button>
+          <span id="week-nav-label"></span>
+          <button class="btn btn-ghost btn-sm" id="btn-next-week">Siguiente →</button>
+        </div>
+      </div>
 
-  <div id="next-week-area" style="margin-top:32px;display:none;">
-    <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#555;font-weight:700;margin-bottom:12px;">Siguiente semana</div>
-    <div class="action-banner" style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);">
-      <div class="msg" style="color:#888;">Podés preparar las iniciativas de la próxima semana mientras la actual sigue en curso.</div>
-      <button class="btn btn-ghost" id="btn-generate-next">▶ Generar iniciativas — semana siguiente</button>
-    </div>
+      <div id="action-area"></div>
+      <div id="cycle-info" class="card" style="display:none;">
+        <div id="cycle-info-body"></div>
+      </div>
+      <div id="krs-block">
+        <div class="loading">Cargando...</div>
+      </div>
+
+      <div id="next-week-area" style="margin-top:var(--sp-8);display:none;">
+        <div class="section-eyebrow">Siguiente semana</div>
+        <div class="action-banner" style="background:var(--c-surface-alt);border-color:var(--c-border);">
+          <div class="msg" style="color:var(--c-text-muted);">Podés preparar las iniciativas de la próxima semana mientras la actual sigue en curso.</div>
+          <button class="btn btn-ghost" id="btn-generate-next">▶ Generar iniciativas — semana siguiente</button>
+        </div>
+      </div>
+    </main>
   </div>
 </div>
 
@@ -116,12 +169,12 @@
     const info = document.getElementById('cycle-info');
     if (cycle) {
       const isCurrentCycle = cycle.week_start <= todayStr && cycle.week_end >= todayStr;
-      const weekTag = isCurrentCycle ? '' : ` <span style="font-size:11px;color:#555;font-weight:400;">(${viewOffset > 0 ? 'próxima semana' : 'semana anterior'})</span>`;
+      const weekTag = isCurrentCycle ? '' : ` <span class="hint">(${viewOffset > 0 ? 'próxima semana' : 'semana anterior'})</span>`;
       document.getElementById('cycle-info-body').innerHTML = `
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:var(--sp-5);flex-wrap:wrap;">
           <div>
             <div class="hint">Semana</div>
-            <div style="font-size:18px;font-weight:700;">${OKR_fmt.fmtDate(cycle.week_start)} — ${OKR_fmt.fmtDate(cycle.week_end)}${weekTag}</div>
+            <div style="font-size:var(--fs-18);font-weight:var(--fw-semibold);color:var(--c-text);">${OKR_fmt.fmtDate(cycle.week_start)} — ${OKR_fmt.fmtDate(cycle.week_end)}${weekTag}</div>
           </div>
           <div>
             <div class="hint">Estado</div>
@@ -179,13 +232,13 @@
       try {
         const res = await fetch('http://localhost:8081/krs?team=' + encodeURIComponent(team));
         const liveKrs = await res.json();
-        if (liveKrs && liveKrs.length) { renderKrCards(liveKrs, {}); return; }
+        if (liveKrs && liveKrs.length) { renderKrCards(liveKrs, {}, null); return; }
       } catch (e) { /* backend no disponible */ }
       root.innerHTML = `<div class="empty">${cycle ? 'Sin KRs en el snapshot.' : 'No hay ciclo para esta semana.'}</div>`;
       return;
     }
 
-    renderKrCards(krSnapshot, initsByKr);
+    renderKrCards(krSnapshot, initsByKr, displayCycle);
 
     // ── Sección "Siguiente semana" (solo cuando vemos esta semana) ────
     const nwa = document.getElementById('next-week-area');
@@ -204,7 +257,7 @@
         };
         const label = statusLabels[nextCycle.status] || nextCycle.status.replace(/_/g, ' ');
         existingMsg.innerHTML = `Semana siguiente <strong>${weekLabel}</strong>: ${label}
-          <button class="btn btn-ghost" style="margin-left:10px;" onclick="document.getElementById('btn-next-week').click()">Ver →</button>`;
+          <button class="btn btn-ghost btn-sm" style="margin-left:var(--sp-3);" onclick="document.getElementById('btn-next-week').click()">Ver →</button>`;
       } else {
         btnNext.style.display = '';
         btnNext.onclick = async () => {
@@ -237,7 +290,7 @@
     }
   }
 
-  function renderKrCards(krs, initsByKr) {
+  function renderKrCards(krs, initsByKr, cycle) {
     // Agrupar KRs por objective
     const byObj = {};
     const objOrder = [];
@@ -248,25 +301,47 @@
     }
 
     root.innerHTML = objOrder.map(obj => `
-      <div style="margin-bottom:32px;">
-        <h2 style="margin:0 0 12px;font-size:16px;text-transform:uppercase;letter-spacing:.06em;opacity:.55;">${OKR_fmt.escapeHtml(obj)}</h2>
-        ${byObj[obj].map(kr => `
-          <div class="card kr-block">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-              <h3 style="margin:0;font-size:15px;">${OKR_fmt.escapeHtml(kr.name)}</h3>
-              <div style="display:flex;gap:16px;font-size:13px;opacity:0.7;">
-                ${kr.current != null ? `<span>Actual: <strong>${kr.current}</strong></span>` : ''}
-                ${kr.target  != null ? `<span>Target: <strong>${kr.target}</strong></span>`  : ''}
+      <div style="margin-bottom:var(--sp-8);">
+        <div class="kr-obj-heading">${OKR_fmt.escapeHtml(obj)}</div>
+        ${byObj[obj].map(kr => {
+          // Status calculation
+          const hasBoth = kr.current != null && kr.target != null && kr.target !== 0;
+          const pct     = hasBoth ? Math.min(100, Math.round(kr.current / kr.target * 100)) : null;
+          const cycleEnded = cycle && cycle.status === 'closed';
+          const st = kr.status
+            ? kr.status
+            : (!hasBoth ? 'not_started' : pct >= 100 ? 'success' : pct >= 75 ? 'on_track' : pct >= 50 ? 'at_risk' : cycleEnded ? 'failed' : 'off_track');
+          const stMap = {
+            not_started: { label: 'Not Started', bg: 'var(--c-neutral-soft)',  color: 'var(--c-text-muted)', bar: 'var(--c-border-strong)', border: 'var(--c-border-strong)' },
+            on_track:    { label: 'On Track',    bg: 'var(--c-success-soft)',  color: 'var(--c-success)',    bar: 'var(--c-success)',       border: 'var(--c-success)'       },
+            at_risk:     { label: 'At Risk',     bg: 'var(--c-warning-soft)',  color: 'var(--c-warning)',    bar: 'var(--c-warning)',       border: 'var(--c-warning)'       },
+            off_track:   { label: 'Off Track',   bg: '#FFE8D6',                color: '#C2540A',             bar: '#C2540A',               border: '#C2540A'                },
+            failed:      { label: 'Failed',      bg: 'var(--c-danger-soft)',   color: 'var(--c-danger)',     bar: 'var(--c-danger)',        border: 'var(--c-danger)'        },
+            success:     { label: 'Success',     bg: 'var(--c-success-soft)',  color: 'var(--c-success)',    bar: 'var(--c-success)',       border: 'var(--c-success)'       },
+          };
+          const s = stMap[st] || stMap['not_started'];
+          return `
+          <div class="card kr-block" style="border-left:3px solid ${s.border};">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--sp-2);">
+              <h2 style="margin:0;font-size:var(--fs-16);font-weight:var(--fw-semibold);color:var(--c-text);">${OKR_fmt.escapeHtml(kr.name)}</h2>
+              <div style="display:flex;gap:var(--sp-4);align-items:center;font-size:var(--fs-13);color:var(--c-text-muted);">
+                ${kr.current != null ? `<span>Actual: <strong style="color:var(--c-text);">${kr.current}</strong></span>` : ''}
+                ${kr.target  != null ? `<span>Target: <strong style="color:var(--c-text);">${kr.target}</strong></span>`  : ''}
+                <span style="background:${s.bg};color:${s.color};padding:2px 10px;border-radius:var(--r-pill);font-size:var(--fs-12);font-weight:var(--fw-semibold);">${s.label}</span>
               </div>
             </div>
-            <div style="margin-top:12px;">
+            ${pct !== null ? `
+            <div class="progress">
+              <span style="width:${pct}%;display:block;height:100%;background:${s.bar};border-radius:var(--r-pill);"></span>
+            </div>` : ''}
+            <div style="margin-top:var(--sp-3);">
               ${(initsByKr[kr.id] || []).length
                 ? (initsByKr[kr.id] || []).map(initRow).join('')
-                : `<div class="hint" style="padding:10px 0 4px;">Sin iniciativas aprobadas aún.</div>`
+                : `<div class="hint" style="padding:var(--sp-2) 0;">Sin iniciativas aprobadas aún.</div>`
               }
             </div>
-          </div>
-        `).join('')}
+          </div>`;
+        }).join('')}
       </div>
     `).join('');
   }
