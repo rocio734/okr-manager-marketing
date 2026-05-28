@@ -116,19 +116,77 @@ def main():
         return
     print(f"{len(pending)} propuestas a aplicar.")
 
+    import requests as req_lib
+    import base64
+
+    # ── Estrategia 1: JSON REST API con AD_Role_ID (sin SmartClient) ──────────
+    base_url = ETENDO_WRITE_BASE.rstrip("/etendo").rstrip("/")
+    auth_str  = base64.b64encode(f"{ETENDO_USER}:{ETENDO_PASS}".encode()).decode()
+    rest_headers = {
+        "Authorization": f"Basic {auth_str}",
+        "Content-Type": "application/json;charset=UTF-8",
+    }
+
+    def rest_update_kr(kr_id, new_value):
+        url = (f"{base_url}/etendo/org.openbravo.service.json.jsonrest"
+               f"/SMFOKR_Okr_Kr/{kr_id}"
+               f"?AD_Role_ID={ETENDO_ROLE}&AD_Client_ID={ETENDO_CLIENT}&AD_Org_ID=0")
+        body = {"data": {"id": kr_id, "currentValue": new_value}}
+        r = req_lib.put(url, json=body, headers=rest_headers, timeout=30)
+        print(f"    REST PUT KR: {r.status_code}")
+        return r
+
+    def rest_add_kr_update(kr_id, kr_name, new_value, comment):
+        url = (f"{base_url}/etendo/org.openbravo.service.json.jsonrest"
+               f"/SMFOKR_Kr_Update"
+               f"?AD_Role_ID={ETENDO_ROLE}&AD_Client_ID={ETENDO_CLIENT}&AD_Org_ID=0")
+        body = {"data": {
+            "keyResult": kr_id,
+            "currentValue": new_value,
+            "comment": comment,
+            "status": "on_track",
+        }}
+        r = req_lib.post(url, json=body, headers=rest_headers, timeout=30)
+        print(f"    REST POST KR_Update: {r.status_code}")
+        return r
+
+    # Probar si el REST API con AD_Role_ID funciona
+    test_item = pending[0]
+    print(f"  Probando REST API con AD_Role_ID={ETENDO_ROLE[:8]}...")
+    test_r = rest_update_kr(test_item["kr_id"], test_item["proposed_value"])
+    rest_ok = test_r.status_code in (200, 201)
+    print(f"  REST API: {'OK' if rest_ok else 'FAILED'} ({test_r.status_code})")
+    if not rest_ok:
+        print(f"  REST body: {test_r.text[:200]}")
+
+    if rest_ok:
+        # Usar REST API para todos
+        for p_item in pending:
+            kr_name = p_item.get("kr_name") or p_item.get("kr_id", "?")
+            try:
+                r1 = rest_update_kr(p_item["kr_id"], p_item["proposed_value"])
+                if r1.status_code not in (200, 201):
+                    raise RuntimeError(f"KR update: {r1.status_code} {r1.text[:100]}")
+                comment = (f"OKR Manager — valor actualizado a {p_item['proposed_value']} "
+                           f"(anterior: {p_item.get('current_value','?')})")
+                r2 = rest_add_kr_update(p_item["kr_id"], kr_name, p_item["proposed_value"], comment)
+                if r2.status_code not in (200, 201):
+                    raise RuntimeError(f"KR_Update: {r2.status_code} {r2.text[:100]}")
+                sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}",
+                   {"status": "applied", "applied_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+                print(f"  ✓ {kr_name[:50]} → {p_item['proposed_value']}")
+            except Exception as e:
+                print(f"  ✗ Error en {kr_name[:40]}: {e}")
+        return  # Listo — no necesita Playwright
+
+    # ── Estrategia 2: Playwright con role en cookie + CSRF ────────────────────
+    print("  REST API no funcionó — intentando vía Playwright...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
         ctx = browser.new_context(viewport={"width": 1400, "height": 900})
         page = ctx.new_page()
 
-        # Interceptar requests para capturar la URL del role switch
-        intercepted = []
-        def on_request(req):
-            if "CHANGE_PROFILE" in (req.post_data or "") or "MainHelper" in req.url or "profile" in req.url.lower():
-                intercepted.append({"url": req.url, "method": req.method, "data": (req.post_data or "")[:200]})
-        page.on("request", on_request)
-
-        # Paso 1: Login
+        # Login
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         time.sleep(2)
         page.evaluate(f"""async () => {{
@@ -143,79 +201,10 @@ def main():
         }}""")
         time.sleep(2)
 
-        # Paso 2: Cargar SmartClient
+        # Cargar SmartClient
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         page.wait_for_load_state("networkidle", timeout=40000)
         time.sleep(5)
-        role_now = page.evaluate("() => (typeof OB !== 'undefined' && OB.User && OB.User.roleId) || 'no OB'")
-        print(f"  Logged in. Role: {role_now}")
-
-        # Paso 3: Cambiar rol via OB.User.userInfo.role.setValue + submit
-        # Interceptar TODOS los POST para capturar el request de cambio de rol
-        all_posts = []
-        def capture_all(req):
-            if req.method == "POST" and req.url and "etendo" in req.url.lower():
-                all_posts.append({"url": req.url, "data": (req.post_data or "")[:200]})
-        page.on("request", capture_all)
-
-        switch_result = page.evaluate(f"""async () => {{
-            try {{
-                // Explorar OB.User completo
-                const userKeys = Object.keys(OB.User || {{}}).filter(k=>!/^_/.test(k)).slice(0,20);
-                const navBarKeys = Object.keys(OB.Application.navigationBarComponents || {{}}).filter(k=>!/^_/.test(k)).slice(0,10);
-
-                // Buscar el widget del form de perfil via isc
-                let profileWidget = null;
-                let profileInfo = 'not found';
-                if (typeof isc !== 'undefined' && isc.Canvas) {{
-                    const allForms = isc.DynamicForm ? isc.DynamicForm.getAll() : [];
-                    for (const f of allForms) {{
-                        try {{
-                            const flds = f.getFields ? f.getFields() : [];
-                            const hasRole = flds.some(fl => (fl.name||'').toLowerCase().includes('role'));
-                            if (hasRole) {{
-                                profileWidget = f;
-                                const vm = f.getField('role') && f.getField('role').valueMap || {{}};
-                                profileInfo = Object.entries(vm).map(([k,v])=>k+':'+String(v)).join(', ');
-                                // Buscar y setear Futit
-                                for (const [k,v] of Object.entries(vm)) {{
-                                    if (String(v).toLowerCase().includes('futit')) {{
-                                        f.setValue('role', k);
-                                        f.submit ? f.submit() : (f.saveData && f.saveData());
-                                        return {{found:'form', roleSet: k+':'+v, profileInfo}};
-                                    }}
-                                }}
-                            }}
-                        }} catch(e) {{}}
-                    }}
-                }}
-
-                // Roles disponibles en OB.User.userInfo.role.roles
-                const roles = OB.User.userInfo && OB.User.userInfo.role && OB.User.userInfo.role.roles;
-                const rolesInfo = roles ? JSON.stringify(roles).slice(0,400) : 'n/a';
-
-                return {{userKeys, navBarKeys, profileInfo, rolesInfo}};
-            }} catch(e) {{ return {{error: e.message}}; }}
-        }}""")
-        time.sleep(3)
-        print(f"  Inspect: {switch_result}")
-        if all_posts:
-            print(f"  POST requests captured: {all_posts[:3]}")
-        else:
-            print(f"  No POST requests captured")
-
-        time.sleep(2)
-        # Loguear cualquier request interceptada
-        if intercepted:
-            print(f"  Intercepted role requests: {intercepted}")
-        else:
-            print(f"  No role-switch requests intercepted")
-
-        # Paso 4: Recargar y verificar rol
-        page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
-        page.wait_for_load_state("networkidle", timeout=40000)
-        time.sleep(4)
-
         info = page.evaluate("""() => ({
             csrfToken: (typeof OB !== 'undefined' && OB.User && OB.User.csrfToken) || null,
             roleId: (typeof OB !== 'undefined' && OB.User && OB.User.roleId) || null,
