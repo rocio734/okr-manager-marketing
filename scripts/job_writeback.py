@@ -150,55 +150,42 @@ def main():
         role_now = page.evaluate("() => (typeof OB !== 'undefined' && OB.User && OB.User.roleId) || 'no OB'")
         print(f"  Logged in. Role: {role_now}")
 
-        # Paso 3: Escanear funciones OB disponibles (siempre, para diagnóstico)
-        ob_fns = page.evaluate("""() => {
-            if (typeof OB === 'undefined') return [];
-            const fns = [];
-            function scan(obj, path, depth) {
-                if (depth > 4 || !obj || typeof obj !== 'object') return;
-                for (const k in obj) {
-                    try {
-                        if (typeof obj[k] === 'function' && /role|profile|change/i.test(k)) {
-                            fns.push(path + '.' + k);
-                        } else { scan(obj[k], path + '.' + k, depth+1); }
-                    } catch(e) {}
-                }
-            }
-            scan(OB, 'OB', 0);
-            return fns.slice(0, 20);
-        }""")
-        print(f"  OB role/profile fns: {ob_fns}")
+        # Paso 3: Cambiar rol via OB.User.userInfo.role.setValue + submit
+        switch_result = page.evaluate(f"""async () => {{
+            try {{
+                const roleField = OB.User && OB.User.userInfo && OB.User.userInfo.role;
+                if (!roleField) return {{error: 'roleField not found'}};
 
-        # Paso 4: Clickear el NavBar para abrir el dropdown de roles
-        nav_clicked = False
-        for selector in ["[class*='OBNavBar']", ".OBNavBarItem", "[class*='role']", "[class*='profile']"]:
-            try:
-                el = page.locator(selector).first
-                if el.is_visible(timeout=1000):
-                    el.click()
-                    time.sleep(1.5)
-                    nav_clicked = True
-                    print(f"  NavBar clicked: {selector}")
-                    break
-            except Exception:
-                pass
+                // Ver roles disponibles
+                const valueMap = roleField.valueMap || {{}};
+                const available = Object.keys(valueMap).slice(0, 10);
 
-        if nav_clicked:
-            # Buscar "Futit" en el dropdown que apareció y hacer clic
-            role_clicked = False
-            for text in ["Futit", "vacaciones", "empleados"]:
-                try:
-                    el = page.get_by_text(text, exact=False).first
-                    if el.is_visible(timeout=2000):
-                        el.click()
-                        time.sleep(2)
-                        role_clicked = True
-                        print(f"  Role item clicked: '{text}'")
-                        break
-                except Exception:
-                    pass
-            if not role_clicked:
-                print("  No role item found in dropdown")
+                // Setear el rol Futit
+                const targetRole = '{ETENDO_ROLE}';
+                if (!valueMap[targetRole]) return {{error: 'role not in valueMap', available}};
+
+                roleField.setValue(targetRole);
+
+                // Hacer submit del form de userInfo
+                const form = OB.User.userInfo;
+                if (form && typeof form.submit === 'function') {{
+                    form.submit();
+                    return {{method: 'form.submit', role: targetRole, available}};
+                }}
+                // Alternativa: saveData
+                if (form && typeof form.saveData === 'function') {{
+                    form.saveData();
+                    return {{method: 'form.saveData', role: targetRole, available}};
+                }}
+                // Alternativa: disparar el handler directamente
+                if (form && typeof form.saveButtonClick === 'function') {{
+                    form.saveButtonClick();
+                    return {{method: 'saveButtonClick', role: targetRole, available}};
+                }}
+                return {{method: 'setValue_only', role: targetRole, available}};
+            }} catch(e) {{ return {{error: e.message}}; }}
+        }}""")
+        print(f"  Role switch via OB.User.userInfo: {switch_result}")
 
         time.sleep(2)
         # Loguear cualquier request interceptada
