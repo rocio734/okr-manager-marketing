@@ -121,52 +121,81 @@ def main():
         ctx = browser.new_context(viewport={"width": 1400, "height": 900})
         page = ctx.new_page()
 
+        # Interceptar requests para capturar la URL del role switch
+        intercepted = []
+        def on_request(req):
+            if "CHANGE_PROFILE" in (req.post_data or "") or "MainHelper" in req.url or "profile" in req.url.lower():
+                intercepted.append({"url": req.url, "method": req.method, "data": (req.post_data or "")[:200]})
+        page.on("request", on_request)
+
         # Paso 1: Login
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         time.sleep(2)
-        login_result = page.evaluate(f"""async () => {{
-            const body = new URLSearchParams();
-            body.append('user',     {json.dumps(ETENDO_USER)});
-            body.append('password', {json.dumps(ETENDO_PASS)});
-            body.append('Command',  'Login');
-            const r = await fetch('/etendo/secureApp/LoginHandler.html', {{
+        page.evaluate(f"""async () => {{
+            const b = new URLSearchParams();
+            b.append('user', {json.dumps(ETENDO_USER)});
+            b.append('password', {json.dumps(ETENDO_PASS)});
+            b.append('Command', 'Login');
+            await fetch('/etendo/secureApp/LoginHandler.html', {{
                 method:'POST', headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
-                credentials:'include', body: body.toString()
+                credentials:'include', body: b.toString()
             }});
-            return {{status: r.status, url: window.location.href}};
         }}""")
-        print(f"  Login: {login_result.get('status')} | page: {login_result.get('url')}")
         time.sleep(2)
 
-        # Paso 2: Cargar home y esperar SmartClient
+        # Paso 2: Cargar SmartClient
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         page.wait_for_load_state("networkidle", timeout=40000)
-        time.sleep(4)
-        current_url = page.url
-        print(f"  Page URL after load: {current_url}")
+        time.sleep(5)
+        print(f"  Logged in. Role: {page.evaluate('() => (typeof OB!=\"undefined\" && OB.User && OB.User.roleId) || \"no OB\"')}")
 
-        # Paso 3: CHANGE_PROFILE con URL absoluta (evita problemas de base URL)
-        switch_result = page.evaluate(f"""async () => {{
-            const base = window.location.origin;
-            const body = new URLSearchParams();
-            body.append('Command',     'CHANGE_PROFILE');
-            body.append('inpRole',     '{ETENDO_ROLE}');
-            body.append('inpClient',   '{ETENDO_CLIENT}');
-            body.append('inpOrg',      '0');
-            body.append('inpWarehouse','04D337E3F7CB454692AD30149ED229B8');
-            body.append('inpLanguage', 'es_ES');
-            const url = base + '/etendo/secureApp/MainHelper.html';
-            const r = await fetch(url, {{
-                method:'POST',
-                headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
-                credentials:'include', body: body.toString()
-            }});
-            return {{status: r.status, url: url}};
-        }}""")
-        print(f"  Role switch: {switch_result.get('url')} → {switch_result.get('status')}")
+        # Paso 3: Buscar y clickear el selector de rol en la UI
+        clicked = False
+        for selector in [
+            f"[id*='role']", "[class*='role']", "[class*='profile']",
+            "[class*='OBNavBar']", ".OBNavBarItem", ".profileSelector",
+            "div[id*='OBNavBar']", "span[id*='role']",
+        ]:
+            try:
+                el = page.locator(selector).first
+                if el.is_visible(timeout=1000):
+                    el.click()
+                    time.sleep(1)
+                    clicked = True
+                    print(f"  Clicked selector: {selector}")
+                    break
+            except Exception:
+                pass
+
+        if not clicked:
+            # Intentar via JS: llamar directamente la función interna de OB
+            switch_js = page.evaluate(f"""async () => {{
+                // Buscar la función de profile change en el objeto OB
+                if (typeof OB === 'undefined') return {{error: 'OB not defined'}};
+                const fns = [];
+                function scan(obj, path, depth) {{
+                    if (depth > 4 || !obj || typeof obj !== 'object') return;
+                    for (const k in obj) {{
+                        try {{
+                            if (typeof obj[k] === 'function' && /role|profile|change/i.test(k)) {{
+                                fns.push(path + '.' + k);
+                            }} else {{ scan(obj[k], path + '.' + k, depth+1); }}
+                        }} catch(e) {{}}
+                    }}
+                }}
+                scan(OB, 'OB', 0);
+                return {{functions: fns.slice(0,20)}};
+            }}""")
+            print(f"  OB functions: {switch_js}")
+
         time.sleep(2)
+        # Loguear cualquier request interceptada
+        if intercepted:
+            print(f"  Intercepted role requests: {intercepted}")
+        else:
+            print(f"  No role-switch requests intercepted")
 
-        # Paso 4: Recargar para aplicar el rol
+        # Paso 4: Recargar y verificar rol
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         page.wait_for_load_state("networkidle", timeout=40000)
         time.sleep(4)
