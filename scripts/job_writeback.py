@@ -151,59 +151,58 @@ def main():
         print(f"  Logged in. Role: {role_now}")
 
         # Paso 3: Cambiar rol via OB.User.userInfo.role.setValue + submit
-        # Interceptar el submit del form de userInfo
-        profile_req = []
-        def capture_req(req):
-            if req.method == "POST" and "etendo" in req.url:
-                profile_req.append({"url": req.url, "data": (req.post_data or "")[:300]})
-        page.on("request", capture_req)
+        # Interceptar TODOS los POST para capturar el request de cambio de rol
+        all_posts = []
+        def capture_all(req):
+            if req.method == "POST" and req.url and "etendo" in req.url.lower():
+                all_posts.append({"url": req.url, "data": (req.post_data or "")[:200]})
+        page.on("request", capture_all)
 
         switch_result = page.evaluate(f"""async () => {{
             try {{
-                const ui = OB.User.userInfo;
-                if (!ui) return {{error: 'OB.User.userInfo not found'}};
+                // Explorar OB.User completo
+                const userKeys = Object.keys(OB.User || {{}}).filter(k=>!/^_/.test(k)).slice(0,20);
+                const navBarKeys = Object.keys(OB.Application.navigationBarComponents || {{}}).filter(k=>!/^_/.test(k)).slice(0,10);
 
-                // Inspeccionar el form
-                const info = {{
-                    type: typeof ui,
-                    keys: Object.keys(ui).filter(k => /role|profile|save|submit|send/i.test(k)).slice(0,15),
-                    hasGetField: typeof ui.getField === 'function',
-                    hasSetValue: typeof ui.setValue === 'function',
-                    currentValues: typeof ui.getValues === 'function' ? JSON.stringify(ui.getValues()).slice(0,200) : 'n/a',
-                }};
-
-                // Intentar via getField
-                if (typeof ui.getField === 'function') {{
-                    const rf = ui.getField('role');
-                    if (rf) {{
-                        info.roleFieldType = typeof rf;
-                        info.roleFieldKeys = Object.keys(rf).filter(k => /value|map|set|get/i.test(k)).slice(0,10);
-                        const vm = rf.valueMap || (typeof rf.getValueMap === 'function' && rf.getValueMap()) || {{}};
-                        info.roleValueMap = Object.entries(vm).map(([k,v]) => k + ':' + String(v)).slice(0,5);
-
-                        // Buscar Futit en el valueMap
-                        for (const [k,v] of Object.entries(vm)) {{
-                            if (String(v).toLowerCase().includes('futit')) {{
-                                if (typeof rf.setValue === 'function') rf.setValue(k);
-                                if (typeof ui.setValue === 'function') ui.setValue('role', k);
-                                info.setTo = k + ':' + v;
-                                break;
+                // Buscar el widget del form de perfil via isc
+                let profileWidget = null;
+                let profileInfo = 'not found';
+                if (typeof isc !== 'undefined' && isc.Canvas) {{
+                    const allForms = isc.DynamicForm ? isc.DynamicForm.getAll() : [];
+                    for (const f of allForms) {{
+                        try {{
+                            const flds = f.getFields ? f.getFields() : [];
+                            const hasRole = flds.some(fl => (fl.name||'').toLowerCase().includes('role'));
+                            if (hasRole) {{
+                                profileWidget = f;
+                                const vm = f.getField('role') && f.getField('role').valueMap || {{}};
+                                profileInfo = Object.entries(vm).map(([k,v])=>k+':'+String(v)).join(', ');
+                                // Buscar y setear Futit
+                                for (const [k,v] of Object.entries(vm)) {{
+                                    if (String(v).toLowerCase().includes('futit')) {{
+                                        f.setValue('role', k);
+                                        f.submit ? f.submit() : (f.saveData && f.saveData());
+                                        return {{found:'form', roleSet: k+':'+v, profileInfo}};
+                                    }}
+                                }}
                             }}
-                        }}
-
-                        // Submit
-                        if (typeof ui.submit === 'function') {{ ui.submit(); info.submitted = 'submit'; }}
-                        else if (typeof ui.saveData === 'function') {{ ui.saveData(); info.submitted = 'saveData'; }}
-                        else {{ info.submitted = 'none'; }}
+                        }} catch(e) {{}}
                     }}
                 }}
-                return info;
+
+                // Roles disponibles en OB.User.userInfo.role.roles
+                const roles = OB.User.userInfo && OB.User.userInfo.role && OB.User.userInfo.role.roles;
+                const rolesInfo = roles ? JSON.stringify(roles).slice(0,400) : 'n/a';
+
+                return {{userKeys, navBarKeys, profileInfo, rolesInfo}};
             }} catch(e) {{ return {{error: e.message}}; }}
         }}""")
-        time.sleep(2)
-        print(f"  Role switch inspect: {switch_result}")
-        if profile_req:
-            print(f"  Captured submit requests: {profile_req}")
+        time.sleep(3)
+        print(f"  Inspect: {switch_result}")
+        if all_posts:
+            print(f"  POST requests captured: {all_posts[:3]}")
+        else:
+            print(f"  No POST requests captured")
 
         time.sleep(2)
         # Loguear cualquier request interceptada
