@@ -120,7 +120,7 @@ def main():
     import base64
 
     # ── Estrategia 1: JSON REST API con AD_Role_ID (sin SmartClient) ──────────
-    base_url = ETENDO_WRITE_BASE.rstrip("/etendo").rstrip("/")
+    base_url = ETENDO_WRITE_BASE.removesuffix("/etendo").removesuffix("/")
     auth_str  = base64.b64encode(f"{ETENDO_USER}:{ETENDO_PASS}".encode()).decode()
     rest_headers = {
         "Authorization": f"Basic {auth_str}",
