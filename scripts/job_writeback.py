@@ -147,7 +147,8 @@ def main():
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         page.wait_for_load_state("networkidle", timeout=40000)
         time.sleep(5)
-        print(f"  Logged in. Role: {page.evaluate('() => (typeof OB!=\"undefined\" && OB.User && OB.User.roleId) || \"no OB\"')}")
+        role_now = page.evaluate("() => (typeof OB !== 'undefined' && OB.User && OB.User.roleId) || 'no OB'")
+        print(f"  Logged in. Role: {role_now}")
 
         # Paso 3: Buscar y clickear el selector de rol en la UI
         clicked = False
