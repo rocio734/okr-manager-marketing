@@ -121,7 +121,7 @@ def main():
         ctx = browser.new_context(viewport={"width": 1400, "height": 900})
         page = ctx.new_page()
 
-        # Paso 1: Login con usuario/contraseña
+        # Paso 1: Login
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         time.sleep(2)
         login_result = page.evaluate(f"""async () => {{
@@ -130,18 +130,24 @@ def main():
             body.append('password', {json.dumps(ETENDO_PASS)});
             body.append('Command',  'Login');
             const r = await fetch('/etendo/secureApp/LoginHandler.html', {{
-                method: 'POST',
-                headers: {{'Content-Type': 'application/x-www-form-urlencoded'}},
-                credentials: 'include',
-                body: body.toString()
+                method:'POST', headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
+                credentials:'include', body: body.toString()
             }});
-            return {{status: r.status}};
+            return {{status: r.status, url: window.location.href}};
         }}""")
-        print(f"  Login: {login_result.get('status')}")
+        print(f"  Login: {login_result.get('status')} | page: {login_result.get('url')}")
         time.sleep(2)
 
-        # Paso 2: Cambiar rol via DefaultActionHandler (endpoint correcto en Etendo)
+        # Paso 2: Cargar home y esperar SmartClient
+        page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
+        page.wait_for_load_state("networkidle", timeout=40000)
+        time.sleep(4)
+        current_url = page.url
+        print(f"  Page URL after load: {current_url}")
+
+        # Paso 3: CHANGE_PROFILE con URL absoluta (evita problemas de base URL)
         switch_result = page.evaluate(f"""async () => {{
+            const base = window.location.origin;
             const body = new URLSearchParams();
             body.append('Command',     'CHANGE_PROFILE');
             body.append('inpRole',     '{ETENDO_ROLE}');
@@ -149,31 +155,21 @@ def main():
             body.append('inpOrg',      '0');
             body.append('inpWarehouse','04D337E3F7CB454692AD30149ED229B8');
             body.append('inpLanguage', 'es_ES');
-            // Intentar los dos endpoints conocidos
-            for (const url of [
-                '/etendo/secureApp/DefaultActionHandler.do',
-                '/etendo/secureApp/DefaultAction.do',
-                '/etendo/DefaultActionHandler.do',
-            ]) {{
-                try {{
-                    const r = await fetch(url, {{
-                        method: 'POST',
-                        headers: {{'Content-Type': 'application/x-www-form-urlencoded'}},
-                        credentials: 'include',
-                        body: body.toString()
-                    }});
-                    if (r.status !== 404) return {{url, status: r.status}};
-                }} catch(e) {{}}
-            }}
-            return {{url: 'none', status: 404}};
+            const url = base + '/etendo/secureApp/MainHelper.html';
+            const r = await fetch(url, {{
+                method:'POST',
+                headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
+                credentials:'include', body: body.toString()
+            }});
+            return {{status: r.status, url: url}};
         }}""")
         print(f"  Role switch: {switch_result.get('url')} → {switch_result.get('status')}")
         time.sleep(2)
 
-        # Paso 3: Cargar home para que SmartClient tome el rol nuevo
+        # Paso 4: Recargar para aplicar el rol
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
-        page.wait_for_load_state("networkidle", timeout=30000)
-        time.sleep(3)
+        page.wait_for_load_state("networkidle", timeout=40000)
+        time.sleep(4)
 
         info = page.evaluate("""() => ({
             csrfToken: (typeof OB !== 'undefined' && OB.User && OB.User.csrfToken) || null,
