@@ -121,14 +121,19 @@ def main():
         ctx = browser.new_context(viewport={"width": 1400, "height": 900})
         page = ctx.new_page()
 
-        # Login via fetch desde el browser context
+        # Login directo con rol Futit empleados incluido en el POST inicial
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         time.sleep(2)
         login_result = page.evaluate(f"""async () => {{
             const body = new URLSearchParams();
-            body.append('user', {json.dumps(ETENDO_USER)});
-            body.append('password', {json.dumps(ETENDO_PASS)});
-            body.append('Command', 'Login');
+            body.append('user',        {json.dumps(ETENDO_USER)});
+            body.append('password',    {json.dumps(ETENDO_PASS)});
+            body.append('Command',     'Login');
+            body.append('inpRole',     '{ETENDO_ROLE}');
+            body.append('inpClient',   '{ETENDO_CLIENT}');
+            body.append('inpOrg',      '0');
+            body.append('inpWarehouse','04D337E3F7CB454692AD30149ED229B8');
+            body.append('inpLanguage', 'es_ES');
             const r = await fetch('/etendo/secureApp/LoginHandler.html', {{
                 method: 'POST',
                 headers: {{'Content-Type': 'application/x-www-form-urlencoded'}},
@@ -137,35 +142,10 @@ def main():
             }});
             return {{status: r.status, body: (await r.text()).slice(0, 100)}};
         }}""")
-        print(f"  Login: {login_result.get('status')}")
+        print(f"  Login (con rol Futit): {login_result.get('status')}")
         time.sleep(2)
 
-        # Cargar home para inicializar SmartClient
-        page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
-        page.wait_for_load_state("networkidle", timeout=30000)
-        time.sleep(3)
-
-        # Cambiar rol a Futit empleados
-        switch_result = page.evaluate(f"""async () => {{
-            const body = new URLSearchParams();
-            body.append('Command', 'CHANGE_PROFILE');
-            body.append('inpRole', '{ETENDO_ROLE}');
-            body.append('inpClient', '{ETENDO_CLIENT}');
-            body.append('inpOrg', '0');
-            body.append('inpWarehouse', '04D337E3F7CB454692AD30149ED229B8');
-            body.append('inpLanguage', 'es_ES');
-            const r = await fetch('/etendo/secureApp/MainHelper.html', {{
-                method: 'POST',
-                headers: {{'Content-Type': 'application/x-www-form-urlencoded'}},
-                credentials: 'include',
-                body: body.toString()
-            }});
-            return {{status: r.status}};
-        }}""")
-        print(f"  Role switch: {switch_result.get('status')}")
-        time.sleep(2)
-
-        # Recargar para aplicar el rol nuevo
+        # Cargar home para inicializar SmartClient con el rol correcto
         page.goto(f"{ETENDO_WRITE_BASE}/", timeout=30000)
         page.wait_for_load_state("networkidle", timeout=30000)
         time.sleep(3)
