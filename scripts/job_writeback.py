@@ -136,22 +136,35 @@ def main():
     }
 
     def rest_update_kr(kr_id, new_value):
-        url = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Okr_Kr/{kr_id}"
-        body = {"data": {"id": kr_id, "currentValue": new_value}}
-        r = req_lib.put(url, json=body, headers=jwt_headers, timeout=30)
-        print(f"    REST PUT KR: {r.status_code} | {r.text[:300]}")
-        return r
+        # Probar los dos endpoints: jsonrest y api/datasource
+        for url in [
+            f"{etendo_base}/api/datasource/SMFOKR_Okr_Kr/{kr_id}",
+            f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Okr_Kr/{kr_id}",
+        ]:
+            body = {"data": {"id": kr_id, "currentValue": new_value}}
+            r = req_lib.put(url, json=body, headers=jwt_headers, timeout=30)
+            print(f"    REST PUT KR [{url.split('/')[2]}]: {r.status_code} | {r.text[:200]}")
+            resp = r.json() if r.text else {}
+            if resp.get("response", {}).get("status") == 0:
+                return r  # éxito
+        return r  # retorna el último intento
 
     def rest_add_kr_update(kr_id, kr_name, new_value, comment):
-        url = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Kr_Update"
-        body = {"data": {
-            "keyResult": kr_id,
-            "currentValue": new_value,
-            "comment": comment,
-            "status": "on_track",
-        }}
-        r = req_lib.post(url, json=body, headers=jwt_headers, timeout=30)
-        print(f"    REST POST KR_Update: {r.status_code} | {r.text[:300]}")
+        for url in [
+            f"{etendo_base}/api/datasource/SMFOKR_Kr_Update",
+            f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Kr_Update",
+        ]:
+            body = {"data": {
+                "keyResult": kr_id,
+                "currentValue": new_value,
+                "comment": comment,
+                "status": "on_track",
+            }}
+            r = req_lib.post(url, json=body, headers=jwt_headers, timeout=30)
+            print(f"    REST POST KR_Update [{url.split('/')[2]}]: {r.status_code} | {r.text[:200]}")
+            resp = r.json() if r.text else {}
+            if resp.get("response", {}).get("status") == 0:
+                return r
         return r
 
     # Probar con el primer item
