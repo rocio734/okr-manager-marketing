@@ -156,36 +156,53 @@ def main():
                 const roleField = OB.User && OB.User.userInfo && OB.User.userInfo.role;
                 if (!roleField) return {{error: 'roleField not found'}};
 
-                // Ver roles disponibles
                 const valueMap = roleField.valueMap || {{}};
-                const available = Object.keys(valueMap).slice(0, 10);
-
-                // Setear el rol Futit
+                // valueMap keys son índices, values son nombres — buscar "Futit"
                 const targetRole = '{ETENDO_ROLE}';
-                if (!valueMap[targetRole]) return {{error: 'role not in valueMap', available}};
+                const targetName = 'Futit';
 
-                roleField.setValue(targetRole);
+                // Loguear todos los roles disponibles
+                const entries = Object.entries(valueMap).map(([k,v]) => k + ':' + JSON.stringify(v));
 
-                // Hacer submit del form de userInfo
-                const form = OB.User.userInfo;
-                if (form && typeof form.submit === 'function') {{
-                    form.submit();
-                    return {{method: 'form.submit', role: targetRole, available}};
+                // Buscar por nombre "Futit" o por role ID en roles array
+                let foundIdx = null;
+                for (const [k, v] of Object.entries(valueMap)) {{
+                    if (String(v).toLowerCase().includes('futit') ||
+                        String(v).toLowerCase().includes('vacacion')) {{
+                        foundIdx = k;
+                        break;
+                    }}
                 }}
-                // Alternativa: saveData
-                if (form && typeof form.saveData === 'function') {{
-                    form.saveData();
-                    return {{method: 'form.saveData', role: targetRole, available}};
+
+                // También buscar en roleField.roles (array de objetos con id/name)
+                const rolesArr = roleField.roles || (roleField.getValueMap && roleField.getValueMap()) || [];
+                let foundFromRoles = null;
+                if (Array.isArray(rolesArr)) {{
+                    for (const r of rolesArr) {{
+                        if ((r.id || r.roleId || '') === targetRole ||
+                            (r.name || r.roleName || '').toLowerCase().includes('futit')) {{
+                            foundFromRoles = r;
+                            break;
+                        }}
+                    }}
                 }}
-                // Alternativa: disparar el handler directamente
-                if (form && typeof form.saveButtonClick === 'function') {{
-                    form.saveButtonClick();
-                    return {{method: 'saveButtonClick', role: targetRole, available}};
+
+                if (foundIdx === null && !foundFromRoles) {{
+                    return {{error: 'Futit not found', entries, rolesArr: JSON.stringify(rolesArr).slice(0,300)}};
                 }}
-                return {{method: 'setValue_only', role: targetRole, available}};
+
+                const idxToUse = foundIdx || (foundFromRoles && foundFromRoles.idx);
+                if (idxToUse !== null) {{
+                    roleField.setValue(idxToUse);
+                    const form = OB.User.userInfo;
+                    if (form && typeof form.submit === 'function') form.submit();
+                    else if (form && typeof form.saveData === 'function') form.saveData();
+                    return {{method: 'setValue_idx', idx: idxToUse, entries}};
+                }}
+                return {{entries, rolesArr: JSON.stringify(rolesArr).slice(0,300)}};
             }} catch(e) {{ return {{error: e.message}}; }}
         }}""")
-        print(f"  Role switch via OB.User.userInfo: {switch_result}")
+        print(f"  Role switch: {switch_result}")
 
         time.sleep(2)
         # Loguear cualquier request interceptada
