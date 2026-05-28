@@ -116,85 +116,92 @@ def main():
         return
     print(f"{len(pending)} propuestas a aplicar.")
 
-    import requests as req_lib
+    import urllib.parse as _urlparse
+    import http.cookiejar as _cookiejar
 
-    # ── Login JWT con rol Futit empleados ──────────────────────────────────────
-    # Igual que job_crm_scoring: /api/auth/login con role en el body
-    etendo_base = os.environ.get("ETENDO_BASE_URL", "https://futit-staff.etendo.cloud")
-    jwt_resp = req_lib.post(
-        f"{etendo_base}/api/auth/login",
-        json={"username": ETENDO_USER, "password": ETENDO_PASS, "role": ETENDO_ROLE},
-        timeout=15,
-    )
-    jwt = jwt_resp.json().get("token", "") if jwt_resp.status_code == 200 else ""
-    print(f"  JWT login: {jwt_resp.status_code} | token: {'OK' if jwt else 'FAIL'}")
-
+    # ── Login JSESSIONID (mismo patrón que job_crm_scoring) ───────────────────
+    # Si el default role del usuario es "Futit empleados", la sesión usará ese rol
     write_base = ETENDO_WRITE_BASE.removesuffix("/")
-    jwt_headers = {
-        "Authorization": f"Bearer {jwt}",
+
+    def login_sid():
+        jar    = _cookiejar.CookieJar()
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+        body   = _urlparse.urlencode(
+            {"user": ETENDO_USER, "password": ETENDO_PASS, "Command": "Login"}
+        ).encode()
+        req = urllib.request.Request(
+            f"{write_base}/secureApp/LoginHandler.html", data=body, method="POST"
+        )
+        req.add_header("Content-Type", "application/x-www-form-urlencoded")
+        try:
+            opener.open(req)
+        except Exception as e:
+            print(f"  WARN login_sid: {e}")
+        for cookie in jar:
+            if cookie.name == "JSESSIONID":
+                return cookie.value
+        return ""
+
+    sid = login_sid()
+    print(f"  JSESSIONID: {'OK' if sid else 'FAIL'}")
+    sid_headers = {
+        "Cookie":        f"JSESSIONID={sid}",
         "Content-Type":  "application/json;charset=UTF-8",
     }
 
     def rest_update_kr(kr_id, new_value):
-        # Probar los dos endpoints: jsonrest y api/datasource
-        for url in [
-            f"{etendo_base}/api/datasource/SMFOKR_Okr_Kr/{kr_id}",
-            f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Okr_Kr/{kr_id}",
-        ]:
-            body = {"data": {"id": kr_id, "currentValue": new_value}}
-            r = req_lib.put(url, json=body, headers=jwt_headers, timeout=30)
-            print(f"    REST PUT KR [{url.split('/')[2]}]: {r.status_code} | {r.text[:200]}")
-            resp = r.json() if r.text else {}
-            if resp.get("response", {}).get("status") == 0:
-                return r  # éxito
-        return r  # retorna el último intento
+        url  = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Okr_Kr/{kr_id}"
+        body = json.dumps({"data": {"id": kr_id, "currentValue": new_value}}).encode()
+        req  = urllib.request.Request(url, data=body, method="PUT")
+        req.add_header("Cookie",        f"JSESSIONID={sid}")
+        req.add_header("Content-Type",  "application/json;charset=UTF-8")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                resp_body = r.read().decode()
+        except urllib.error.HTTPError as e:
+            resp_body = e.read().decode()
+        print(f"    PUT KR: {resp_body[:300]}")
+        return json.loads(resp_body) if resp_body else {}
 
-    def rest_add_kr_update(kr_id, kr_name, new_value, comment):
-        for url in [
-            f"{etendo_base}/api/datasource/SMFOKR_Kr_Update",
-            f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Kr_Update",
-        ]:
-            body = {"data": {
-                "keyResult": kr_id,
-                "currentValue": new_value,
-                "comment": comment,
-                "status": "on_track",
-            }}
-            r = req_lib.post(url, json=body, headers=jwt_headers, timeout=30)
-            print(f"    REST POST KR_Update [{url.split('/')[2]}]: {r.status_code} | {r.text[:200]}")
-            resp = r.json() if r.text else {}
-            if resp.get("response", {}).get("status") == 0:
-                return r
-        return r
+    def rest_add_kr_update(kr_id, new_value, comment):
+        url  = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Kr_Update"
+        body = json.dumps({"data": {
+            "keyResult": kr_id, "currentValue": new_value,
+            "comment": comment, "status": "on_track",
+        }}).encode()
+        req  = urllib.request.Request(url, data=body, method="POST")
+        req.add_header("Cookie",        f"JSESSIONID={sid}")
+        req.add_header("Content-Type",  "application/json;charset=UTF-8")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                resp_body = r.read().decode()
+        except urllib.error.HTTPError as e:
+            resp_body = e.read().decode()
+        print(f"    POST KR_Update: {resp_body[:200]}")
+        return json.loads(resp_body) if resp_body else {}
 
     # Probar con el primer item
-    test_item = pending[0]
-    print(f"  Probando REST API con JWT (rol Futit)...")
-    test_r = rest_update_kr(test_item["kr_id"], test_item["proposed_value"])
-    rest_ok = test_r.status_code in (200, 201)
-    print(f"  REST API: {'OK' if rest_ok else 'FAILED'} ({test_r.status_code})")
-    if not rest_ok:
-        print(f"  REST body: {test_r.text[:200]}")
+    print("  Probando JSESSIONID approach (default role del usuario)...")
+    test_resp = rest_update_kr(test_item["kr_id"], test_item["proposed_value"])
+    rest_ok = test_resp.get("response", {}).get("status") == 0
+    print(f"  Resultado: {'OK' if rest_ok else 'FAIL'}")
 
     if rest_ok:
-        # Usar REST API para todos
         for p_item in pending:
             kr_name = p_item.get("kr_name") or p_item.get("kr_id", "?")
             try:
                 r1 = rest_update_kr(p_item["kr_id"], p_item["proposed_value"])
-                if r1.status_code not in (200, 201):
-                    raise RuntimeError(f"KR update: {r1.status_code} {r1.text[:100]}")
+                if r1.get("response", {}).get("status") != 0:
+                    raise RuntimeError(f"KR update falló: {str(r1)[:200]}")
                 comment = (f"OKR Manager — valor actualizado a {p_item['proposed_value']} "
                            f"(anterior: {p_item.get('current_value','?')})")
-                r2 = rest_add_kr_update(p_item["kr_id"], kr_name, p_item["proposed_value"], comment)
-                if r2.status_code not in (200, 201):
-                    raise RuntimeError(f"KR_Update: {r2.status_code} {r2.text[:100]}")
+                rest_add_kr_update(p_item["kr_id"], p_item["proposed_value"], comment)
                 sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}",
                    {"status": "applied", "applied_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
                 print(f"  ✓ {kr_name[:50]} → {p_item['proposed_value']}")
             except Exception as e:
-                print(f"  ✗ Error en {kr_name[:40]}: {e}")
-        return  # Listo — no necesita Playwright
+                print(f"  ✗ {kr_name[:40]}: {e}")
+        return
 
     # ── Estrategia 2: Playwright con role en cookie + CSRF ────────────────────
     print("  REST API no funcionó — intentando vía Playwright...")
