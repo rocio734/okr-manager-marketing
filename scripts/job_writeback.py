@@ -150,44 +150,55 @@ def main():
         role_now = page.evaluate("() => (typeof OB !== 'undefined' && OB.User && OB.User.roleId) || 'no OB'")
         print(f"  Logged in. Role: {role_now}")
 
-        # Paso 3: Buscar y clickear el selector de rol en la UI
-        clicked = False
-        for selector in [
-            f"[id*='role']", "[class*='role']", "[class*='profile']",
-            "[class*='OBNavBar']", ".OBNavBarItem", ".profileSelector",
-            "div[id*='OBNavBar']", "span[id*='role']",
-        ]:
+        # Paso 3: Escanear funciones OB disponibles (siempre, para diagnóstico)
+        ob_fns = page.evaluate("""() => {
+            if (typeof OB === 'undefined') return [];
+            const fns = [];
+            function scan(obj, path, depth) {
+                if (depth > 4 || !obj || typeof obj !== 'object') return;
+                for (const k in obj) {
+                    try {
+                        if (typeof obj[k] === 'function' && /role|profile|change/i.test(k)) {
+                            fns.push(path + '.' + k);
+                        } else { scan(obj[k], path + '.' + k, depth+1); }
+                    } catch(e) {}
+                }
+            }
+            scan(OB, 'OB', 0);
+            return fns.slice(0, 20);
+        }""")
+        print(f"  OB role/profile fns: {ob_fns}")
+
+        # Paso 4: Clickear el NavBar para abrir el dropdown de roles
+        nav_clicked = False
+        for selector in ["[class*='OBNavBar']", ".OBNavBarItem", "[class*='role']", "[class*='profile']"]:
             try:
                 el = page.locator(selector).first
                 if el.is_visible(timeout=1000):
                     el.click()
-                    time.sleep(1)
-                    clicked = True
-                    print(f"  Clicked selector: {selector}")
+                    time.sleep(1.5)
+                    nav_clicked = True
+                    print(f"  NavBar clicked: {selector}")
                     break
             except Exception:
                 pass
 
-        if not clicked:
-            # Intentar via JS: llamar directamente la función interna de OB
-            switch_js = page.evaluate(f"""async () => {{
-                // Buscar la función de profile change en el objeto OB
-                if (typeof OB === 'undefined') return {{error: 'OB not defined'}};
-                const fns = [];
-                function scan(obj, path, depth) {{
-                    if (depth > 4 || !obj || typeof obj !== 'object') return;
-                    for (const k in obj) {{
-                        try {{
-                            if (typeof obj[k] === 'function' && /role|profile|change/i.test(k)) {{
-                                fns.push(path + '.' + k);
-                            }} else {{ scan(obj[k], path + '.' + k, depth+1); }}
-                        }} catch(e) {{}}
-                    }}
-                }}
-                scan(OB, 'OB', 0);
-                return {{functions: fns.slice(0,20)}};
-            }}""")
-            print(f"  OB functions: {switch_js}")
+        if nav_clicked:
+            # Buscar "Futit" en el dropdown que apareció y hacer clic
+            role_clicked = False
+            for text in ["Futit", "vacaciones", "empleados"]:
+                try:
+                    el = page.get_by_text(text, exact=False).first
+                    if el.is_visible(timeout=2000):
+                        el.click()
+                        time.sleep(2)
+                        role_clicked = True
+                        print(f"  Role item clicked: '{text}'")
+                        break
+                except Exception:
+                    pass
+            if not role_clicked:
+                print("  No role item found in dropdown")
 
         time.sleep(2)
         # Loguear cualquier request interceptada
