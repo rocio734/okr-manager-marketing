@@ -117,42 +117,46 @@ def main():
     print(f"{len(pending)} propuestas a aplicar.")
 
     import requests as req_lib
-    import base64
 
-    # ── Estrategia 1: JSON REST API con AD_Role_ID (sin SmartClient) ──────────
-    base_url = ETENDO_WRITE_BASE.removesuffix("/etendo").removesuffix("/")
-    auth_str  = base64.b64encode(f"{ETENDO_USER}:{ETENDO_PASS}".encode()).decode()
-    rest_headers = {
-        "Authorization": f"Basic {auth_str}",
-        "Content-Type": "application/json;charset=UTF-8",
+    # ── Login JWT con rol Futit empleados ──────────────────────────────────────
+    # Igual que job_crm_scoring: /api/auth/login con role en el body
+    etendo_base = os.environ.get("ETENDO_BASE_URL", "https://futit-staff.etendo.cloud")
+    jwt_resp = req_lib.post(
+        f"{etendo_base}/api/auth/login",
+        json={"username": ETENDO_USER, "password": ETENDO_PASS, "role": ETENDO_ROLE},
+        timeout=15,
+    )
+    jwt = jwt_resp.json().get("token", "") if jwt_resp.status_code == 200 else ""
+    print(f"  JWT login: {jwt_resp.status_code} | token: {'OK' if jwt else 'FAIL'}")
+
+    write_base = ETENDO_WRITE_BASE.removesuffix("/")
+    jwt_headers = {
+        "Authorization": f"Bearer {jwt}",
+        "Content-Type":  "application/json;charset=UTF-8",
     }
 
     def rest_update_kr(kr_id, new_value):
-        url = (f"{base_url}/etendo/org.openbravo.service.json.jsonrest"
-               f"/SMFOKR_Okr_Kr/{kr_id}"
-               f"?AD_Role_ID={ETENDO_ROLE}&AD_Client_ID={ETENDO_CLIENT}&AD_Org_ID=0")
+        url = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Okr_Kr/{kr_id}"
         body = {"data": {"id": kr_id, "currentValue": new_value}}
-        r = req_lib.put(url, json=body, headers=rest_headers, timeout=30)
-        print(f"    REST PUT KR: {r.status_code} | {r.text[:400]}")
+        r = req_lib.put(url, json=body, headers=jwt_headers, timeout=30)
+        print(f"    REST PUT KR: {r.status_code} | {r.text[:300]}")
         return r
 
     def rest_add_kr_update(kr_id, kr_name, new_value, comment):
-        url = (f"{base_url}/etendo/org.openbravo.service.json.jsonrest"
-               f"/SMFOKR_Kr_Update"
-               f"?AD_Role_ID={ETENDO_ROLE}&AD_Client_ID={ETENDO_CLIENT}&AD_Org_ID=0")
+        url = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Kr_Update"
         body = {"data": {
             "keyResult": kr_id,
             "currentValue": new_value,
             "comment": comment,
             "status": "on_track",
         }}
-        r = req_lib.post(url, json=body, headers=rest_headers, timeout=30)
-        print(f"    REST POST KR_Update: {r.status_code} | {r.text[:400]}")
+        r = req_lib.post(url, json=body, headers=jwt_headers, timeout=30)
+        print(f"    REST POST KR_Update: {r.status_code} | {r.text[:300]}")
         return r
 
-    # Probar si el REST API con AD_Role_ID funciona
+    # Probar con el primer item
     test_item = pending[0]
-    print(f"  Probando REST API con AD_Role_ID={ETENDO_ROLE[:8]}...")
+    print(f"  Probando REST API con JWT (rol Futit)...")
     test_r = rest_update_kr(test_item["kr_id"], test_item["proposed_value"])
     rest_ok = test_r.status_code in (200, 201)
     print(f"  REST API: {'OK' if rest_ok else 'FAILED'} ({test_r.status_code})")
