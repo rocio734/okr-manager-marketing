@@ -181,6 +181,7 @@ def main():
         return json.loads(resp_body) if resp_body else {}
 
     # Probar con el primer item
+    test_item = pending[0]
     print("  Probando JSESSIONID approach (default role del usuario)...")
     test_resp = rest_update_kr(test_item["kr_id"], test_item["proposed_value"])
     rest_ok = test_resp.get("response", {}).get("status") == 0
