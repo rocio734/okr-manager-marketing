@@ -238,6 +238,10 @@ def main():
         status  = lead.get("leadStatus") or ""
         lead_id = lead["id"]
 
+        # Excluir archivados: no tienen intención de compra activa
+        if status == "cold_archived":
+            continue
+
         if status in ("lost_deal", "won_deal"):
             fn_l  = (lead.get("firstName") or "").strip()
             co_l  = (lead.get("company") or "").strip()
@@ -313,12 +317,12 @@ def main():
     hot = hot_deduped
 
     processed = len([l for l in all_leads.values()
-                     if (l.get("leadStatus") or "") not in ("lost_deal","won_deal")])
+                     if (l.get("leadStatus") or "") not in ("lost_deal","won_deal","cold_archived")])
     today = datetime.now().strftime("%Y-%m-%d")
 
     report = f"""=== REPORTE DIARIO ===
 Fecha: {today}
-Leads procesados: {processed}
+Leads procesados (excluye lost/won/archived): {processed}
 Actualizados: {updated}
 Lost/won descritos: {lost_updated}
 Sin cambios: {no_change}
@@ -327,6 +331,11 @@ Señales calientes (SPI>=2): {len(hot)}
 {chr(10).join(hot) if hot else '  (ninguna)'}
 Candidatos a descartar (SPI=-1): {len(discard)}
 {chr(10).join(discard) if discard else '  (ninguno)'}
+---
+Nota phoneValid: este campo marca que el mensaje de WhatsApp fue ENVIADO
+por la API de Twilio, no que el número sea válido para llamadas de voz.
+Un número puede recibir WhatsApp y no tener línea de voz activa, o
+viceversa. No usarlo como indicador de número válido para llamadas.
 === FIN ==="""
 
     LOG(report)
