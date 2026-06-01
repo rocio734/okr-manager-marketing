@@ -218,14 +218,14 @@ p { margin: 0 0 var(--sp-3); }
   width: 36px;
   height: 36px;
   border-radius: var(--r-sm);
-  background: var(--c-brand);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--sp-3);
   flex-shrink: 0;
   text-decoration: none;
-  padding: 4px;
+  padding: 2px;
 }
 
 .sidebar .nav-icon {
