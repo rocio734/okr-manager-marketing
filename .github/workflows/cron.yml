@@ -18,6 +18,8 @@ on:
     - cron: '0 8 * * *'
     # Diario 8am España = 6 UTC — CRM scoring
     - cron: '0 6 * * *'
+    # Cada hora — generate_backlog (pick up iniciativas aprobadas por cualquier vía)
+    - cron: '0 * * * *'
   workflow_dispatch:
     inputs:
       job:
@@ -67,6 +69,7 @@ jobs:
               "5 7 * * 1")    echo "job=crm_pulse"         >> $GITHUB_OUTPUT ;;
               "0 8 * * *")    echo "job=reply_checker"     >> $GITHUB_OUTPUT ;;
               "0 6 * * *")    echo "job=crm_scoring"       >> $GITHUB_OUTPUT ;;
+              "0 * * * *")    echo "job=generate_backlog"  >> $GITHUB_OUTPUT ;;
             esac
             echo "next_week=false" >> $GITHUB_OUTPUT
           fi
