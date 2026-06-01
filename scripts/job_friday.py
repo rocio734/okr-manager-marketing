@@ -426,18 +426,27 @@ def fetch_recent_market_intel(team):
 # ── LLM propose ──────────────────────────────────────────────────────────────
 
 def llm_propose(kr, current_value, evidence, external):
-    inits_done = [i for i in evidence["initiatives"] if i["status"] in ("completed", "suggested_completed")]
-    tasks_done = [t for t in evidence["tasks"] if t["status"] == "done"]
-    entries    = evidence["entries"]
+    inits_done     = [i for i in evidence["initiatives"] if i["status"] in ("completed", "suggested_completed")]
+    inits_progress = [i for i in evidence["initiatives"] if i["status"] in ("approved", "in_progress")]
+    tasks_done     = [t for t in evidence["tasks"] if t["status"] == "done"]
+    tasks_total    = len(evidence["tasks"])
+    entries        = evidence["entries"]
 
-    # Evidencia interna (iniciativas/tasks/avances)
+    # Evidencia interna (iniciativas completadas + en progreso)
     ev_lines = []
     for i in inits_done:
-        ev_lines.append(f"  ✓ Iniciativa completada: {i['title']}")
+        # Contar tasks completadas de esta iniciativa
+        done_count = len([t for t in tasks_done if t.get("initiative_id") == i["id"]])
+        total_count = len([t for t in evidence["tasks"] if t.get("initiative_id") == i["id"]])
+        ev_lines.append(f"  ✓ COMPLETADA esta semana: {i['title']} ({done_count}/{total_count} tasks done)")
         if i.get("execution_plan"):
-            ev_lines.append(f"    Plan ejecutado: {i['execution_plan'][:150]}")
-    for t in tasks_done[:10]:
-        ev_line = f"  ✓ Task: {t['title']}"
+            ev_lines.append(f"    Qué se hizo: {i['execution_plan'][:150]}")
+    for i in inits_progress:
+        done_count = len([t for t in tasks_done if t.get("initiative_id") == i["id"]])
+        total_count = len([t for t in evidence["tasks"] if t.get("initiative_id") == i["id"]])
+        ev_lines.append(f"  ⏳ EN PROGRESO esta semana: {i['title']} ({done_count}/{total_count} tasks done)")
+    for t in tasks_done[:8]:
+        ev_line = f"  ✓ Task ejecutada: {t['title']}"
         if t.get("evidence_url"):
             ev_line += f" → {t['evidence_url']}"
         ev_lines.append(ev_line)
@@ -549,10 +558,11 @@ Baseline: {kr.get('baseline') or '—'}
 {chr(10).join(ext_lines) if ext_lines else '  (sin datos externos disponibles)'}
 
 INSTRUCCIONES:
-- Priorizá los DATOS EXTERNOS REALES sobre las estimaciones de iniciativas
-- Si hay datos CRM o Search Console concretos, usalos como base del proposed_value
-- Si no hay evidencia suficiente, mantené el valor actual (no inventés progreso)
-- El rationale debe citar explícitamente qué dato justifica el número propuesto
+- Priorizá los DATOS EXTERNOS REALES cuando están disponibles y son recientes
+- Si hay iniciativas COMPLETADAS esta semana cuyo impacto todavía no aparece en los datos externos (lag normal de 3-7 días en GA4, Search Console, CRM), consideralas como evidencia cualitativa de progreso inminente y proponé un valor levemente superior al actual
+- Si hay iniciativas EN PROGRESO, consideralas como señal de que el KR va a mejorar la semana siguiente
+- Si no hay ni datos externos ni iniciativas ejecutadas, mantené el valor actual
+- El rationale debe citar qué dato o iniciativa justifica el número propuesto y mencionar si hay lag esperado
 
 Devolvé SOLO este JSON:
 {{"proposed_value": <número>, "rationale": "<2-4 líneas citando evidencia concreta>"}}"""
