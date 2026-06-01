@@ -3,10 +3,436 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OKR Manager — Viernes · Aprobar nuevos KRs</title>
+<title>OKR Manager — Viernes · Aprobar valores semanales</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="styles.css">
+<style>
+  /* ============================================================
+     PAGE-SPECIFIC STYLES — kr-proposals-friday
+     ============================================================ */
+
+  /* Tabs sub-nav */
+  .tabs {
+    display: inline-flex;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-pill);
+    padding: 4px; gap: 2px;
+    margin-bottom: var(--sp-6);
+    box-shadow: var(--shadow-xs);
+  }
+  .tab {
+    padding: 8px 16px;
+    border-radius: var(--r-pill);
+    font-size: var(--fs-13);
+    font-weight: var(--fw-medium);
+    color: var(--c-text-muted);
+    cursor: pointer; border: 0; background: transparent;
+    text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .tab:hover:not(.active) { background: var(--c-surface-sunk); color: var(--c-text); }
+  .tab.active { background: var(--c-brand); color: var(--c-text-on-dark); }
+
+  /* Page head */
+  .page-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: var(--sp-6); margin-bottom: var(--sp-6);
+  }
+  .page-head .eyebrow {
+    font-size: var(--fs-12);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    margin-bottom: 6px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .page-head .eyebrow .day-chip {
+    background: var(--c-accent);
+    color: var(--c-text-on-yellow);
+    padding: 2px 8px;
+    border-radius: var(--r-pill);
+    font-size: var(--fs-11);
+    letter-spacing: var(--tracking-wide);
+  }
+  .page-head h1 {
+    font-size: var(--fs-28);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text);
+    letter-spacing: var(--tracking-tight);
+    margin: 0; line-height: 1.15;
+  }
+  .page-head .sub {
+    font-size: var(--fs-14); color: var(--c-text-muted);
+    margin-top: 6px; max-width: 65ch;
+  }
+  .page-head .lead-actions {
+    display: flex; gap: var(--sp-2); align-items: center;
+    flex-shrink: 0;
+  }
+  .page-head .meta-time {
+    font-size: var(--fs-12);
+    color: var(--c-text-muted);
+    font-family: var(--font-mono);
+    text-align: right;
+    margin-bottom: 6px;
+  }
+
+  /* Summary strip */
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-6);
+  }
+  .summary-strip .tile {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 16px 20px;
+  }
+  .summary-strip .tile .top {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--c-text-muted);
+    font-size: var(--fs-13);
+    margin-bottom: 8px;
+  }
+  .summary-strip .tile .top svg { width: 14px; height: 14px; }
+  .summary-strip .tile .row {
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .summary-strip .tile .num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-28);
+    font-weight: var(--fw-regular);
+    color: var(--c-text);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1;
+  }
+  .summary-strip .tile.up .num { color: var(--c-success); }
+  .summary-strip .tile.down .num { color: var(--c-danger); }
+  .summary-strip .tile .pill {
+    font-size: var(--fs-12);
+    font-weight: var(--fw-medium);
+    padding: 3px 8px;
+    border-radius: var(--r-pill);
+    background: var(--c-neutral-soft);
+    color: var(--c-text-muted);
+  }
+  .summary-strip .tile.up .pill { background: var(--c-success-soft); color: var(--c-success); }
+  .summary-strip .tile.down .pill { background: var(--c-danger-soft); color: var(--c-danger); }
+
+  /* Filters bar */
+  .filters {
+    display: flex; align-items: center; gap: var(--sp-3);
+    margin-bottom: var(--sp-6);
+    flex-wrap: wrap;
+  }
+  .filters .field {
+    height: 38px;
+    border-radius: var(--r-sm);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-strong);
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0 14px;
+    font-size: var(--fs-14);
+    color: var(--c-text-body);
+  }
+  .filters .field svg { width: 14px; height: 14px; color: var(--c-text-muted); }
+  .filters .field input {
+    border: 0; background: transparent; outline: none;
+    font-size: var(--fs-14); color: var(--c-text);
+    width: 240px;
+  }
+  .filters .field input::placeholder { color: var(--c-text-subtle); }
+  .filters .field select {
+    border: 0; background: transparent; outline: none;
+    font-size: var(--fs-14); color: var(--c-text);
+  }
+  .filters .spacer { flex: 1; }
+  .filters .counter {
+    display: flex; align-items: center; gap: var(--sp-3);
+    font-size: var(--fs-13);
+    color: var(--c-text-muted);
+  }
+  .filters .counter .num { font-family: var(--font-mono); font-weight: var(--fw-medium); }
+  .filters .counter .num.pending { color: var(--c-warning); }
+  .filters .counter .num.approved { color: var(--c-success); }
+  .filters .counter .num.rejected { color: var(--c-danger); }
+
+  /* KR stack */
+  .kr-stack { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+  /* KR row — 3-col grid */
+  .kr-block {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 20px 22px;
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) 300px minmax(260px, 1fr);
+    gap: var(--sp-5);
+    align-items: stretch;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+    position: relative;
+  }
+  .kr-block:hover { border-color: var(--c-border-strong); }
+  .kr-block.state-approved {
+    border-left: 3px solid var(--c-success);
+    padding-left: 19px;
+  }
+  .kr-block.state-rejected {
+    border-left: 3px solid var(--c-danger);
+    padding-left: 19px;
+  }
+  .kr-block.state-approved .col-justification,
+  .kr-block.state-approved .col-kr {
+    opacity: 0.65;
+  }
+  .kr-block .approved-badge {
+    position: absolute; top: 14px; right: 16px;
+    z-index: 1;
+  }
+
+  /* Col 1 · KR meta */
+  .col-kr { display: flex; flex-direction: column; justify-content: space-between; }
+  .col-kr .kr-id {
+    font-size: var(--fs-11);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    margin-bottom: 4px;
+  }
+  .col-kr .kr-name {
+    font-size: var(--fs-15);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.35;
+    margin-bottom: 10px;
+  }
+  .col-kr .kr-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    font-size: var(--fs-12);
+    margin-top: auto;
+    padding-top: var(--sp-3);
+  }
+  .col-kr .kr-tags .tag {
+    background: var(--c-neutral-soft);
+    color: var(--c-text-muted);
+    padding: 3px 8px;
+    border-radius: var(--r-pill);
+  }
+
+  /* Col 2 · Delta editor */
+  .col-delta {
+    background: var(--c-surface-alt);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .col-delta .delta-grid {
+    display: grid;
+    grid-template-columns: 1fr 20px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  .col-delta .col-label {
+    font-size: var(--fs-11);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    margin-bottom: 4px;
+  }
+  .col-delta .actual-val {
+    font-family: var(--font-mono);
+    font-size: var(--fs-24);
+    color: var(--c-text);
+    font-weight: var(--fw-regular);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.1;
+  }
+  .col-delta .arrow {
+    color: var(--c-text-subtle);
+    text-align: center;
+    font-size: var(--fs-18);
+    line-height: 1;
+    padding-top: 14px;
+  }
+  .col-delta .input-wrap { position: relative; }
+  .col-delta .edit-value {
+    width: 100%;
+    height: 38px;
+    padding: 0 28px 0 10px;
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--r-sm);
+    background: var(--c-surface);
+    font-family: var(--font-mono);
+    font-size: var(--fs-20);
+    font-weight: var(--fw-regular);
+    color: var(--c-text);
+    outline: none;
+  }
+  .col-delta .edit-value:focus {
+    border-color: var(--c-brand);
+    box-shadow: var(--shadow-focus);
+  }
+  .col-delta .delta-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 8px; padding-top: 10px;
+    border-top: 1px solid var(--c-border);
+    font-size: var(--fs-12);
+    color: var(--c-text-muted);
+  }
+  .col-delta .delta-pill {
+    font-family: var(--font-mono);
+    font-weight: var(--fw-medium);
+    padding: 3px 9px;
+    border-radius: var(--r-pill);
+    background: var(--c-neutral-soft);
+    color: var(--c-text-muted);
+    font-size: var(--fs-12);
+  }
+  .col-delta .delta-pill.up { background: var(--c-success-soft); color: var(--c-success); }
+  .col-delta .delta-pill.down { background: var(--c-danger-soft); color: var(--c-danger); }
+
+  /* Col 3 · Justification + actions */
+  .col-justification {
+    display: flex; flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  .col-justification .rationale-label {
+    font-size: var(--fs-11);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .col-justification .rationale-label::before {
+    content: "✦";
+    color: var(--c-accent-pressed);
+    font-size: 12px;
+  }
+  .col-justification .rationale-text {
+    font-size: var(--fs-13);
+    color: var(--c-text-body);
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .col-justification .reject-text {
+    width: 100%;
+    font-family: inherit;
+    font-size: var(--fs-13);
+    color: var(--c-text-body);
+    line-height: 1.55;
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--r-sm);
+    background: var(--c-surface);
+    padding: 8px 10px;
+    outline: none;
+    resize: vertical;
+    min-height: 60px;
+    display: none;
+  }
+  .col-justification .reject-text:focus {
+    border-color: var(--c-brand);
+    box-shadow: var(--shadow-focus);
+  }
+  .kr-block.state-rejected .col-justification .reject-text { display: block; }
+  .kr-block.state-rejected .col-justification .rationale-text { display: none; }
+
+  .col-justification .actions {
+    display: flex; gap: 8px; margin-top: 4px;
+  }
+  .col-justification .actions .btn { flex: 1; justify-content: center; }
+
+  /* Approve/reject button states */
+  .btn-approve {
+    background: var(--c-surface); color: var(--c-success);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+  }
+  .btn-approve:hover { background: var(--c-success-soft); border-color: var(--c-success); }
+  .btn-approve.active { background: var(--c-success-soft); color: var(--c-success); border-color: transparent; }
+
+  .btn-reject {
+    background: var(--c-surface); color: var(--c-danger);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+  }
+  .btn-reject:hover { background: var(--c-danger-soft); border-color: var(--c-danger); }
+  .btn-reject.active { background: var(--c-danger-soft); color: var(--c-danger); border-color: transparent; }
+
+  /* Empty states */
+  #not-approver .empty,
+  #empty .empty {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: var(--sp-10);
+    text-align: center;
+    color: var(--c-text-muted);
+    font-size: var(--fs-14);
+  }
+
+  /* Sticky bottom bar */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: var(--sidebar-w, 56px);
+    right: 0;
+    background: var(--c-surface);
+    border-top: 1px solid var(--c-border);
+    box-shadow: var(--shadow-up);
+    z-index: 30;
+  }
+  .bottom-bar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px var(--sp-8);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--sp-4);
+    min-height: 76px;
+  }
+  .bottom-bar .summary-line {
+    display: flex; gap: var(--sp-4); align-items: center;
+    font-size: var(--fs-14);
+    color: var(--c-text-muted);
+  }
+  .bottom-bar .stat {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .bottom-bar .stat .num {
+    font-family: var(--font-mono);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-18);
+  }
+  .bottom-bar .stat.approved .num { color: var(--c-success); }
+  .bottom-bar .stat.rejected .num { color: var(--c-danger); }
+  .bottom-bar .stat.pending .num { color: var(--c-text); }
+  .bottom-bar .sep { color: var(--c-border-strong); }
+  .bottom-bar .bar-actions { display: flex; gap: var(--sp-2); align-items: center; }
+  .target-info {
+    font-size: var(--fs-12);
+    color: var(--c-text-subtle);
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-right: 4px;
+  }
+  .target-info svg { width: 13px; height: 13px; }
+  .ghost-ai::before { content: "✦"; color: var(--c-accent-pressed); margin-right: 4px; }
+
+  /* Workspace extra bottom padding for fixed bar */
+  .content { padding-bottom: calc(76px + var(--sp-12)); }
+</style>
 </head>
 <body>
 
@@ -27,8 +453,93 @@
     <header class="topbar"></header>
 
     <main class="content">
-      <h1>Viernes — Aprobar nuevos KRs</h1>
-      <p class="lead">El agente analizó los avances de la semana y propone estos nuevos valores. Podés ajustarlos a mano antes de aprobar. Al aprobar, los nuevos valores se escriben en Etendo automáticamente.</p>
+
+      <!-- Sub-nav tabs -->
+      <div class="tabs" role="tablist">
+        <a href="dashboard.html" class="tab">Dashboard</a>
+        <a href="approval-monday.html" class="tab">Iniciativas</a>
+        <a href="kr-proposals-friday.html" class="tab active">Valores KR</a>
+        <a href="market-intel.html" class="tab">Visión del Mercado</a>
+      </div>
+
+      <!-- Page header -->
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">
+            <span class="day-chip">Viernes</span>
+            <span id="week-label">Cierre de semana</span>
+          </div>
+          <h1>Aprobar valores semanales</h1>
+          <div class="sub">El agente recalculó los KRs con datos del CRM, ventas y campañas. Revisá las propuestas y aprobá para escribir los nuevos valores en Etendo.</div>
+        </div>
+        <div>
+          <div class="meta-time" id="last-recalc" style="display:none;">Último recálculo · —</div>
+          <div class="lead-actions">
+            <button class="btn btn-secondary btn-sm" id="btn-generate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M3 12a9 9 0 0 1 15.5-6.4L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15.5 6.4L3 16"></path><path d="M3 21v-5h5"></path></svg>
+              Recalcular
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary strip (dynamic) -->
+      <section class="summary-strip" id="summary-strip" style="display:none;">
+        <div class="tile">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle></svg>
+            Total KRs
+          </div>
+          <div class="row">
+            <span class="num" id="strip-total">—</span>
+            <span class="pill">esta semana</span>
+          </div>
+        </div>
+        <div class="tile">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path></svg>
+            Sin cambios
+          </div>
+          <div class="row">
+            <span class="num" id="strip-flat">—</span>
+            <span class="pill">flat</span>
+          </div>
+        </div>
+        <div class="tile up">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l7-7 7 7M12 5v14"></path></svg>
+            Subidas
+          </div>
+          <div class="row">
+            <span class="num" id="strip-up">—</span>
+            <span class="pill" id="strip-up-label">↑ subidas</span>
+          </div>
+        </div>
+        <div class="tile down">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12l-7 7-7-7M12 19V5"></path></svg>
+            Bajadas
+          </div>
+          <div class="row">
+            <span class="num" id="strip-down">—</span>
+            <span class="pill" id="strip-down-label">↓ bajadas</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters (rendered once content loads) -->
+      <div class="filters" id="filters-bar" style="display:none;">
+        <label class="field" style="cursor:text;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+          <input type="search" id="filter-search" placeholder="Buscar KR…">
+        </label>
+        <div class="spacer"></div>
+        <div class="counter">
+          <span><span class="num pending" id="count-pending">—</span> sin decisión</span>
+          <span><span class="num approved" id="count-approved">0</span> aprobadas</span>
+          <span><span class="num rejected" id="count-rejected">0</span> rechazadas</span>
+        </div>
+      </div>
 
       <div id="not-approver" style="display:none;">
         <div class="empty">
@@ -38,15 +549,7 @@
       </div>
 
       <div id="content" style="display:none;">
-        <div id="krs-block"></div>
-
-        <div class="summary-bar">
-          <div><span id="summary" class="muted">—</span></div>
-          <div style="display:flex;gap:var(--sp-2);">
-            <button class="btn btn-secondary" id="btn-generate">⚡ Recalcular con el agente</button>
-            <button class="btn btn-primary" id="btn-apply">Aprobar y escribir en Etendo</button>
-          </div>
-        </div>
+        <div class="kr-stack" id="krs-block"></div>
       </div>
 
       <div id="empty" style="display:none;">
@@ -57,7 +560,33 @@
           </div>
         </div>
       </div>
+
     </main>
+  </div>
+</div>
+
+<!-- Sticky bottom bar -->
+<div class="bottom-bar" id="bottom-bar" style="display:none;">
+  <div class="bottom-bar-inner">
+    <div class="summary-line">
+      <div class="stat approved"><span class="num" id="bar-approved">0</span><span>aprobadas</span></div>
+      <span class="sep">·</span>
+      <div class="stat rejected"><span class="num" id="bar-rejected">0</span><span>rechazada</span></div>
+      <span class="sep">·</span>
+      <div class="stat pending"><span class="num" id="bar-pending">—</span><span>sin decisión</span></div>
+    </div>
+    <div class="bar-actions">
+      <span class="target-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9"></path><path d="M16 18l2 2 4-4"></path></svg>
+        Los valores aprobados se escriben en Etendo
+      </span>
+      <button class="btn btn-ghost ghost-ai" id="btn-generate-bar">Recalcular con el agente</button>
+      <button class="btn btn-secondary" id="btn-cancel">Descartar cambios</button>
+      <button class="btn btn-accent" id="btn-apply">
+        Aprobar y escribir en Etendo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -115,6 +644,7 @@
     }
   }
   document.getElementById('btn-generate')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
+  document.getElementById('btn-generate-bar')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
   document.getElementById('btn-generate-empty')?.addEventListener('click', e => runGenerateProposals(e.currentTarget));
 
   // Cycle pendiente de KR approval
@@ -139,6 +669,26 @@
     return;
   }
 
+  // Populate summary strip
+  const total = proposals.length;
+  let countUp = 0, countDown = 0, countFlat = 0;
+  proposals.forEach(p => {
+    const cur = parseFloat(p.current_value);
+    const prop = parseFloat(p.proposed_value);
+    if (!isNaN(cur) && !isNaN(prop)) {
+      if (prop > cur) countUp++;
+      else if (prop < cur) countDown++;
+      else countFlat++;
+    } else {
+      countFlat++;
+    }
+  });
+  document.getElementById('strip-total').textContent = total;
+  document.getElementById('strip-flat').textContent = countFlat;
+  document.getElementById('strip-up').textContent = countUp;
+  document.getElementById('strip-down').textContent = countDown;
+  document.getElementById('summary-strip').style.display = '';
+
   // Estado pending: id -> { action, value }
   const pending = {};
   proposals.forEach(p => { pending[p.id] = { action: 'pending', value: p.proposed_value }; });
@@ -146,33 +696,68 @@
   const root = document.getElementById('krs-block');
   root.innerHTML = proposals.map(propRow).join('');
   document.getElementById('content').style.display = '';
+  document.getElementById('filters-bar').style.display = '';
+  document.getElementById('bottom-bar').style.display = '';
   refreshSummary();
 
   function propRow(p) {
+    const cur = parseFloat(p.current_value);
+    const prop = parseFloat(p.proposed_value);
+    let deltaClass = '';
+    let deltaTxt = 'sin cambios';
+    if (!isNaN(cur) && !isNaN(prop) && prop !== cur) {
+      const diff = prop - cur;
+      deltaClass = diff > 0 ? 'up' : 'down';
+      deltaTxt = (diff > 0 ? '+' : '') + diff;
+    }
+
     return `
-      <div class="card kr-block" data-id="${p.id}">
-        <div class="kr-card">
-          <div class="left">
-            <div class="label">${OKR_fmt.escapeHtml(p.kr_id)}</div>
-            <div class="name">${OKR_fmt.escapeHtml(p.kr_name)}</div>
-            <div class="kr-values">
-              <div><div class="hint">Valor actual</div><div class="val">${p.current_value ?? '—'}</div></div>
-              <div class="arrow">→</div>
-              <div>
-                <div class="hint">Valor propuesto</div>
-                <input class="edit-value input" type="number" step="any" data-act="value" value="${p.proposed_value ?? ''}">
+      <div class="kr-block" data-id="${p.id}">
+        <div class="col-kr">
+          <div>
+            <div class="kr-id">${OKR_fmt.escapeHtml(p.kr_id)}</div>
+            <div class="kr-name">${OKR_fmt.escapeHtml(p.kr_name)}</div>
+          </div>
+          <div class="kr-tags">
+            <span class="tag">${OKR_fmt.escapeHtml(team)}</span>
+          </div>
+        </div>
+
+        <div class="col-delta">
+          <div class="delta-grid">
+            <div>
+              <div class="col-label">Actual</div>
+              <div class="actual-val">${p.current_value ?? '—'}</div>
+            </div>
+            <div class="arrow">→</div>
+            <div>
+              <div class="col-label">Propuesto</div>
+              <div class="input-wrap">
+                <input class="edit-value ${deltaClass}" type="number" step="any" data-act="value" value="${p.proposed_value ?? ''}">
               </div>
             </div>
-            <div class="actions-row">
-              <button class="btn btn-sm btn-approve" data-act="set-approve">✓ Aprobar</button>
-              <button class="btn btn-sm btn-reject"  data-act="set-reject">✗ Rechazar</button>
-            </div>
           </div>
-          <div class="right">
-            <div class="rationale">
-              <h3>Justificación del agente</h3>
-              <div style="white-space:pre-wrap;">${OKR_fmt.escapeHtml(p.rationale || '—')}</div>
-            </div>
+          <div class="delta-row">
+            <span>Target <strong style="color:var(--c-text-body);font-family:var(--font-mono);">${p.target_value ?? '—'}</strong></span>
+            <span class="delta-pill ${deltaClass}">${deltaTxt}</span>
+          </div>
+        </div>
+
+        <div class="col-justification">
+          <div>
+            <div class="rationale-label">Justificación del agente</div>
+            <div class="rationale-text">${OKR_fmt.escapeHtml(p.rationale || '—')}</div>
+            <textarea class="reject-text" placeholder="Escribí por qué rechazás este valor…" rows="3"></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn btn-sm btn-approve" data-act="set-approve">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"></path></svg>
+              Aprobar
+            </button>
+            <button class="btn btn-sm btn-reject" data-act="set-reject">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px;"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+              Rechazar
+            </button>
           </div>
         </div>
       </div>
@@ -180,8 +765,11 @@
   }
 
   root.addEventListener('click', (e) => {
-    const t = e.target;
-    if (t.matches('[data-act="set-approve"]')) {
+    const t = e.target.closest('[data-act]');
+    if (!t) return;
+    const act = t.dataset.act;
+
+    if (act === 'set-approve') {
       const card = t.closest('.kr-block');
       const id = Number(card.dataset.id);
       pending[id].action = 'approve';
@@ -189,7 +777,7 @@
       card.querySelector('[data-act="set-approve"]').classList.add('active');
       card.querySelector('[data-act="set-reject"]').classList.remove('active');
       refreshSummary();
-    } else if (t.matches('[data-act="set-reject"]')) {
+    } else if (act === 'set-reject') {
       const card = t.closest('.kr-block');
       const id = Number(card.dataset.id);
       pending[id].action = 'reject';
@@ -212,8 +800,27 @@
     const ap  = Object.values(pending).filter(p => p.action === 'approve').length;
     const re  = Object.values(pending).filter(p => p.action === 'reject').length;
     const pen = Object.values(pending).filter(p => p.action === 'pending').length;
-    document.getElementById('summary').textContent = `${ap} a aplicar · ${re} rechazadas · ${pen} sin decisión`;
+
+    // Filters bar
+    const elPending  = document.getElementById('count-pending');
+    const elApproved = document.getElementById('count-approved');
+    const elRejected = document.getElementById('count-rejected');
+    if (elPending)  elPending.textContent  = pen;
+    if (elApproved) elApproved.textContent = ap;
+    if (elRejected) elRejected.textContent = re;
+
+    // Bottom bar
+    const barPending  = document.getElementById('bar-pending');
+    const barApproved = document.getElementById('bar-approved');
+    const barRejected = document.getElementById('bar-rejected');
+    if (barPending)  barPending.textContent  = pen;
+    if (barApproved) barApproved.textContent = ap;
+    if (barRejected) barRejected.textContent = re;
   }
+
+  document.getElementById('btn-cancel')?.addEventListener('click', () => {
+    if (confirm('¿Descartar cambios y volver al dashboard?')) location.href = 'dashboard.html';
+  });
 
   document.getElementById('btn-apply').addEventListener('click', async () => {
     const btn = document.getElementById('btn-apply');
