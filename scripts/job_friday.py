@@ -67,7 +67,27 @@ def fetch_crm_snapshot():
         # scorePurchaseIntention es el campo real en el CRM (confirmado 2026-05-20)
         hot           = [l for l in fit_yes if int(l.get("scorePurchaseIntention") or 0) >= 3]
         won           = [l for l in leads if l.get("leadStatus") == "won_deal"]
-        negotiation   = [l for l in active if l.get("leadStatus") == "negotiation"]
+
+        # Negociación: no existe leadStatus fijo — se detecta por keywords en summary
+        _negotiation_keywords = ["negociación", "negociacion", "negociando",
+                                  "evaluando propuesta", "revisando propuesta",
+                                  "etapa de cierre", "en proceso de cierre"]
+        def _in_negotiation(lead):
+            if lead.get("leadStatus") == "negotiation":
+                return True
+            summ = (lead.get("summary") or "").lower()
+            return any(k in summ for k in _negotiation_keywords)
+        negotiation = [l for l in active if _in_negotiation(l)]
+
+        # Meetings: no usar meetingDate (no se actualiza consistentemente) — detectar en summary
+        _meeting_keywords = ["reunión", "reunion", "meeting", "demo realiz",
+                              "llamada exitosa", "llamada ok", "tuvimos llamada",
+                              "hicimos demo", "se realizó demo", "demo completada",
+                              "reunimos", "nos reunimos", "presentamos", "demo hecha"]
+        cutoff_30d_str = (date.today() - timedelta(days=29)).isoformat()
+        meetings = [l for l in leads if any(
+            k in (l.get("summary") or "").lower() for k in _meeting_keywords
+        )]
         # % hot con propuesta: buscar en summary o leadStatus
         # No existe campo proposalSent — se detecta por keywords en summary o por leadStatus
         _proposal_keywords = ["propuesta enviada", "propuesta presentada", "envié propuesta",
@@ -80,8 +100,6 @@ def fetch_crm_snapshot():
             summ = (lead.get("summary") or "").lower()
             return any(k in summ for k in _proposal_keywords)
         proposal_sent = [l for l in hot if _has_proposal(l)]
-        cutoff_30d_str = (date.today() - timedelta(days=29)).isoformat()
-        meetings      = [l for l in leads if (l.get("meetingDate") or "")[:10] >= cutoff_30d_str]
         unclassified  = [l for l in active if not l.get("strategicFit") or l.get("strategicFit") == "unclassified"]
 
         # Score promedio de los leads fit (para medir calidad del pipeline)
