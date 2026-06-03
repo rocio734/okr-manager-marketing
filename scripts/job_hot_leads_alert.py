@@ -20,15 +20,26 @@ VICO_EMAIL = "victoria.miguez@etendo.software"
 def get_hot_leads():
     jwt = etendo_login(ROLE_COMERCIAL)
     leads = etendo_fetch(jwt, "ECLM_Lead")
-    return [
-        l for l in leads
+    all_active = [l for l in leads if l.get("leadStatus") not in ("lost_deal", "won_deal", "cold_archived")]
+    hot = [
+        l for l in all_active
         if (l.get("scorePurchaseIntention") or 0) >= 2
         and l.get("strategicFit") == "strategic_fit_yes"
-        and l.get("leadStatus") not in ("lost_deal", "won_deal", "cold_archived")
     ]
+    # Candidates near negotiation: demo done, proposal sent, or summary mentions advanced stage
+    _near_negotiation_kw = ["propuesta", "demo realiz", "demo hecha", "llamada exitosa",
+                             "negociaci", "evaluando", "revisando", "avanzando", "cierre",
+                             "reunión de", "presentamos", "acuerdo"]
+    near_neg = [
+        l for l in all_active
+        if any(k in (l.get("summary") or "").lower() for k in _near_negotiation_kw)
+        and l not in hot  # exclude already shown as hot leads
+    ]
+    return hot, near_neg
 
 
-def build_html(hot_leads):
+def build_html(hot_leads, near_neg=None):
+    near_neg = near_neg or []
     today = datetime.now().strftime("%d/%m/%Y")
 
     spi_styles = {
@@ -81,6 +92,21 @@ def build_html(hot_leads):
   </table>
 </div>"""
 
+    # Negotiation candidates section
+    if near_neg:
+        neg_rows = "".join(
+            f'<div style="font-size:13px;color:#2D3556;padding:4px 0;border-bottom:1px solid #E9EBF3;">'
+            f'· <strong>{((l.get("firstName") or "") + " " + (l.get("lastName") or "")).strip() or l.get("company","?")}</strong>'
+            f' — {(l.get("summary") or "")[-80:].strip()}</div>'
+            for l in near_neg[:5]
+        )
+        neg_section = f"""<div style="background:#fff;border-radius:8px;padding:10px 14px;margin-bottom:10px;">
+          <div style="font-size:11px;color:#6B7388;font-weight:600;margin-bottom:6px;">LEADS CON ACTIVIDAD RECIENTE QUE PODRÍAN ESTAR AVANZANDO:</div>
+          {neg_rows}
+        </div>"""
+    else:
+        neg_section = '<p style="margin:0 0 8px;font-size:13px;color:#9098A8;">El sistema no detectó leads en etapa avanzada fuera de los hot leads de arriba.</p>'
+
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -113,11 +139,25 @@ def build_html(hot_leads):
     {cards}
   </td></tr>
 
-  <tr><td style="background:#ffffff;padding:16px 32px;border-left:1px solid #ECEEF1;border-right:1px solid #ECEEF1;">
+  <tr><td style="background:#ffffff;padding:16px 32px 0;border-left:1px solid #ECEEF1;border-right:1px solid #ECEEF1;">
     <div style="background:#FFF8E6;border-left:4px solid #FFCC00;border-radius:0 10px 10px 0;padding:14px 18px;">
       <div style="font-size:11px;font-weight:700;color:#B5810D;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">¿CÓMO ACTUALIZAR?</div>
       <p style="margin:0;font-size:13px;color:#1F2858;line-height:1.6;">
         Entrá a <strong>Etendo CRM → Lead</strong> y cambiá el <em>Lead Status</em> del que corresponda. Los cambios se reflejan automáticamente en el cálculo de mañana.
+      </p>
+    </div>
+  </td></tr>
+
+  <tr><td style="background:#ffffff;padding:20px 32px;border-left:1px solid #ECEEF1;border-right:1px solid #ECEEF1;">
+    <div style="background:#F0F4FF;border-left:4px solid #2D5BCF;border-radius:0 10px 10px 0;padding:16px 20px;">
+      <div style="font-size:11px;font-weight:700;color:#2D5BCF;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">🤝 Consulta adicional — Leads en negociación</div>
+      <p style="margin:0 0 12px;font-size:13px;color:#1F2858;line-height:1.6;">
+        El sistema usa el CRM para detectar si hay leads en negociación, pero sabemos que no siempre está actualizado.
+        <strong>¿Hay algún lead con el que estés en proceso de negociación activa o avanzado que no figure arriba?</strong>
+      </p>
+      {neg_section}
+      <p style="margin:8px 0 0;font-size:12px;color:#9098A8;">
+        Si hay alguno, respondé este mail con el nombre y el estado actual — el agente del viernes lo va a tener en cuenta.
       </p>
     </div>
   </td></tr>
@@ -148,12 +188,13 @@ def send_email(html_body, n_leads):
 
 def main():
     print("=== Hot Leads Alert ===")
-    hot = get_hot_leads()
+    hot, near_neg = get_hot_leads()
     print(f"  Hot leads encontrados: {len(hot)}")
+    print(f"  Leads cerca de negociación: {len(near_neg)}")
     if not hot:
         print("  Sin hot leads activos, no se envía mail.")
         return
-    html = build_html(hot)
+    html = build_html(hot, near_neg)
     send_email(html, len(hot))
 
 
