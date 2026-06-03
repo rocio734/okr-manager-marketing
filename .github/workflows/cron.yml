@@ -20,6 +20,8 @@ on:
     - cron: '0 6 * * *'
     # Cada hora — generate_backlog (pick up iniciativas aprobadas por cualquier vía)
     - cron: '0 * * * *'
+    # Jueves 9am España = 7 UTC — hot leads alert para Vico antes del cálculo del viernes
+    - cron: '0 7 * * 4'
   workflow_dispatch:
     inputs:
       job:
@@ -70,6 +72,7 @@ jobs:
               "0 8 * * *")    echo "job=reply_checker"     >> $GITHUB_OUTPUT ;;
               "0 6 * * *")    echo "job=crm_scoring"       >> $GITHUB_OUTPUT ;;
               "0 * * * *")    echo "job=generate_backlog"  >> $GITHUB_OUTPUT ;;
+              "0 7 * * 4")    echo "job=hot_leads_alert"   >> $GITHUB_OUTPUT ;;
             esac
             echo "next_week=false" >> $GITHUB_OUTPUT
           fi
@@ -120,4 +123,5 @@ jobs:
             crm_pulse)         python job_monday_crm_pulse.py ;;
             reply_checker)     python job_reply_checker.py ;;
             crm_scoring)       python job_crm_scoring.py ;;
+            hot_leads_alert)   python job_hot_leads_alert.py ;;
           esac
