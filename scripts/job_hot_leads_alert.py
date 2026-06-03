@@ -29,60 +29,107 @@ def get_hot_leads():
 
 
 def build_html(hot_leads):
-    rows = ""
-    for l in hot_leads:
-        name    = f"{l.get('firstName','')} {l.get('lastName','')}".strip() or l.get("company", "?")
-        company = l.get("company", "—")
-        spi     = l.get("scorePurchaseIntention", "?")
-        status  = l.get("leadStatus", "?")
-        summary = (l.get("summary") or "Sin notas").replace("\n", "<br>")[:300]
-        rows += f"""
-        <tr style="border-bottom:1px solid #ECEEF1;">
-          <td style="padding:12px 16px;font-weight:600;color:#1F2858;">{name}</td>
-          <td style="padding:12px 16px;color:#6B7388;">{company}</td>
-          <td style="padding:12px 16px;text-align:center;">
-            <span style="background:#FFF4BF;color:#1F2858;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">SPI={spi}</span>
-          </td>
-          <td style="padding:12px 16px;color:#6B7388;font-size:13px;">{summary}</td>
-        </tr>"""
-
     today = datetime.now().strftime("%d/%m/%Y")
-    return f"""
-    <div style="font-family:Helvetica,Arial,sans-serif;max-width:700px;margin:0 auto;">
-      <div style="background:#1F2858;padding:24px 32px;border-radius:10px 10px 0 0;">
-        <h2 style="margin:0;color:#FFCC00;font-size:16px;letter-spacing:2px;text-transform:uppercase;">OKR Manager</h2>
-        <h1 style="margin:8px 0 4px;color:#fff;font-size:20px;">Revisión de hot leads — {today}</h1>
-        <p style="margin:0;color:rgba(255,255,255,0.6);font-size:13px;">
-          Mañana el agente calcula los KRs. Revisá si el estado de cada lead es correcto.
-        </p>
-      </div>
-      <div style="background:#fff;border:1px solid #ECEEF1;border-top:none;padding:24px 32px;">
-        <p style="color:#2D3556;font-size:14px;">Hola Vico 👋</p>
-        <p style="color:#2D3556;font-size:14px;">
-          El sistema detectó <strong>{len(hot_leads)} hot leads activos</strong> que se van a usar mañana para calcular el KR de pipeline.
-          Revisá cada uno y actualizá el estado en el CRM si corresponde (<em>cold_archived, negotiation, proposal_sent</em>, etc.)
-          antes de las <strong>5pm</strong>.
-        </p>
-        <table width="100%" cellpadding="0" cellspacing="0"
-               style="border-collapse:collapse;border:1px solid #ECEEF1;border-radius:8px;overflow:hidden;margin-top:16px;">
-          <thead>
-            <tr style="background:#F6F7F9;">
-              <th style="padding:10px 16px;text-align:left;font-size:12px;color:#6B7388;font-weight:600;">NOMBRE</th>
-              <th style="padding:10px 16px;text-align:left;font-size:12px;color:#6B7388;font-weight:600;">EMPRESA</th>
-              <th style="padding:10px 16px;text-align:center;font-size:12px;color:#6B7388;font-weight:600;">SPI</th>
-              <th style="padding:10px 16px;text-align:left;font-size:12px;color:#6B7388;font-weight:600;">ÚLTIMO MOVIMIENTO</th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
+
+    spi_styles = {
+        3: ("background:#FCE5E8;color:#D02F3D;", "🔴"),
+        2: ("background:#FFF1C9;color:#B5810D;", "🟡"),
+        1: ("background:#E1F3EA;color:#1A8554;", "🟢"),
+    }
+
+    cards = ""
+    for l in hot_leads:
+        name    = f"{l.get('firstName', '')} {l.get('lastName', '')}".strip() or l.get("company", "?")
+        company = l.get("company") or "—"
+        spi     = int(l.get("scorePurchaseIntention") or 0)
+        summary = (l.get("summary") or "").strip()
+        lines   = [x.strip() for x in summary.split("\n") if x.strip()]
+        last    = lines[-1] if lines else "Sin notas recientes"
+        spi_css, fire = spi_styles.get(spi, ("background:#EEF0F4;color:#6B7388;", "⚪"))
+
+        cards += f"""
+<div style="background:#ffffff;border:1px solid #ECEEF1;border-radius:12px;padding:18px 22px;margin-bottom:14px;box-shadow:0 2px 8px rgba(31,40,88,0.06);">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="vertical-align:top;">
+        <div style="font-size:15px;font-weight:700;color:#1F2858;">{fire} {name}</div>
+        <div style="font-size:12px;color:#9098A8;margin-top:2px;">{company}</div>
+      </td>
+      <td align="right" style="vertical-align:top;">
+        <span style="{spi_css}padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">SPI = {spi}</span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding-top:12px;">
+        <div style="font-size:11px;font-weight:700;color:#9098A8;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">ÚLTIMO MOVIMIENTO</div>
+        <div style="font-size:13px;color:#2D3556;background:#F6F7F9;border-radius:8px;padding:10px 14px;line-height:1.55;">{last}</div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding-top:12px;">
+        <div style="font-size:11px;font-weight:700;color:#9098A8;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">MARCALO EN ETENDO COMO:</div>
+        <table cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding-right:6px;"><span style="background:#E1F3EA;color:#1A8554;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">✓ Sigue igual</span></td>
+            <td style="padding-right:6px;"><span style="background:#FFF1C9;color:#B5810D;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">📄 Propuesta enviada</span></td>
+            <td style="padding-right:6px;"><span style="background:#E4ECFB;color:#2D5BCF;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">🤝 Negociación</span></td>
+            <td><span style="background:#EEF0F4;color:#6B7388;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">❌ Archivar</span></td>
+          </tr>
         </table>
-        <div style="background:#FFF8E6;border-left:4px solid #FFCC00;border-radius:0 8px 8px 0;padding:14px 18px;margin-top:20px;">
-          <p style="margin:0;font-size:13px;color:#1F2858;">
-            <strong>¿Cómo actualizar?</strong> Entrá al CRM de Etendo y cambiá el <em>Lead Status</em> de los que corresponda.
-            Los cambios se van a reflejar automáticamente en el cálculo de mañana.
-          </p>
-        </div>
-      </div>
-    </div>"""
+      </td>
+    </tr>
+  </table>
+</div>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F6F7F9;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F6F7F9;padding:28px 16px;">
+<tr><td align="center">
+<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
+
+  <tr><td style="background:#1F2858;border-radius:12px 12px 0 0;padding:24px 32px;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td>
+        <div style="font-size:11px;color:#FFCC00;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">OKR Manager · Revenue Org</div>
+        <h1 style="margin:0 0 6px;font-size:20px;font-weight:800;color:#ffffff;line-height:1.2;">Revisá los hot leads antes del viernes</h1>
+        <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.6);">{today} · El agente calcula mañana a las 17hs</p>
+      </td>
+      <td align="right" style="vertical-align:middle;">
+        <span style="background:#FFCC00;color:#1F2858;font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;white-space:nowrap;">⏰ ACCIÓN HOY</span>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <tr><td style="background:#ffffff;padding:20px 32px 16px;border-left:1px solid #ECEEF1;border-right:1px solid #ECEEF1;">
+    <p style="margin:0;font-size:14px;color:#2D3556;line-height:1.65;">
+      Hola Vico 👋 El sistema encontró <strong style="color:#1F2858;">{len(hot_leads)} hot leads activos</strong> que se usan mañana para calcular el KR de pipeline.
+      Revisá cada uno y <strong>actualizá el estado en Etendo CRM</strong> si algo cambió — antes de las 17hs.
+    </p>
+  </td></tr>
+
+  <tr><td style="background:#F6F7F9;padding:0 32px 16px;border-left:1px solid #ECEEF1;border-right:1px solid #ECEEF1;">
+    {cards}
+  </td></tr>
+
+  <tr><td style="background:#ffffff;padding:16px 32px;border-left:1px solid #ECEEF1;border-right:1px solid #ECEEF1;">
+    <div style="background:#FFF8E6;border-left:4px solid #FFCC00;border-radius:0 10px 10px 0;padding:14px 18px;">
+      <div style="font-size:11px;font-weight:700;color:#B5810D;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">¿CÓMO ACTUALIZAR?</div>
+      <p style="margin:0;font-size:13px;color:#1F2858;line-height:1.6;">
+        Entrá a <strong>Etendo CRM → Lead</strong> y cambiá el <em>Lead Status</em> del que corresponda. Los cambios se reflejan automáticamente en el cálculo de mañana.
+      </p>
+    </div>
+  </td></tr>
+
+  <tr><td style="background:#1F2858;border-radius:0 0 12px 12px;padding:14px 32px;">
+    <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.4);">Este mail se envía automáticamente todos los jueves a las 9am · OKR Manager</p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body></html>"""
 
 
 def send_email(html_body, n_leads):
@@ -92,7 +139,6 @@ def send_email(html_body, n_leads):
     msg["To"]      = VICO_EMAIL
     msg["Cc"]      = APPROVER_EMAIL
     msg.attach(MIMEText(html_body, "html"))
-
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as s:
         s.starttls()
         s.login(SMTP_USER, SMTP_PASS)
