@@ -665,6 +665,7 @@ def main():
                 "kr_name":        kr["name"],
                 "current_value":  kr.get("current"),
                 "proposed_value": pr.get("proposed_value"),
+                "target_value":   kr.get("target"),
                 "rationale":      pr.get("rationale"),
                 "evidence_summary": {
                     "n_initiatives_done": len([i for i in kr_inits if i["status"] in ("completed","suggested_completed")]),
