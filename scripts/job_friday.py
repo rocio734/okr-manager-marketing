@@ -68,8 +68,18 @@ def fetch_crm_snapshot():
         hot           = [l for l in fit_yes if int(l.get("scorePurchaseIntention") or 0) >= 3]
         won           = [l for l in leads if l.get("leadStatus") == "won_deal"]
         negotiation   = [l for l in active if l.get("leadStatus") == "negotiation"]
-        # % hot con propuesta: cuántos hot leads tienen propuesta activa (en negotiation)
-        proposal_sent = [l for l in hot if l.get("leadStatus") == "negotiation"]
+        # % hot con propuesta: buscar en summary o leadStatus
+        # No existe campo proposalSent — se detecta por keywords en summary o por leadStatus
+        _proposal_keywords = ["propuesta enviada", "propuesta presentada", "envié propuesta",
+                               "mandé propuesta", "mandamos propuesta", "enviamos propuesta",
+                               "envió propuesta", "propuesta de", "enviamos la propuesta",
+                               "mandamos la propuesta", "envie propuesta", "mande propuesta"]
+        def _has_proposal(lead):
+            if lead.get("leadStatus") in ("proposal_sent", "negotiation"):
+                return True
+            summ = (lead.get("summary") or "").lower()
+            return any(k in summ for k in _proposal_keywords)
+        proposal_sent = [l for l in hot if _has_proposal(l)]
         cutoff_30d_str = (date.today() - timedelta(days=29)).isoformat()
         meetings      = [l for l in leads if (l.get("meetingDate") or "")[:10] >= cutoff_30d_str]
         unclassified  = [l for l in active if not l.get("strategicFit") or l.get("strategicFit") == "unclassified"]
