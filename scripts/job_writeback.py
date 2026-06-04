@@ -217,8 +217,12 @@ def main():
                 r1 = rest_update_kr(p_item["kr_id"], p_item["proposed_value"], target_val)
                 if r1.get("response", {}).get("status") != 0:
                     raise RuntimeError(f"KR update falló: {str(r1)[:200]}")
-                comment = (f"OKR Manager — valor actualizado a {p_item['proposed_value']} "
-                           f"(anterior: {p_item.get('current_value','?')}) | Estado: {kr_status}")
+                rationale = (p_item.get("rationale") or "").strip()
+                # Limpiar el prefijo [DATO CALCULADO] para que quede más limpio en el ERP
+                rationale = rationale.replace("[DATO CALCULADO] ", "")
+                comment = (f"[OKR Manager] {kr_status.upper()} | "
+                           f"{p_item['proposed_value']} (anterior: {p_item.get('current_value','?')}). "
+                           f"{rationale[:400]}")
                 rest_add_kr_update(p_item["kr_id"], p_item["proposed_value"], comment, target_val)
                 print(f"  ✓ {kr_name[:45]} → {p_item['proposed_value']} [{kr_status}]")
                 sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}",
