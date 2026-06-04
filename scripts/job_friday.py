@@ -88,7 +88,10 @@ def fetch_crm_snapshot():
                               "reunimos con ella", "nos reunimos", "contactada por teléfono",
                               "contactado por teléfono", "presentamos la demo",
                               "presentamos etendo", "hicimos la llamada", "tuve llamada",
-                              "tuve reunión", "tuvimos reunión"]
+                              "tuve reunión", "tuvimos reunión",
+                              "primera sesion", "tuvo una sesion", "tuvimos una sesion",
+                              "sesion realizada", "primera sesión", "tuvo una sesión",
+                              "reunion de acercamiento", "reunión de acercamiento"]
         # Frases que indican reunión del lead con TERCEROS (falsos positivos)
         _meeting_exclude = ["se reun", "reuniran con", "reunirán con", "reunion con su",
                              "reunión con su", "reúne con", "su cliente", "con nescor",
