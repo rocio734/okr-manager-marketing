@@ -149,9 +149,28 @@ def main():
         "Content-Type":  "application/json;charset=UTF-8",
     }
 
-    def rest_update_kr(kr_id, new_value):
+    def calc_kr_status(new_value, target_value, cycle_closed=False):
+        """Calcula el estado del KR según el nuevo valor vs target."""
+        if target_value is None or target_value == 0:
+            return "not_started"
+        try:
+            pct = float(new_value) / float(target_value) * 100
+        except (TypeError, ZeroDivisionError):
+            return "not_started"
+        if pct >= 100:
+            return "success"
+        if pct >= 75:
+            return "on_track"
+        if pct >= 50:
+            return "at_risk"
+        if cycle_closed:
+            return "failed"
+        return "off_track"
+
+    def rest_update_kr(kr_id, new_value, target_value=None):
         url  = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Okr_Kr/{kr_id}"
-        body = json.dumps({"data": {"id": kr_id, "currentValue": new_value}}).encode()
+        status = calc_kr_status(new_value, target_value)
+        body = json.dumps({"data": {"id": kr_id, "currentValue": new_value, "status": status}}).encode()
         req  = urllib.request.Request(url, data=body, method="PUT")
         req.add_header("Cookie",        f"JSESSIONID={sid}")
         req.add_header("Content-Type",  "application/json;charset=UTF-8")
@@ -163,11 +182,12 @@ def main():
         print(f"    PUT KR: {resp_body[:300]}")
         return json.loads(resp_body) if resp_body else {}
 
-    def rest_add_kr_update(kr_id, new_value, comment):
+    def rest_add_kr_update(kr_id, new_value, comment, target_value=None):
         url  = f"{write_base}/org.openbravo.service.json.jsonrest/SMFOKR_Kr_Update"
+        status = calc_kr_status(new_value, target_value)
         body = json.dumps({"data": {
             "keyResult": kr_id, "currentValue": new_value,
-            "comment": comment, "status": "on_track",
+            "comment": comment, "status": status,
         }}).encode()
         req  = urllib.request.Request(url, data=body, method="POST")
         req.add_header("Cookie",        f"JSESSIONID={sid}")
@@ -183,20 +203,24 @@ def main():
     # Probar con el primer item
     test_item = pending[0]
     print("  Probando JSESSIONID approach (default role del usuario)...")
-    test_resp = rest_update_kr(test_item["kr_id"], test_item["proposed_value"])
+    target = test_item.get("target_value")
+    test_resp = rest_update_kr(test_item["kr_id"], test_item["proposed_value"], target)
     rest_ok = test_resp.get("response", {}).get("status") == 0
     print(f"  Resultado: {'OK' if rest_ok else 'FAIL'}")
 
     if rest_ok:
         for p_item in pending:
             kr_name = p_item.get("kr_name") or p_item.get("kr_id", "?")
+            target_val = p_item.get("target_value")
+            kr_status = calc_kr_status(p_item["proposed_value"], target_val)
             try:
-                r1 = rest_update_kr(p_item["kr_id"], p_item["proposed_value"])
+                r1 = rest_update_kr(p_item["kr_id"], p_item["proposed_value"], target_val)
                 if r1.get("response", {}).get("status") != 0:
                     raise RuntimeError(f"KR update falló: {str(r1)[:200]}")
                 comment = (f"OKR Manager — valor actualizado a {p_item['proposed_value']} "
-                           f"(anterior: {p_item.get('current_value','?')})")
-                rest_add_kr_update(p_item["kr_id"], p_item["proposed_value"], comment)
+                           f"(anterior: {p_item.get('current_value','?')}) | Estado: {kr_status}")
+                rest_add_kr_update(p_item["kr_id"], p_item["proposed_value"], comment, target_val)
+                print(f"  ✓ {kr_name[:45]} → {p_item['proposed_value']} [{kr_status}]")
                 sb("PATCH", f"kr_proposals?id=eq.{p_item['id']}",
                    {"status": "applied", "applied_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
                 print(f"  ✓ {kr_name[:50]} → {p_item['proposed_value']}")
