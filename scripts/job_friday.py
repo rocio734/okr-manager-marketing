@@ -80,14 +80,44 @@ def fetch_crm_snapshot():
         negotiation = [l for l in active if _in_negotiation(l)]
 
         # Meetings: no usar meetingDate (no se actualiza consistentemente) — detectar en summary
-        _meeting_keywords = ["reunión", "reunion", "meeting", "demo realiz",
-                              "llamada exitosa", "llamada ok", "tuvimos llamada",
-                              "hicimos demo", "se realizó demo", "demo completada",
-                              "reunimos", "nos reunimos", "presentamos", "demo hecha"]
-        cutoff_30d_str = (date.today() - timedelta(days=29)).isoformat()
-        meetings = [l for l in leads if any(
-            k in (l.get("summary") or "").lower() for k in _meeting_keywords
-        )]
+        # Meetings: keywords de contacto exitoso del EQUIPO con el lead
+        # Excluir frases donde es el lead quien se reúne con terceros
+        _meeting_keywords = ["llamada exitosa", "llamada ok", "tuvimos llamada",
+                              "demo realiz", "hicimos demo", "se realizó demo",
+                              "demo completada", "demo hecha", "reunimos con él",
+                              "reunimos con ella", "nos reunimos", "contactada por teléfono",
+                              "contactado por teléfono", "presentamos la demo",
+                              "presentamos etendo", "hicimos la llamada", "tuve llamada",
+                              "tuve reunión", "tuvimos reunión"]
+        # Frases que indican reunión del lead con TERCEROS (falsos positivos)
+        _meeting_exclude = ["se reun", "reuniran con", "reunirán con", "reunion con su",
+                             "reunión con su", "reúne con", "su cliente", "con nescor",
+                             "con su equipo"]
+        # Fechas Q2 completo (14 abril - 31 julio 2026) — KR mide acumulado trimestral
+        _q2_dates = set()
+        _q2_iter = date(2026, 4, 14)
+        while _q2_iter <= date(2026, 7, 31):
+            _q2_dates.add(f"{_q2_iter.day}/{_q2_iter.month}")
+            _q2_dates.add(f"{_q2_iter.day:02d}/{_q2_iter.month:02d}")
+            _q2_dates.add(f"{_q2_iter.day}/{_q2_iter.month:02d}")
+            _q2_iter += timedelta(days=1)
+
+        def _normalize(text):
+            return (text.replace("á","a").replace("é","e").replace("í","i")
+                    .replace("ó","o").replace("ú","u").replace("ü","u"))
+
+        def _has_meeting(lead):
+            summ = lead.get("summary") or ""
+            lines = [_normalize(l.lower()) for l in summ.split("\n") if l.strip()]
+            # Ventana 3 líneas: fecha en línea N → keyword en N, N+1 o N+2
+            for i, ln in enumerate(lines):
+                if any(dt in ln for dt in _q2_dates):
+                    for wl in lines[i:i+3]:
+                        if (any(k in wl for k in _meeting_keywords)
+                                and not any(ex in wl for ex in _meeting_exclude)):
+                            return True
+            return False
+        meetings = [l for l in leads if _has_meeting(l)]
         # % hot con propuesta: buscar en summary o leadStatus
         # No existe campo proposalSent — se detecta por keywords en summary o por leadStatus
         _proposal_keywords = ["propuesta enviada", "propuesta presentada", "envié propuesta",
