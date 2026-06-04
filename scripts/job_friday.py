@@ -141,6 +141,7 @@ def fetch_crm_snapshot():
             "meetings_booked":       len(meetings),
             "won_deals":             len(won),
             "in_negotiation":        len(negotiation),
+            "negotiation_count":     len(negotiation),
             "proposals_sent":        len(proposal_sent),
             "pct_hot_with_proposal": round(len(proposal_sent) / len(hot) * 100) if hot else 0,
             "avg_spi_fit_leads":     avg_spi,
@@ -456,6 +457,65 @@ def fetch_recent_market_intel(team):
         return {}
 
 
+# ── Cálculo determinístico de KRs con datos reales ───────────────────────────
+# Para KRs que tienen una fórmula exacta, el valor se calcula en Python.
+# El LLM SOLO redacta la justificación — nunca decide el número.
+
+def deterministic_value(kr_name: str, crm: dict, sc: dict, ga4: dict, ads: dict):
+    """
+    Devuelve (value, source_note) si el KR tiene cálculo determinístico,
+    o (None, None) si debe estimarlo el LLM.
+    """
+    name = kr_name.lower()
+
+    # CPL real = gasto Ads 30d / leads fit creados en CRM 30d
+    if any(k in name for k in ["cpl", "coste por lead"]):
+        spend     = (ads or {}).get("monthly_spend", 0)
+        new_fit   = (crm or {}).get("new_fit_leads_30d", 0)
+        if spend > 0 and new_fit > 0:
+            return round(spend / new_fit, 2), f"€{spend} gasto Ads 30d / {new_fit} leads fit = €{round(spend/new_fit,2)}"
+        if spend > 0 and new_fit == 0:
+            return None, "gasto pero 0 leads fit — CPL incalculable"
+
+    # Impresiones Google Search = SC total_impressions 28d
+    if any(k in name for k in ["impresion", "impresión"]) and "search" in name:
+        val = (sc or {}).get("total_impressions")
+        if val:
+            return val, f"Search Console 28d: {val:,} impresiones totales"
+
+    # Sesiones orgánicas non-brand = SC nonbrand_clicks 28d
+    if "sesion" in name and ("orgánic" in name or "organc" in name or "non-brand" in name or "search console" in name):
+        val = (sc or {}).get("nonbrand_clicks")
+        if val is not None:
+            return val, f"Search Console 28d: {val} clics non-brand"
+
+    # Tiempo primer contacto = promedio whatsAppContactDate vs creationDate
+    if "tiempo" in name and "contacto" in name:
+        val = (crm or {}).get("avg_first_contact_h")
+        if val is not None:
+            return val, f"CRM: promedio {val}h (whatsAppContactDate vs creationDate, últimos 60d)"
+
+    # Meetings/mes = detectados en summary CRM
+    if "meeting" in name or ("reunión" in name and "mes" in name) or ("meetings" in name):
+        val = (crm or {}).get("meetings_booked")
+        if val is not None:
+            return val, f"CRM summary: {val} reuniones/llamadas detectadas en notas"
+
+    # Leads en negociación = detectados en summary
+    if "negociaci" in name:
+        val = (crm or {}).get("negotiation_count")
+        if val is not None:
+            return val, f"CRM summary: {val} leads con keywords de negociación"
+
+    # Leads strategic_fit_yes = directo del CRM
+    if "strategic_fit" in name or ("leads" in name and "fit" in name):
+        val = (crm or {}).get("strategic_fit_yes")
+        if val is not None:
+            return val, f"CRM: {val} leads con strategic_fit_yes activos"
+
+    return None, None
+
+
 # ── LLM propose ──────────────────────────────────────────────────────────────
 
 def llm_propose(kr, current_value, evidence, external):
@@ -664,6 +724,21 @@ def main():
             except Exception as e:
                 print(f"  ✗ LLM error en KR {kr['name']}: {e}")
                 continue
+
+            # Validación determinística: si hay cálculo exacto, lo imponemos
+            det_val, det_note = deterministic_value(
+                kr["name"],
+                external.get("crm", {}),
+                external.get("search_console", {}),
+                external.get("ga4", {}),
+                external.get("google_ads", {}),
+            )
+            if det_val is not None:
+                if pr.get("proposed_value") != det_val:
+                    print(f"  ⚠ KR {kr['name'][:40]}: LLM propuso {pr.get('proposed_value')} → corregido a {det_val} ({det_note})")
+                pr["proposed_value"] = det_val
+                pr["rationale"] = f"[DATO CALCULADO] {det_note}. " + (pr.get("rationale") or "")
+
             proposals.append({
                 "cycle_id":       cycle["id"],
                 "kr_id":          kr["id"],
