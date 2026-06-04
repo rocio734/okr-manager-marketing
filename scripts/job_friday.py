@@ -106,15 +106,20 @@ def fetch_crm_snapshot():
         spi_values = [int(l.get("scorePurchaseIntention") or 0) for l in fit_yes if l.get("scorePurchaseIntention")]
         avg_spi = round(sum(spi_values) / len(spi_values), 1) if spi_values else None
 
-        # Tiempo primer contacto (promedio últimos 50 leads con ambas fechas)
+        # Tiempo primer contacto — usa whatsAppContactDate (primer toque automatizado via Elena)
+        # firstContactDate no existe en el CRM; whatsAppContactDate es el campo más cercano disponible
         from datetime import datetime as dt
         contact_times = []
-        for l in leads[:50]:
+        cutoff_60d = (date.today() - timedelta(days=60)).isoformat()
+        recent_leads = [l for l in leads if (l.get("creationDate") or "")[:10] >= cutoff_60d]
+        for l in recent_leads:
             created = l.get("creationDate") or ""
-            first_c = l.get("firstContactDate") or ""
-            if created and first_c:
+            wp_date = l.get("whatsAppContactDate") or ""
+            if created and wp_date:
                 try:
-                    diff_h = (dt.fromisoformat(first_c[:19]) - dt.fromisoformat(created[:19])).total_seconds() / 3600
+                    created_dt = dt.fromisoformat(created[:10])
+                    contact_dt = dt.fromisoformat(wp_date[:10])
+                    diff_h = (contact_dt - created_dt).total_seconds() / 3600
                     if 0 <= diff_h <= 720:
                         contact_times.append(diff_h)
                 except Exception:
