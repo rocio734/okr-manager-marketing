@@ -50,10 +50,27 @@ SMTP_PASS  = os.getenv("SMTP_PASS",  os.getenv("GMAIL_PASSWORD", ""))
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
-HOT_STATUSES = {
-    "new", "in_progress", "meeting_scheduled", "meeting_pending",
-    "proposal_sent", "follow_up", "negotiation", "hot",
-    "cold_archived", "lost_deal", "won_deal",  # include all for matching
+# Statuses ETCRM_Lead y sus IDs
+LEAD_STATUS_IDS = {
+    "New":       "9F8DCA2E5AAF43B09ABB0CE9ABE82F2B",
+    "Contacted": "12CC82530A1648F58831EE025CFFBB25",
+    "Qualified": "0F1528CB6FFA401D832EE74599AF0C42",
+    "Converted": "AA7ED8A743574739AFBC8ECE598799D6",
+    "Dead":      "777D97139053459DA4C472D9704406C3",
+}
+# Mapeo de status old → new para compatibilidad con respuestas viejas
+OLD_STATUS_MAP = {
+    "new":               "New",
+    "in_progress":       "Qualified",
+    "meeting_scheduled": "Qualified",
+    "meeting_pending":   "Qualified",
+    "proposal_sent":     "Qualified",
+    "negotiation":       "Qualified",
+    "follow_up":         "Contacted",
+    "hot":               "Qualified",
+    "won_deal":          "Converted",
+    "lost_deal":         "Dead",
+    "cold_archived":     "Dead",
 }
 
 LOG = lambda msg: print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
@@ -92,14 +109,16 @@ def login_sid():
     return ""
 
 
-def get_all_leads(jwt):
+def get_all_leads(sid):
     all_leads, seen, start = [], set(), 0
     while True:
         params = urllib.parse.urlencode(
             {"_startRow": start, "_endRow": start + 100, "_orderBy": "creationDate desc"}
         )
-        req = urllib.request.Request(f"{BASE_URL}/api/datasource/ECLM_Lead?{params}")
-        req.add_header("Authorization", f"Bearer {jwt}")
+        url = f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead?{params}"
+        req = urllib.request.Request(url)
+        req.add_header("Cookie", f"JSESSIONID={sid}")
+        req.add_header("Accept", "application/json")
         with urllib.request.urlopen(req) as r:
             data = json.loads(r.read())
         page = data.get("response", {}).get("data", [])
@@ -118,10 +137,12 @@ def get_all_leads(jwt):
     return all_leads
 
 
-def get_single_lead(jwt, lead_id):
+def get_single_lead(sid, lead_id):
     try:
-        req = urllib.request.Request(f"{BASE_URL}/api/datasource/ECLM_Lead/{lead_id}")
-        req.add_header("Authorization", f"Bearer {jwt}")
+        url = f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead/{lead_id}"
+        req = urllib.request.Request(url)
+        req.add_header("Cookie", f"JSESSIONID={sid}")
+        req.add_header("Accept", "application/json")
         with urllib.request.urlopen(req) as r:
             data = json.loads(r.read())
         return data.get("response", {}).get("data", [None])[0]
@@ -130,7 +151,7 @@ def get_single_lead(jwt, lead_id):
 
 
 def update_lead(lead_id, payload, sid):
-    url = f"{WRITE_URL}/org.openbravo.service.json.jsonrest/ECLM_Lead/{lead_id}"
+    url = f"{WRITE_URL}/org.openbravo.service.json.jsonrest/ETCRM_Lead/{lead_id}"
     req = urllib.request.Request(
         url, data=json.dumps({"data": payload}).encode(), method="PUT"
     )
@@ -172,20 +193,19 @@ Para cada lead mencionado, devolvé un JSON object con estos campos exactos:
 - "lead_id": ID del lead de la lista (string, o null si no lo podés identificar)
 - "lead_name": nombre del lead identificado (string)
 - "company": empresa del lead (string)
-- "new_status": nuevo estado en inglés o null si no cambia. Valores válidos:
-  new, in_progress, meeting_scheduled, meeting_pending, proposal_sent,
-  negotiation, won_deal, lost_deal, cold_archived, follow_up
+- "new_status": nuevo estado o null si no cambia. Valores válidos:
+  New, Contacted, Qualified, Converted, Dead
 - "note": descripción breve de la actualización, máx 200 caracteres (string)
 - "confidence": "alta", "media" o "baja" según qué tan seguro estás de la identificación
 
 Reglas de mapeo de estado:
-- "demo realizada / tuve demo / hice demo" → meeting_scheduled
-- "propuesta enviada / mandé presupuesto" → proposal_sent
-- "reunión agendada / le di un turno" → meeting_scheduled
-- "negociando / en negociación" → negotiation
-- "firmó / ganado / won / cerrado positivo" → won_deal
-- "no responde / perdido / descartado / cold / archivado" → lost_deal o cold_archived
-- "llamé / escribí / contacté sin respuesta" → follow_up
+- "demo realizada / tuve demo / hice demo" → Qualified
+- "propuesta enviada / mandé presupuesto" → Qualified
+- "reunión agendada / le di un turno" → Qualified
+- "negociando / en negociación" → Qualified
+- "firmó / ganado / won / cerrado positivo" → Converted
+- "no responde / perdido / descartado / cold / archivado" → Dead
+- "llamé / escribí / contacté sin respuesta" → Contacted
 
 Devolvé SOLO un JSON array válido, sin texto adicional ni explicaciones.
 Si no hay leads identificables, devolvé [].
@@ -219,20 +239,23 @@ Si no hay leads identificables, devolvé [].
 def _parse_basic(reply_text, leads_snapshot):
     """Fallback parser: match by name/company, detect action keywords."""
     STATUS_KEYWORDS = {
-        "demo":         "meeting_scheduled",
-        "demostración": "meeting_scheduled",
-        "reunión":      "meeting_scheduled",
-        "propuesta":    "proposal_sent",
-        "presupuesto":  "proposal_sent",
-        "negociación":  "negotiation",
-        "won":          "won_deal",
-        "ganado":       "won_deal",
-        "firmó":        "won_deal",
-        "firmo":        "won_deal",
-        "perdido":      "lost_deal",
-        "lost":         "lost_deal",
-        "cold":         "cold_archived",
-        "descartado":   "lost_deal",
+        "demo":         "Qualified",
+        "demostración": "Qualified",
+        "reunión":      "Qualified",
+        "propuesta":    "Qualified",
+        "presupuesto":  "Qualified",
+        "negociación":  "Qualified",
+        "won":          "Converted",
+        "ganado":       "Converted",
+        "firmó":        "Converted",
+        "firmo":        "Converted",
+        "perdido":      "Dead",
+        "lost":         "Dead",
+        "cold":         "Dead",
+        "descartado":   "Dead",
+        "llamé":        "Contacted",
+        "escribí":      "Contacted",
+        "contacté":     "Contacted",
     }
     reply_lower = reply_text.lower()
     updates = []
@@ -411,14 +434,14 @@ def send_confirmation(to_addr, updates):
 def main():
     LOG("=== CRM Reply Checker ===")
 
-    # Fetch live leads from CRM for context
-    LOG("Login JWT…")
-    jwt = login_jwt()
-    if not jwt:
-        LOG("ERROR: JWT login fallido"); return
+    # Fetch live leads from CRM for context (SID needed for ETCRM_Lead)
+    LOG("Login SID…")
+    sid = login_sid()
+    if not sid:
+        LOG("ERROR: SID login fallido"); return
 
     LOG("Cargando leads del CRM para contexto de parsing…")
-    all_leads = get_all_leads(jwt)
+    all_leads = get_all_leads(sid)
     leads_by_id = {l["id"]: l for l in all_leads if l.get("id")}
     leads_snapshot = [
         {
@@ -428,8 +451,8 @@ def main():
                 f"{(l.get('lastName') or '').strip()}"
             ).strip() or "(sin nombre)",
             "company": l.get("company") or "",
-            "status":  l.get("leadStatus") or "",
-            "summary": l.get("summary") or "",
+            "status":  (l.get("leadStatus$_identifier") or l.get("leadStatus") or ""),
+            "summary": l.get("description") or "",
         }
         for l in all_leads
         if l.get("id")
@@ -481,17 +504,21 @@ def main():
                 upd["write_ok"] = False
                 continue
 
-            # Build payload
+            # Build payload — status must be sent as ID in ETCRM_Lead
             payload = {"id": lead_id}
             if new_status:
-                payload["leadStatus"] = new_status
+                # Map old status names or accept new ones directly
+                canonical = OLD_STATUS_MAP.get(new_status, new_status)
+                status_id = LEAD_STATUS_IDS.get(canonical)
+                if status_id:
+                    payload["leadStatus"] = status_id
 
-            # Prepend note to existing summary (use already-loaded lead data)
+            # Prepend note to existing description (field rename: summary → description)
             if note:
                 existing = leads_by_id.get(lead_id, {})
-                old = (existing.get("summary") or "").strip()
+                old = (existing.get("description") or "").strip()
                 ts  = datetime.now().strftime("%d/%m/%Y")
-                payload["summary"] = (
+                payload["description"] = (
                     f"[{ts} — {sender}] {note}\n{old}" if old
                     else f"[{ts} — {sender}] {note}"
                 )[:2000]

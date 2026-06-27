@@ -15,73 +15,102 @@ import argparse, json, os, urllib.request, urllib.parse
 from datetime import date, timedelta
 from _etendo import (sb_request, llm_call, send_email,
                      APPROVER_EMAIL, SITE_URL,
-                     ETENDO_BASE, etendo_login)
+                     ETENDO_BASE, ETENDO_PASS, ETENDO_USER, WRITE_URL, etendo_login,
+                     etendo_fetch)
 
-# Rol Comercial — único con acceso a ECLM_Lead
-COMERCIAL_ROLE_ID = "8351131DFF384725AB08E06773FE6144"
+# Rol Comercial — requerido para leer ETCRM_Lead con datos reales
+_COMERCIAL_ROLE = "8351131DFF384725AB08E06773FE6144"
 
 # ── Fetch CRM ─────────────────────────────────────────────────────────────────
 
-def _crm_token():
+def _crm_login_classic():
+    """JSESSIONID contra la API clásica de Etendo (da acceso a todos los leads)."""
+    class _NoRedirect(urllib.request.HTTPRedirectHandler):
+        def http_error_302(self, req, fp, code, msg, headers):
+            raise urllib.error.HTTPError(req.full_url, code, msg, headers, fp)
+        http_error_301 = http_error_303 = http_error_307 = http_error_302
+
+    opener = urllib.request.build_opener(_NoRedirect())
+    body = urllib.parse.urlencode(
+        {"user": ETENDO_USER, "password": ETENDO_PASS, "Command": "Login"}
+    ).encode()
+    req = urllib.request.Request(
+        f"{WRITE_URL}/secureApp/LoginHandler.html", data=body, method="POST"
+    )
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
     try:
-        return etendo_login(COMERCIAL_ROLE_ID)
-    except Exception:
-        return ""
+        with opener.open(req, timeout=15) as r:
+            for h, v in r.headers.items():
+                if h.lower() == "set-cookie" and "JSESSIONID" in v:
+                    for p in v.split(";"):
+                        if p.strip().startswith("JSESSIONID="):
+                            return p.strip().split("=", 1)[1]
+    except urllib.error.HTTPError as e:
+        for h, v in e.headers.items():
+            if h.lower() == "set-cookie" and "JSESSIONID" in v:
+                for p in v.split(";"):
+                    if p.strip().startswith("JSESSIONID="):
+                        return p.strip().split("=", 1)[1]
+    return ""
 
 
 def fetch_crm_snapshot():
-    """Devuelve métricas clave del CRM para la semana actual.
-
-    Campos confirmados en ECLM_Lead:
-      - leadStatus: in_progress | proposal_sent | negotiation | won_deal | lost_deal | disqualified | cold_archived
-      - strategicFit: strategic_fit_yes | strategic_fit_no | (vacío)   ← campo correcto (NO leadQualy)
-      - scorePurchaseIntention: 1–5                                      ← campo correcto (NO purchaseIntentionScore)
-      - scoreIndex: número
-      - leadScore: número
-      - meetingDate: fecha reunión agendada
-      - creationDate: fecha creación
-      - firstContactDate: fecha primer contacto
-    """
-    jwt = _crm_token()
-    if not jwt:
+    """Devuelve métricas clave del CRM usando la API clásica (org.openbravo.service.datasource)."""
+    sid = _crm_login_classic()
+    if not sid:
+        print("  [CRM] Login falló — sin JSESSIONID")
         return {}
     try:
         leads = []
+        seen_ids = set()
         start = 0
         while True:
             params = urllib.parse.urlencode({"_startRow": start, "_endRow": start + 100})
-            req = urllib.request.Request(f"{ETENDO_BASE}/api/datasource/ECLM_Lead?{params}")
-            req.add_header("Authorization", f"Bearer {jwt}")
-            with urllib.request.urlopen(req, timeout=20) as r:
-                batch = json.loads(r.read()).get("response", {}).get("data", [])
-            if not batch:
+            url = f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead?{params}"
+            req = urllib.request.Request(url)
+            req.add_header("Cookie", f"JSESSIONID={sid}")
+            req.add_header("Accept", "application/json")
+            with urllib.request.urlopen(req, timeout=60) as r:
+                body = r.read()
+            if not body or body.startswith(b"window.location"):
                 break
-            leads.extend(batch)
+            batch = json.loads(body).get("response", {}).get("data", [])
+            new = [l for l in batch if l.get("id") and l["id"] not in seen_ids]
+            for l in new:
+                seen_ids.add(l["id"])
+            leads.extend(new)
+            if not new:
+                break
             start += 100
             if len(batch) < 100:
                 break
 
-        INACTIVE = {"lost_deal", "won_deal", "disqualified", "cold_archived"}
-        active        = [l for l in leads if (l.get("leadStatus") or "") not in INACTIVE]
-        fit_yes       = [l for l in active if l.get("strategicFit") == "strategic_fit_yes"]
-        # scorePurchaseIntention es el campo real en el CRM (confirmado 2026-05-20)
-        hot           = [l for l in fit_yes if int(l.get("scorePurchaseIntention") or 0) >= 3]
-        won           = [l for l in leads if l.get("leadStatus") == "won_deal"]
+        def _status(lead):
+            return (lead.get("leadStatus$_identifier") or "")
 
-        # Negociación: no existe leadStatus fijo — se detecta por keywords en summary
+        # Activos = no Dead y no Converted
+        INACTIVE = {"Dead", "Converted"}
+        active      = [l for l in leads if _status(l) not in INACTIVE]
+        # SQL classification = equivalente a strategicFit_yes del módulo anterior
+        fit_yes     = [l for l in active if (l.get("classification$_identifier") or "") == "SQL"]
+        # Hot leads = status Qualified (oportunidad de venta validada)
+        hot         = [l for l in active if _status(l) == "Qualified"]
+        # Won = Converted
+        won         = [l for l in leads if _status(l) == "Converted"]
+
+        # Negociación: successProbability >= 70 o keywords en description
         _negotiation_keywords = ["negociación", "negociacion", "negociando",
                                   "evaluando propuesta", "revisando propuesta",
                                   "etapa de cierre", "en proceso de cierre"]
         def _in_negotiation(lead):
-            if lead.get("leadStatus") == "negotiation":
+            prob = float(lead.get("successProbability") or 0)
+            if prob >= 70:
                 return True
-            summ = (lead.get("summary") or "").lower()
-            return any(k in summ for k in _negotiation_keywords)
+            desc = (lead.get("description") or "").lower()
+            return any(k in desc for k in _negotiation_keywords)
         negotiation = [l for l in active if _in_negotiation(l)]
 
-        # Meetings: no usar meetingDate (no se actualiza consistentemente) — detectar en summary
-        # Meetings: keywords de contacto exitoso del EQUIPO con el lead
-        # Excluir frases donde es el lead quien se reúne con terceros
+        # Meetings: keywords de contacto exitoso del equipo en description
         _meeting_keywords = ["llamada exitosa", "llamada ok", "tuvimos llamada",
                               "demo realiz", "hicimos demo", "se realizó demo",
                               "demo completada", "demo hecha", "reunimos con él",
@@ -94,11 +123,10 @@ def fetch_crm_snapshot():
                               "reunion de acercamiento", "reunión de acercamiento",
                               "contactado por", "contactada por", "contacte al", "contacté al",
                               "contactamos al", "contactamos a"]
-        # Frases que indican reunión del lead con TERCEROS (falsos positivos)
         _meeting_exclude = ["se reun", "reuniran con", "reunirán con", "reunion con su",
                              "reunión con su", "reúne con", "su cliente", "con nescor",
                              "con su equipo"]
-        # Fechas Q2 completo (14 abril - 31 julio 2026) — KR mide acumulado trimestral
+        # Fechas Q2 completo (14 abril - 31 julio 2026)
         _q2_dates = set()
         _q2_iter = date(2026, 4, 14)
         while _q2_iter <= date(2026, 7, 31):
@@ -112,9 +140,8 @@ def fetch_crm_snapshot():
                     .replace("ó","o").replace("ú","u").replace("ü","u"))
 
         def _has_meeting(lead):
-            summ = lead.get("summary") or ""
-            lines = [_normalize(l.lower()) for l in summ.split("\n") if l.strip()]
-            # Ventana 3 líneas: fecha en línea N → keyword en N, N+1 o N+2
+            desc = lead.get("description") or ""
+            lines = [_normalize(ln.lower()) for ln in desc.split("\n") if ln.strip()]
             for i, ln in enumerate(lines):
                 if any(dt in ln for dt in _q2_dates):
                     for wl in lines[i:i+3]:
@@ -123,55 +150,31 @@ def fetch_crm_snapshot():
                             return True
             return False
         meetings = [l for l in leads if _has_meeting(l)]
-        # % hot con propuesta: buscar en summary o leadStatus
-        # No existe campo proposalSent — se detecta por keywords en summary o por leadStatus
+
+        # % hot con propuesta: keywords en description (leadStatus "proposal_sent" ya no existe)
         _proposal_keywords = ["propuesta enviada", "propuesta presentada", "envié propuesta",
                                "mandé propuesta", "mandamos propuesta", "enviamos propuesta",
                                "envió propuesta", "propuesta de", "enviamos la propuesta",
                                "mandamos la propuesta", "envie propuesta", "mande propuesta"]
         def _has_proposal(lead):
-            if lead.get("leadStatus") in ("proposal_sent", "negotiation"):
-                return True
-            summ = (lead.get("summary") or "").lower()
-            return any(k in summ for k in _proposal_keywords)
+            desc = (lead.get("description") or "").lower()
+            return any(k in desc for k in _proposal_keywords)
         proposal_sent = [l for l in hot if _has_proposal(l)]
-        unclassified  = [l for l in active if not l.get("strategicFit") or l.get("strategicFit") == "unclassified"]
 
-        # Score promedio de los leads fit (para medir calidad del pipeline)
-        spi_values = [int(l.get("scorePurchaseIntention") or 0) for l in fit_yes if l.get("scorePurchaseIntention")]
-        avg_spi = round(sum(spi_values) / len(spi_values), 1) if spi_values else None
+        unclassified = [l for l in active
+                        if (l.get("classification$_identifier") or "") not in ("SQL", "IQL")]
 
-        # Tiempo primer contacto — usa whatsAppContactDate (primer toque automatizado via Elena)
-        # firstContactDate no existe en el CRM; whatsAppContactDate es el campo más cercano disponible
+        # Ventana mes calendario actual (día 1 al hoy) — para CPL y KR strategic_fit_yes
         from datetime import datetime as dt
-        contact_times = []
-        cutoff_60d = (date.today() - timedelta(days=60)).isoformat()
-        recent_leads = [l for l in leads if (l.get("creationDate") or "")[:10] >= cutoff_60d]
-        for l in recent_leads:
-            created = l.get("creationDate") or ""
-            wp_date = l.get("whatsAppContactDate") or ""
-            if created and wp_date:
-                try:
-                    created_dt = dt.fromisoformat(created[:10])
-                    contact_dt = dt.fromisoformat(wp_date[:10])
-                    diff_h = (contact_dt - created_dt).total_seconds() / 3600
-                    if 0 <= diff_h <= 720:
-                        contact_times.append(diff_h)
-                except Exception:
-                    pass
-        avg_contact_h = round(sum(contact_times) / len(contact_times), 1) if contact_times else None
-
-        # Leads fit creados en los últimos 30 días (para CPL real = Ads spend / fit leads)
-        cutoff_30d = (dt.today() - timedelta(days=29)).strftime("%Y-%m-%d")
-        new_fit_30d = [
-            l for l in fit_yes
-            if (l.get("creationDate") or "")[:10] >= cutoff_30d
-        ]
+        month_start = date.today().replace(day=1).strftime("%Y-%m-%d")
+        new_leads_month = [l for l in leads if (l.get("creationDate") or "")[:10] >= month_start]
+        new_fit_month   = [l for l in leads if (l.get("creationDate") or "")[:10] >= month_start
+                           and (l.get("classification$_identifier") or "") == "SQL"]
 
         return {
             "total_leads_active":    len(active),
-            "strategic_fit_yes":     len(fit_yes),
-            "hot_leads":             len(hot),
+            "strategic_fit_yes":     len(new_fit_month),  # SQL leads creados este mes calendario
+            "hot_leads":             len(hot),        # Qualified status
             "unclassified_leads":    len(unclassified),
             "meetings_booked":       len(meetings),
             "won_deals":             len(won),
@@ -179,9 +182,9 @@ def fetch_crm_snapshot():
             "negotiation_count":     len(negotiation),
             "proposals_sent":        len(proposal_sent),
             "pct_hot_with_proposal": round(len(proposal_sent) / len(hot) * 100) if hot else 0,
-            "avg_spi_fit_leads":     avg_spi,
-            "avg_first_contact_h":   avg_contact_h,
-            "new_fit_leads_30d":     len(new_fit_30d),   # para CPL real mensual
+            "avg_spi_fit_leads":     None,  # campo scorePurchaseIntention eliminado en ETCRM_Lead
+            "avg_first_contact_h":   None,  # campo whatsAppContactDate eliminado en ETCRM_Lead
+            "new_fit_leads_30d":     len(new_leads_month),  # TODOS los leads del mes, denominador CPL
         }
     except Exception as e:
         print(f"  [CRM] Error: {e}")
@@ -192,63 +195,75 @@ def fetch_crm_snapshot():
 
 def fetch_search_console():
     """Devuelve impresiones y clics orgánicos de los últimos 28 días vía OAuth."""
-    try:
-        token = _google_access_token("GOOGLE_REFRESH_TOKEN_GA4_SC")
-        if not token:
-            return {}
+    import time
+    for attempt in range(3):
+        try:
+            return _fetch_search_console_once()
+        except Exception as e:
+            if attempt < 2:
+                wait = 15 * (2 ** attempt)  # 15s, 30s
+                print(f"  [SearchConsole] intento {attempt+1} fallido: {e} — reintentando en {wait}s")
+                time.sleep(wait)
+            else:
+                print(f"  [SearchConsole] Error tras 3 intentos: {e}")
+                return {}
 
-        env_file = os.path.join(os.path.dirname(__file__), "..", "..", ".env.google")
-        site = "sc-domain:etendo.software"
-        for line in open(env_file).read().splitlines():
-            if line.startswith("SC_SITE"):
-                site = line.split("=", 1)[1].strip().strip('"')
 
-        end_date   = date.today() - timedelta(days=3)
-        start_date = end_date - timedelta(days=27)
-        site_enc   = urllib.parse.quote(site, safe="")
-        sc_url     = f"https://searchconsole.googleapis.com/webmasters/v3/sites/{site_enc}/searchAnalytics/query"
-
-        def sc_query(extra=None):
-            body = {"startDate": str(start_date), "endDate": str(end_date), "dimensions": [], "rowLimit": 1}
-            if extra:
-                body.update(extra)
-            req = urllib.request.Request(sc_url, data=json.dumps(body).encode(),
-                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=15) as r:
-                return json.loads(r.read()).get("rows", [{}])[0]
-
-        totals = sc_query()
-        nb     = sc_query({"dimensionFilterGroups": [{"filters": [
-            {"dimension": "query", "operator": "notContains", "expression": "etendo"}
-        ]}]})
-
-        # Top países esta semana (últimos 7 días)
-        end_w   = date.today() - timedelta(days=1)
-        start_w = end_w - timedelta(days=6)
-        req_w = urllib.request.Request(sc_url,
-            data=json.dumps({"startDate": str(start_w), "endDate": str(end_w),
-                             "dimensions": ["country"], "rowLimit": 5}).encode(),
-            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
-        with urllib.request.urlopen(req_w, timeout=15) as r:
-            top_countries = {
-                row["keys"][0]: {"clicks": row["clicks"], "impressions": row["impressions"]}
-                for row in json.loads(r.read()).get("rows", [])
-            }
-
-        return {
-            "period_days":           28,
-            "total_impressions":     int(totals.get("impressions", 0)),
-            "total_clicks":          int(totals.get("clicks", 0)),
-            "nonbrand_clicks":       int(nb.get("clicks", 0)),
-            "nonbrand_impressions":  int(nb.get("impressions", 0)),
-            "avg_position":          round(totals.get("position", 0), 1),
-            "top_countries_7d":      top_countries,
-            "spain_clicks_7d":       top_countries.get("esp", {}).get("clicks", 0),
-            "argentina_clicks_7d":   top_countries.get("arg", {}).get("clicks", 0),
-        }
-    except Exception as e:
-        print(f"  [SearchConsole] Error: {e}")
+def _fetch_search_console_once():
+    """Lanza excepción en caso de fallo — el caller fetch_search_console() maneja reintentos."""
+    token = _google_access_token("GOOGLE_REFRESH_TOKEN_GA4_SC")
+    if not token:
         return {}
+
+    env_file = os.path.join(os.path.dirname(__file__), "..", "..", ".env.google")
+    site = "sc-domain:etendo.software"
+    for line in open(env_file).read().splitlines():
+        if line.startswith("SC_SITE"):
+            site = line.split("=", 1)[1].strip().strip('"')
+
+    end_date   = date.today() - timedelta(days=3)
+    start_date = end_date - timedelta(days=27)
+    site_enc   = urllib.parse.quote(site, safe="")
+    sc_url     = f"https://searchconsole.googleapis.com/webmasters/v3/sites/{site_enc}/searchAnalytics/query"
+
+    def sc_query(extra=None):
+        body = {"startDate": str(start_date), "endDate": str(end_date), "dimensions": [], "rowLimit": 1}
+        if extra:
+            body.update(extra)
+        req = urllib.request.Request(sc_url, data=json.dumps(body).encode(),
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            return json.loads(r.read()).get("rows", [{}])[0]
+
+    totals = sc_query()
+    nb     = sc_query({"dimensionFilterGroups": [{"filters": [
+        {"dimension": "query", "operator": "notContains", "expression": "etendo"}
+    ]}]})
+
+    # Top países esta semana (últimos 7 días)
+    end_w   = date.today() - timedelta(days=1)
+    start_w = end_w - timedelta(days=6)
+    req_w = urllib.request.Request(sc_url,
+        data=json.dumps({"startDate": str(start_w), "endDate": str(end_w),
+                         "dimensions": ["country"], "rowLimit": 5}).encode(),
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req_w, timeout=15) as r:
+        top_countries = {
+            row["keys"][0]: {"clicks": row["clicks"], "impressions": row["impressions"]}
+            for row in json.loads(r.read()).get("rows", [])
+        }
+
+    return {
+        "period_days":           28,
+        "total_impressions":     int(totals.get("impressions", 0)),
+        "total_clicks":          int(totals.get("clicks", 0)),
+        "nonbrand_clicks":       int(nb.get("clicks", 0)),
+        "nonbrand_impressions":  int(nb.get("impressions", 0)),
+        "avg_position":          round(totals.get("position", 0), 1),
+        "top_countries_7d":      top_countries,
+        "spain_clicks_7d":       top_countries.get("esp", {}).get("clicks", 0),
+        "argentina_clicks_7d":   top_countries.get("arg", {}).get("clicks", 0),
+    }
 
 
 # ── Google OAuth helper ──────────────────────────────────────────────────────
@@ -496,21 +511,43 @@ def fetch_recent_market_intel(team):
 # Para KRs que tienen una fórmula exacta, el valor se calcula en Python.
 # El LLM SOLO redacta la justificación — nunca decide el número.
 
-def deterministic_value(kr_name: str, crm: dict, sc: dict, ga4: dict, ads: dict):
+def fetch_last_applied_values() -> dict:
+    """Devuelve dict {kr_name: proposed_value} del último proposal applied por KR."""
+    try:
+        rows = sb_request("GET",
+            "kr_proposals?status=eq.applied&order=created_at.desc&limit=200"
+            "&select=kr_name,proposed_value,created_at") or []
+        seen, result = set(), {}
+        for r in rows:
+            name = r.get("kr_name", "")
+            if name not in seen:
+                seen.add(name)
+                result[name] = r.get("proposed_value")
+        return result
+    except Exception:
+        return {}
+
+
+def deterministic_value(kr_name: str, crm: dict, sc: dict, ga4: dict, ads: dict,
+                        last_applied: dict = None):
     """
     Devuelve (value, source_note) si el KR tiene cálculo determinístico,
     o (None, None) si debe estimarlo el LLM.
     """
     name = kr_name.lower()
+    last_applied = last_applied or {}
 
-    # CPL real = gasto Ads 30d / leads fit creados en CRM 30d
+    # CPL real = gasto Ads mes calendario / TODOS los leads nuevos del mes
     if any(k in name for k in ["cpl", "coste por lead"]):
-        spend     = (ads or {}).get("monthly_spend", 0)
-        new_fit   = (crm or {}).get("new_fit_leads_30d", 0)
-        if spend > 0 and new_fit > 0:
-            return round(spend / new_fit, 2), f"€{spend} gasto Ads 30d / {new_fit} leads fit = €{round(spend/new_fit,2)}"
-        if spend > 0 and new_fit == 0:
-            return None, "gasto pero 0 leads fit — CPL incalculable"
+        spend       = (ads or {}).get("monthly_spend", 0)
+        new_leads   = (crm or {}).get("new_fit_leads_30d", 0)  # ALL new leads this month
+        if spend > 0 and new_leads > 0:
+            return round(spend / new_leads, 2), f"€{spend} gasto Ads mes / {new_leads} leads nuevos = €{round(spend/new_leads,2)}"
+        if spend > 0 and new_leads == 0:
+            fallback = last_applied.get(kr_name)
+            if fallback is not None:
+                return fallback, f"Sin leads nuevos este mes — usando último CPL aplicado: €{fallback}"
+            return None, "gasto pero 0 leads nuevos — CPL incalculable"
 
     # Impresiones Google Search = SC total_impressions 28d
     if any(k in name for k in ["impresion", "impresión"]) and "search" in name:
@@ -542,11 +579,11 @@ def deterministic_value(kr_name: str, crm: dict, sc: dict, ga4: dict, ads: dict)
         if val is not None:
             return val, f"CRM summary: {val} leads con keywords de negociación"
 
-    # Leads strategic_fit_yes = directo del CRM
+    # Leads strategic_fit_yes = SQL creados en el mes calendario actual
     if "strategic_fit" in name or ("leads" in name and "fit" in name):
         val = (crm or {}).get("strategic_fit_yes")
         if val is not None:
-            return val, f"CRM: {val} leads con strategic_fit_yes activos"
+            return val, f"CRM: {val} leads SQL creados este mes calendario"
 
     return None, None
 
@@ -595,12 +632,10 @@ def llm_propose(kr, current_value, evidence, external):
         if any(k in kr_name_lower for k in ["lead", "fit", "strategic", "pipeline"]):
             ext_lines.append(
                 f"  CRM — Leads activos: {crm.get('total_leads_active')}"
-                f" | Fit YES (strategicFit=strategic_fit_yes): {crm.get('strategic_fit_yes')}"
-                f" | Hot (fit+SPI≥3): {crm.get('hot_leads')}"
+                f" | SQL clasificados: {crm.get('strategic_fit_yes')}"
+                f" | Hot (Qualified): {crm.get('hot_leads')}"
                 f" | Sin clasificar: {crm.get('unclassified_leads')}"
             )
-            if crm.get("avg_spi_fit_leads"):
-                ext_lines.append(f"  CRM — SPI promedio fit leads: {crm.get('avg_spi_fit_leads')} (escala 1–5)")
         if any(k in kr_name_lower for k in ["meeting", "reunión", "contacto"]):
             ext_lines.append(f"  CRM — Meetings registrados: {crm.get('meetings_booked')}")
         if any(k in kr_name_lower for k in ["propuesta", "negociación", "deal", "cierre"]):
@@ -614,8 +649,8 @@ def llm_propose(kr, current_value, evidence, external):
             ext_lines.append(f"  CRM — Tiempo promedio primer contacto: {crm.get('avg_first_contact_h')} horas")
         if "cpl" in kr_name_lower or "coste" in kr_name_lower:
             ext_lines.append(
-                f"  CRM — Leads fit YES: {crm.get('strategic_fit_yes')}"
-                f" | Hot leads: {crm.get('hot_leads')} — usar fit_yes como denominador CPL"
+                f"  CRM — Leads SQL (clasificados): {crm.get('strategic_fit_yes')}"
+                f" | Hot leads (Qualified): {crm.get('hot_leads')} — usar SQL como denominador CPL"
             )
 
     if sc:
@@ -733,6 +768,7 @@ def main():
         "google_ads":     fetch_google_ads(),
         "market_intel":   fetch_recent_market_intel(team_slug),
     }
+    last_applied = fetch_last_applied_values()
     print(f"  CRM: {len(external['crm'])} métricas"
           f" | SC: {len(external['search_console'])} métricas"
           f" | GA4: {len(external['ga4'])} métricas"
@@ -767,6 +803,7 @@ def main():
                 external.get("search_console", {}),
                 external.get("ga4", {}),
                 external.get("google_ads", {}),
+                last_applied,
             )
             if det_val is not None:
                 if pr.get("proposed_value") != det_val:

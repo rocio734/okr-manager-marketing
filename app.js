@@ -149,6 +149,7 @@
       { key: 'monday',       label: 'Iniciativas planteadas',  href: 'approval-monday.html' },
       { key: 'friday',       label: 'Valores KR a aprobar',   href: 'kr-proposals-friday.html' },
       { key: 'market-intel', label: '🔍 Visión del Mercado', href: 'market-intel.html' },
+      { key: 'content',      label: '✦ Contenido Semanal',  href: 'content-queue.html' },
     ];
     const navHtml = links.map(l =>
       `<a href="${l.href}" ${activeKey === l.key ? 'class="active"' : ''}>${l.label}</a>`

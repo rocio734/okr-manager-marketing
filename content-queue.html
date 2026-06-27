@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Manager — Contenido Semanal</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ── Toolbar ── */
+  .cq-toolbar {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-6);
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface); flex-wrap: wrap;
+  }
+  .cq-toolbar h1 { margin: 0; font-size: var(--fs-18); flex: 1; }
+  .cq-filters { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+  .cq-filters select, .cq-filters input {
+    padding: 6px 10px; border: 1px solid var(--c-border-strong);
+    border-radius: 6px; font-size: var(--fs-13); background: var(--c-surface);
+    color: var(--c-text); cursor: pointer;
+  }
+
+  /* ── Stats ── */
+  .cq-stats {
+    display: flex; gap: var(--sp-5); padding: var(--sp-3) var(--sp-6);
+    background: var(--c-surface); border-bottom: 1px solid var(--c-border);
+    font-size: var(--fs-13); color: var(--c-text-muted); flex-wrap: wrap;
+  }
+  .cq-stats strong { color: var(--c-text); font-weight: 600; }
+
+  /* ── Grid ── */
+  .cq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: var(--sp-4); padding: var(--sp-5) var(--sp-6);
+  }
+
+  /* ── Card ── */
+  .post-card {
+    background: var(--c-surface); border: 1.5px solid var(--c-border);
+    border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+    transition: box-shadow .15s;
+  }
+  .post-card:hover { box-shadow: 0 4px 16px rgba(31,40,88,.10); }
+  .post-card.status-approved { border-color: var(--c-success); }
+  .post-card.status-published { border-color: var(--c-info); opacity: .75; }
+
+  .card-header {
+    display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
+    padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface-alt);
+  }
+  .platform-badge {
+    font-size: var(--fs-11); font-weight: 600; padding: 2px 8px;
+    border-radius: 99px; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .platform-linkedin  { background: #E8F0FE; color: #1A5BB0; }
+  .platform-instagram { background: #FDE8F3; color: #A0216A; }
+  .format-badge {
+    font-size: var(--fs-11); padding: 2px 7px; border-radius: 99px;
+    background: var(--c-neutral-soft); color: var(--c-text-muted); text-transform: capitalize;
+  }
+  .sector-badge {
+    font-size: var(--fs-11); padding: 2px 7px; border-radius: 99px;
+    background: var(--c-accent-soft); color: var(--c-text); margin-left: auto;
+  }
+  .day-label { font-size: var(--fs-11); color: var(--c-text-muted); text-transform: capitalize; }
+
+  /* ── Card body ── */
+  .card-body { padding: var(--sp-4); flex: 1; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .card-title { font-size: var(--fs-15); font-weight: 600; color: var(--c-text); margin: 0; line-height: 1.35; }
+
+  /* Text: siempre visible, colapsable */
+  .card-text {
+    font-size: var(--fs-13); color: var(--c-text-body); line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .card-text.collapsed {
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Slides */
+  .slides-preview { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .slide-item {
+    background: var(--c-surface-sunk); border-radius: 6px;
+    padding: var(--sp-2) var(--sp-3); font-size: var(--fs-12);
+  }
+  .slide-item strong { display: block; color: var(--c-text); margin-bottom: 2px; }
+  .slide-item span { color: var(--c-text-muted); }
+  .slides-collapsed .slide-item:nth-child(n+4) { display: none; }
+
+  /* Hashtags */
+  .card-hashtags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .hashtag { font-size: var(--fs-11); color: var(--c-info); background: var(--c-info-soft); padding: 2px 6px; border-radius: 4px; }
+
+  /* Source */
+  .card-source { font-size: var(--fs-12); color: var(--c-text-muted); }
+  .card-source a { color: var(--c-text-link); text-decoration: none; }
+  .card-source a:hover { text-decoration: underline; }
+
+  /* ── Image prompt ── */
+  .image-prompt-section {
+    background: var(--c-surface-sunk); border-radius: 8px;
+    padding: var(--sp-3); border: 1px dashed var(--c-border-strong);
+  }
+  .image-prompt-label {
+    font-size: var(--fs-11); font-weight: 600; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--c-text-muted); margin-bottom: var(--sp-1);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .image-prompt-text {
+    font-size: var(--fs-12); color: var(--c-text-body); line-height: 1.5;
+    font-style: italic;
+  }
+  .btn-copy {
+    font-size: var(--fs-11); padding: 2px 8px; border-radius: 4px;
+    border: 1px solid var(--c-border-strong); background: var(--c-surface);
+    cursor: pointer; color: var(--c-text-muted);
+  }
+  .btn-copy:hover { background: var(--c-surface-sunk); }
+
+  /* ── Image upload ── */
+  .image-upload-section { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .image-preview-wrap {
+    position: relative; display: inline-block; width: 100%;
+  }
+  .image-preview-thumb {
+    width: 100%; aspect-ratio: 16/9; object-fit: cover;
+    border-radius: 8px; border: 1px solid var(--c-border); display: block;
+  }
+  .image-preview-thumb.square { aspect-ratio: 1/1; }
+  .btn-remove-image {
+    position: absolute; top: 8px; right: 8px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(0,0,0,.55); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #fff; transition: background .15s;
+    line-height: 1;
+  }
+  .btn-remove-image:hover { background: rgba(220,38,38,.85); }
+  .upload-drop-zone {
+    border: 2px dashed var(--c-border-strong); border-radius: 8px;
+    padding: var(--sp-3); text-align: center; cursor: pointer;
+    font-size: var(--fs-12); color: var(--c-text-muted);
+    transition: border-color .15s, background .15s;
+  }
+  .upload-drop-zone:hover { border-color: var(--c-brand); background: var(--c-brand-softer); }
+  .upload-drop-zone input[type=file] { display: none; }
+
+  /* ── Card footer ── */
+  .card-footer {
+    padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--c-border);
+    display: flex; gap: var(--sp-2); align-items: center; flex-wrap: wrap;
+  }
+  .status-pill {
+    font-size: var(--fs-11); font-weight: 600; padding: 3px 9px;
+    border-radius: 99px; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .status-draft     { background: var(--c-neutral-soft);  color: var(--c-text-muted); }
+  .status-approved  { background: var(--c-success-soft);  color: var(--c-success); }
+  .status-published { background: var(--c-info-soft);     color: var(--c-info); }
+  .card-actions { margin-left: auto; display: flex; gap: var(--sp-2); }
+
+  .btn-approve {
+    padding: 5px 14px; font-size: var(--fs-13); font-weight: 600;
+    border-radius: 6px; border: none; cursor: pointer;
+    background: var(--c-success); color: #fff; transition: background .15s;
+  }
+  .btn-approve:hover:not(:disabled) { background: #166945; }
+  .btn-approve:disabled { background: var(--c-neutral-soft); color: var(--c-text-muted); cursor: default; }
+  .btn-sm {
+    padding: 5px 10px; font-size: var(--fs-12); border-radius: 6px;
+    border: 1px solid var(--c-border-strong); background: var(--c-surface);
+    color: var(--c-text-muted); cursor: pointer;
+  }
+  .btn-sm:hover { background: var(--c-surface-sunk); }
+  .btn-generate {
+    padding: 7px 18px; font-size: var(--fs-13); font-weight: 600;
+    border-radius: 8px; border: none; cursor: pointer;
+    background: var(--c-brand); color: #fff; transition: background .15s;
+  }
+  .btn-generate:hover:not(:disabled) { background: var(--c-brand-hover); }
+  .btn-generate:disabled { opacity: .6; cursor: default; }
+
+  /* ── Modal de preview ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: var(--c-overlay);
+    z-index: 1000; align-items: center; justify-content: center; padding: var(--sp-5);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--c-surface); border-radius: 16px; max-width: 480px; width: 100%;
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--c-border);
+    font-weight: 600; font-size: var(--fs-15);
+  }
+  .modal-close {
+    background: none; border: none; font-size: 20px; cursor: pointer;
+    color: var(--c-text-muted); line-height: 1; padding: 4px;
+  }
+  .modal-close:hover { color: var(--c-text); }
+  .modal-body { padding: var(--sp-5); }
+
+  /* LinkedIn mock */
+  .li-mock {
+    border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #fff;
+  }
+  .li-mock-header {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  }
+  .li-mock-avatar {
+    width: 40px; height: 40px; border-radius: 50%; background: #1F2858;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden;
+  }
+  .li-mock-avatar img { width: 26px; height: 24px; object-fit: contain; }
+  .li-mock-name { font-weight: 600; font-size: 14px; color: #000; }
+  .li-mock-meta { font-size: 12px; color: #666; }
+  .li-mock-image {
+    width: 100%; aspect-ratio: 16/9; object-fit: cover;
+    background: var(--c-surface-sunk);
+  }
+  .li-mock-image-placeholder {
+    width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg, #e8ecf3, #c8d0e0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #888;
+  }
+  .li-mock-text { padding: 12px 16px 4px; font-size: 13px; color: #333; line-height: 1.5; white-space: pre-wrap; }
+  .li-mock-hashtags { padding: 0 16px 12px; font-size: 12px; color: #0a66c2; }
+  .li-mock-actions {
+    display: flex; gap: 0; border-top: 1px solid #e0e0e0; padding: 4px 8px;
+  }
+  .li-mock-action {
+    flex: 1; text-align: center; padding: 8px 4px; font-size: 12px;
+    color: #666; cursor: default;
+  }
+
+  /* Instagram mock */
+  .ig-mock {
+    border: 1px solid #dbdbdb; border-radius: 8px; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #fff;
+  }
+  .ig-mock-header {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  }
+  .ig-mock-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #1F2858;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden;
+    outline: 2px solid transparent;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #dc2743;
+  }
+  .ig-mock-avatar img { width: 20px; height: 18px; object-fit: contain; }
+  .ig-mock-username { font-weight: 600; font-size: 13px; color: #000; }
+  .ig-mock-image {
+    width: 100%; aspect-ratio: 1/1; object-fit: cover;
+    background: var(--c-surface-sunk);
+  }
+  .ig-mock-image-placeholder {
+    width: 100%; aspect-ratio: 1/1; background: linear-gradient(135deg, #e8ecf3, #c8d0e0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #888;
+  }
+  .ig-mock-actions { display: flex; gap: 14px; padding: 10px 12px 4px; font-size: 20px; }
+  .ig-mock-caption { padding: 0 12px 12px; font-size: 13px; color: #000; line-height: 1.4; white-space: pre-wrap; }
+  .ig-mock-caption strong { font-weight: 600; }
+
+  /* Empty / loading */
+  .empty-state { grid-column: 1/-1; text-align: center; padding: var(--sp-10) var(--sp-6); color: var(--c-text-muted); }
+  .empty-state h2 { font-size: var(--fs-18); margin-bottom: var(--sp-2); color: var(--c-text); }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--c-border-strong); border-top-color: var(--c-brand); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <a href="dashboard.html" class="sidebar-logo" title="OKR Manager">
+      <img src="assets/etendo_icon.png" alt="Etendo" style="width:28px;height:26px;display:block;">
+    </a>
+    <a href="dashboard.html"           class="nav-icon" title="Dashboard">⊞</a>
+    <a href="approval-monday.html"     class="nav-icon" title="Lunes · Iniciativas">◫</a>
+    <a href="kr-proposals-friday.html" class="nav-icon" title="Viernes · KRs">◈</a>
+    <a href="market-intel.html"        class="nav-icon" title="Visión del Mercado">◉</a>
+    <a href="content-queue.html"       class="nav-icon active" title="Contenido Semanal">✦</a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-avatar" id="sidebar-avatar">—</div>
+  </nav>
+
+  <!-- Workspace -->
+  <div class="workspace">
+    <header class="topbar"></header>
+    <main class="content" style="padding:0;">
+
+      <!-- Toolbar -->
+      <div class="cq-toolbar">
+        <h1>Contenido Semanal</h1>
+        <div class="cq-filters">
+          <input type="week" id="filter-week" title="Semana">
+          <select id="filter-platform">
+            <option value="">Todas las plataformas</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="instagram">Instagram</option>
+          </select>
+          <select id="filter-sector">
+            <option value="">Todos los sectores</option>
+            <option value="manufacturing">Manufactura</option>
+            <option value="distribution">Distribución</option>
+            <option value="retail">Retail</option>
+            <option value="services">Servicios</option>
+          </select>
+          <select id="filter-status">
+            <option value="">Todos los estados</option>
+            <option value="draft">Borrador</option>
+            <option value="approved">Aprobado</option>
+            <option value="published">Publicado</option>
+          </select>
+        </div>
+        <button class="btn-generate" id="btn-generate">⚡ Generar semana</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="cq-stats" id="cq-stats"><span>Cargando...</span></div>
+
+      <!-- Grid -->
+      <div class="cq-grid" id="cq-grid">
+        <div class="empty-state"><div class="spinner"></div><p>Cargando posts...</p></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal de preview -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span id="modal-title">Vista previa del post</span>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  await OKR_renderTopbar('content');
+  const sb = OKR_SB;
+
+  function esc(s) { return OKR_fmt.escapeHtml(String(s || '')); }
+
+  const SECTOR_LABELS = { manufacturing:'Manufactura', distribution:'Distribución', retail:'Retail', services:'Servicios' };
+  const DAY_LABELS    = { monday:'Lunes', tuesday:'Martes', wednesday:'Miércoles', thursday:'Jueves', friday:'Viernes' };
+
+  // ── Semana actual ───────────────────────────────────────────────────────────
+  function currentWeekMonday() {
+    const d = new Date(), day = d.getDay();
+    const mon = new Date(d); mon.setDate(d.getDate() - day + (day === 0 ? -6 : 1));
+    return mon.toISOString().slice(0, 10);
+  }
+  function weekInputValue(mondayStr) {
+    const d = new Date(mondayStr + 'T12:00:00');
+    const jan4 = new Date(d.getFullYear(), 0, 4);
+    const s = new Date(jan4); s.setDate(jan4.getDate() - ((jan4.getDay()+6)%7));
+    const w = Math.ceil(((d-s)/86400000+1)/7);
+    return `${d.getFullYear()}-W${String(w).padStart(2,'0')}`;
+  }
+  function weekInputToMonday(wv) {
+    const [year, week] = wv.split('-W').map(Number);
+    const jan4 = new Date(year, 0, 4);
+    const d = new Date(jan4); d.setDate(jan4.getDate() - ((jan4.getDay()+6)%7) + (week-1)*7);
+    return d.toISOString().slice(0, 10);
+  }
+
+  const monday = currentWeekMonday();
+  document.getElementById('filter-week').value = weekInputValue(monday);
+
+  // ── Load ────────────────────────────────────────────────────────────────────
+  async function load() {
+    const grid  = document.getElementById('cq-grid');
+    const stats = document.getElementById('cq-stats');
+    grid.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Cargando...</p></div>';
+
+    const wv = document.getElementById('filter-week').value;
+    const weekStart = wv ? weekInputToMonday(wv) : monday;
+    const platform  = document.getElementById('filter-platform').value;
+    const sector    = document.getElementById('filter-sector').value;
+    const status    = document.getElementById('filter-status').value;
+
+    let q = sb.from('content_queue').select('*').eq('week_start', weekStart).order('day_slot').order('platform');
+    if (platform) q = q.eq('platform', platform);
+    if (sector)   q = q.eq('sector', sector);
+    if (status)   q = q.eq('status', status);
+
+    const { data: posts, error } = await q;
+    if (error) { grid.innerHTML = `<div class="empty-state"><h2>Error</h2><p>${esc(error.message)}</p></div>`; return; }
+
+    const total = posts.length, approved = posts.filter(p=>p.status==='approved').length;
+    const published = posts.filter(p=>p.status==='published').length, draft = posts.filter(p=>p.status==='draft').length;
+    stats.innerHTML = `<span>Semana <strong>${weekStart}</strong></span><span>Total: <strong>${total}</strong></span><span>Borradores: <strong>${draft}</strong></span><span>Aprobados: <strong>${approved}</strong></span><span>Publicados: <strong>${published}</strong></span>`;
+
+    if (!posts.length) {
+      grid.innerHTML = `<div class="empty-state"><h2>No hay posts esta semana</h2><p>Hacé click en <strong>⚡ Generar semana</strong>.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = posts.map(p => renderCard(p)).join('');
+    bindEvents(posts);
+  }
+
+  // ── Render card ─────────────────────────────────────────────────────────────
+  function renderCard(p) {
+    const sc = `status-${p.status}`;
+    const stLabel = {draft:'Borrador', approved:'Aprobado', published:'Publicado'}[p.status]||p.status;
+    const isCarousel = p.format === 'carousel' && p.slides?.length;
+
+    const slidesHtml = isCarousel ? `
+      <div class="slides-preview slides-collapsed" id="slides-${p.id}">
+        ${p.slides.map((s,i)=>`<div class="slide-item"><strong>Slide ${i+1}: ${esc(s.title)}</strong><span>${esc(s.body)}</span></div>`).join('')}
+      </div>` : '';
+
+    const hashHtml = (p.hashtags||[]).length
+      ? `<div class="card-hashtags">${p.hashtags.map(h=>`<span class="hashtag">${esc(h)}</span>`).join('')}</div>` : '';
+
+    const srcHtml = p.source_title
+      ? `<div class="card-source">Fuente: ${p.source_url ? `<a href="${esc(p.source_url)}" target="_blank">${esc(p.source_title)}</a>` : esc(p.source_title)}</div>` : '';
+
+    const promptHtml = p.image_prompt ? `
+      <div class="image-prompt-section">
+        <div class="image-prompt-label">
+          <span>🎨 Prompt para imagen</span>
+          <button class="btn-copy" data-prompt="${esc(p.image_prompt)}" data-id="${p.id}">Copiar</button>
+        </div>
+        <div class="image-prompt-text">${esc(p.image_prompt)}</div>
+      </div>` : '';
+
+    const thumbAspect = p.platform === 'instagram' ? 'square' : '';
+    const imgHtml = p.image_url
+      ? `<div class="image-preview-wrap">
+           <img class="image-preview-thumb ${thumbAspect}" src="${esc(p.image_url)}" alt="imagen del post">
+           <button class="btn-remove-image" data-post-id="${p.id}" title="Eliminar imagen">🗑</button>
+         </div>`
+      : '';
+
+    const uploadHtml = `
+      <div class="image-upload-section">
+        ${imgHtml}
+        <label class="upload-drop-zone" for="file-${p.id}">
+          ${p.image_url ? '🔄 Cambiar imagen' : '📎 Subir imagen generada'}
+          <input type="file" id="file-${p.id}" accept="image/*" data-post-id="${p.id}" data-platform="${p.platform}">
+        </label>
+      </div>`;
+
+    const approveBtn = p.status === 'draft'
+      ? `<button class="btn-approve" data-id="${p.id}">✓ Aprobar</button>`
+      : `<button class="btn-approve" disabled>${p.status==='approved'?'✓ Aprobado':'✓ Publicado'}</button>`;
+
+    return `
+      <div class="post-card ${sc}" id="card-${p.id}">
+        <div class="card-header">
+          <span class="day-label">${esc(DAY_LABELS[p.day_slot]||p.day_slot)}</span>
+          <span class="platform-badge platform-${esc(p.platform)}">${esc(p.platform)}</span>
+          <span class="format-badge">${esc(p.format)}</span>
+          <span class="sector-badge">${esc(SECTOR_LABELS[p.sector]||p.sector)}</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">${esc(p.title)}</h3>
+          <div class="card-text collapsed" id="text-${p.id}">${esc(p.body)}</div>
+          ${slidesHtml}
+          ${hashHtml}
+          ${srcHtml}
+          ${promptHtml}
+          ${uploadHtml}
+        </div>
+        <div class="card-footer">
+          <span class="status-pill ${sc}">${stLabel}</span>
+          <div class="card-actions">
+            <button class="btn-sm btn-expand" data-id="${p.id}" data-expanded="0">Leer más</button>
+            <button class="btn-sm btn-preview" data-id="${p.id}">👁 Preview</button>
+            ${approveBtn}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // ── Bind events ─────────────────────────────────────────────────────────────
+  function bindEvents(posts) {
+    const postsMap = Object.fromEntries(posts.map(p=>[p.id, p]));
+    const grid = document.getElementById('cq-grid');
+
+    // Expand/collapse text
+    grid.querySelectorAll('.btn-expand').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expanded = btn.dataset.expanded === '1';
+        const textEl = document.getElementById('text-' + btn.dataset.id);
+        const slidesEl = document.getElementById('slides-' + btn.dataset.id);
+        if (expanded) {
+          textEl.classList.add('collapsed');
+          if (slidesEl) slidesEl.classList.add('slides-collapsed');
+          btn.textContent = 'Leer más'; btn.dataset.expanded = '0';
+        } else {
+          textEl.classList.remove('collapsed');
+          if (slidesEl) slidesEl.classList.remove('slides-collapsed');
+          btn.textContent = 'Ver menos'; btn.dataset.expanded = '1';
+        }
+      });
+    });
+
+    // Copy prompt
+    grid.querySelectorAll('.btn-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(btn.dataset.prompt).then(() => {
+          const orig = btn.textContent; btn.textContent = '✓ Copiado';
+          setTimeout(() => { btn.textContent = orig; }, 1500);
+        });
+      });
+    });
+
+    // Upload image
+    grid.querySelectorAll('input[type=file]').forEach(input => {
+      input.addEventListener('change', async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const postId   = input.dataset.postId;
+        const platform = input.dataset.platform;
+        const label = input.closest('.upload-drop-zone');
+        label.innerHTML = '<span class="spinner"></span> Subiendo...';
+        try {
+          const path = `post-${postId}-${Date.now()}.${file.name.split('.').pop()}`;
+          const { error: upErr } = await sb.storage.from('content-images').upload(path, file, { upsert: true });
+          if (upErr) throw new Error(upErr.message);
+          const { data: { publicUrl } } = sb.storage.from('content-images').getPublicUrl(path);
+          const { error: dbErr } = await sb.from('content_queue').update({ image_url: publicUrl }).eq('id', postId);
+          if (dbErr) throw new Error(dbErr.message);
+          // Refresh card
+          const { data } = await sb.from('content_queue').select('*').eq('id', postId).single();
+          const card = document.getElementById('card-' + postId);
+          const newCardHtml = renderCard(data);
+          const tmp = document.createElement('div'); tmp.innerHTML = newCardHtml;
+          card.replaceWith(tmp.firstElementChild);
+          bindEvents([data]);
+          OKR_toast('✓ Imagen subida', 'success');
+        } catch(err) {
+          OKR_toast('Error al subir: ' + err.message, 'error');
+          label.textContent = '📎 Subir imagen generada';
+        }
+      });
+    });
+
+    // Preview modal
+    grid.querySelectorAll('.btn-preview').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = postsMap[Number(btn.dataset.id)];
+        openPreview(p);
+      });
+    });
+
+    // Remove image
+    grid.querySelectorAll('.btn-remove-image').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const postId = btn.dataset.postId;
+        if (!confirm('¿Eliminar la imagen de este post?')) return;
+        btn.disabled = true;
+        const { error } = await sb.from('content_queue').update({ image_url: null }).eq('id', postId);
+        if (error) { alert('Error al eliminar: ' + error.message); btn.disabled = false; return; }
+        await load();
+      });
+    });
+
+    // Approve
+    grid.querySelectorAll('.btn-approve').forEach(btn => {
+      btn.addEventListener('click', () => approvePost(btn.dataset.id, btn));
+    });
+  }
+
+  // ── Preview modal ───────────────────────────────────────────────────────────
+  function openPreview(p) {
+    const modal = document.getElementById('preview-modal');
+    const body  = document.getElementById('modal-body');
+    document.getElementById('modal-title').textContent =
+      `Preview — ${p.platform === 'linkedin' ? 'LinkedIn' : 'Instagram'} · ${SECTOR_LABELS[p.sector]||p.sector}`;
+
+    const bodyText = p.format === 'carousel' && p.slides?.length
+      ? p.slides.map((s,i) => `📌 Slide ${i+1}: ${s.title}\n${s.body}`).join('\n\n')
+      : p.body;
+
+    const hashText = (p.hashtags||[]).join(' ');
+    const imgUrl   = p.image_url;
+
+    if (p.platform === 'linkedin') {
+      body.innerHTML = `
+        <div class="li-mock">
+          <div class="li-mock-header">
+            <div class="li-mock-avatar"><img src="assets/etendo_icon.png" alt="Etendo"></div>
+            <div>
+              <div class="li-mock-name">Etendo</div>
+              <div class="li-mock-meta">Software empresarial · 1er grado</div>
+            </div>
+          </div>
+          ${imgUrl
+            ? `<img class="li-mock-image" src="${esc(imgUrl)}" alt="">`
+            : `<div class="li-mock-image-placeholder">📷 Sin imagen — subí una para ver el preview completo</div>`}
+          <div class="li-mock-text">${esc(bodyText)}</div>
+          <div class="li-mock-hashtags">${esc(hashText)}</div>
+          <div class="li-mock-actions">
+            <div class="li-mock-action">👍 Me gusta</div>
+            <div class="li-mock-action">💬 Comentar</div>
+            <div class="li-mock-action">↗ Compartir</div>
+          </div>
+        </div>`;
+    } else {
+      body.innerHTML = `
+        <div class="ig-mock">
+          <div class="ig-mock-header">
+            <div class="ig-mock-avatar"><img src="assets/etendo_icon.png" alt="Etendo"></div>
+            <div class="ig-mock-username">etendo.software</div>
+          </div>
+          ${imgUrl
+            ? `<img class="ig-mock-image" src="${esc(imgUrl)}" alt="">`
+            : `<div class="ig-mock-image-placeholder">📷 Sin imagen — subí una para ver el preview completo</div>`}
+          <div class="ig-mock-actions">❤️ 💬 ↗</div>
+          <div class="ig-mock-caption">
+            <strong>etendo.software</strong> ${esc(bodyText)}<br>
+            <span style="color:#00376b">${esc(hashText)}</span>
+          </div>
+        </div>`;
+    }
+
+    modal.classList.add('open');
+  }
+
+  document.getElementById('modal-close').addEventListener('click', () => {
+    document.getElementById('preview-modal').classList.remove('open');
+  });
+  document.getElementById('preview-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+
+  // ── Approve ─────────────────────────────────────────────────────────────────
+  async function approvePost(id, btn) {
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    const { error } = await sb.from('content_queue').update({
+      status: 'approved', approved_at: new Date().toISOString(),
+      approved_by: (await sb.auth.getUser())?.data?.user?.email || 'dashboard',
+    }).eq('id', id);
+    if (error) { OKR_toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '✓ Aprobar'; return; }
+    const card = document.getElementById('card-' + id);
+    card.classList.remove('status-draft'); card.classList.add('status-approved');
+    card.querySelector('.status-pill').className = 'status-pill status-approved';
+    card.querySelector('.status-pill').textContent = 'Aprobado';
+    btn.textContent = '✓ Aprobado';
+    OKR_toast('Post aprobado', 'success');
+    await load();
+  }
+
+  // ── Generate ─────────────────────────────────────────────────────────────────
+  document.getElementById('btn-generate').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-generate');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Generando...';
+    const r = await OKR_triggerJob('content');
+    if (r?.ok) {
+      OKR_toast('✓ Generando contenido — llegará en ~2 minutos', 'success');
+      const since = new Date().toISOString();
+      const poll = setInterval(async () => {
+        const { data } = await sb.from('content_queue').select('id').gte('created_at', since).limit(1);
+        if (data?.length) { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Generar semana'; await load(); }
+      }, 4000);
+      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '⚡ Generar semana'; }, 300000);
+    } else {
+      btn.disabled = false; btn.textContent = '⚡ Generar semana';
+      OKR_toast('Error: ' + (r?.error || r?.status), 'error');
+    }
+  });
+
+  // ── Filters ──────────────────────────────────────────────────────────────────
+  ['filter-week','filter-platform','filter-sector','filter-status'].forEach(id => {
+    document.getElementById(id).addEventListener('change', load);
+  });
+
+  await load();
+})();
+</script>
+</body>
+</html>

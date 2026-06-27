@@ -98,6 +98,8 @@ class Handler(BaseHTTPRequestHandler):
             self._run(["job_market_intel.py", "--team", team])
         elif parsed.path == "/generate-backlog":
             self._run(["job_generate_backlog.py"])
+        elif parsed.path == "/generate-content":
+            self._run(["job_content.py"])
         else:
             self.send_response(404)
             self.end_headers()

@@ -1,5 +1,5 @@
 """Helpers compartidos para los jobs de OKR Manager."""
-import os, json, urllib.request, urllib.parse, urllib.error
+import os, json, http.cookiejar, urllib.request, urllib.parse, urllib.error
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,6 +18,7 @@ if ENV.exists():
 ETENDO_USER = os.environ.get("ETENDO_USERNAME")
 ETENDO_PASS = os.environ.get("ETENDO_PASSWORD")
 ETENDO_BASE = os.environ.get("ETENDO_BASE_URL") or os.environ.get("ETENDO_BASE", "https://futit-staff.etendo.cloud")
+WRITE_URL   = os.environ.get("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
 
 SUPABASE_URL  = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY")
@@ -65,6 +66,52 @@ def etendo_fetch(jwt, entity):
         req = urllib.request.Request(f"{ETENDO_BASE}/api/datasource/{entity}", data=body, method="POST")
         req.add_header("Authorization", f"Bearer {jwt}")
         req.add_header("Content-Type", "application/x-www-form-urlencoded")
+        with urllib.request.urlopen(req, timeout=30) as r:
+            page = json.loads(r.read()).get("response", {}).get("data", [])
+        if not page:
+            break
+        out.extend(page)
+        if len(page) < 500:
+            break
+        start += 500
+    return out
+
+
+def etendo_sid_login():
+    """Login via JSESSIONID en staff-ui (requerido para ETCRM_Lead)."""
+    jar    = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    body   = urllib.parse.urlencode(
+        {"user": ETENDO_USER, "password": ETENDO_PASS, "Command": "Login"}
+    ).encode()
+    req = urllib.request.Request(
+        f"{WRITE_URL}/secureApp/LoginHandler.html", data=body, method="POST"
+    )
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    try:
+        with opener.open(req):
+            pass
+    except Exception:
+        pass
+    for cookie in jar:
+        if cookie.name == "JSESSIONID":
+            return cookie.value
+    return ""
+
+
+def etendo_fetch_crm(sid, entity="ETCRM_Lead"):
+    """Fetch paginado de ETCRM_Lead via JSESSIONID (staff-ui datasource)."""
+    out = []
+    start = 0
+    while True:
+        params = urllib.parse.urlencode({
+            "_startRow": str(start),
+            "_endRow":   str(start + 500),
+        })
+        url = f"{WRITE_URL}/org.openbravo.service.datasource/{entity}?{params}"
+        req = urllib.request.Request(url)
+        req.add_header("Cookie", f"JSESSIONID={sid}")
+        req.add_header("Accept", "application/json")
         with urllib.request.urlopen(req, timeout=30) as r:
             page = json.loads(r.read()).get("response", {}).get("data", [])
         if not page:

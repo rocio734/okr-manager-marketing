@@ -7,9 +7,7 @@ import os, smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
-from _etendo import etendo_login, etendo_fetch, APPROVER_EMAIL
-
-ROLE_COMERCIAL = os.getenv("ETENDO_ROLE_ID", "8351131DFF384725AB08E06773FE6144")
+from _etendo import etendo_sid_login, etendo_fetch_crm, APPROVER_EMAIL
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER = os.getenv("SMTP_USER", os.getenv("GMAIL_USER", ""))
@@ -18,22 +16,23 @@ VICO_EMAIL = "victoria.miguez@etendo.software"
 
 
 def get_hot_leads():
-    jwt = etendo_login(ROLE_COMERCIAL)
-    leads = etendo_fetch(jwt, "ECLM_Lead")
-    all_active = [l for l in leads if l.get("leadStatus") not in ("lost_deal", "won_deal", "cold_archived")]
-    hot = [
-        l for l in all_active
-        if (l.get("scorePurchaseIntention") or 0) >= 2
-        and l.get("strategicFit") == "strategic_fit_yes"
-    ]
-    # Candidates near negotiation: demo done, proposal sent, or summary mentions advanced stage
+    sid = etendo_sid_login()
+    leads = etendo_fetch_crm(sid, "ETCRM_Lead")
+    # Activos = no Dead y no Converted
+    all_active = [l for l in leads
+                  if (l.get("leadStatus$_identifier") or "") not in ("Dead", "Converted")]
+    # Hot = status Qualified (oportunidad de venta validada)
+    hot = [l for l in all_active
+           if (l.get("leadStatus$_identifier") or "") == "Qualified"]
+    # Cerca de negociación: keywords en description o successProbability alto
     _near_negotiation_kw = ["propuesta", "demo realiz", "demo hecha", "llamada exitosa",
                              "negociaci", "evaluando", "revisando", "avanzando", "cierre",
                              "reunión de", "presentamos", "acuerdo"]
     near_neg = [
         l for l in all_active
-        if any(k in (l.get("summary") or "").lower() for k in _near_negotiation_kw)
-        and l not in hot  # exclude already shown as hot leads
+        if (any(k in (l.get("description") or "").lower() for k in _near_negotiation_kw)
+            or float(l.get("successProbability") or 0) >= 50)
+        and l not in hot
     ]
     return hot, near_neg
 
@@ -52,11 +51,12 @@ def build_html(hot_leads, near_neg=None):
     for l in hot_leads:
         name    = f"{l.get('firstName', '')} {l.get('lastName', '')}".strip() or l.get("company", "?")
         company = l.get("company") or "—"
-        spi     = int(l.get("scorePurchaseIntention") or 0)
-        summary = (l.get("summary") or "").strip()
+        prob    = int(float(l.get("successProbability") or 0))
+        summary = (l.get("description") or "").strip()
         lines   = [x.strip() for x in summary.split("\n") if x.strip()]
         last    = lines[-1] if lines else "Sin notas recientes"
-        spi_css, fire = spi_styles.get(spi, ("background:#EEF0F4;color:#6B7388;", "⚪"))
+        spi_css = "background:#FCE5E8;color:#D02F3D;" if prob >= 50 else "background:#FFF1C9;color:#B5810D;"
+        fire    = "🔴" if prob >= 50 else "🟡"
 
         cards += f"""
 <div style="background:#ffffff;border:1px solid #ECEEF1;border-radius:12px;padding:18px 22px;margin-bottom:14px;box-shadow:0 2px 8px rgba(31,40,88,0.06);">
@@ -67,7 +67,7 @@ def build_html(hot_leads, near_neg=None):
         <div style="font-size:12px;color:#9098A8;margin-top:2px;">{company}</div>
       </td>
       <td align="right" style="vertical-align:top;">
-        <span style="{spi_css}padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">SPI = {spi}</span>
+        <span style="{spi_css}padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">Prob {prob}%</span>
       </td>
     </tr>
     <tr>
@@ -97,7 +97,7 @@ def build_html(hot_leads, near_neg=None):
         neg_rows = "".join(
             f'<div style="font-size:13px;color:#2D3556;padding:4px 0;border-bottom:1px solid #E9EBF3;">'
             f'· <strong>{((l.get("firstName") or "") + " " + (l.get("lastName") or "")).strip() or l.get("company","?")}</strong>'
-            f' — {(l.get("summary") or "")[-80:].strip()}</div>'
+            f' — {(l.get("description") or "")[-80:].strip()}</div>'
             for l in near_neg[:5]
         )
         neg_section = f"""<div style="background:#fff;border-radius:8px;padding:10px 14px;margin-bottom:10px;">
@@ -130,7 +130,7 @@ def build_html(hot_leads, near_neg=None):
 
   <tr><td style="background:#ffffff;padding:20px 32px 16px;border-left:1px solid #ECEEF1;border-right:1px solid #ECEEF1;">
     <p style="margin:0;font-size:14px;color:#2D3556;line-height:1.65;">
-      Hola Vico 👋 El sistema encontró <strong style="color:#1F2858;">{len(hot_leads)} hot leads activos</strong> que se usan mañana para calcular el KR de pipeline.
+      Hola Vico 👋 El sistema encontró <strong style="color:#1F2858;">{len(hot_leads)} hot leads activos</strong> (status Qualified) que se usan mañana para calcular el KR de pipeline.
       Revisá cada uno y <strong>actualizá el estado en Etendo CRM</strong> si algo cambió — antes de las 17hs.
     </p>
   </td></tr>

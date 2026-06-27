@@ -51,50 +51,54 @@ _AVATAR_CANDIDATES = [
 ]
 AVATAR_PATH = next((p for p in _AVATAR_CANDIDATES if p.exists()), None)
 
-HOT_STATUSES = {
-    "new", "in_progress", "meeting_scheduled", "meeting_pending",
-    "proposal_sent", "follow_up", "negotiation", "hot",
-}
+HOT_STATUSES = {"New", "Contacted", "Qualified"}
 
 STATUS_LABELS = {
-    "new":               "Nuevo",
-    "in_progress":       "En progreso",
-    "meeting_scheduled": "Reunión agendada",
-    "meeting_pending":   "Reunión pendiente",
-    "proposal_sent":     "Propuesta enviada",
-    "follow_up":         "Follow-up",
-    "negotiation":       "Negociación",
-    "hot":               "Hot",
+    "New":       "Nuevo",
+    "Contacted": "Contactado",
+    "Qualified": "Calificado (Hot)",
 }
 
-STATUS_ORDER = [
-    "negotiation", "proposal_sent", "meeting_scheduled",
-    "meeting_pending", "in_progress", "follow_up", "hot", "new",
-]
+STATUS_ORDER = ["Qualified", "Contacted", "New"]
 
 LOG = lambda msg: print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
 
 
 # ── CRM ────────────────────────────────────────────────────────────────────────
-def login_jwt():
+def login_sid():
+    import http.cookiejar
+    WRITE_URL = os.getenv("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
+    jar    = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    body   = urllib.parse.urlencode(
+        {"user": USERNAME, "password": PASSWORD, "Command": "Login"}
+    ).encode()
     req = urllib.request.Request(
-        f"{BASE_URL}/api/auth/login",
-        data=json.dumps({"username": USERNAME, "password": PASSWORD, "role": ROLE_ID}).encode(),
-        method="POST",
+        f"{WRITE_URL}/secureApp/LoginHandler.html", data=body, method="POST"
     )
-    req.add_header("Content-Type", "application/json")
-    with urllib.request.urlopen(req) as r:
-        return json.loads(r.read()).get("token", "")
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    try:
+        with opener.open(req):
+            pass
+    except Exception as e:
+        LOG(f"WARN login_sid: {e}")
+    for cookie in jar:
+        if cookie.name == "JSESSIONID":
+            return cookie.value
+    return ""
 
 
-def get_hot_leads(jwt):
+def get_hot_leads(sid):
+    WRITE_URL = os.getenv("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
     all_leads, seen, start = [], set(), 0
     while True:
         params = urllib.parse.urlencode(
             {"_startRow": start, "_endRow": start + 100, "_orderBy": "creationDate desc"}
         )
-        req = urllib.request.Request(f"{BASE_URL}/api/datasource/ECLM_Lead?{params}")
-        req.add_header("Authorization", f"Bearer {jwt}")
+        url = f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead?{params}"
+        req = urllib.request.Request(url)
+        req.add_header("Cookie", f"JSESSIONID={sid}")
+        req.add_header("Accept", "application/json")
         with urllib.request.urlopen(req) as r:
             data = json.loads(r.read())
         page = data.get("response", {}).get("data", [])
@@ -128,21 +132,21 @@ def get_hot_leads(jwt):
                         "no continúa", "no continua", "archivado", "cold"]
 
     def is_discarded_by_note(lead):
-        summary  = (lead.get("summary") or "").strip()
+        summary  = (lead.get("description") or "").strip()
         interest = (lead.get("interest") or "").strip()
         latest   = _latest_note(summary, interest).lower()
         return any(k in latest for k in DISCARD_KEYWORDS)
 
     hot = [l for l in all_leads
-           if (l.get("leadStatus") or "").lower() in HOT_STATUSES
+           if (l.get("leadStatus$_identifier") or "") in HOT_STATUSES
            and not is_test(l)
            and not is_discarded_by_note(l)]
 
     def sort_key(l):
-        s = (l.get("leadStatus") or "").lower()
+        s = (l.get("leadStatus$_identifier") or "")
         order = STATUS_ORDER.index(s) if s in STATUS_ORDER else 99
-        score = int(l.get("leadScore") or l.get("scoreIndex") or 0)
-        return (order, -score)
+        prob  = float(l.get("successProbability") or 0)
+        return (order, -prob)
 
     hot.sort(key=sort_key)
 
@@ -176,7 +180,7 @@ def get_hot_leads(jwt):
         # Usamos la fecha en la propia nota (no updated, que cambia con el scoring)
         if lid not in seen_stale:
             latest = _latest_note(
-                (l.get("summary") or ""), (l.get("interest") or "")
+                (l.get("description") or ""), (l.get("interest") or "")
             )
             latest_lower = latest.lower()
             PENDING_KEYWORDS = [
@@ -253,24 +257,19 @@ def build_html(leads, today_str, stale=None):
     stale = stale or []
     rows_html = ""
     badge_colors = {
-        "negotiation":       ("#166534", "#dcfce7"),
-        "proposal_sent":     ("#1e40af", "#dbeafe"),
-        "meeting_scheduled": ("#92400e", "#fef3c7"),
-        "meeting_pending":   ("#92400e", "#fef9c3"),
-        "in_progress":       ("#6b21a8", "#f3e8ff"),
-        "follow_up":         ("#0e7490", "#cffafe"),
-        "hot":               ("#991b1b", "#fee2e2"),
-        "new":               ("#374151", "#f3f4f6"),
+        "Qualified": ("#166534", "#dcfce7"),
+        "Contacted": ("#1e40af", "#dbeafe"),
+        "New":       ("#374151", "#f3f4f6"),
     }
 
     for i, lead in enumerate(leads):
         bg          = "#ffffff" if i % 2 == 0 else "#f8f9fb"
-        status_raw  = (lead.get("leadStatus") or "").lower()
+        status_raw  = (lead.get("leadStatus$_identifier") or "")
         label       = STATUS_LABELS.get(status_raw, status_raw or "—")
-        spi         = lead.get("scorePurchaseIntention") or "—"
+        prob        = int(float(lead.get("successProbability") or 0))
         company     = lead.get("company") or "—"
         name        = lead_name(lead)
-        raw_summary  = (lead.get("summary") or "").strip()
+        raw_summary  = (lead.get("description") or "").strip()
         raw_interest = (lead.get("interest") or "").strip()
         latest = _latest_note(raw_summary, raw_interest)
         summary = latest[:120] + ("…" if len(latest) > 120 else "") if latest else "—"
@@ -291,7 +290,7 @@ def build_html(leads, today_str, stale=None):
           </td>
           <td style="padding:10px 12px;font-size:13px;text-align:center;
                      border-bottom:1px solid #e5e7eb;color:#374151;">
-            SPI {spi}</td>
+            {prob}%</td>
           <td style="padding:10px 12px;font-size:12px;color:#6b7280;
                      border-bottom:1px solid #e5e7eb;">
             {summary or "—"}</td>
@@ -308,7 +307,7 @@ def build_html(leads, today_str, stale=None):
             name    = lead_name(lead)
             company = lead.get("company") or "—"
             status  = STATUS_LABELS.get((lead.get("leadStatus") or "").lower(), "—")
-            latest  = _latest_note((lead.get("summary") or ""), (lead.get("interest") or ""))
+            latest  = _latest_note((lead.get("description") or ""), (lead.get("interest") or ""))
             note    = latest[:100] + ("…" if len(latest) > 100 else "") if latest else "—"
             stale_rows += f"""
             <tr>
@@ -410,7 +409,7 @@ def build_html(leads, today_str, stale=None):
                      border-bottom:2px solid #e5e7eb;">Estado</th>
           <th style="padding:10px 12px;text-align:center;font-size:12px;color:#6b7280;
                      text-transform:uppercase;letter-spacing:.5px;
-                     border-bottom:2px solid #e5e7eb;">SPI</th>
+                     border-bottom:2px solid #e5e7eb;">Prob.</th>
           <th style="padding:10px 12px;text-align:left;font-size:12px;color:#6b7280;
                      text-transform:uppercase;letter-spacing:.5px;
                      border-bottom:2px solid #e5e7eb;">Notas</th>
@@ -496,12 +495,12 @@ def main():
     today_str = datetime.now().strftime("%d/%m/%Y")
     LOG("=== CRM Monday Pulse ===")
 
-    jwt = login_jwt()
-    if not jwt:
-        LOG("ERROR: JWT login fallido"); return
+    sid = login_sid()
+    if not sid:
+        LOG("ERROR: SID login fallido"); return
 
     LOG("Cargando leads activos del CRM…")
-    leads, stale = get_hot_leads(jwt)
+    leads, stale = get_hot_leads(sid)
     LOG(f"  {len(leads)} leads activos | {len(stale)} desactualizados (+30 días)")
 
     if not leads:

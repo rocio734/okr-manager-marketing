@@ -22,6 +22,8 @@ on:
     - cron: '0 * * * *'
     # Jueves 9am España = 7 UTC — hot leads alert para Vico antes del cálculo del viernes
     - cron: '0 7 * * 4'
+    # Lunes 9:10am España = 7:10 UTC — generación de contenido semanal
+    - cron: '10 7 * * 1'
   workflow_dispatch:
     inputs:
       job:
@@ -29,7 +31,7 @@ on:
         required: true
         default: 'monday'
         type: choice
-        options: [monday, generate_backlog, daily_sweep, friday, writeback, market_intel, crm_pulse, reply_checker, crm_scoring]
+        options: [monday, generate_backlog, daily_sweep, friday, writeback, market_intel, crm_pulse, reply_checker, crm_scoring, content]
       next_week:
         description: 'Generar para semana siguiente (solo para job=monday)'
         required: false
@@ -73,6 +75,7 @@ jobs:
               "0 6 * * *")    echo "job=crm_scoring"       >> $GITHUB_OUTPUT ;;
               "0 * * * *")    echo "job=generate_backlog"  >> $GITHUB_OUTPUT ;;
               "0 7 * * 4")    echo "job=hot_leads_alert"   >> $GITHUB_OUTPUT ;;
+              "10 7 * * 1")   echo "job=content"           >> $GITHUB_OUTPUT ;;
             esac
             echo "next_week=false" >> $GITHUB_OUTPUT
           fi
@@ -81,6 +84,7 @@ jobs:
         env:
           ETENDO_USERNAME:      ${{ secrets.ETENDO_USERNAME }}
           ETENDO_PASSWORD:      ${{ secrets.ETENDO_PASSWORD }}
+          ETENDO_WRITE_URL:     https://staff-ui.etendo.cloud/etendo
           ETENDO_CLIENT_ID:     ${{ secrets.ETENDO_CLIENT_ID }}
           ETENDO_ORG_ID:        ${{ secrets.ETENDO_ORG_ID }}
           ETENDO_WAREHOUSE_ID:  ${{ secrets.ETENDO_WAREHOUSE_ID }}
@@ -99,7 +103,7 @@ jobs:
           GOOGLE_ADS_DEVELOPER_TOKEN:    ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
           GOOGLE_ADS_MCC_CUSTOMER_ID:    ${{ secrets.GOOGLE_ADS_MCC_CUSTOMER_ID }}
           GOOGLE_ADS_CLIENT_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_CLIENT_CUSTOMER_ID }}
-          GOOGLE_ADS_API_VERSION:        v20
+          GOOGLE_ADS_API_VERSION:        v21
           GA4_PROPERTY_ID:               ${{ secrets.GA4_PROPERTY_ID }}
           SC_SITE:                       sc-domain:etendo.software
           CRM_PULSE_RECIPIENTS:          ${{ vars.CRM_PULSE_RECIPIENTS }}
@@ -124,4 +128,5 @@ jobs:
             reply_checker)     python job_reply_checker.py ;;
             crm_scoring)       python job_crm_scoring.py ;;
             hot_leads_alert)   python job_hot_leads_alert.py ;;
+            content)           python job_content.py ;;
           esac

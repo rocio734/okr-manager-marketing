@@ -308,9 +308,10 @@
           const hasBoth = kr.current != null && kr.target != null && kr.target !== 0;
           const pct     = hasBoth ? Math.min(100, Math.round(kr.current / kr.target * 100)) : null;
           const cycleEnded = cycle && cycle.status === 'closed';
-          const st = kr.status
+          const rawSt = kr.status
             ? kr.status
-            : (!hasBoth ? 'not_started' : pct >= 100 ? 'success' : pct >= 75 ? 'on_track' : pct >= 50 ? 'at_risk' : cycleEnded ? 'failed' : 'off_track');
+            : (!hasBoth ? 'not_started' : pct >= 100 ? 'success' : pct >= 75 ? 'on_track' : pct >= 50 ? 'at_risk' : 'off_track');
+          const st = (rawSt === 'failed' && !cycleEnded) ? 'off_track' : rawSt;
           const stMap = {
             not_started: { label: 'Not Started', bg: 'var(--c-neutral-soft)',  color: 'var(--c-text-muted)', bar: 'var(--c-border-strong)', border: 'var(--c-border-strong)' },
             on_track:    { label: 'On Track',    bg: 'var(--c-success-soft)',  color: 'var(--c-success)',    bar: 'var(--c-success)',       border: 'var(--c-success)'       },

@@ -146,6 +146,32 @@ def run_team(cfg, dry_run, next_week=False):
     jwt = etendo_login(role_id)
     krs = fetch_team_krs(jwt, period, team_id)
     print(f"KRs encontrados: {len(krs)}")
+
+    # Sobrescribir current con el último valor applied en Supabase.
+    # Etendo puede estar desactualizado si el ciclo anterior fue aprobado
+    # después de que este ciclo ya se creó (o el writeback tardó).
+    try:
+        applied = sb_request("GET",
+            "kr_proposals?status=eq.applied&order=applied_at.desc&limit=200"
+            "&select=kr_id,proposed_value,applied_at") or []
+        last_applied = {}
+        for row in applied:
+            kid = row.get("kr_id")
+            if kid and kid not in last_applied:
+                last_applied[kid] = row.get("proposed_value")
+        overrides = 0
+        for kr in krs:
+            if kr.get("id") in last_applied:
+                new_val = last_applied[kr["id"]]
+                if new_val != kr.get("current"):
+                    print(f"  Snapshot override KR {kr['name'][:50]}: {kr.get('current')} → {new_val} (último applied)")
+                    kr["current"] = new_val
+                    overrides += 1
+        if overrides:
+            print(f"  {overrides} KR(s) corregidos con último valor applied")
+    except Exception as e:
+        print(f"  [snapshot override] Error: {e}")
+
     if not krs:
         print("Sin KRs — skip.")
         return
