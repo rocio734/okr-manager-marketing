@@ -337,13 +337,25 @@ Tu voz en redes sociales:
 """
 
 
-def generate_post(slot, sector, research, week_start):
+def generate_post(slot, sector, research, week_start, history=None):
     """Genera un post individual usando Claude."""
 
     research_text = "\n".join(
         f"- {r['title']}: {r['snippet']} ({r['url']})"
         for r in research[:3]
     ) or "No hay resultados de búsqueda — usá tu conocimiento de Gartner 2024-2025."
+
+    # Construir contexto de posts anteriores para evitar repetición
+    history_text = ""
+    if history:
+        prev = [p for p in history if p.get('sector') == sector]
+        if prev:
+            titles = "\n".join(f"  - [{p['platform']} {p['format']}] {p['title']}" for p in prev[:10])
+            history_text = (
+                f"\nPOSTS YA PUBLICADOS SOBRE ESTE SECTOR (últimas 4 semanas) — NO repetir ni parafrasear:\n"
+                f"{titles}\n"
+                f"Tu post DEBE abordar un ángulo diferente, una estadística distinta o un aspecto nuevo del tema.\n"
+            )
 
     format_instructions = {
         'post': (
@@ -407,7 +419,7 @@ FORMATO: {slot['format'].upper()}
 FUENTE DE INSPIRACIÓN: {slot['source'].upper()}
 Investigación encontrada:
 {research_text}
-
+{history_text}
 {image_instruction}
 
 INSTRUCCIONES ADICIONALES:
@@ -443,6 +455,22 @@ Devolvé SOLO el JSON solicitado, sin texto adicional.
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def fetch_published_history(weeks_back=4):
+    """Devuelve títulos y temas de posts aprobados/publicados en las últimas N semanas."""
+    cutoff = date.today() - timedelta(weeks=weeks_back)
+    try:
+        result = sb_request('GET',
+            f"content_queue?week_start=gte.{cutoff}&status=in.(approved,published)"
+            f"&select=title,sector,platform,format,day_slot&order=week_start.desc&limit=40"
+        )
+        if not result:
+            return []
+        return result
+    except Exception as e:
+        print(f"  [history] {e}")
+        return []
+
+
 def get_week_start(week_arg=None):
     if week_arg:
         from datetime import datetime
@@ -455,6 +483,11 @@ def get_week_start(week_arg=None):
 def run(dry_run=False, sector_filter=None, week_arg=None):
     week_start = get_week_start(week_arg)
     print(f"Generando contenido semana {week_start} …")
+
+    # Historial de posts ya publicados para evitar repetición
+    history = fetch_published_history(weeks_back=4)
+    if history:
+        print(f"  [history] {len(history)} posts anteriores cargados para evitar repetición")
 
     # Rotar sectores según número de semana (para no repetir siempre el mismo)
     week_num = week_start.isocalendar()[1]
@@ -470,7 +503,7 @@ def run(dry_run=False, sector_filter=None, week_arg=None):
         print(f"  → {label}")
 
         research = fetch_research(sector, slot['source'])
-        content  = generate_post(slot, sector, research, str(week_start))
+        content  = generate_post(slot, sector, research, str(week_start), history)
 
         source_url = research[0]['url'] if research else None
         source_title = research[0]['title'] if research else None
