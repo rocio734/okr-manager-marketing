@@ -120,6 +120,8 @@ def fetch_crm_snapshot():
 
         # Meetings: keywords de contacto exitoso del equipo en description
         _meeting_keywords = ["llamada exitosa", "llamada ok", "tuvimos llamada",
+                              "llamada telefon",          # llamada telefonica / telefónica
+                              "conversacion telefon",     # conversación telefónica
                               "demo realiz", "hicimos demo", "se realizó demo",
                               "demo completada", "demo hecha", "reunimos con él",
                               "reunimos con ella", "nos reunimos", "contactada por teléfono",
@@ -129,33 +131,50 @@ def fetch_crm_snapshot():
                               "primera sesion", "tuvo una sesion", "tuvimos una sesion",
                               "sesion realizada", "primera sesión", "tuvo una sesión",
                               "reunion de acercamiento", "reunión de acercamiento",
+                              "mensaje de whatsapp", "whatsapp para proponer",
                               "contactado por", "contactada por", "contacte al", "contacté al",
                               "contactamos al", "contactamos a"]
+        # Excluir si el segmento de contacto menciona fallo o rechazo (no contacto real)
         _meeting_exclude = ["se reun", "reuniran con", "reunirán con", "reunion con su",
                              "reunión con su", "reúne con", "su cliente", "con nescor",
-                             "con su equipo"]
-        # Fechas Q2 completo (14 abril - 31 julio 2026)
-        _q2_dates = set()
-        _q2_iter = date(2026, 4, 14)
-        while _q2_iter <= date(2026, 7, 31):
-            _q2_dates.add(f"{_q2_iter.day}/{_q2_iter.month}")
-            _q2_dates.add(f"{_q2_iter.day:02d}/{_q2_iter.month:02d}")
-            _q2_dates.add(f"{_q2_iter.day}/{_q2_iter.month:02d}")
-            _q2_iter += timedelta(days=1)
+                             "con su equipo", "no existe", "numero no existe",
+                             "no responde", "no contesta"]
+        # Fechas del mes calendario actual (día 1 hasta hoy)
+        import re as _re
+        _today = date.today()
+        _month_dates = set()
+        _m_iter = _today.replace(day=1)
+        while _m_iter <= _today:
+            _month_dates.add(f"{_m_iter.day}/{_m_iter.month}")
+            _month_dates.add(f"{_m_iter.day:02d}/{_m_iter.month:02d}")
+            _month_dates.add(f"{_m_iter.day}/{_m_iter.month:02d}")
+            _m_iter += timedelta(days=1)
 
         def _normalize(text):
             return (text.replace("á","a").replace("é","e").replace("í","i")
                     .replace("ó","o").replace("ú","u").replace("ü","u"))
 
+        def _split_diary(desc):
+            """Separa la descripción en segmentos por entrada de fecha (N/M — ...)."""
+            # Divide en cada patrón tipo "1/6 —" o "01/06 —"
+            parts = _re.split(r'(?=\d{1,2}/\d{1,2}\s*[—\-])', desc)
+            segments = []
+            for part in parts:
+                for ln in part.split("\n"):
+                    ln = ln.strip()
+                    if ln:
+                        segments.append(_normalize(ln.lower()))
+            return segments
+
         def _has_meeting(lead):
+            """True si algún segmento del mes actual contiene evidencia de contacto."""
             desc = lead.get("description") or ""
-            lines = [_normalize(ln.lower()) for ln in desc.split("\n") if ln.strip()]
-            for i, ln in enumerate(lines):
-                if any(dt in ln for dt in _q2_dates):
-                    for wl in lines[i:i+3]:
-                        if (any(k in wl for k in _meeting_keywords)
-                                and not any(ex in wl for ex in _meeting_exclude)):
-                            return True
+            segments = _split_diary(desc)
+            for seg in segments:
+                if any(d in seg for d in _month_dates):
+                    if (any(k in seg for k in _meeting_keywords)
+                            and not any(ex in seg for ex in _meeting_exclude)):
+                        return True
             return False
         meetings = [l for l in leads if _has_meeting(l)]
 
