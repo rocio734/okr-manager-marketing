@@ -24,13 +24,23 @@ _COMERCIAL_ROLE = "8351131DFF384725AB08E06773FE6144"
 # ── Fetch CRM ─────────────────────────────────────────────────────────────────
 
 def _crm_login_classic():
-    """JSESSIONID contra la API clásica de Etendo (da acceso a todos los leads)."""
+    """JSESSIONID contra la API clásica de Etendo con rol Comercial."""
     class _NoRedirect(urllib.request.HTTPRedirectHandler):
         def http_error_302(self, req, fp, code, msg, headers):
             raise urllib.error.HTTPError(req.full_url, code, msg, headers, fp)
         http_error_301 = http_error_303 = http_error_307 = http_error_302
 
     opener = urllib.request.build_opener(_NoRedirect())
+
+    def _extract_sid(headers):
+        for h, v in headers.items():
+            if h.lower() == "set-cookie" and "JSESSIONID" in v:
+                for p in v.split(";"):
+                    if p.strip().startswith("JSESSIONID="):
+                        return p.strip().split("=", 1)[1]
+        return ""
+
+    # Paso 1: login inicial
     body = urllib.parse.urlencode(
         {"user": ETENDO_USER, "password": ETENDO_PASS, "Command": "Login"}
     ).encode()
@@ -38,52 +48,50 @@ def _crm_login_classic():
         f"{WRITE_URL}/secureApp/LoginHandler.html", data=body, method="POST"
     )
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    sid = ""
     try:
         with opener.open(req, timeout=15) as r:
-            for h, v in r.headers.items():
-                if h.lower() == "set-cookie" and "JSESSIONID" in v:
-                    for p in v.split(";"):
-                        if p.strip().startswith("JSESSIONID="):
-                            return p.strip().split("=", 1)[1]
+            sid = _extract_sid(r.headers)
     except urllib.error.HTTPError as e:
-        for h, v in e.headers.items():
-            if h.lower() == "set-cookie" and "JSESSIONID" in v:
-                for p in v.split(";"):
-                    if p.strip().startswith("JSESSIONID="):
-                        return p.strip().split("=", 1)[1]
-    return ""
+        sid = _extract_sid(e.headers)
+
+    if not sid:
+        return ""
+
+    # Paso 2: seleccionar rol Comercial para que ETCRM_Lead sea accesible
+    role_body = urllib.parse.urlencode({
+        "inpRole": _COMERCIAL_ROLE,
+        "Command":  "DEFAULT",
+    }).encode()
+    role_req = urllib.request.Request(
+        f"{WRITE_URL}/secureApp/StartupController", data=role_body, method="POST"
+    )
+    role_req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    role_req.add_header("Cookie", f"JSESSIONID={sid}")
+    try:
+        with opener.open(role_req, timeout=15) as r:
+            new_sid = _extract_sid(r.headers)
+            if new_sid:
+                sid = new_sid
+    except urllib.error.HTTPError as e:
+        new_sid = _extract_sid(e.headers)
+        if new_sid:
+            sid = new_sid
+    except Exception:
+        pass  # Si falla el rol switch, intentamos con el SID original
+
+    return sid
 
 
 def fetch_crm_snapshot():
-    """Devuelve métricas clave del CRM usando la API clásica (org.openbravo.service.datasource)."""
-    sid = _crm_login_classic()
-    if not sid:
-        print("  [CRM] Login falló — sin JSESSIONID")
+    """Devuelve métricas clave del CRM usando etendo_fetch con rol Comercial."""
+    token = etendo_login(_COMERCIAL_ROLE)
+    if not token:
+        print("  [CRM] Login falló — sin token")
         return {}
     try:
-        leads = []
-        seen_ids = set()
-        start = 0
-        while True:
-            params = urllib.parse.urlencode({"_startRow": start, "_endRow": start + 100})
-            url = f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead?{params}"
-            req = urllib.request.Request(url)
-            req.add_header("Cookie", f"JSESSIONID={sid}")
-            req.add_header("Accept", "application/json")
-            with urllib.request.urlopen(req, timeout=60) as r:
-                body = r.read()
-            if not body or body.startswith(b"window.location"):
-                break
-            batch = json.loads(body).get("response", {}).get("data", [])
-            new = [l for l in batch if l.get("id") and l["id"] not in seen_ids]
-            for l in new:
-                seen_ids.add(l["id"])
-            leads.extend(new)
-            if not new:
-                break
-            start += 100
-            if len(batch) < 100:
-                break
+        leads = etendo_fetch(token, "ETCRM_Lead")
+        print(f"  [CRM] {len(leads)} leads obtenidos")
 
         def _status(lead):
             return (lead.get("leadStatus$_identifier") or "")
