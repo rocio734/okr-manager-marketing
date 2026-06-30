@@ -166,12 +166,28 @@ def fetch_crm_snapshot():
                         segments.append(_normalize(ln.lower()))
             return segments
 
+        _month_start_str = _today.replace(day=1).strftime("%Y-%m-%d")
+
         def _has_meeting(lead):
-            """True si algún segmento del mes actual contiene evidencia de contacto."""
+            """True si hay evidencia de contacto en el mes actual.
+
+            Dos vías:
+            1. Segmento con fecha del mes + keyword de contacto.
+            2. Lead creado este mes: cualquier línea con keyword (sin fecha requerida),
+               porque todas sus notas son implícitamente de este mes.
+            """
             desc = lead.get("description") or ""
             segments = _split_diary(desc)
+            # Vía 1: segmento con fecha del mes
             for seg in segments:
                 if any(d in seg for d in _month_dates):
+                    if (any(k in seg for k in _meeting_keywords)
+                            and not any(ex in seg for ex in _meeting_exclude)):
+                        return True
+            # Vía 2: lead creado este mes → notas sin fecha también cuentan
+            created = (lead.get("creationDate") or "")[:10]
+            if created >= _month_start_str:
+                for seg in segments:
                     if (any(k in seg for k in _meeting_keywords)
                             and not any(ex in seg for ex in _meeting_exclude)):
                         return True
