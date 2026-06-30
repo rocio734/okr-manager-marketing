@@ -331,12 +331,13 @@ def fetch_crm_snapshot():
         from datetime import datetime as dt
         month_start = date.today().replace(day=1).strftime("%Y-%m-%d")
         new_leads_month = [l for l in leads if (l.get("creationDate") or "")[:10] >= month_start]
+        # SQL + IQL = leads con strategic fit (encajan con el ICP aunque no tengan señal de compra aún)
         new_fit_month   = [l for l in leads if (l.get("creationDate") or "")[:10] >= month_start
-                           and (l.get("classification$_identifier") or "") == "SQL"]
+                           and (l.get("classification$_identifier") or "") in ("SQL", "IQL")]
 
         return {
             "total_leads_active":    len(active),
-            "strategic_fit_yes":     len(new_fit_month),  # SQL leads creados este mes calendario
+            "strategic_fit_yes":     len(new_fit_month),  # SQL + IQL creados este mes
             "hot_leads":             len(hot),        # Qualified status
             "unclassified_leads":    len(unclassified),
             "meetings_booked":       len(meetings),
