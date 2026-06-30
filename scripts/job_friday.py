@@ -83,6 +83,47 @@ def _crm_login_classic():
     return sid
 
 
+def fetch_lead_notes(token):
+    """Fetch all ETCRM_Lead_Note records via JWT (Comercial role).
+
+    Requiere _noActiveFilter=true — sin él el rol Comercial sólo devuelve ~7 registros.
+    Devuelve dict {lead_id: [{"note": ..., "creationDate": ...}]} con TODAS las notas.
+    """
+    all_notes = []
+    start = 0
+    while True:
+        body = urllib.parse.urlencode({
+            "_operationType": "fetch",
+            "_startRow":       str(start),
+            "_endRow":         str(start + 500),
+            "_noActiveFilter": "true",
+        }).encode()
+        req = urllib.request.Request(
+            f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
+            data=body, method="POST"
+        )
+        req.add_header("Authorization", f"Bearer {token}")
+        req.add_header("Content-Type", "application/x-www-form-urlencoded")
+        with urllib.request.urlopen(req, timeout=30) as r:
+            page = json.loads(r.read()).get("response", {}).get("data", [])
+        if not page:
+            break
+        all_notes.extend(page)
+        if len(page) < 500:
+            break
+        start += 500
+    print(f"  [CRM] {len(all_notes)} notas obtenidas (ETCRM_Lead_Note)")
+    notes_by_lead = {}
+    for n in all_notes:
+        lid = n.get("lead")
+        if lid:
+            notes_by_lead.setdefault(lid, []).append({
+                "note":         n.get("note") or "",
+                "creationDate": n.get("creationDate") or "",
+            })
+    return notes_by_lead
+
+
 def fetch_crm_snapshot():
     """Devuelve métricas clave del CRM usando etendo_fetch con rol Comercial."""
     token = etendo_login(_COMERCIAL_ROLE)
@@ -92,6 +133,7 @@ def fetch_crm_snapshot():
     try:
         leads = etendo_fetch(token, "ETCRM_Lead")
         print(f"  [CRM] {len(leads)} leads obtenidos")
+        notes_by_lead = fetch_lead_notes(token)
 
         def _status(lead):
             return (lead.get("leadStatus$_identifier") or "")
@@ -106,22 +148,12 @@ def fetch_crm_snapshot():
         # Won = Converted
         won         = [l for l in leads if _status(l) == "Converted"]
 
-        # Negociación: successProbability >= 70 o keywords en description
-        _negotiation_keywords = ["negociación", "negociacion", "negociando",
-                                  "evaluando propuesta", "revisando propuesta",
-                                  "etapa de cierre", "en proceso de cierre"]
-        def _in_negotiation(lead):
-            prob = float(lead.get("successProbability") or 0)
-            if prob >= 70:
-                return True
-            desc = (lead.get("description") or "").lower()
-            return any(k in desc for k in _negotiation_keywords)
-        negotiation = [l for l in active if _in_negotiation(l)]
+        # ── helpers de detección ────────────────────────────────────────────────
+        import re as _re
+        from datetime import datetime as _dt
 
-        # Meetings: keywords de contacto exitoso del equipo en description
         _meeting_keywords = ["llamada exitosa", "llamada ok", "tuvimos llamada",
-                              "llamada telefon",          # llamada telefonica / telefónica
-                              "conversacion telefon",     # conversación telefónica
+                              "llamada telefon", "conversacion telefon",
                               "demo realiz", "hicimos demo", "se realizó demo",
                               "demo completada", "demo hecha", "reunimos con él",
                               "reunimos con ella", "nos reunimos", "contactada por teléfono",
@@ -134,14 +166,21 @@ def fetch_crm_snapshot():
                               "mensaje de whatsapp", "whatsapp para proponer",
                               "contactado por", "contactada por", "contacte al", "contacté al",
                               "contactamos al", "contactamos a"]
-        # Excluir si el segmento de contacto menciona fallo o rechazo (no contacto real)
         _meeting_exclude = ["se reun", "reuniran con", "reunirán con", "reunion con su",
                              "reunión con su", "reúne con", "su cliente", "con nescor",
                              "con su equipo", "no existe", "numero no existe",
-                             "no responde", "no contesta"]
-        # Fechas del mes calendario actual (día 1 hasta hoy)
-        import re as _re
+                             "no responde", "no contesta", "fuera de servicio",
+                             "no conecta", "sin respuesta"]
+        _negotiation_keywords = ["negociación", "negociacion", "negociando",
+                                  "evaluando propuesta", "revisando propuesta",
+                                  "etapa de cierre", "en proceso de cierre"]
+        _proposal_keywords = ["propuesta enviada", "propuesta presentada", "envié propuesta",
+                               "mandé propuesta", "mandamos propuesta", "enviamos propuesta",
+                               "envió propuesta", "propuesta de", "enviamos la propuesta",
+                               "mandamos la propuesta", "envie propuesta", "mande propuesta"]
+
         _today = date.today()
+        _month_start_str = _today.replace(day=1).strftime("%Y-%m-%d")
         _month_dates = set()
         _m_iter = _today.replace(day=1)
         while _m_iter <= _today:
@@ -154,55 +193,136 @@ def fetch_crm_snapshot():
             return (text.replace("á","a").replace("é","e").replace("í","i")
                     .replace("ó","o").replace("ú","u").replace("ü","u"))
 
-        def _split_diary(desc):
-            """Separa la descripción en segmentos por entrada de fecha (N/M — ...)."""
-            # Divide en cada patrón tipo "1/6 —" o "01/06 —"
-            parts = _re.split(r'(?=\d{1,2}/\d{1,2}\s*[—\-])', desc)
-            segments = []
+        def _split_diary(text):
+            # Incluye —, –, - como separadores de entrada de diario
+            parts = _re.split(r'(?=\d{1,2}/\d{1,2}\s*[—–\-])', text)
+            segs = []
             for part in parts:
                 for ln in part.split("\n"):
                     ln = ln.strip()
                     if ln:
-                        segments.append(_normalize(ln.lower()))
-            return segments
+                        segs.append(_normalize(ln.lower()))
+            return segs
 
-        _month_start_str = _today.replace(day=1).strftime("%Y-%m-%d")
+        # Cualquier segmento que empiece con N/M (con o sin dash) se trata como entrada fechada
+        _has_date_pfx = _re.compile(r'^\d{1,2}/\d{1,2}')
+
+        def _segs_have_contact(segs, note_date_str=""):
+            """True si algún segmento tiene keyword sin señal negativa en el mes actual.
+
+            Regla de fecha:
+            - Segmento con prefijo de fecha N/M: sólo cuenta si esa fecha está en el mes actual.
+            - Segmento SIN prefijo de fecha (texto libre o continuación): usa note_date_str
+              como proxy — si la nota fue creada este mes, el texto pertenece a este mes.
+            """
+            for seg in segs:
+                if not (any(k in seg for k in _meeting_keywords)
+                        and not any(ex in seg for ex in _meeting_exclude)):
+                    continue
+                if _has_date_pfx.match(seg):
+                    # Fecha explícita → sólo vale si esa fecha está en el mes actual
+                    if any(d in seg for d in _month_dates):
+                        return True
+                else:
+                    # Sin fecha → la nota en sí tiene que ser de este mes
+                    if note_date_str >= _month_start_str:
+                        return True
+            return False
 
         def _has_meeting(lead):
             """True si hay evidencia de contacto en el mes actual.
-
-            Dos vías:
-            1. Segmento con fecha del mes + keyword de contacto.
-            2. Lead creado este mes: cualquier línea con keyword (sin fecha requerida),
-               porque todas sus notas son implícitamente de este mes.
+            Busca en description Y en ETCRM_Lead_Note del lead.
             """
+            lead_id = lead.get("id") or ""
+            # description (campo legacy)
             desc = lead.get("description") or ""
-            segments = _split_diary(desc)
-            # Vía 1: segmento con fecha del mes
-            for seg in segments:
-                if any(d in seg for d in _month_dates):
-                    if (any(k in seg for k in _meeting_keywords)
-                            and not any(ex in seg for ex in _meeting_exclude)):
-                        return True
-            # Vía 2: lead creado este mes → notas sin fecha también cuentan
-            created = (lead.get("creationDate") or "")[:10]
-            if created >= _month_start_str:
-                for seg in segments:
-                    if (any(k in seg for k in _meeting_keywords)
-                            and not any(ex in seg for ex in _meeting_exclude)):
-                        return True
+            if desc:
+                segs = _split_diary(desc)
+                created = (lead.get("creationDate") or "")[:10]
+                note_date = created if created >= _month_start_str else ""
+                if _segs_have_contact(segs, note_date):
+                    return True
+            # ETCRM_Lead_Note
+            for note_rec in notes_by_lead.get(lead_id, []):
+                note_text = note_rec.get("note") or ""
+                if not note_text:
+                    continue
+                note_date = (note_rec.get("creationDate") or "")[:10]
+                segs = _split_diary(note_text)
+                if _segs_have_contact(segs, note_date):
+                    return True
             return False
-        meetings = [l for l in leads if _has_meeting(l)]
 
-        # % hot con propuesta: keywords en description (leadStatus "proposal_sent" ya no existe)
-        _proposal_keywords = ["propuesta enviada", "propuesta presentada", "envié propuesta",
-                               "mandé propuesta", "mandamos propuesta", "enviamos propuesta",
-                               "envió propuesta", "propuesta de", "enviamos la propuesta",
-                               "mandamos la propuesta", "envie propuesta", "mande propuesta"]
         def _has_proposal(lead):
-            desc = (lead.get("description") or "").lower()
-            return any(k in desc for k in _proposal_keywords)
-        proposal_sent = [l for l in hot if _has_proposal(l)]
+            """True si hay evidencia de propuesta enviada (description o notas)."""
+            lead_id = lead.get("id") or ""
+            desc = _normalize((lead.get("description") or "").lower())
+            if any(k in desc for k in _proposal_keywords):
+                return True
+            for note_rec in notes_by_lead.get(lead_id, []):
+                note_text = _normalize((note_rec.get("note") or "").lower())
+                if any(k in note_text for k in _proposal_keywords):
+                    return True
+            return False
+
+        def _in_negotiation(lead):
+            """True si el lead está en negociación activa (prob >= 70 o keywords)."""
+            prob = float(lead.get("successProbability") or 0)
+            if prob >= 70:
+                return True
+            lead_id = lead.get("id") or ""
+            desc = _normalize((lead.get("description") or "").lower())
+            if any(k in desc for k in _negotiation_keywords):
+                return True
+            for note_rec in notes_by_lead.get(lead_id, []):
+                note_text = _normalize((note_rec.get("note") or "").lower())
+                if any(k in note_text for k in _negotiation_keywords):
+                    return True
+            return False
+
+        negotiation   = [l for l in active if _in_negotiation(l)]
+        meetings      = [l for l in leads  if _has_meeting(l)]
+        proposal_sent = [l for l in hot    if _has_proposal(l)]
+
+        # ── Tiempo SQL → primer contacto ────────────────────────────────────
+        sql_leads = [l for l in leads if (l.get("classification$_identifier") or "") == "SQL"]
+        _sql_times = []
+        for lead in sql_leads:
+            lead_id   = lead.get("id") or ""
+            l_created = (lead.get("creationDate") or "")[:10]
+            if not l_created:
+                continue
+            sorted_notes = sorted(notes_by_lead.get(lead_id, []),
+                                  key=lambda n: n.get("creationDate") or "")
+            first_contact = None
+            for note_rec in sorted_notes:
+                note_text = _normalize((note_rec.get("note") or "").lower())
+                if (any(k in note_text for k in _meeting_keywords)
+                        and not any(ex in note_text for ex in _meeting_exclude)):
+                    first_contact = (note_rec.get("creationDate") or "")[:10]
+                    break
+            if first_contact:
+                try:
+                    days = (_dt.strptime(first_contact, "%Y-%m-%d").date()
+                            - _dt.strptime(l_created, "%Y-%m-%d").date()).days
+                    _sql_times.append({
+                        "lead":         (lead.get("_identifier") or lead_id)[:40],
+                        "created":       l_created,
+                        "first_contact": first_contact,
+                        "days":          days,
+                    })
+                except Exception:
+                    pass
+
+        if _sql_times:
+            avg_days = sum(t["days"] for t in _sql_times) / len(_sql_times)
+            print(f"\n  [SQL → Primer Contacto] {len(_sql_times)}/{len(sql_leads)} leads SQL con contacto registrado")
+            print(f"  Promedio: {avg_days:.1f}d | Máx: {max(t['days'] for t in _sql_times)}d | Mín: {min(t['days'] for t in _sql_times)}d")
+            for t in sorted(_sql_times, key=lambda x: x["days"], reverse=True):
+                print(f"    {t['lead']}: {t['created']} → {t['first_contact']} ({t['days']}d)")
+            avg_first_contact_h = round(avg_days * 24, 1)  # convertir días a horas
+        else:
+            avg_first_contact_h = None
 
         unclassified = [l for l in active
                         if (l.get("classification$_identifier") or "") not in ("SQL", "IQL")]
@@ -226,7 +346,7 @@ def fetch_crm_snapshot():
             "proposals_sent":        len(proposal_sent),
             "pct_hot_with_proposal": round(len(proposal_sent) / len(hot) * 100) if hot else 0,
             "avg_spi_fit_leads":     None,  # campo scorePurchaseIntention eliminado en ETCRM_Lead
-            "avg_first_contact_h":   None,  # campo whatsAppContactDate eliminado en ETCRM_Lead
+            "avg_first_contact_h":   avg_first_contact_h,  # días promedio SQL → primer contacto
             "new_fit_leads_30d":     len(new_leads_month),  # TODOS los leads del mes, denominador CPL
         }
     except Exception as e:
