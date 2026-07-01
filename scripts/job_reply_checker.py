@@ -176,7 +176,12 @@ def create_lead_note(lead_id, note_text, sid):
     req.add_header("Content-Type", "application/json")
     try:
         with urllib.request.urlopen(req) as r:
-            return json.loads(r.read()), None
+            result = json.loads(r.read())
+        status = result.get("response", {}).get("status", 0)
+        if status < 0:
+            errors = result.get("response", {}).get("errors") or result.get("response", {}).get("error", {})
+            return None, f"status {status}: {errors}"
+        return result, None
     except urllib.error.HTTPError as e:
         err = e.read().decode("utf-8", errors="replace")[:300]
         return None, f"HTTP {e.code}: {err}"
