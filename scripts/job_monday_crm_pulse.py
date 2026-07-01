@@ -269,6 +269,44 @@ def lead_name(lead):
     return name if name else "(sin nombre)"
 
 
+def _note_days_ago(note_text, lead_updated=""):
+    """Días transcurridos desde la fecha de la nota más reciente (o del campo updated)."""
+    now = datetime.now(timezone.utc)
+    if note_text:
+        m = _re.search(r"\[?(\d{1,2})/(\d{1,2})(?:/(\d{2,4}))?", note_text[:30])
+        if m:
+            try:
+                day, month = int(m.group(1)), int(m.group(2))
+                yr = m.group(3)
+                year = int(yr) + (2000 if int(yr) < 100 else 0) if yr else now.year
+                if month > now.month or (month == now.month and day > now.day):
+                    year -= 1
+                note_date = datetime(year, month, day, tzinfo=timezone.utc)
+                return (now - note_date).days
+            except Exception:
+                pass
+    if lead_updated:
+        try:
+            updated = datetime.fromisoformat(lead_updated.replace("Z", "+00:00"))
+            return (now - updated).days
+        except Exception:
+            pass
+    return None
+
+
+def _days_badge(days):
+    """HTML badge de días desde última actualización."""
+    if days is None:
+        return ""
+    if days <= 7:
+        color, icon = "#166534", f"hace {days}d"
+    elif days <= 14:
+        color, icon = "#b45309", f"⚠ hace {days}d"
+    else:
+        color, icon = "#991b1b", f"🔴 hace {days}d"
+    return f'<br><span style="font-size:10px;font-weight:600;color:{color};">{icon}</span>'
+
+
 def build_html(leads, today_str, stale=None):
     stale = stale or []
     rows_html = ""
@@ -285,15 +323,14 @@ def build_html(leads, today_str, stale=None):
         prob        = int(float(lead.get("successProbability") or 0))
         company     = lead.get("company") or "—"
         name        = lead_name(lead)
-        latest = (
-            lead.get("_crm_note")
-            or _latest_note(
-                (lead.get("description") or "").strip(),
-                (lead.get("interest") or "").strip(),
-            )
-        )
-        summary = latest[:120] + ("…" if len(latest) > 120 else "") if latest else "—"
+        crm_note    = lead.get("_crm_note") or ""
+        desc        = (lead.get("description") or "").strip()
+        interest    = (lead.get("interest") or "").strip()
+        latest      = _latest_note(crm_note, "") if crm_note else _latest_note(desc, interest)
+        summary     = latest[:120] + ("…" if len(latest) > 120 else "") if latest else "—"
         txt_c, bg_c = badge_colors.get(status_raw, ("#374151", "#f3f4f6"))
+        days        = _note_days_ago(latest, lead.get("updated") or "")
+        badge       = _days_badge(days)
 
         rows_html += f"""
         <tr style="background:{bg};">
@@ -313,7 +350,7 @@ def build_html(leads, today_str, stale=None):
             {prob}%</td>
           <td style="padding:10px 12px;font-size:12px;color:#6b7280;
                      border-bottom:1px solid #e5e7eb;">
-            {summary or "—"}</td>
+            {summary or "—"}{badge}</td>
         </tr>"""
 
     count = len(leads)
@@ -327,10 +364,10 @@ def build_html(leads, today_str, stale=None):
             name    = lead_name(lead)
             company = lead.get("company") or "—"
             status  = STATUS_LABELS.get((lead.get("leadStatus") or "").lower(), "—")
-            latest  = (
-                lead.get("_crm_note")
-                or _latest_note((lead.get("description") or ""), (lead.get("interest") or ""))
-            )
+            crm_note = lead.get("_crm_note") or ""
+            desc     = (lead.get("description") or "").strip()
+            interest = (lead.get("interest") or "").strip()
+            latest   = _latest_note(crm_note, "") if crm_note else _latest_note(desc, interest)
             note    = latest[:100] + ("…" if len(latest) > 100 else "") if latest else "—"
             stale_rows += f"""
             <tr>
