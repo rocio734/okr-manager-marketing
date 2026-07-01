@@ -1,0 +1,35 @@
+name: OKR Manager — writeback
+
+on:
+  schedule:
+    # Cada 5 min: procesa kr_proposals con status=approved
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+
+      - name: Install Python dependencies
+        run: pip install anthropic httpx requests python-dotenv
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install chromium --with-deps
+
+      - name: Run writeback
+        env:
+          ETENDO_USERNAME:      ${{ secrets.ETENDO_USERNAME }}
+          ETENDO_PASSWORD:      ${{ secrets.ETENDO_PASSWORD }}
+          ETENDO_WRITE_URL:     https://staff-ui.etendo.cloud/etendo
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          cd scripts
+          python job_writeback.py

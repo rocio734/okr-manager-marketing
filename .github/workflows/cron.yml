@@ -10,8 +10,6 @@ on:
     - cron: '0 18 * * *'
     # Viernes 5pm España = 15 UTC
     - cron: '0 15 * * 5'
-    # Cada 5 min: writeback (procesa proposals approved)
-    - cron: '*/5 * * * *'
     # Lunes 9:05am España = 7:05 UTC — CRM Pulse (5 min después del monday OKR)
     - cron: '5 7 * * 1'
     # Diario 10am España = 8 UTC — reply checker
@@ -31,7 +29,7 @@ on:
         required: true
         default: 'monday'
         type: choice
-        options: [monday, generate_backlog, daily_sweep, friday, writeback, market_intel, crm_pulse, reply_checker, crm_scoring, content]
+        options: [monday, generate_backlog, daily_sweep, friday, market_intel, crm_pulse, reply_checker, crm_scoring, content]
       next_week:
         description: 'Generar para semana siguiente (solo para job=monday)'
         required: false
@@ -51,12 +49,6 @@ jobs:
       - name: Install Python dependencies
         run: pip install anthropic httpx requests python-dotenv
 
-      - name: Install Playwright (solo para writeback)
-        if: github.event.schedule == '*/5 * * * *' || github.event.inputs.job == 'writeback'
-        run: |
-          pip install playwright
-          playwright install chromium --with-deps
-
       - name: Decide which script to run
         id: pick
         run: |
@@ -69,7 +61,6 @@ jobs:
               "30 5 * * *")   echo "job=market_intel"      >> $GITHUB_OUTPUT ;;
               "0 18 * * *")   echo "job=daily_sweep"       >> $GITHUB_OUTPUT ;;
               "0 15 * * 5")   echo "job=friday"            >> $GITHUB_OUTPUT ;;
-              "*/5 * * * *")  echo "job=writeback"         >> $GITHUB_OUTPUT ;;
               "5 7 * * 1")    echo "job=crm_pulse"         >> $GITHUB_OUTPUT ;;
               "0 8 * * *")    echo "job=reply_checker"     >> $GITHUB_OUTPUT ;;
               "0 6 * * *")    echo "job=crm_scoring"       >> $GITHUB_OUTPUT ;;
@@ -122,7 +113,6 @@ jobs:
             generate_backlog)  python job_generate_backlog.py ;;
             daily_sweep)       python job_generate_backlog.py && python job_daily_sweep.py ;;
             friday)            python job_friday.py --team marketing --any-status ;;
-            writeback)         python job_writeback.py ;;
             market_intel)      python job_market_intel.py --team marketing ;;
             crm_pulse)         python job_monday_crm_pulse.py ;;
             reply_checker)     python job_reply_checker.py ;;
