@@ -74,7 +74,7 @@ def _fetch_lead_notes(token):
         body = urllib.parse.urlencode({
             "_operationType": "fetch",
             "_startRow":       str(start),
-            "_endRow":         str(start + 500),
+            "_endRow":         str(start + 499),
             "_noActiveFilter": "true",
         }).encode()
         req = urllib.request.Request(
@@ -260,9 +260,12 @@ def _latest_note(summary, interest=""):
 
 
 def lead_name(lead):
-    fn = (lead.get("firstName") or "").strip()
-    ln = (lead.get("lastName") or "").strip()
+    fn = (lead.get("firstname") or lead.get("firstName") or "").strip()
+    ln = (lead.get("lastname") or lead.get("lastName") or "").strip()
     name = f"{fn} {ln}".strip()
+    if not name:
+        ident = (lead.get("_identifier") or "").replace(" - ", " ").strip()
+        name = ident
     return name if name else "(sin nombre)"
 
 
