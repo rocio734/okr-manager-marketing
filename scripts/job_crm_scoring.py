@@ -34,11 +34,15 @@ GENERIC_DOMAINS = {"gmail.com","hotmail.com","yahoo.com","outlook.com","hotmail.
 SQL_ID = "4847D259D5D544778884865219753DB3"
 IQL_ID = "FBDED8EB276D4EC4B6C6A7AD6DA63BF1"
 
+# Rol Comercial — requerido para ETCRM_Lead sin depender del rol activo de Rocío
+_COMERCIAL_ROLE = "8351131DFF384725AB08E06773FE6144"
+
 LOG = lambda msg: print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
 
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
 def login_sid():
+    """JSESSIONID con selección de rol Comercial — para escrituras en ETCRM_Lead."""
     jar    = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
     body   = urllib.parse.urlencode(
@@ -53,35 +57,46 @@ def login_sid():
             pass
     except Exception as e:
         LOG(f"WARN login_sid: {e}")
+
+    sid = ""
     for cookie in jar:
         if cookie.name == "JSESSIONID":
-            return cookie.value
-    return ""
+            sid = cookie.value
+            break
+    if not sid:
+        return ""
+
+    # Seleccionar rol Comercial para que las escrituras en ETCRM_Lead sean accesibles
+    role_body = urllib.parse.urlencode(
+        {"inpRole": _COMERCIAL_ROLE, "Command": "DEFAULT"}
+    ).encode()
+    role_req = urllib.request.Request(
+        f"{WRITE_URL}/secureApp/StartupController", data=role_body, method="POST"
+    )
+    role_req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    role_req.add_header("Cookie", f"JSESSIONID={sid}")
+    try:
+        with opener.open(role_req):
+            pass
+    except Exception:
+        pass  # Si falla el switch de rol, continuar con el SID original
+
+    for cookie in jar:
+        if cookie.name == "JSESSIONID":
+            sid = cookie.value
+    return sid
 
 
 # ── CRM ────────────────────────────────────────────────────────────────────────
-def get_all_leads(sid):
-    all_leads = {}
-    start = 0
-    while True:
-        params = urllib.parse.urlencode({
-            "_startRow": start, "_endRow": start + 100, "_orderBy": "creationDate desc"
-        })
-        url = f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead?{params}"
-        req = urllib.request.Request(url)
-        req.add_header("Cookie", f"JSESSIONID={sid}")
-        req.add_header("Accept", "application/json")
-        with urllib.request.urlopen(req) as r:
-            data = json.loads(r.read())
-        page = data.get("response", {}).get("data", [])
-        new = sum(1 for l in page if l.get("id") and l["id"] not in all_leads)
-        for l in page:
-            if l.get("id"):
-                all_leads[l["id"]] = l
-        if new == 0:
-            break
-        start += 100
-    return all_leads
+def get_all_leads():
+    """Lee todos los leads via JWT Comercial — no depende del rol activo de Rocío."""
+    from _etendo import etendo_login, etendo_fetch
+    token = etendo_login(_COMERCIAL_ROLE)
+    if not token:
+        LOG("ERROR get_all_leads: JWT login falló")
+        return {}
+    leads = etendo_fetch(token, "ETCRM_Lead")
+    return {l["id"]: l for l in leads if l.get("id")}
 
 
 def update_lead(lead_id, payload, sid):
@@ -104,7 +119,7 @@ def update_lead(lead_id, payload, sid):
 # ── Classification ─────────────────────────────────────────────────────────────
 def calc_classification(lead):
     """Determina SQL/IQL del lead según contenido. Devuelve ('SQL'|'IQL'|None, note)."""
-    fn      = (lead.get("firstName") or "").strip()
+    fn      = (lead.get("firstname") or lead.get("firstName") or "").strip()
     email   = (lead.get("email") or "").strip().lower()
     phone   = (lead.get("phone") or "").strip()
     company = (lead.get("company") or "").strip()
@@ -186,11 +201,14 @@ def send_report_email(report_text, today, updated, processed, hot, errors):
 # ── Main ───────────────────────────────────────────────────────────────────────
 def main():
     LOG("=== CRM Daily Classification ===")
-    sid = login_sid()
-    LOG(f"Auth — SID: {'OK' if sid else 'FAIL'}")
 
-    all_leads = get_all_leads(sid)
+    # READ: JWT Comercial — no depende del rol activo de Rocío (evita bloqueo por rol vacaciones)
+    all_leads = get_all_leads()
     LOG(f"Total leads: {len(all_leads)}")
+
+    # WRITE: JSESSIONID con rol Comercial seleccionado
+    sid = login_sid()
+    LOG(f"Auth escritura — SID: {'OK' if sid else 'FAIL'}")
 
     updated = no_change = errors = sid_uses = 0
     hot = []
@@ -203,7 +221,7 @@ def main():
         if status_id in ("Dead", "Converted"):
             continue
 
-        name  = f"{lead.get('firstName') or ''} {lead.get('lastName') or ''}".strip()
+        name  = f"{lead.get('firstname') or lead.get('firstName') or ''} {lead.get('lastname') or lead.get('lastName') or ''}".strip() or (lead.get("_identifier") or "").replace(" - ", " ").strip()
         comp  = (lead.get("company") or "sin empresa").strip()
         em    = (lead.get("email") or "").strip().lower()
 
