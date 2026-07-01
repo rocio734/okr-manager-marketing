@@ -458,15 +458,17 @@ def main():
         LOG("ERROR: SID login fallido"); return
 
     LOG("Cargando leads del CRM para contexto de parsing…")
-    all_leads = get_all_leads(sid)
+    from _etendo import etendo_login, etendo_fetch
+    jwt_token = etendo_login(ROLE_ID)
+    all_leads = etendo_fetch(jwt_token, "ETCRM_Lead") if jwt_token else []
     leads_by_id = {l["id"]: l for l in all_leads if l.get("id")}
     leads_snapshot = [
         {
             "id":      l.get("id", ""),
             "name":    (
-                f"{(l.get('firstName') or '').strip()} "
-                f"{(l.get('lastName') or '').strip()}"
-            ).strip() or "(sin nombre)",
+                f"{(l.get('firstname') or l.get('firstName') or '').strip()} "
+                f"{(l.get('lastname') or l.get('lastName') or '').strip()}"
+            ).strip() or (l.get("_identifier") or "").replace(" - ", " ").strip() or "(sin nombre)",
             "company": l.get("company") or "",
             "status":  (l.get("leadStatus$_identifier") or l.get("leadStatus") or ""),
             "summary": l.get("description") or "",
@@ -502,7 +504,7 @@ def main():
 
         if not updates:
             LOG(f"  Sin leads identificados en la respuesta.")
-            mark_read_and_label(reply["imap_num"])
+            mark_processed(imap_conn, reply["imap_num"])
             continue
 
         LOG(f"  {len(updates)} update(s) identificados")

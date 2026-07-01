@@ -12,8 +12,8 @@ on:
     - cron: '0 15 * * 5'
     # Lunes 9:05am España = 7:05 UTC — CRM Pulse (5 min después del monday OKR)
     - cron: '5 7 * * 1'
-    # Diario 10am España = 8 UTC — reply checker
-    - cron: '0 8 * * *'
+    # Cada hora — reply checker
+    - cron: '30 * * * *'
     # Diario 8am España = 6 UTC — CRM scoring
     - cron: '0 6 * * *'
     # Cada hora — generate_backlog (pick up iniciativas aprobadas por cualquier vía)
