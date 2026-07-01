@@ -65,55 +65,66 @@ LOG = lambda msg: print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}
 
 
 # ── CRM ────────────────────────────────────────────────────────────────────────
-def login_sid():
-    import http.cookiejar
-    WRITE_URL = os.getenv("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
-    jar    = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
-    body   = urllib.parse.urlencode(
-        {"user": USERNAME, "password": PASSWORD, "Command": "Login"}
-    ).encode()
-    req = urllib.request.Request(
-        f"{WRITE_URL}/secureApp/LoginHandler.html", data=body, method="POST"
-    )
-    req.add_header("Content-Type", "application/x-www-form-urlencoded")
-    try:
-        with opener.open(req):
-            pass
-    except Exception as e:
-        LOG(f"WARN login_sid: {e}")
-    for cookie in jar:
-        if cookie.name == "JSESSIONID":
-            return cookie.value
-    return ""
-
-
-def get_hot_leads(sid):
-    WRITE_URL = os.getenv("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
-    all_leads, seen, start = [], set(), 0
+def _fetch_lead_notes(token):
+    """Devuelve {lead_id: latest_note_text} con la nota más reciente de ETCRM_Lead_Note por lead."""
+    from _etendo import ETENDO_BASE
+    all_notes = []
+    start = 0
     while True:
-        params = urllib.parse.urlencode(
-            {"_startRow": start, "_endRow": start + 100, "_orderBy": "creationDate desc"}
+        body = urllib.parse.urlencode({
+            "_operationType": "fetch",
+            "_startRow":       str(start),
+            "_endRow":         str(start + 500),
+            "_noActiveFilter": "true",
+        }).encode()
+        req = urllib.request.Request(
+            f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
+            data=body, method="POST"
         )
-        url = f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead?{params}"
-        req = urllib.request.Request(url)
-        req.add_header("Cookie", f"JSESSIONID={sid}")
-        req.add_header("Accept", "application/json")
-        with urllib.request.urlopen(req) as r:
-            data = json.loads(r.read())
-        page = data.get("response", {}).get("data", [])
+        req.add_header("Authorization", f"Bearer {token}")
+        req.add_header("Content-Type", "application/x-www-form-urlencoded")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                page = json.loads(r.read()).get("response", {}).get("data", [])
+        except Exception as e:
+            LOG(f"WARN fetch_lead_notes: {e}")
+            break
         if not page:
             break
-        added = 0
-        for lead in page:
-            lid = lead.get("id")
-            if lid and lid not in seen:
-                seen.add(lid)
-                all_leads.append(lead)
-                added += 1
-        if added == 0:
+        all_notes.extend(page)
+        if len(page) < 500:
             break
-        start += 100
+        start += 500
+
+    # Agrupar por lead y quedarse con la nota más reciente (creationDate desc)
+    best = {}
+    for n in all_notes:
+        lid  = n.get("lead")
+        text = (n.get("note") or "").strip()
+        date = n.get("creationDate") or ""
+        if not lid or not text:
+            continue
+        if lid not in best or date > best[lid]["date"]:
+            best[lid] = {"date": date, "note": text}
+    return {lid: v["note"] for lid, v in best.items()}
+
+
+def get_hot_leads():
+    """Lee todos los leads via JWT Comercial — no depende del rol activo de Rocío."""
+    from _etendo import etendo_login, etendo_fetch
+    token = etendo_login(ROLE_ID)
+    if not token:
+        LOG("ERROR get_hot_leads: JWT login falló")
+        return [], []
+    raw = etendo_fetch(token, "ETCRM_Lead")
+    all_leads = list({l["id"]: l for l in raw if l.get("id")}.values())
+
+    # Adjuntar la nota más reciente de ETCRM_Lead_Note a cada lead
+    notes_map = _fetch_lead_notes(token)
+    for l in all_leads:
+        crm_note = notes_map.get(l.get("id"), "")
+        if crm_note:
+            l["_crm_note"] = crm_note
 
     TEST_KEYWORDS = ["prueba", "test", "demo", "testing", "devops"]
 
@@ -132,9 +143,10 @@ def get_hot_leads(sid):
                         "no continúa", "no continua", "archivado", "cold"]
 
     def is_discarded_by_note(lead):
-        summary  = (lead.get("description") or "").strip()
-        interest = (lead.get("interest") or "").strip()
-        latest   = _latest_note(summary, interest).lower()
+        latest = (
+            lead.get("_crm_note")
+            or _latest_note((lead.get("description") or ""), (lead.get("interest") or ""))
+        ).lower()
         return any(k in latest for k in DISCARD_KEYWORDS)
 
     hot = [l for l in all_leads
@@ -177,10 +189,11 @@ def get_hot_leads(sid):
             continue
 
         # Motivo 2: última nota tiene acción pendiente no resuelta
-        # Usamos la fecha en la propia nota (no updated, que cambia con el scoring)
+        # Preferimos _crm_note (ETCRM_Lead_Note) sobre description/interest
         if lid not in seen_stale:
-            latest = _latest_note(
-                (l.get("description") or ""), (l.get("interest") or "")
+            latest = (
+                l.get("_crm_note")
+                or _latest_note((l.get("description") or ""), (l.get("interest") or ""))
             )
             latest_lower = latest.lower()
             PENDING_KEYWORDS = [
@@ -269,9 +282,13 @@ def build_html(leads, today_str, stale=None):
         prob        = int(float(lead.get("successProbability") or 0))
         company     = lead.get("company") or "—"
         name        = lead_name(lead)
-        raw_summary  = (lead.get("description") or "").strip()
-        raw_interest = (lead.get("interest") or "").strip()
-        latest = _latest_note(raw_summary, raw_interest)
+        latest = (
+            lead.get("_crm_note")
+            or _latest_note(
+                (lead.get("description") or "").strip(),
+                (lead.get("interest") or "").strip(),
+            )
+        )
         summary = latest[:120] + ("…" if len(latest) > 120 else "") if latest else "—"
         txt_c, bg_c = badge_colors.get(status_raw, ("#374151", "#f3f4f6"))
 
@@ -307,7 +324,10 @@ def build_html(leads, today_str, stale=None):
             name    = lead_name(lead)
             company = lead.get("company") or "—"
             status  = STATUS_LABELS.get((lead.get("leadStatus") or "").lower(), "—")
-            latest  = _latest_note((lead.get("description") or ""), (lead.get("interest") or ""))
+            latest  = (
+                lead.get("_crm_note")
+                or _latest_note((lead.get("description") or ""), (lead.get("interest") or ""))
+            )
             note    = latest[:100] + ("…" if len(latest) > 100 else "") if latest else "—"
             stale_rows += f"""
             <tr>
@@ -495,12 +515,8 @@ def main():
     today_str = datetime.now().strftime("%d/%m/%Y")
     LOG("=== CRM Monday Pulse ===")
 
-    sid = login_sid()
-    if not sid:
-        LOG("ERROR: SID login fallido"); return
-
     LOG("Cargando leads activos del CRM…")
-    leads, stale = get_hot_leads(sid)
+    leads, stale = get_hot_leads()
     LOG(f"  {len(leads)} leads activos | {len(stale)} desactualizados (+30 días)")
 
     if not leads:
