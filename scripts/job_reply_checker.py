@@ -167,6 +167,23 @@ def update_lead(lead_id, payload, sid):
         return None, str(e)
 
 
+def create_lead_note(lead_id, note_text, sid):
+    """Crea un registro en ETCRM_Lead_Note (pestaña Notas del lead)."""
+    url = f"{WRITE_URL}/org.openbravo.service.json.jsonrest/ETCRM_Lead_Note"
+    body = json.dumps({"data": {"lead": lead_id, "note": note_text}}).encode()
+    req = urllib.request.Request(url, data=body, method="POST")
+    req.add_header("Cookie", f"JSESSIONID={sid}")
+    req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req) as r:
+            return json.loads(r.read()), None
+    except urllib.error.HTTPError as e:
+        err = e.read().decode("utf-8", errors="replace")[:300]
+        return None, f"HTTP {e.code}: {err}"
+    except Exception as e:
+        return None, str(e)
+
+
 # ── OpenAI parsing ───────────────────────────────────────────────────────────
 def parse_reply(reply_text, leads_snapshot):
     if not OPENAI_API_KEY:
@@ -504,37 +521,35 @@ def main():
                 upd["write_ok"] = False
                 continue
 
-            # Build payload — status must be sent as ID in ETCRM_Lead
-            payload = {"id": lead_id}
+            if not sid:
+                LOG(f"    SKIP write: sin JSESSIONID")
+                upd["write_ok"] = False
+                continue
+
+            write_ok = True
+            ts = datetime.now().strftime("%d/%m/%Y")
+
+            # 1. Cambio de status → update_lead (solo el campo leadStatus)
             if new_status:
-                # Map old status names or accept new ones directly
                 canonical = OLD_STATUS_MAP.get(new_status, new_status)
                 status_id = LEAD_STATUS_IDS.get(canonical)
                 if status_id:
-                    payload["leadStatus"] = status_id
+                    _, err = update_lead(lead_id, {"id": lead_id, "leadStatus": status_id}, sid)
+                    if err:
+                        LOG(f"    WARN status update: {err}")
+                        write_ok = False
 
-            # Prepend note to existing description (field rename: summary → description)
+            # 2. Nota → nueva fila en ETCRM_Lead_Note (pestaña Notas del lead)
             if note:
-                existing = leads_by_id.get(lead_id, {})
-                old = (existing.get("description") or "").strip()
-                ts  = datetime.now().strftime("%d/%m/%Y")
-                payload["description"] = (
-                    f"[{ts} — {sender}] {note}\n{old}" if old
-                    else f"[{ts} — {sender}] {note}"
-                )[:2000]
-
-            # Attempt CRM write
-            if sid:
-                result, err = update_lead(lead_id, payload, sid)
+                note_text = f"[{ts} — {sender}] {note}"[:2000]
+                _, err = create_lead_note(lead_id, note_text, sid)
                 if err:
-                    LOG(f"    WARN CRM write: {err}")
-                    upd["write_ok"] = False
-                else:
-                    LOG(f"    ✓ CRM actualizado: {lead_name}")
-                    upd["write_ok"] = True
-            else:
-                LOG(f"    SKIP write: sin JSESSIONID")
-                upd["write_ok"] = False
+                    LOG(f"    WARN nota CRM: {err}")
+                    write_ok = False
+
+            upd["write_ok"] = write_ok
+            if write_ok:
+                LOG(f"    ✓ CRM actualizado: {lead_name}")
 
         send_confirmation(sender, updates)
         mark_processed(imap_conn, reply["imap_num"])
