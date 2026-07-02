@@ -692,7 +692,7 @@
     } else {
       footerBtns = `<button class="btn-approve" disabled>✓ Publicado</button>`;
     }
-    const metricsBtn = p.status === 'published'
+    const metricsBtn = (p.status === 'published' || p.status === 'approved')
       ? `<button class="btn-metrics" data-id="${p.id}" title="Cargar métricas de rendimiento">📊</button>` : '';
 
     return `
@@ -1038,7 +1038,7 @@
 
   // ── Sidebar badge ────────────────────────────────────────────────────────────
   async function updateSidebarBadge() {
-    const { data } = await sb.from('content_queue').select('id', { count: 'exact', head: true }).eq('status', 'draft');
+    const { data } = await sb.from('content_queue').select('id').eq('status', 'draft');
     const count = data?.length ?? 0;
     const navIcon = document.querySelector('.nav-icon.active');
     if (!navIcon) return;
