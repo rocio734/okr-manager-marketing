@@ -161,6 +161,8 @@
   .status-draft     { background: var(--c-neutral-soft);  color: var(--c-text-muted); }
   .status-approved  { background: var(--c-success-soft);  color: var(--c-success); }
   .status-published { background: var(--c-info-soft);     color: var(--c-info); }
+  .status-rejected  { background: #FEE2E2; color: #991B1B; }
+  .post-card.status-rejected { border-color: #FECACA; opacity: .85; }
   .card-actions { margin-left: auto; display: flex; gap: var(--sp-2); }
 
   .btn-approve {
@@ -170,12 +172,61 @@
   }
   .btn-approve:hover:not(:disabled) { background: #166945; }
   .btn-approve:disabled { background: var(--c-neutral-soft); color: var(--c-text-muted); cursor: default; }
+  .btn-reject {
+    padding: 5px 12px; font-size: var(--fs-13); font-weight: 600;
+    border-radius: 6px; border: 1.5px solid #DC2626; cursor: pointer;
+    background: transparent; color: #DC2626; transition: background .15s;
+  }
+  .btn-reject:hover { background: #FEF2F2; }
+  .btn-publish {
+    padding: 5px 14px; font-size: var(--fs-13); font-weight: 600;
+    border-radius: 6px; border: none; cursor: pointer;
+    background: var(--c-info); color: #fff; transition: background .15s;
+  }
+  .btn-publish:hover:not(:disabled) { filter: brightness(0.9); }
+  .btn-publish:disabled { background: var(--c-neutral-soft); color: var(--c-text-muted); cursor: default; }
   .btn-sm {
     padding: 5px 10px; font-size: var(--fs-12); border-radius: 6px;
     border: 1px solid var(--c-border-strong); background: var(--c-surface);
     color: var(--c-text-muted); cursor: pointer;
   }
   .btn-sm:hover { background: var(--c-surface-sunk); }
+  .btn-view-toggle { transition: background .12s, color .12s; }
+  .btn-view-toggle.active { background: var(--c-brand); color: #fff; border-color: var(--c-brand); }
+
+  /* ── Calendar view ── */
+  .cq-calendar {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: var(--sp-3); padding: var(--sp-5) var(--sp-6);
+  }
+  .cal-day-header {
+    font-size: var(--fs-11); font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--c-text-muted);
+    padding-bottom: var(--sp-2); border-bottom: 2px solid var(--c-border);
+    margin-bottom: var(--sp-2);
+  }
+  .cal-day-posts { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .cal-post-item {
+    background: var(--c-surface); border: 1.5px solid var(--c-border);
+    border-radius: 8px; padding: var(--sp-2) var(--sp-3);
+    cursor: pointer; transition: box-shadow .12s;
+  }
+  .cal-post-item:hover { box-shadow: 0 2px 8px rgba(31,40,88,.10); }
+  .cal-post-item.status-approved { border-color: var(--c-success); }
+  .cal-post-item.status-published { border-color: var(--c-info); opacity: .75; }
+  .cal-post-item.status-rejected  { border-color: #FECACA; opacity: .8; }
+  .cal-empty { font-size: var(--fs-12); color: var(--c-text-muted); padding: var(--sp-3); text-align: center; }
+
+  /* ── Rejection note in card ── */
+  .rejection-note {
+    background: #FEF2F2; border: 1px solid #FECACA; border-radius: 6px;
+    padding: var(--sp-2) var(--sp-3);
+  }
+  .rejection-note-label {
+    font-size: var(--fs-11); font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: #991B1B; margin-bottom: 4px;
+  }
+  .rejection-note-text { font-size: var(--fs-13); color: #7F1D1D; }
   .btn-generate {
     padding: 7px 18px; font-size: var(--fs-13); font-weight: 600;
     border-radius: 8px; border: none; cursor: pointer;
@@ -324,7 +375,12 @@
             <option value="draft">Borrador</option>
             <option value="approved">Aprobado</option>
             <option value="published">Publicado</option>
+            <option value="rejected">Rechazado</option>
           </select>
+        </div>
+        <div style="display:flex;gap:var(--sp-2);">
+          <button class="btn-sm btn-view-toggle active" id="btn-view-grid" title="Vista grid">⊞</button>
+          <button class="btn-sm btn-view-toggle" id="btn-view-cal" title="Vista semanal">▦</button>
         </div>
         <button class="btn-generate" id="btn-generate">⚡ Generar semana</button>
       </div>
@@ -338,6 +394,26 @@
       </div>
 
     </main>
+  </div>
+</div>
+
+<!-- Modal de rechazo -->
+<div class="modal-overlay" id="reject-modal">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <span>Rechazar post</span>
+      <button class="modal-close" id="reject-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:var(--fs-14);color:var(--c-text-muted);margin-bottom:var(--sp-3);line-height:1.5;">
+        Indicá por qué no sirve este post. El motivo queda guardado para mejorar la generación futura.
+      </p>
+      <textarea id="reject-note" rows="4" style="width:100%;padding:10px 12px;border:1px solid var(--c-border-strong);border-radius:8px;font-size:var(--fs-13);resize:vertical;font-family:inherit;color:var(--c-text);background:var(--c-surface);" placeholder="Ej: El tono no es correcto, menciona a la competencia, no refleja el producto..."></textarea>
+      <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-3);justify-content:flex-end;">
+        <button class="btn-sm" id="reject-cancel">Cancelar</button>
+        <button class="btn-reject" id="reject-confirm">Confirmar rechazo</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -410,21 +486,29 @@
 
     const total = posts.length, approved = posts.filter(p=>p.status==='approved').length;
     const published = posts.filter(p=>p.status==='published').length, draft = posts.filter(p=>p.status==='draft').length;
-    stats.innerHTML = `<span>Semana <strong>${weekStart}</strong></span><span>Total: <strong>${total}</strong></span><span>Borradores: <strong>${draft}</strong></span><span>Aprobados: <strong>${approved}</strong></span><span>Publicados: <strong>${published}</strong></span>`;
+    const rejected = posts.filter(p=>p.status==='rejected').length;
+    stats.innerHTML = `<span>Semana <strong>${weekStart}</strong></span><span>Total: <strong>${total}</strong></span><span>Borradores: <strong>${draft}</strong></span><span>Aprobados: <strong>${approved}</strong></span><span>Publicados: <strong>${published}</strong></span>${rejected ? `<span style="color:#DC2626">Rechazados: <strong>${rejected}</strong></span>` : ''}`;
 
     if (!posts.length) {
       grid.innerHTML = `<div class="empty-state"><h2>No hay posts esta semana</h2><p>Hacé click en <strong>⚡ Generar semana</strong>.</p></div>`;
       return;
     }
 
-    grid.innerHTML = posts.map(p => renderCard(p)).join('');
+    const isCalView = document.getElementById('btn-view-cal').classList.contains('active');
+    if (isCalView) {
+      grid.className = ''; // remove cq-grid
+      grid.innerHTML = renderCalendarView(posts);
+    } else {
+      grid.className = 'cq-grid';
+      grid.innerHTML = posts.map(p => renderCard(p)).join('');
+    }
     bindEvents(posts);
   }
 
   // ── Render card ─────────────────────────────────────────────────────────────
   function renderCard(p) {
     const sc = `status-${p.status}`;
-    const stLabel = {draft:'Borrador', approved:'Aprobado', published:'Publicado'}[p.status]||p.status;
+    const stLabel = {draft:'Borrador', approved:'Aprobado', published:'Publicado', rejected:'Rechazado'}[p.status]||p.status;
     const isCarousel = p.format === 'carousel' && p.slides?.length;
 
     const slidesHtml = isCarousel ? `
@@ -437,6 +521,12 @@
 
     const srcHtml = p.source_title
       ? `<div class="card-source">Fuente: ${p.source_url ? `<a href="${esc(p.source_url)}" target="_blank">${esc(p.source_title)}</a>` : esc(p.source_title)}</div>` : '';
+
+    const rejectionHtml = p.status === 'rejected' && p.rejection_note
+      ? `<div class="rejection-note">
+           <div class="rejection-note-label">Motivo del rechazo</div>
+           <div class="rejection-note-text">${esc(p.rejection_note)}</div>
+         </div>` : '';
 
     const promptHtml = p.image_prompt ? `
       <div class="image-prompt-section">
@@ -464,9 +554,18 @@
         </label>
       </div>`;
 
-    const approveBtn = p.status === 'draft'
-      ? `<button class="btn-approve" data-id="${p.id}">✓ Aprobar</button>`
-      : `<button class="btn-approve" disabled>${p.status==='approved'?'✓ Aprobado':'✓ Publicado'}</button>`;
+    let footerBtns = '';
+    if (p.status === 'draft') {
+      footerBtns = `<button class="btn-reject" data-id="${p.id}">✕ Rechazar</button>
+                    <button class="btn-approve" data-id="${p.id}">✓ Aprobar</button>`;
+    } else if (p.status === 'approved') {
+      footerBtns = `<button class="btn-publish" data-id="${p.id}">↗ Marcar publicado</button>
+                    <button class="btn-approve" disabled>✓ Aprobado</button>`;
+    } else if (p.status === 'rejected') {
+      footerBtns = `<button class="btn-sm btn-restore" data-id="${p.id}">↩ Restaurar</button>`;
+    } else {
+      footerBtns = `<button class="btn-approve" disabled>✓ Publicado</button>`;
+    }
 
     return `
       <div class="post-card ${sc}" id="card-${p.id}">
@@ -482,6 +581,7 @@
           ${slidesHtml}
           ${hashHtml}
           ${srcHtml}
+          ${rejectionHtml}
           ${promptHtml}
           ${uploadHtml}
         </div>
@@ -490,7 +590,7 @@
           <div class="card-actions">
             <button class="btn-sm btn-expand" data-id="${p.id}" data-expanded="0">Leer más</button>
             <button class="btn-sm btn-preview" data-id="${p.id}">👁 Preview</button>
-            ${approveBtn}
+            ${footerBtns}
           </div>
         </div>
       </div>`;
@@ -583,6 +683,29 @@
     grid.querySelectorAll('.btn-approve').forEach(btn => {
       btn.addEventListener('click', () => approvePost(btn.dataset.id, btn));
     });
+
+    // Reject
+    grid.querySelectorAll('.btn-reject').forEach(btn => {
+      btn.addEventListener('click', () => openRejectModal(btn.dataset.id));
+    });
+
+    // Mark published
+    grid.querySelectorAll('.btn-publish').forEach(btn => {
+      btn.addEventListener('click', () => markPublished(btn.dataset.id, btn));
+    });
+
+    // Restore to draft
+    grid.querySelectorAll('.btn-restore').forEach(btn => {
+      btn.addEventListener('click', () => restorePost(btn.dataset.id, btn));
+    });
+
+    // Calendar item click → open preview
+    document.querySelectorAll('.cal-post-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const p = postsMap[Number(item.dataset.id)];
+        if (p) openPreview(p);
+      });
+    });
   }
 
   // ── Preview modal ───────────────────────────────────────────────────────────
@@ -647,6 +770,94 @@
   document.getElementById('preview-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
   });
+
+  // ── Calendar view ────────────────────────────────────────────────────────────
+  function renderCalendarView(posts) {
+    const days = ['monday','tuesday','wednesday','thursday','friday'];
+    const dayLabel = {monday:'Lunes',tuesday:'Martes',wednesday:'Miércoles',thursday:'Jueves',friday:'Viernes'};
+    const stLabel  = {draft:'Borrador',approved:'Aprobado',published:'Publicado',rejected:'Rechazado'};
+    return `<div class="cq-calendar">${days.map(d => {
+      const dayPosts = posts.filter(p => p.day_slot === d);
+      return `<div>
+        <div class="cal-day-header">${dayLabel[d]}</div>
+        <div class="cal-day-posts">
+          ${dayPosts.length
+            ? dayPosts.map(p => `
+              <div class="cal-post-item status-${p.status}" data-id="${p.id}">
+                <span class="platform-badge platform-${esc(p.platform)}" style="font-size:10px;">${esc(p.platform)}</span>
+                <div style="font-size:12px;font-weight:600;margin-top:4px;line-height:1.3;color:var(--c-text);">${esc(p.title)}</div>
+                <div style="font-size:11px;color:var(--c-text-muted);margin-top:2px;">${esc(SECTOR_LABELS[p.sector]||p.sector)}</div>
+                <span class="status-pill status-${p.status}" style="font-size:10px;margin-top:6px;display:inline-block;">${stLabel[p.status]||p.status}</span>
+              </div>`).join('')
+            : `<div class="cal-empty">Sin posts</div>`}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  // ── View toggle ───────────────────────────────────────────────────────────────
+  document.getElementById('btn-view-grid').addEventListener('click', () => {
+    document.getElementById('btn-view-grid').classList.add('active');
+    document.getElementById('btn-view-cal').classList.remove('active');
+    load();
+  });
+  document.getElementById('btn-view-cal').addEventListener('click', () => {
+    document.getElementById('btn-view-cal').classList.add('active');
+    document.getElementById('btn-view-grid').classList.remove('active');
+    load();
+  });
+
+  // ── Reject modal ──────────────────────────────────────────────────────────────
+  let _rejectTargetId = null;
+  function openRejectModal(id) {
+    _rejectTargetId = id;
+    document.getElementById('reject-note').value = '';
+    document.getElementById('reject-modal').classList.add('open');
+    setTimeout(() => document.getElementById('reject-note').focus(), 50);
+  }
+  document.getElementById('reject-modal-close').addEventListener('click', () => {
+    document.getElementById('reject-modal').classList.remove('open');
+  });
+  document.getElementById('reject-cancel').addEventListener('click', () => {
+    document.getElementById('reject-modal').classList.remove('open');
+  });
+  document.getElementById('reject-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+  document.getElementById('reject-confirm').addEventListener('click', async () => {
+    const note = document.getElementById('reject-note').value.trim();
+    const btn  = document.getElementById('reject-confirm');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    const update = { status: 'rejected' };
+    if (note) update.rejection_note = note;
+    const { error } = await sb.from('content_queue').update(update).eq('id', _rejectTargetId);
+    btn.disabled = false; btn.textContent = 'Confirmar rechazo';
+    if (error) { OKR_toast('Error: ' + error.message, 'error'); return; }
+    document.getElementById('reject-modal').classList.remove('open');
+    OKR_toast('Post rechazado', 'info');
+    await load();
+  });
+
+  // ── Mark published ─────────────────────────────────────────────────────────────
+  async function markPublished(id, btn) {
+    if (!confirm('¿Marcar este post como publicado?')) return;
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    const { error } = await sb.from('content_queue').update({
+      status: 'published', published_at: new Date().toISOString()
+    }).eq('id', id);
+    if (error) { OKR_toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '↗ Marcar publicado'; return; }
+    OKR_toast('Post marcado como publicado', 'success');
+    await load();
+  }
+
+  // ── Restore to draft ──────────────────────────────────────────────────────────
+  async function restorePost(id, btn) {
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    const { error } = await sb.from('content_queue').update({ status: 'draft', rejection_note: null }).eq('id', id);
+    if (error) { OKR_toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '↩ Restaurar'; return; }
+    OKR_toast('Post restaurado a borrador', 'info');
+    await load();
+  }
 
   // ── Approve ─────────────────────────────────────────────────────────────────
   async function approvePost(id, btn) {
