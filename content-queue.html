@@ -302,6 +302,39 @@
   .btn-generate:hover:not(:disabled) { background: var(--c-brand-hover); }
   .btn-generate:disabled { opacity: .6; cursor: default; }
 
+  /* ── Tab bar ── */
+  .cq-tabs {
+    display: flex; gap: 0; border-bottom: 2px solid var(--c-border);
+    background: var(--c-surface); padding: 0 var(--sp-6); overflow-x: auto;
+  }
+  .cq-tab {
+    padding: 10px 16px; font-size: var(--fs-13); font-weight: 500;
+    border: none; border-bottom: 3px solid transparent; margin-bottom: -2px;
+    background: none; cursor: pointer; color: var(--c-text-muted); white-space: nowrap;
+    transition: color .15s; display: flex; align-items: center; gap: 5px;
+  }
+  .cq-tab:hover { color: var(--c-text); }
+  .cq-tab.active { color: var(--c-brand); border-bottom-color: var(--c-brand); font-weight: 600; }
+  .tab-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    background: var(--c-neutral-soft); color: var(--c-text-muted);
+    font-size: 10px; font-weight: 700; border-radius: 99px;
+  }
+  .cq-tab.active .tab-count { background: var(--c-brand-softer); color: var(--c-brand); }
+  .cq-tab.tab-published.active .tab-count { background: var(--c-info-soft); color: var(--c-info); }
+  .cq-tab.tab-published { }
+  .cq-tab.tab-published.active { color: var(--c-info); border-bottom-color: var(--c-info); }
+
+  /* ── Post URL chip in published card ── */
+  .post-url-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: var(--fs-11); color: var(--c-info); background: var(--c-info-soft);
+    padding: 3px 8px; border-radius: 99px; text-decoration: none;
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .post-url-chip:hover { text-decoration: underline; }
+
   /* ── Modal de preview ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: var(--c-overlay);
@@ -457,6 +490,15 @@
         <button class="btn-generate" id="btn-generate">⚡ Generar semana</button>
       </div>
 
+      <!-- Tab bar -->
+      <div class="cq-tabs" id="cq-tabs">
+        <button class="cq-tab active" data-tab="">Todos <span class="tab-count" id="tc-all">—</span></button>
+        <button class="cq-tab" data-tab="draft">Borradores <span class="tab-count" id="tc-draft">—</span></button>
+        <button class="cq-tab" data-tab="approved">Aprobados <span class="tab-count" id="tc-approved">—</span></button>
+        <button class="cq-tab tab-published" data-tab="published">📢 Publicados <span class="tab-count" id="tc-published">—</span></button>
+        <button class="cq-tab" data-tab="rejected">Rechazados <span class="tab-count" id="tc-rejected">—</span></button>
+      </div>
+
       <!-- Stats -->
       <div class="cq-stats" id="cq-stats"><span>Cargando...</span></div>
 
@@ -502,6 +544,34 @@
       <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-4);justify-content:flex-end;">
         <button class="btn-sm" id="metrics-cancel">Cancelar</button>
         <button class="btn-save-edit" id="metrics-confirm">Guardar métricas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de publicar -->
+<div class="modal-overlay" id="publish-modal">
+  <div class="modal-box" style="max-width:440px;">
+    <div class="modal-header">
+      <span>Confirmar publicación</span>
+      <button class="modal-close" id="publish-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:var(--fs-13);color:var(--c-text-muted);margin-bottom:var(--sp-4);line-height:1.5;">
+        Pegá el URL del post publicado en LinkedIn o Instagram. Lo usaremos para rastrear métricas automáticamente.
+      </p>
+      <label style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);display:block;margin-bottom:6px;">
+        URL del post <span style="font-weight:400;">(opcional)</span>
+      </label>
+      <input id="publish-url" type="url"
+        placeholder="https://www.linkedin.com/feed/update/urn:li:activity:..."
+        style="width:100%;padding:8px 10px;border:1px solid var(--c-border-strong);border-radius:6px;font-size:var(--fs-13);background:var(--c-surface);color:var(--c-text);box-sizing:border-box;">
+      <p style="font-size:var(--fs-11);color:var(--c-text-muted);margin-top:6px;line-height:1.4;">
+        Con el URL guardado, el sistema podrá importar métricas automáticamente cuando esté configurado el token de LinkedIn/Instagram.
+      </p>
+      <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-4);justify-content:flex-end;">
+        <button class="btn-sm" id="publish-cancel">Cancelar</button>
+        <button class="btn-publish" id="publish-confirm">↗ Confirmar publicación</button>
       </div>
     </div>
   </div>
@@ -574,6 +644,8 @@
   const monday = currentWeekMonday();
   document.getElementById('filter-week').value = weekInputValue(monday);
 
+  let _activeTab = '';
+
   // ── Load ────────────────────────────────────────────────────────────────────
   async function load() {
     const grid  = document.getElementById('cq-grid');
@@ -584,12 +656,28 @@
     const weekStart = wv ? weekInputToMonday(wv) : monday;
     const platform  = document.getElementById('filter-platform').value;
     const sector    = document.getElementById('filter-sector').value;
-    const status    = document.getElementById('filter-status').value;
 
+    // Load all posts for this week (for tab counts)
+    let qAll = sb.from('content_queue').select('id, status').eq('week_start', weekStart);
+    if (platform) qAll = qAll.eq('platform', platform);
+    if (sector)   qAll = qAll.eq('sector', sector);
+    const { data: allPosts } = await qAll;
+    const cAll  = allPosts?.length || 0;
+    const cDraft = allPosts?.filter(p=>p.status==='draft').length || 0;
+    const cApproved = allPosts?.filter(p=>p.status==='approved').length || 0;
+    const cPublished = allPosts?.filter(p=>p.status==='published').length || 0;
+    const cRejected = allPosts?.filter(p=>p.status==='rejected').length || 0;
+    document.getElementById('tc-all').textContent      = cAll;
+    document.getElementById('tc-draft').textContent    = cDraft;
+    document.getElementById('tc-approved').textContent = cApproved;
+    document.getElementById('tc-published').textContent= cPublished;
+    document.getElementById('tc-rejected').textContent = cRejected;
+
+    // Load filtered posts for display
     let q = sb.from('content_queue').select('*').eq('week_start', weekStart).order('day_slot').order('platform');
     if (platform) q = q.eq('platform', platform);
     if (sector)   q = q.eq('sector', sector);
-    if (status)   q = q.eq('status', status);
+    if (_activeTab) q = q.eq('status', _activeTab);
 
     const { data: posts, error } = await q;
     if (error) { grid.innerHTML = `<div class="empty-state"><h2>Error</h2><p>${esc(error.message)}</p></div>`; return; }
@@ -642,16 +730,21 @@
          </div>` : '';
 
     const m = p.metrics || {};
-    const metricsHtml = p.status === 'published' && (m.impressions || m.likes || m.comments || m.clicks)
+    const hasMetrics = m.impressions || m.likes || m.comments || m.clicks;
+    const metricsHtml = p.status === 'published'
       ? `<div>
-           <div style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);margin-bottom:6px;">Rendimiento</div>
-           <div class="metrics-row">
+           <div style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+             Rendimiento
+             ${!hasMetrics ? `<span style="font-size:var(--fs-11);font-weight:400;color:var(--c-text-muted);">— sin datos aún. Usá el botón 📊</span>` : ''}
+           </div>
+           ${hasMetrics ? `<div class="metrics-row">
              <div class="metric-chip"><div class="val">${(m.impressions||0).toLocaleString('es')}</div><div class="lbl">Impresiones</div></div>
              <div class="metric-chip"><div class="val">${(m.likes||0).toLocaleString('es')}</div><div class="lbl">Me gusta</div></div>
              <div class="metric-chip"><div class="val">${(m.comments||0).toLocaleString('es')}</div><div class="lbl">Comentarios</div></div>
              <div class="metric-chip"><div class="val">${(m.clicks||0).toLocaleString('es')}</div><div class="lbl">Clics</div></div>
            </div>
-           ${m.impressions ? `<div style="font-size:var(--fs-11);color:var(--c-text-muted);margin-top:6px;">Engagement: <strong>${(((m.likes||0)+(m.comments||0)+(m.clicks||0))/m.impressions*100).toFixed(1)}%</strong></div>` : ''}
+           ${m.impressions ? `<div style="font-size:var(--fs-11);color:var(--c-text-muted);margin-top:6px;">Engagement: <strong>${(((m.likes||0)+(m.comments||0)+(m.clicks||0))/m.impressions*100).toFixed(1)}%</strong></div>` : ''}` : ''}
+           ${p.post_url ? `<a href="${esc(p.post_url)}" target="_blank" rel="noopener" class="post-url-chip" style="margin-top:6px;display:inline-flex;">↗ Ver post publicado</a>` : ''}
          </div>` : '';
 
     const promptHtml = p.image_prompt ? `
@@ -692,7 +785,8 @@
     } else {
       footerBtns = `<button class="btn-approve" disabled>✓ Publicado</button>`;
     }
-    const metricsBtn = `<button class="btn-metrics" data-id="${p.id}" title="Cargar métricas de rendimiento">📊</button>`;
+    const metricsBtn = p.status === 'published'
+      ? `<button class="btn-metrics" data-id="${p.id}" title="Cargar métricas del post publicado">📊</button>` : '';
 
     return `
       <div class="post-card ${sc}" id="card-${p.id}">
@@ -821,7 +915,7 @@
 
     // Mark published
     grid.querySelectorAll('.btn-publish').forEach(btn => {
-      btn.addEventListener('click', () => markPublished(btn.dataset.id, btn));
+      btn.addEventListener('click', () => markPublished(btn.dataset.id));
     });
 
     // Restore to draft
@@ -978,17 +1072,36 @@
     await load();
   });
 
-  // ── Mark published ─────────────────────────────────────────────────────────────
-  async function markPublished(id, btn) {
-    if (!confirm('¿Marcar este post como publicado?')) return;
+  // ── Publish modal ─────────────────────────────────────────────────────────────
+  let _publishTargetId = null;
+  function markPublished(id) {
+    _publishTargetId = id;
+    document.getElementById('publish-url').value = '';
+    document.getElementById('publish-modal').classList.add('open');
+    setTimeout(() => document.getElementById('publish-url').focus(), 50);
+  }
+  document.getElementById('publish-modal-close').addEventListener('click', () => {
+    document.getElementById('publish-modal').classList.remove('open');
+  });
+  document.getElementById('publish-cancel').addEventListener('click', () => {
+    document.getElementById('publish-modal').classList.remove('open');
+  });
+  document.getElementById('publish-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+  document.getElementById('publish-confirm').addEventListener('click', async () => {
+    const btn = document.getElementById('publish-confirm');
+    const postUrl = document.getElementById('publish-url').value.trim();
     btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
-    const { error } = await sb.from('content_queue').update({
-      status: 'published', published_at: new Date().toISOString()
-    }).eq('id', id);
-    if (error) { OKR_toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '↗ Marcar publicado'; return; }
+    const update = { status: 'published', published_at: new Date().toISOString() };
+    if (postUrl) update.post_url = postUrl;
+    const { error } = await sb.from('content_queue').update(update).eq('id', _publishTargetId);
+    btn.disabled = false; btn.textContent = '↗ Confirmar publicación';
+    if (error) { OKR_toast('Error: ' + error.message, 'error'); return; }
+    document.getElementById('publish-modal').classList.remove('open');
     OKR_toast('Post marcado como publicado', 'success');
     await load();
-  }
+  });
 
   // ── Restore to draft ──────────────────────────────────────────────────────────
   async function restorePost(id, btn) {
@@ -1189,10 +1302,22 @@
     }
   });
 
+  // ── Tabs ─────────────────────────────────────────────────────────────────────
+  document.querySelectorAll('.cq-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.cq-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      _activeTab = tab.dataset.tab;
+      load();
+    });
+  });
+
   // ── Filters ──────────────────────────────────────────────────────────────────
-  ['filter-week','filter-platform','filter-sector','filter-status'].forEach(id => {
+  ['filter-week','filter-platform','filter-sector'].forEach(id => {
     document.getElementById(id).addEventListener('change', load);
   });
+  // Status select syncs with tabs (keep for backwards compat but hide)
+  document.getElementById('filter-status').style.display = 'none';
 
   await load();
   await updateSidebarBadge();

@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS content_queue (
   image_prompt    TEXT,
   image_url       TEXT,
   rejection_note  TEXT,
-  metrics         JSONB      -- {impressions, likes, comments, clicks}
+  metrics         JSONB,     -- {impressions, likes, comments, clicks}
+  post_url        TEXT       -- URL del post publicado en LinkedIn/Instagram (para auto-fetch de métricas)
 );
 
 ALTER TABLE content_queue ENABLE ROW LEVEL SECURITY;
