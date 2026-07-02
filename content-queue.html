@@ -194,6 +194,44 @@
   .btn-view-toggle { transition: background .12s, color .12s; }
   .btn-view-toggle.active { background: var(--c-brand); color: #fff; border-color: var(--c-brand); }
 
+  /* ── Week nav ── */
+  .week-nav { display: flex; align-items: center; gap: 4px; }
+  .week-nav input[type=week] { padding: 6px 10px; border: 1px solid var(--c-border-strong); border-radius: 6px; font-size: var(--fs-13); background: var(--c-surface); color: var(--c-text); cursor: pointer; }
+  .btn-week-nav { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--c-border-strong); border-radius: 6px; background: var(--c-surface); cursor: pointer; font-size: 13px; color: var(--c-text-muted); }
+  .btn-week-nav:hover { background: var(--c-surface-sunk); color: var(--c-text); }
+
+  /* ── Regenerate rejected ── */
+  .btn-regen-rejected {
+    padding: 7px 14px; font-size: var(--fs-13); font-weight: 600;
+    border-radius: 8px; border: 1.5px solid #DC2626; cursor: pointer;
+    background: transparent; color: #DC2626; transition: background .15s;
+    display: none;
+  }
+  .btn-regen-rejected:hover { background: #FEF2F2; }
+  .btn-regen-rejected.visible { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* ── Edit mode ── */
+  .card-edit-area {
+    width: 100%; min-height: 120px; padding: 10px 12px;
+    border: 1.5px solid var(--c-brand); border-radius: 8px;
+    font-size: var(--fs-13); color: var(--c-text); background: var(--c-surface);
+    resize: vertical; font-family: inherit; line-height: 1.6;
+  }
+  .card-edit-area:focus { outline: none; box-shadow: 0 0 0 3px var(--c-brand-softer); }
+  .btn-save-edit {
+    padding: 5px 14px; font-size: var(--fs-13); font-weight: 600;
+    border-radius: 6px; border: none; cursor: pointer;
+    background: var(--c-brand); color: #fff; transition: background .15s;
+  }
+  .btn-save-edit:hover:not(:disabled) { background: var(--c-brand-hover); }
+  .btn-save-edit:disabled { opacity: .6; cursor: default; }
+  .btn-edit {
+    padding: 5px 10px; font-size: var(--fs-12); border-radius: 6px;
+    border: 1px solid var(--c-border-strong); background: var(--c-surface);
+    color: var(--c-text-muted); cursor: pointer;
+  }
+  .btn-edit:hover { background: var(--c-surface-sunk); color: var(--c-text); }
+
   /* ── Calendar view ── */
   .cq-calendar {
     display: grid; grid-template-columns: repeat(5, 1fr);
@@ -357,7 +395,11 @@
       <div class="cq-toolbar">
         <h1>Contenido Semanal</h1>
         <div class="cq-filters">
-          <input type="week" id="filter-week" title="Semana">
+          <div class="week-nav">
+            <button class="btn-week-nav" id="btn-week-prev" title="Semana anterior">‹</button>
+            <input type="week" id="filter-week" title="Semana">
+            <button class="btn-week-nav" id="btn-week-next" title="Semana siguiente">›</button>
+          </div>
           <select id="filter-platform">
             <option value="">Todas las plataformas</option>
             <option value="linkedin">LinkedIn</option>
@@ -382,6 +424,7 @@
           <button class="btn-sm btn-view-toggle active" id="btn-view-grid" title="Vista grid">⊞</button>
           <button class="btn-sm btn-view-toggle" id="btn-view-cal" title="Vista semanal">▦</button>
         </div>
+        <button class="btn-regen-rejected" id="btn-regen-rejected" title="Borra los rechazados y genera posts nuevos para esos slots">↺ Regenerar rechazados</button>
         <button class="btn-generate" id="btn-generate">⚡ Generar semana</button>
       </div>
 
@@ -488,6 +531,9 @@
     const published = posts.filter(p=>p.status==='published').length, draft = posts.filter(p=>p.status==='draft').length;
     const rejected = posts.filter(p=>p.status==='rejected').length;
     stats.innerHTML = `<span>Semana <strong>${weekStart}</strong></span><span>Total: <strong>${total}</strong></span><span>Borradores: <strong>${draft}</strong></span><span>Aprobados: <strong>${approved}</strong></span><span>Publicados: <strong>${published}</strong></span>${rejected ? `<span style="color:#DC2626">Rechazados: <strong>${rejected}</strong></span>` : ''}`;
+    const regenBtn = document.getElementById('btn-regen-rejected');
+    regenBtn.classList.toggle('visible', rejected > 0);
+    regenBtn.textContent = `↺ Regenerar rechazados (${rejected})`;
 
     if (!posts.length) {
       grid.innerHTML = `<div class="empty-state"><h2>No hay posts esta semana</h2><p>Hacé click en <strong>⚡ Generar semana</strong>.</p></div>`;
@@ -590,6 +636,7 @@
           <div class="card-actions">
             <button class="btn-sm btn-expand" data-id="${p.id}" data-expanded="0">Leer más</button>
             <button class="btn-sm btn-preview" data-id="${p.id}">👁 Preview</button>
+            ${p.status !== 'published' ? `<button class="btn-edit" data-id="${p.id}" title="Editar texto del post">✎</button>` : ''}
             ${footerBtns}
           </div>
         </div>
@@ -705,6 +752,11 @@
         const p = postsMap[Number(item.dataset.id)];
         if (p) openPreview(p);
       });
+    });
+
+    // Edit button
+    grid.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.addEventListener('click', () => enterEditMode(btn.dataset.id, postsMap[Number(btn.dataset.id)]));
     });
   }
 
@@ -892,6 +944,95 @@
     } else {
       btn.disabled = false; btn.textContent = '⚡ Generar semana';
       OKR_toast('Error: ' + (r?.error || r?.status), 'error');
+    }
+  });
+
+  // ── Week navigation ───────────────────────────────────────────────────────────
+  function shiftWeek(delta) {
+    const wv = document.getElementById('filter-week').value;
+    const monday = new Date(weekInputToMonday(wv) + 'T12:00:00');
+    monday.setDate(monday.getDate() + delta * 7);
+    document.getElementById('filter-week').value = weekInputValue(monday.toISOString().slice(0, 10));
+    load();
+  }
+  document.getElementById('btn-week-prev').addEventListener('click', () => shiftWeek(-1));
+  document.getElementById('btn-week-next').addEventListener('click', () => shiftWeek(+1));
+
+  // ── Inline edit ───────────────────────────────────────────────────────────────
+  function enterEditMode(id, post) {
+    const card = document.getElementById('card-' + id);
+    const textEl = document.getElementById('text-' + id);
+    if (!textEl || card.dataset.editing === '1') return;
+    card.dataset.editing = '1';
+
+    // Replace text div with textarea
+    const original = post.body || '';
+    textEl.style.display = 'none';
+    const ta = document.createElement('textarea');
+    ta.className = 'card-edit-area';
+    ta.id = 'edit-ta-' + id;
+    ta.value = original;
+    textEl.after(ta);
+    ta.focus();
+
+    // Swap footer buttons
+    const editBtn  = card.querySelector('.btn-edit');
+    const actionsDiv = card.querySelector('.card-actions');
+    editBtn.style.display = 'none';
+
+    const saveBtn   = document.createElement('button');
+    saveBtn.className = 'btn-save-edit';
+    saveBtn.textContent = 'Guardar';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn-sm';
+    cancelBtn.textContent = 'Cancelar';
+
+    actionsDiv.appendChild(cancelBtn);
+    actionsDiv.appendChild(saveBtn);
+
+    cancelBtn.addEventListener('click', () => {
+      ta.remove(); cancelBtn.remove(); saveBtn.remove();
+      textEl.style.display = '';
+      editBtn.style.display = '';
+      card.dataset.editing = '0';
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const newBody = ta.value.trim();
+      if (!newBody) { OKR_toast('El texto no puede estar vacío', 'error'); return; }
+      saveBtn.disabled = true; saveBtn.innerHTML = '<span class="spinner"></span>';
+      const { error } = await sb.from('content_queue').update({ body: newBody }).eq('id', id);
+      if (error) { OKR_toast('Error: ' + error.message, 'error'); saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; return; }
+      OKR_toast('Texto actualizado', 'success');
+      card.dataset.editing = '0';
+      await load();
+    });
+  }
+
+  // ── Regenerate rejected ───────────────────────────────────────────────────────
+  document.getElementById('btn-regen-rejected').addEventListener('click', async () => {
+    const wv = document.getElementById('filter-week').value;
+    const weekStart = wv ? weekInputToMonday(wv) : monday;
+    const btn = document.getElementById('btn-regen-rejected');
+    if (!confirm(`¿Borrar los posts rechazados de la semana ${weekStart} y generar nuevos? Los posts aprobados no se tocan.`)) return;
+
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Eliminando rechazados...';
+    const { error } = await sb.from('content_queue').delete().eq('week_start', weekStart).eq('status', 'rejected');
+    if (error) { OKR_toast('Error al eliminar: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '↺ Regenerar rechazados'; return; }
+
+    btn.innerHTML = '<span class="spinner"></span> Generando...';
+    const r = await OKR_triggerJob('content');
+    if (r?.ok) {
+      OKR_toast('✓ Generando posts nuevos — llegará en ~2 minutos', 'success');
+      const since = new Date().toISOString();
+      const poll = setInterval(async () => {
+        const { data } = await sb.from('content_queue').select('id').gte('created_at', since).limit(1);
+        if (data?.length) { clearInterval(poll); btn.disabled = false; await load(); }
+      }, 4000);
+      setTimeout(() => { clearInterval(poll); btn.disabled = false; btn.textContent = '↺ Regenerar rechazados'; }, 300000);
+    } else {
+      btn.disabled = false; btn.textContent = '↺ Regenerar rechazados';
+      OKR_toast('Error al triggerear el job: ' + (r?.error || r?.status), 'error');
     }
   });
 
