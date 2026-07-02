@@ -13,10 +13,14 @@ CREATE TABLE IF NOT EXISTS content_queue (
   slides        JSONB,                 -- [{title, body}] para carruseles
   hashtags      TEXT[],
   status        TEXT        NOT NULL DEFAULT 'draft',  -- draft → approved → published
-  approved_by   TEXT,
-  approved_at   TIMESTAMPTZ,
-  published_at  TIMESTAMPTZ,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  approved_by     TEXT,
+  approved_at     TIMESTAMPTZ,
+  published_at    TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  -- Added post-deploy (schema drift columns):
+  image_prompt    TEXT,
+  image_url       TEXT,
+  rejection_note  TEXT
 );
 
 ALTER TABLE content_queue ENABLE ROW LEVEL SECURITY;
