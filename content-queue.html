@@ -692,8 +692,7 @@
     } else {
       footerBtns = `<button class="btn-approve" disabled>✓ Publicado</button>`;
     }
-    const metricsBtn = (p.status === 'published' || p.status === 'approved')
-      ? `<button class="btn-metrics" data-id="${p.id}" title="Cargar métricas de rendimiento">📊</button>` : '';
+    const metricsBtn = `<button class="btn-metrics" data-id="${p.id}" title="Cargar métricas de rendimiento">📊</button>`;
 
     return `
       <div class="post-card ${sc}" id="card-${p.id}">
