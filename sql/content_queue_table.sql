@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS content_queue (
   -- Added post-deploy (schema drift columns):
   image_prompt    TEXT,
   image_url       TEXT,
-  rejection_note  TEXT
+  rejection_note  TEXT,
+  metrics         JSONB      -- {impressions, likes, comments, clicks}
 );
 
 ALTER TABLE content_queue ENABLE ROW LEVEL SECURITY;

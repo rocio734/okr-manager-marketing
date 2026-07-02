@@ -255,6 +255,35 @@
   .cal-post-item.status-rejected  { border-color: #FECACA; opacity: .8; }
   .cal-empty { font-size: var(--fs-12); color: var(--c-text-muted); padding: var(--sp-3); text-align: center; }
 
+  /* ── Sidebar badge ── */
+  .nav-icon { position: relative; }
+  .nav-badge {
+    position: absolute; top: 2px; right: 2px;
+    min-width: 16px; height: 16px; padding: 0 4px;
+    background: #DC2626; color: #fff;
+    font-size: 9px; font-weight: 700; border-radius: 99px;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1; pointer-events: none;
+  }
+
+  /* ── Metrics ── */
+  .metrics-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-2); margin-top: var(--sp-1);
+  }
+  .metric-chip {
+    background: var(--c-surface-sunk); border-radius: 6px;
+    padding: var(--sp-1) var(--sp-2); text-align: center;
+  }
+  .metric-chip .val { font-size: var(--fs-15); font-weight: 700; color: var(--c-text); font-variant-numeric: tabular-nums; }
+  .metric-chip .lbl { font-size: 9.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--c-text-muted); margin-top: 1px; }
+  .btn-metrics {
+    padding: 5px 10px; font-size: var(--fs-12); border-radius: 6px;
+    border: 1px solid var(--c-border-strong); background: var(--c-surface);
+    color: var(--c-text-muted); cursor: pointer;
+  }
+  .btn-metrics:hover { background: var(--c-surface-sunk); color: var(--c-text); }
+
   /* ── Rejection note in card ── */
   .rejection-note {
     background: #FEF2F2; border: 1px solid #FECACA; border-radius: 6px;
@@ -440,6 +469,44 @@
   </div>
 </div>
 
+<!-- Modal de métricas -->
+<div class="modal-overlay" id="metrics-modal">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="modal-header">
+      <span>Métricas del post</span>
+      <button class="modal-close" id="metrics-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:var(--fs-13);color:var(--c-text-muted);margin-bottom:var(--sp-4);line-height:1.5;">
+        Ingresá los datos de rendimiento del post publicado.
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);">
+        <div>
+          <label style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);display:block;margin-bottom:4px;">Impresiones</label>
+          <input id="m-impressions" type="number" min="0" placeholder="0" style="width:100%;padding:8px 10px;border:1px solid var(--c-border-strong);border-radius:6px;font-size:var(--fs-14);background:var(--c-surface);color:var(--c-text);">
+        </div>
+        <div>
+          <label style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);display:block;margin-bottom:4px;">Me gusta</label>
+          <input id="m-likes" type="number" min="0" placeholder="0" style="width:100%;padding:8px 10px;border:1px solid var(--c-border-strong);border-radius:6px;font-size:var(--fs-14);background:var(--c-surface);color:var(--c-text);">
+        </div>
+        <div>
+          <label style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);display:block;margin-bottom:4px;">Comentarios</label>
+          <input id="m-comments" type="number" min="0" placeholder="0" style="width:100%;padding:8px 10px;border:1px solid var(--c-border-strong);border-radius:6px;font-size:var(--fs-14);background:var(--c-surface);color:var(--c-text);">
+        </div>
+        <div>
+          <label style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);display:block;margin-bottom:4px;">Clics</label>
+          <input id="m-clicks" type="number" min="0" placeholder="0" style="width:100%;padding:8px 10px;border:1px solid var(--c-border-strong);border-radius:6px;font-size:var(--fs-14);background:var(--c-surface);color:var(--c-text);">
+        </div>
+      </div>
+      <div id="m-engagement-preview" style="margin-top:var(--sp-3);font-size:var(--fs-13);color:var(--c-text-muted);min-height:20px;"></div>
+      <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-4);justify-content:flex-end;">
+        <button class="btn-sm" id="metrics-cancel">Cancelar</button>
+        <button class="btn-save-edit" id="metrics-confirm">Guardar métricas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal de rechazo -->
 <div class="modal-overlay" id="reject-modal">
   <div class="modal-box" style="max-width:420px;">
@@ -574,6 +641,19 @@
            <div class="rejection-note-text">${esc(p.rejection_note)}</div>
          </div>` : '';
 
+    const m = p.metrics || {};
+    const metricsHtml = p.status === 'published' && (m.impressions || m.likes || m.comments || m.clicks)
+      ? `<div>
+           <div style="font-size:var(--fs-11);font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted);margin-bottom:6px;">Rendimiento</div>
+           <div class="metrics-row">
+             <div class="metric-chip"><div class="val">${(m.impressions||0).toLocaleString('es')}</div><div class="lbl">Impresiones</div></div>
+             <div class="metric-chip"><div class="val">${(m.likes||0).toLocaleString('es')}</div><div class="lbl">Me gusta</div></div>
+             <div class="metric-chip"><div class="val">${(m.comments||0).toLocaleString('es')}</div><div class="lbl">Comentarios</div></div>
+             <div class="metric-chip"><div class="val">${(m.clicks||0).toLocaleString('es')}</div><div class="lbl">Clics</div></div>
+           </div>
+           ${m.impressions ? `<div style="font-size:var(--fs-11);color:var(--c-text-muted);margin-top:6px;">Engagement: <strong>${(((m.likes||0)+(m.comments||0)+(m.clicks||0))/m.impressions*100).toFixed(1)}%</strong></div>` : ''}
+         </div>` : '';
+
     const promptHtml = p.image_prompt ? `
       <div class="image-prompt-section">
         <div class="image-prompt-label">
@@ -612,6 +692,8 @@
     } else {
       footerBtns = `<button class="btn-approve" disabled>✓ Publicado</button>`;
     }
+    const metricsBtn = p.status === 'published'
+      ? `<button class="btn-metrics" data-id="${p.id}" title="Cargar métricas de rendimiento">📊</button>` : '';
 
     return `
       <div class="post-card ${sc}" id="card-${p.id}">
@@ -628,6 +710,7 @@
           ${hashHtml}
           ${srcHtml}
           ${rejectionHtml}
+          ${metricsHtml}
           ${promptHtml}
           ${uploadHtml}
         </div>
@@ -637,6 +720,7 @@
             <button class="btn-sm btn-expand" data-id="${p.id}" data-expanded="0">Leer más</button>
             <button class="btn-sm btn-preview" data-id="${p.id}">👁 Preview</button>
             ${p.status !== 'published' ? `<button class="btn-edit" data-id="${p.id}" title="Editar texto del post">✎</button>` : ''}
+            ${metricsBtn}
             ${footerBtns}
           </div>
         </div>
@@ -757,6 +841,11 @@
     // Edit button
     grid.querySelectorAll('.btn-edit').forEach(btn => {
       btn.addEventListener('click', () => enterEditMode(btn.dataset.id, postsMap[Number(btn.dataset.id)]));
+    });
+
+    // Metrics button
+    grid.querySelectorAll('.btn-metrics').forEach(btn => {
+      btn.addEventListener('click', () => openMetricsModal(btn.dataset.id, postsMap[Number(btn.dataset.id)]));
     });
   }
 
@@ -947,6 +1036,71 @@
     }
   });
 
+  // ── Sidebar badge ────────────────────────────────────────────────────────────
+  async function updateSidebarBadge() {
+    const { data } = await sb.from('content_queue').select('id', { count: 'exact', head: true }).eq('status', 'draft');
+    const count = data?.length ?? 0;
+    const navIcon = document.querySelector('.nav-icon.active');
+    if (!navIcon) return;
+    let badge = navIcon.querySelector('.nav-badge');
+    if (count > 0) {
+      if (!badge) { badge = document.createElement('span'); badge.className = 'nav-badge'; navIcon.appendChild(badge); }
+      badge.textContent = count > 99 ? '99+' : count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  // ── Metrics modal ─────────────────────────────────────────────────────────────
+  let _metricsTargetId = null;
+  function openMetricsModal(id, post) {
+    _metricsTargetId = id;
+    const m = post.metrics || {};
+    document.getElementById('m-impressions').value = m.impressions || '';
+    document.getElementById('m-likes').value       = m.likes       || '';
+    document.getElementById('m-comments').value    = m.comments    || '';
+    document.getElementById('m-clicks').value      = m.clicks      || '';
+    updateEngagementPreview();
+    document.getElementById('metrics-modal').classList.add('open');
+    document.getElementById('m-impressions').focus();
+  }
+  function updateEngagementPreview() {
+    const imp  = parseInt(document.getElementById('m-impressions').value) || 0;
+    const act  = (parseInt(document.getElementById('m-likes').value)||0) +
+                 (parseInt(document.getElementById('m-comments').value)||0) +
+                 (parseInt(document.getElementById('m-clicks').value)||0);
+    const prev = document.getElementById('m-engagement-preview');
+    prev.textContent = imp > 0 ? `Engagement rate: ${(act/imp*100).toFixed(1)}%` : '';
+  }
+  ['m-impressions','m-likes','m-comments','m-clicks'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateEngagementPreview);
+  });
+  document.getElementById('metrics-modal-close').addEventListener('click', () => {
+    document.getElementById('metrics-modal').classList.remove('open');
+  });
+  document.getElementById('metrics-cancel').addEventListener('click', () => {
+    document.getElementById('metrics-modal').classList.remove('open');
+  });
+  document.getElementById('metrics-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+  document.getElementById('metrics-confirm').addEventListener('click', async () => {
+    const btn = document.getElementById('metrics-confirm');
+    const metrics = {
+      impressions: parseInt(document.getElementById('m-impressions').value) || 0,
+      likes:       parseInt(document.getElementById('m-likes').value)       || 0,
+      comments:    parseInt(document.getElementById('m-comments').value)    || 0,
+      clicks:      parseInt(document.getElementById('m-clicks').value)      || 0,
+    };
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    const { error } = await sb.from('content_queue').update({ metrics }).eq('id', _metricsTargetId);
+    btn.disabled = false; btn.textContent = 'Guardar métricas';
+    if (error) { OKR_toast('Error: ' + error.message, 'error'); return; }
+    document.getElementById('metrics-modal').classList.remove('open');
+    OKR_toast('Métricas guardadas', 'success');
+    await load();
+  });
+
   // ── Week navigation ───────────────────────────────────────────────────────────
   function shiftWeek(delta) {
     const wv = document.getElementById('filter-week').value;
@@ -1042,6 +1196,7 @@
   });
 
   await load();
+  await updateSidebarBadge();
 })();
 </script>
 </body>
