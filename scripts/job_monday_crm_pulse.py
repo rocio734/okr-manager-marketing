@@ -96,12 +96,13 @@ def _fetch_lead_notes(token):
             break
         start += 500
 
-    # Agrupar por lead y quedarse con la nota más reciente (creationDate desc)
+    # Agrupar por lead y quedarse con la nota más reciente
+    # Usa max(creationDate, updatedDate) para detectar notas editadas después de crearse
     best = {}
     for n in all_notes:
         lid  = n.get("lead")
         text = (n.get("note") or "").strip()
-        date = n.get("creationDate") or ""
+        date = max(n.get("creationDate") or "", n.get("updatedDate") or "")
         if not lid or not text:
             continue
         if lid not in best or date > best[lid]["date"]:
