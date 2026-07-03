@@ -367,7 +367,7 @@ def fetch_crm_pulse_replies():
     LOG(f"  {len(msg_nums)} emails CRM Pulse sin procesar")
 
     for num in msg_nums:
-        status, msg_data = mail.fetch(num, "(RFC822)")
+        status, msg_data = mail.fetch(num, "(BODY.PEEK[])")
         if status != "OK":
             continue
 
