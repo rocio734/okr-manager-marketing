@@ -107,7 +107,7 @@ def _fetch_lead_notes(token):
             continue
         if lid not in best or date > best[lid]["date"]:
             best[lid] = {"date": date, "note": text}
-    return {lid: v["note"] for lid, v in best.items()}
+    return {lid: {"note": v["note"], "date": v["date"]} for lid, v in best.items()}
 
 
 def get_hot_leads():
@@ -123,9 +123,10 @@ def get_hot_leads():
     # Adjuntar la nota más reciente de ETCRM_Lead_Note a cada lead
     notes_map = _fetch_lead_notes(token)
     for l in all_leads:
-        crm_note = notes_map.get(l.get("id"), "")
-        if crm_note:
-            l["_crm_note"] = crm_note
+        entry = notes_map.get(l.get("id"))
+        if entry:
+            l["_crm_note"]      = entry["note"]
+            l["_crm_note_date"] = entry["date"]
 
     TEST_KEYWORDS = ["prueba", "test", "demo", "testing", "devops"]
 
@@ -270,8 +271,10 @@ def lead_name(lead):
     return name if name else "(sin nombre)"
 
 
-def _note_days_ago(note_text, lead_updated=""):
-    """Días transcurridos desde la fecha de la nota más reciente (o del campo updated)."""
+def _note_days_ago(note_text, lead_updated="", note_date=""):
+    """Días desde la última actualización real.
+    Prioridad: fecha en el texto > creationDate/updatedDate de la nota > updated del lead.
+    """
     now = datetime.now(timezone.utc)
     if note_text:
         m = _re.search(r"\[?(\d{1,2})/(\d{1,2})(?:/(\d{2,4}))?", note_text[:30])
@@ -282,16 +285,16 @@ def _note_days_ago(note_text, lead_updated=""):
                 year = int(yr) + (2000 if int(yr) < 100 else 0) if yr else now.year
                 if month > now.month or (month == now.month and day > now.day):
                     year -= 1
-                note_date = datetime(year, month, day, tzinfo=timezone.utc)
-                return (now - note_date).days
+                return (now - datetime(year, month, day, tzinfo=timezone.utc)).days
             except Exception:
                 pass
-    if lead_updated:
-        try:
-            updated = datetime.fromisoformat(lead_updated.replace("Z", "+00:00"))
-            return (now - updated).days
-        except Exception:
-            pass
+    # Sin fecha en el texto: usar la fecha de la nota del CRM (más precisa que el lead.updated)
+    for fallback in (note_date, lead_updated):
+        if fallback:
+            try:
+                return (now - datetime.fromisoformat(fallback.replace("Z", "+00:00"))).days
+            except Exception:
+                pass
     return None
 
 
@@ -330,7 +333,7 @@ def build_html(leads, today_str, stale=None):
         latest      = _latest_note(crm_note, "") if crm_note else _latest_note(desc, interest)
         summary     = latest[:120] + ("…" if len(latest) > 120 else "") if latest else "—"
         txt_c, bg_c = badge_colors.get(status_raw, ("#374151", "#f3f4f6"))
-        days        = _note_days_ago(latest, lead.get("updated") or "")
+        days        = _note_days_ago(latest, lead.get("updated") or "", lead.get("_crm_note_date") or "")
         badge       = _days_badge(days)
 
         rows_html += f"""
