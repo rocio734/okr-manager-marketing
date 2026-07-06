@@ -23,6 +23,15 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 
+# ── Cargar .env antes de leer variables (está un nivel arriba de scripts/) ───────
+_env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+if _env_path.exists():
+    for _line in _env_path.read_text().splitlines():
+        _line = _line.strip()
+        if "=" in _line and not _line.startswith("#"):
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+
 # ── Config ──────────────────────────────────────────────────────────────────────
 BASE_URL   = os.getenv("ETENDO_BASE_URL",  "https://futit-staff.etendo.cloud")
 USERNAME   = os.getenv("ETENDO_USERNAME",  "Rocio Altamirano")
@@ -174,13 +183,15 @@ def get_hot_leads():
 
     for l in hot:
         lid = l.get("id")
-        updated_str = l.get("updated") or l.get("updatedAt") or ""
+        # Usar la fecha más reciente entre el lead y su nota — una nota nueva no mueve lead.updated
+        updated_str   = l.get("updated") or l.get("updatedAt") or ""
+        note_date_str = l.get("_crm_note_date") or ""
+        best_date_str = max(note_date_str, updated_str) if note_date_str and updated_str else (note_date_str or updated_str)
         days_old = 0
-        if updated_str:
+        if best_date_str:
             try:
                 from datetime import datetime as _dt
-                updated = _dt.fromisoformat(updated_str.replace("Z", "+00:00"))
-                days_old = (now - updated).days
+                days_old = (now - _dt.fromisoformat(best_date_str.replace("Z", "+00:00"))).days
             except Exception:
                 pass
 
