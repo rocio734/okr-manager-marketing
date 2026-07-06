@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: crm-pulse
+    runtime: python
+    buildCommand: pip install -r mcp_crm_requirements.txt
+    startCommand: python3 mcp_crm_server.py
+    plan: free
+    envVars:
+      - key: ETENDO_BASE_URL
+        sync: false
+      - key: ETENDO_USERNAME
+        sync: false
+      - key: ETENDO_PASSWORD
+        sync: false
+      - key: ETENDO_WRITE_URL
+        sync: false
+      - key: MCP_AUTH_TOKEN
+        sync: false
