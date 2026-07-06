@@ -336,7 +336,14 @@ async def handle_messages(request: Request):
     await sse.handle_post_message(request.scope, request.receive, request._send)
 
 
+async def handle_root(_r: Request):
+    return Response(
+        '{"service":"etendo-crm-mcp","status":"running","endpoints":["/sse","/health"]}',
+        media_type="application/json",
+    )
+
 app = Starlette(routes=[
+    Route("/",          endpoint=handle_root),
     Route("/sse",       endpoint=handle_sse),
     Route("/messages/", endpoint=handle_messages, methods=["POST"]),
     Route("/health",    endpoint=lambda _r: Response("ok")),
