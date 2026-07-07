@@ -372,12 +372,17 @@ async def handle_oauth_metadata(_r: Request):
 
 
 async def handle_register(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    redirect_uris = body.get("redirect_uris", [])
     return Response(json.dumps({
         "client_id":                  "crm-etendo-mcp",
         "client_secret_expires_at":   0,
         "grant_types":                ["authorization_code"],
         "response_types":             ["code"],
-        "redirect_uris":              [],
+        "redirect_uris":              redirect_uris,
         "token_endpoint_auth_method": "none",
     }), media_type="application/json", status_code=201)
 
