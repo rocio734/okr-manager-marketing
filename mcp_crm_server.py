@@ -388,15 +388,34 @@ async def handle_authorize(request: Request):
     state    = params.get("state", "")
     sep      = "&" if "?" in redirect else "?"
     location = f"{redirect}{sep}code=crm-approved&state={state}"
-    # Use JS redirect instead of 302 to avoid HTTPS→HTTP mixed-content block
-    html = (
-        f'<!DOCTYPE html><html><head>'
-        f'<meta http-equiv="refresh" content="0;url={location}">'
-        f'<script>window.location.replace("{location}");</script>'
-        f'</head><body>'
-        f'<p>Autorizando CRM Etendo... <a href="{location}">click aquí si no redirige</a></p>'
-        f'</body></html>'
-    )
+    html = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Autorizar CRM Etendo</title>
+<style>
+  body {{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#F7F9FC;}}
+  .card {{background:#fff;border:1px solid #E5E9F0;border-radius:10px;padding:40px 48px;text-align:center;max-width:400px;}}
+  .logo {{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1863DC;margin-bottom:16px;}}
+  h1 {{font-size:20px;font-weight:700;color:#111827;margin:0 0 8px;}}
+  p {{color:#6B7280;font-size:14px;margin:0 0 28px;}}
+  a.btn {{display:inline-block;background:#1863DC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:7px;font-size:15px;font-weight:600;}}
+  a.btn:hover {{background:#0D47A8;}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Etendo CRM</div>
+  <h1>Autorizar conexión</h1>
+  <p>Claude Desktop quiere conectarse al CRM.<br>Hacé click para aprobar.</p>
+  <a href="{location}" class="btn">Autorizar</a>
+</div>
+<script>
+  // Attempt auto-redirect after short delay; user click is the reliable fallback
+  setTimeout(function(){{ window.location.href = "{location}"; }}, 800);
+</script>
+</body>
+</html>"""
     return Response(html, media_type="text/html")
 
 
