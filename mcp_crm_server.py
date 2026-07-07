@@ -388,7 +388,16 @@ async def handle_authorize(request: Request):
     state    = params.get("state", "")
     sep      = "&" if "?" in redirect else "?"
     location = f"{redirect}{sep}code=crm-approved&state={state}"
-    return Response("", status_code=302, headers={"Location": location})
+    # Use JS redirect instead of 302 to avoid HTTPS→HTTP mixed-content block
+    html = (
+        f'<!DOCTYPE html><html><head>'
+        f'<meta http-equiv="refresh" content="0;url={location}">'
+        f'<script>window.location.replace("{location}");</script>'
+        f'</head><body>'
+        f'<p>Autorizando CRM Etendo... <a href="{location}">click aquí si no redirige</a></p>'
+        f'</body></html>'
+    )
+    return Response(html, media_type="text/html")
 
 
 async def handle_token(request: Request):
