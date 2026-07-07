@@ -355,6 +355,52 @@ async def handle_brief(_r: Request):
         return Response("Brief no encontrado", status_code=404)
 
 
+# ── OAuth endpoints (required by mcp-remote) ───────────────────────────────
+_OAUTH_BASE = "https://crm-pulse.onrender.com"
+
+async def handle_oauth_metadata(_r: Request):
+    return Response(json.dumps({
+        "issuer":                             _OAUTH_BASE,
+        "authorization_endpoint":             f"{_OAUTH_BASE}/oauth/authorize",
+        "token_endpoint":                     f"{_OAUTH_BASE}/oauth/token",
+        "registration_endpoint":              f"{_OAUTH_BASE}/register",
+        "response_types_supported":           ["code"],
+        "grant_types_supported":              ["authorization_code"],
+        "code_challenge_methods_supported":   ["S256"],
+        "scopes_supported":                   ["mcp"],
+    }), media_type="application/json")
+
+
+async def handle_register(request: Request):
+    return Response(json.dumps({
+        "client_id":                  "crm-etendo-mcp",
+        "client_secret_expires_at":   0,
+        "grant_types":                ["authorization_code"],
+        "response_types":             ["code"],
+        "redirect_uris":              [],
+        "token_endpoint_auth_method": "none",
+    }), media_type="application/json", status_code=201)
+
+
+async def handle_authorize(request: Request):
+    params   = dict(request.query_params)
+    redirect = params.get("redirect_uri", "")
+    state    = params.get("state", "")
+    sep      = "&" if "?" in redirect else "?"
+    location = f"{redirect}{sep}code=crm-approved&state={state}"
+    return Response("", status_code=302, headers={"Location": location})
+
+
+async def handle_token(request: Request):
+    token = MCP_AUTH_TOKEN or "vico-crm-etendo-2026"
+    return Response(json.dumps({
+        "access_token": token,
+        "token_type":   "bearer",
+        "expires_in":   31536000,
+        "scope":        "mcp",
+    }), media_type="application/json")
+
+
 # ── Brief response endpoints ────────────────────────────────────────────────
 _CORS_HEADERS = {
     "Access-Control-Allow-Origin":  "*",
@@ -493,6 +539,10 @@ app = Starlette(routes=[
     Route("/sse",                   endpoint=handle_sse),
     Route("/messages/",             endpoint=handle_messages,           methods=["POST"]),
     Route("/health",                endpoint=lambda _r: Response("ok")),
+    Route("/.well-known/oauth-authorization-server", endpoint=handle_oauth_metadata, methods=["GET"]),
+    Route("/register",              endpoint=handle_register,           methods=["POST", "OPTIONS"]),
+    Route("/oauth/authorize",       endpoint=handle_authorize,          methods=["GET"]),
+    Route("/oauth/token",           endpoint=handle_token,              methods=["POST", "OPTIONS"]),
     Route("/brief",                 endpoint=handle_brief,              methods=["GET"]),
     Route("/brief-response",        endpoint=handle_brief_response,     methods=["POST", "OPTIONS"]),
     Route("/brief-responses",       endpoint=handle_brief_responses,    methods=["GET"]),
