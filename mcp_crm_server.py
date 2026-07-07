@@ -430,6 +430,23 @@ async def handle_brief_responses(request: Request):
                         media_type="application/json")
 
 
+async def handle_brief_responses_json(request: Request):
+    """Public JSON endpoint — returns responses grouped by question_key for the brief page."""
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return Response('[]', media_type="application/json", headers=_CORS_HEADERS)
+    req = urllib.request.Request(
+        f"{SUPABASE_URL}/rest/v1/brief_responses?select=question_key,respondent,response_text,created_at&order=created_at.asc",
+    )
+    req.add_header("apikey",        SUPABASE_KEY)
+    req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read())
+        return Response(json.dumps(data), media_type="application/json", headers=_CORS_HEADERS)
+    except Exception as e:
+        return Response('[]', media_type="application/json", headers=_CORS_HEADERS)
+
+
 def _render_responses_html(rows):
     LABELS = {
         "resp-brand-arch":  "Brand architecture (secc. 01)",
@@ -472,13 +489,14 @@ def _render_responses_html(rows):
 
 
 app = Starlette(routes=[
-    Route("/",                 endpoint=handle_root),
-    Route("/sse",              endpoint=handle_sse),
-    Route("/messages/",        endpoint=handle_messages, methods=["POST"]),
-    Route("/health",           endpoint=lambda _r: Response("ok")),
-    Route("/brief",            endpoint=handle_brief,            methods=["GET"]),
-    Route("/brief-response",   endpoint=handle_brief_response,  methods=["POST", "OPTIONS"]),
-    Route("/brief-responses",  endpoint=handle_brief_responses, methods=["GET"]),
+    Route("/",                      endpoint=handle_root),
+    Route("/sse",                   endpoint=handle_sse),
+    Route("/messages/",             endpoint=handle_messages,           methods=["POST"]),
+    Route("/health",                endpoint=lambda _r: Response("ok")),
+    Route("/brief",                 endpoint=handle_brief,              methods=["GET"]),
+    Route("/brief-response",        endpoint=handle_brief_response,     methods=["POST", "OPTIONS"]),
+    Route("/brief-responses",       endpoint=handle_brief_responses,    methods=["GET"]),
+    Route("/brief-responses-json",  endpoint=handle_brief_responses_json, methods=["GET", "OPTIONS"]),
 ])
 
 if __name__ == "__main__":

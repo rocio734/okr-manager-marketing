@@ -351,6 +351,10 @@ body {
   display: none; white-space: nowrap;
 }
 .save-status.error { color: var(--red); }
+.saved-responses { margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+.saved-entry { background: var(--surface-2); border-left: 3px solid var(--blue); border-radius: 4px; padding: 8px 12px; }
+.saved-who { font-size: 11px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .05em; }
+.saved-text { margin: 4px 0 0; font-size: 13.5px; color: var(--text-1); white-space: pre-wrap; line-height: 1.5; }
 
 /* ── Insight note ── */
 .insight {
@@ -697,7 +701,36 @@ body {
 </div>
 
 <script>
-const BRIEF_API = "https://crm-pulse.onrender.com/brief-response";
+const BRIEF_API       = "https://crm-pulse.onrender.com/brief-response";
+const BRIEF_RESP_API  = "https://crm-pulse.onrender.com/brief-responses-json";
+
+// Load existing responses on page load
+async function loadResponses() {
+  try {
+    const r = await fetch(BRIEF_RESP_API);
+    const rows = await r.json();
+    const grouped = {};
+    rows.forEach(row => {
+      if (!grouped[row.question_key]) grouped[row.question_key] = [];
+      grouped[row.question_key].push(row);
+    });
+    Object.keys(grouped).forEach(key => {
+      const wrap = document.getElementById(key)?.closest('.response-wrap');
+      if (!wrap) return;
+      let list = wrap.querySelector('.saved-responses');
+      if (!list) {
+        list = document.createElement('div');
+        list.className = 'saved-responses';
+        wrap.insertBefore(list, wrap.querySelector('textarea'));
+      }
+      list.innerHTML = grouped[key].map(e => {
+        const ts = (e.created_at || '').slice(0, 16).replace('T', ' ');
+        return `<div class="saved-entry"><span class="saved-who">${e.respondent} · ${ts}</span><p class="saved-text">${e.response_text}</p></div>`;
+      }).join('');
+    });
+  } catch (_) {}
+}
+document.addEventListener('DOMContentLoaded', loadResponses);
 
 async function saveResponse(questionKey, btn) {
   const wrap = btn.closest('.response-wrap');
