@@ -1,0 +1,750 @@
+
+<title>Brief de Posicionamiento — Etendo · Julio 2026</title>
+<style>
+:root {
+  --bg:        #F7F9FC;
+  --surface:   #FFFFFF;
+  --text:      #111827;
+  --text-2:    #4B5563;
+  --text-3:    #9CA3AF;
+  --border:    #E5E9F0;
+  --border-s:  #CBD5E1;
+
+  --blue:      #1863DC;
+  --blue-s:    #EBF2FD;
+  --blue-b:    #0D47A8;
+
+  --amber:     #B45309;
+  --amber-s:   #FFFBEB;
+  --amber-bd:  #FCD34D;
+
+  --green:     #166534;
+  --green-s:   #F0FDF4;
+  --green-bd:  #86EFAC;
+
+  --red:       #991B1B;
+  --red-s:     #FEF2F2;
+  --red-bd:    #FCA5A5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #0D1117;
+    --surface:   #161D2C;
+    --text:      #E5EAF4;
+    --text-2:    #8494B0;
+    --text-3:    #4A5568;
+    --border:    #232D3F;
+    --border-s:  #2E3A50;
+    --blue:      #4D8FF5;
+    --blue-s:    #162038;
+    --blue-b:    #7AB0FF;
+    --amber:     #FBBF24;
+    --amber-s:   #1C1500;
+    --amber-bd:  #78480C;
+    --green:     #4ADE80;
+    --green-s:   #052E16;
+    --green-bd:  #166534;
+    --red:       #F87171;
+    --red-s:     #2D0A0A;
+    --red-bd:    #7F1D1D;
+  }
+}
+:root[data-theme="light"] {
+  --bg:#F7F9FC;--surface:#FFFFFF;--text:#111827;--text-2:#4B5563;--text-3:#9CA3AF;
+  --border:#E5E9F0;--border-s:#CBD5E1;--blue:#1863DC;--blue-s:#EBF2FD;--blue-b:#0D47A8;
+  --amber:#B45309;--amber-s:#FFFBEB;--amber-bd:#FCD34D;
+  --green:#166534;--green-s:#F0FDF4;--green-bd:#86EFAC;
+  --red:#991B1B;--red-s:#FEF2F2;--red-bd:#FCA5A5;
+}
+:root[data-theme="dark"] {
+  --bg:#0D1117;--surface:#161D2C;--text:#E5EAF4;--text-2:#8494B0;--text-3:#4A5568;
+  --border:#232D3F;--border-s:#2E3A50;--blue:#4D8FF5;--blue-s:#162038;--blue-b:#7AB0FF;
+  --amber:#FBBF24;--amber-s:#1C1500;--amber-bd:#78480C;
+  --green:#4ADE80;--green-s:#052E16;--green-bd:#166534;
+  --red:#F87171;--red-s:#2D0A0A;--red-bd:#7F1D1D;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 80px;
+}
+
+/* ── Doc header ── */
+.doc-header {
+  background: var(--blue);
+  padding: 36px 40px 32px;
+}
+.doc-header-inner { max-width: 760px; margin: 0 auto; }
+.dh-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: rgba(255,255,255,.55);
+  margin-bottom: 10px;
+}
+.dh-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 26px; font-weight: 700; line-height: 1.15;
+  color: #fff;
+  text-wrap: balance;
+}
+.dh-sub {
+  font-size: 13.5px; color: rgba(255,255,255,.70);
+  margin-top: 6px;
+}
+.dh-meta {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 20px;
+}
+.dh-chip {
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  padding: 3px 10px; border-radius: 3px;
+  background: rgba(255,255,255,.12); color: rgba(255,255,255,.80);
+}
+
+/* ── Body ── */
+.body { max-width: 760px; margin: 0 auto; padding: 0 40px; }
+
+/* ── Sections ── */
+.section {
+  border-bottom: 1px solid var(--border);
+  padding: 32px 0;
+}
+.section:last-child { border-bottom: none; }
+
+.sec-head {
+  display: flex; align-items: baseline; gap: 14px;
+  margin-bottom: 18px;
+}
+.sec-num {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11px; font-weight: 700;
+  color: var(--blue); letter-spacing: .06em;
+  flex-shrink: 0; padding-top: 2px;
+}
+.sec-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--text); line-height: 1.2;
+  text-wrap: balance;
+}
+.sec-desc {
+  font-size: 13px; color: var(--text-3); margin-top: 2px;
+}
+
+/* ── Callout boxes ── */
+.callout {
+  border-radius: 5px; padding: 14px 18px;
+  font-size: 13.5px; line-height: 1.55;
+  border-left: 3px solid;
+  margin: 14px 0;
+}
+.callout-blue   { background: var(--blue-s); border-color: var(--blue); color: var(--text); }
+.callout-amber  { background: var(--amber-s); border-color: var(--amber-bd); color: var(--text); }
+.callout-green  { background: var(--green-s); border-color: var(--green-bd); color: var(--text); }
+.callout-red    { background: var(--red-s);   border-color: var(--red-bd);   color: var(--text); }
+.callout strong { font-weight: 700; }
+.callout .label {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; margin-bottom: 4px; display: block;
+  color: var(--text-3);
+}
+.callout-amber .label { color: var(--amber); }
+.callout-green .label { color: var(--green); }
+.callout-blue .label  { color: var(--blue); }
+
+/* ── Statement (big sentence) ── */
+.statement {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20px; font-weight: 700; line-height: 1.3;
+  color: var(--text); text-wrap: balance;
+  padding: 18px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 5px 5px 0;
+  margin: 16px 0;
+}
+
+/* ── Two products ── */
+.products-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  margin: 16px 0;
+}
+.product-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 18px 20px;
+}
+.product-name {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 6px;
+}
+.product-tagline {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px; font-weight: 700; line-height: 1.3;
+  color: var(--text); margin-bottom: 8px;
+}
+.product-desc { font-size: 12.5px; color: var(--text-2); line-height: 1.5; }
+.product-pill {
+  display: inline-block; margin-top: 10px;
+  font-size: 10px; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; padding: 2px 8px; border-radius: 3px;
+  background: var(--blue-s); color: var(--blue);
+}
+
+/* ── ICP table ── */
+.icp-grid {
+  display: grid; grid-template-columns: 140px 1fr; gap: 0;
+  border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  margin: 16px 0;
+}
+.icp-row {
+  display: contents;
+}
+.icp-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-3);
+  background: var(--bg); padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start;
+}
+.icp-value {
+  font-size: 13.5px; color: var(--text);
+  background: var(--surface); padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.45;
+}
+.icp-label:last-of-type,
+.icp-value:last-of-type { border-bottom: none; }
+
+/* ── Competitive table ── */
+.comp-table-wrap { overflow-x: auto; margin: 16px 0; }
+.comp-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+.comp-table th {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--text-3);
+  padding: 9px 14px; border-bottom: 2px solid var(--border);
+  text-align: left; white-space: nowrap; background: var(--surface);
+}
+.comp-table td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  vertical-align: top; background: var(--surface);
+}
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: var(--bg); }
+.comp-name { font-weight: 600; color: var(--text); }
+.comp-them { color: var(--text-2); }
+.comp-us   { color: var(--blue); font-weight: 500; }
+
+/* ── Channel messages ── */
+.channel-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.channel-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 5px; padding: 13px 16px;
+  display: grid; grid-template-columns: 110px 1fr; gap: 12px;
+  align-items: start;
+}
+.ch-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--text-3);
+  padding-top: 1px; line-height: 1.4;
+}
+.ch-msg { font-size: 13.5px; color: var(--text); line-height: 1.45; }
+.ch-msg em { font-style: italic; color: var(--text-2); font-size: 12.5px; }
+
+/* ── NOT list ── */
+.not-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+.not-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 14px; border-radius: 5px;
+  background: var(--red-s); border: 1px solid var(--red-bd);
+  font-size: 13.5px;
+}
+.not-x {
+  font-size: 14px; font-weight: 700; color: var(--red);
+  flex-shrink: 0; margin-top: 1px;
+}
+.not-text { color: var(--text); }
+.not-reason { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+/* ── Pending items ── */
+.pending-list { display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
+.pending-item {
+  background: var(--amber-s); border: 1px solid var(--amber-bd);
+  border-radius: 5px; padding: 11px 14px;
+  font-size: 13.5px; display: flex; gap: 10px; align-items: flex-start;
+}
+.pending-icon { flex-shrink: 0; font-size: 14px; margin-top: 1px; }
+.pending-body { color: var(--text); line-height: 1.45; }
+.pending-who { font-size: 11.5px; color: var(--amber); font-weight: 600; margin-top: 3px; }
+
+/* ── Response area ── */
+.response-wrap { margin-top: 10px; }
+.response-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-3);
+  margin-bottom: 5px; display: block;
+}
+.response-area {
+  width: 100%;
+  min-height: 72px;
+  background: var(--surface);
+  border: 1.5px dashed var(--border-s);
+  border-radius: 5px 5px 0 0;
+  padding: 10px 13px;
+  font-size: 13.5px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color: var(--text);
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  transition: border-color .15s, background .15s;
+  box-sizing: border-box;
+  display: block;
+}
+.response-area::placeholder { color: var(--text-3); font-style: italic; }
+.response-area:focus {
+  border-color: var(--blue);
+  border-style: solid;
+  background: var(--blue-s);
+}
+.response-area.saved {
+  border-style: solid;
+  border-color: var(--green-bd);
+  background: var(--green-s);
+}
+.response-footer {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg); border: 1.5px solid var(--border-s);
+  border-top: none; border-radius: 0 0 5px 5px;
+  padding: 7px 10px;
+}
+.resp-name {
+  flex: 1; min-width: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; padding: 5px 9px;
+  font-size: 12.5px; font-family: inherit; color: var(--text);
+  outline: none;
+}
+.resp-name::placeholder { color: var(--text-3); }
+.resp-name:focus { border-color: var(--blue); }
+.save-btn {
+  background: var(--blue); color: #fff;
+  border: none; border-radius: 4px;
+  padding: 5px 14px; font-size: 12px; font-weight: 600;
+  font-family: inherit; cursor: pointer; white-space: nowrap;
+  transition: background .12s;
+}
+.save-btn:hover { background: var(--blue-b); }
+.save-btn:disabled { background: var(--text-3); cursor: default; }
+.save-status {
+  font-size: 11.5px; color: var(--green); font-weight: 600;
+  display: none; white-space: nowrap;
+}
+.save-status.error { color: var(--red); }
+
+/* ── Insight note ── */
+.insight {
+  background: var(--bg); border: 1px solid var(--border);
+  border-left: 3px solid var(--text-3);
+  border-radius: 0 5px 5px 0;
+  padding: 12px 16px; font-size: 12.5px;
+  color: var(--text-2); line-height: 1.5;
+  margin: 12px 0;
+}
+.insight strong { color: var(--text); }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .doc-header { padding: 24px 20px; }
+  .body { padding: 0 20px; }
+  .products-grid { grid-template-columns: 1fr; }
+  .channel-item { grid-template-columns: 1fr; gap: 4px; }
+  .icp-grid { grid-template-columns: 100px 1fr; }
+}
+</style>
+
+<div class="doc-header">
+  <div class="doc-header-inner">
+    <div class="dh-label">Revenue Org · Etendo</div>
+    <div class="dh-title">Brief de posicionamiento de marca</div>
+    <div class="dh-sub">Documento de referencia para SEO, SEM y outbound — Q3 2026</div>
+    <div class="dh-meta">
+      <span class="dh-chip">Julio 2026</span>
+      <span class="dh-chip">España</span>
+      <span class="dh-chip">Rocío + Salu</span>
+      <span class="dh-chip">Borrador v1 — pendiente validación</span>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- 1. Qué es Etendo -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <div>
+        <div class="sec-title">Qué es Etendo — en una oración</div>
+        <div class="sec-desc">La definición que debe aparecer igual en Google Ads, en los H1 de SEO y en el cold email.</div>
+      </div>
+    </div>
+
+    <div class="statement">
+      Etendo es un ERP composable y de código abierto que las empresas adaptan a sus procesos exactos — y que los agentes de IA ya usan para ejecutar esos procesos con validez empresarial.
+    </div>
+
+    <p style="font-size:13px;color:var(--text-2);margin-top:12px;line-height:1.55;">El claim combina los dos pilares confirmados en el brand book: <strong>composable</strong> (el diferencial histórico de Etendo) y <strong>agéntico</strong> (el diferencial del momento). No son mensajes en competencia — son la misma promesa en dos épocas.</p>
+
+    <div class="products-grid" style="margin-top:20px;">
+      <div class="product-card">
+        <div class="product-name">Etendo</div>
+        <div class="product-tagline">"Somos el lego del software empresarial."</div>
+        <div class="product-desc">ERP on-prem / cloud, open source, composable. El cliente construye su stack exacto. Sin licencias por módulo, sin vendor lock-in.</div>
+        <span class="product-pill">Tagline confirmado</span>
+      </div>
+      <div class="product-card">
+        <div class="product-name">Etendo Go</div>
+        <div class="product-tagline">"El ERP que ejecuta tu negocio."</div>
+        <div class="product-desc">AERPP — Agentic ERP Platform. El ERP que Claude, ChatGPT y Copilot eligen para ejecutar con validez empresarial. SaaS, equipos híbridos humano + IA.</div>
+        <span class="product-pill">Tagline confirmado (brand book abr'26)</span>
+      </div>
+    </div>
+
+    <div class="callout callout-amber" style="margin-top:14px;">
+      <span class="label">Decisión pendiente — Fernando / Galder / Javi</span>
+      <strong>Brand architecture no definida todavía.</strong> ¿Etendo y Etendo Go son la misma marca o dos productos paralelos? Esto afecta directamente el SEO (¿optimizamos para "Etendo" o para "Etendo Go"?) y la nomenclatura en los anuncios.
+      <div class="response-wrap" style="margin-top:10px;">
+        <label class="response-label" for="resp-brand-arch">Respuesta</label>
+        <textarea id="resp-brand-arch" class="response-area" placeholder="Escribí tu respuesta acá — ¿una marca o dos? ¿Cuál tiene prioridad en SEO?"></textarea>
+        <div class="response-footer">
+          <input class="resp-name" type="text" placeholder="Tu nombre" aria-label="Tu nombre">
+          <button class="save-btn" onclick="saveResponse('resp-brand-arch', this)">Guardar</button>
+          <span class="save-status"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Para quién -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <div>
+        <div class="sec-title">Para quién es (ICP)</div>
+        <div class="sec-desc">El perfil exacto al que apunta toda la comunicación en Q3.</div>
+      </div>
+    </div>
+
+    <div class="icp-grid">
+      <div class="icp-label">Geografía</div>
+      <div class="icp-value"><strong>España</strong> — foco exclusivo Q3. Argentina queda fuera de la comunicación pagada este cuatrimestre.</div>
+
+      <div class="icp-label">Tamaño</div>
+      <div class="icp-value">Pyme mediana a empresa mediana — entre <strong>20 y 500 empleados</strong>. Demasiado grande para una hoja de Excel, demasiado pequeña para SAP.</div>
+
+      <div class="icp-label">Perfil</div>
+      <div class="icp-value">
+        <strong>CEO / COO:</strong> gestiona procesos complejos, quiere automatizar sin contratar más, evalúa el ROI en meses.<br>
+        <strong>CTO / Responsable IT:</strong> quiere modernizar el stack, integrar IA en los flujos operativos, evitar deuda técnica.
+      </div>
+
+      <div class="icp-label">Dolor</div>
+      <div class="icp-value">Su ERP actual es rígido: no se adapta a sus procesos, no habla con las herramientas de IA que el equipo ya usa (Claude, ChatGPT), y cada cambio cuesta meses y dinero.</div>
+
+      <div class="icp-label">Momento</div>
+      <div class="icp-value">Están evaluando cambiar de ERP <strong>ahora</strong>, o están viendo cómo integrar IA en su operación y descubren que su ERP actual es el cuello de botella. Verifactu es una palanca de urgencia para España.</div>
+    </div>
+
+    <div class="insight">
+      <strong>Aprendizaje de campaña (jul'26):</strong> el 50% de los leads de "ERP Agéntico" en junio eran personas buscando trabajo, y un 14% confundió el anuncio con un curso de IA o una integración de ChatGPT a su ERP actual. El ICP real (empresas tomando decisión de ERP) representó solo el 35% del tráfico. El mensaje necesita ser inequívoco sobre <em>quién</em> es el destinatario y <em>qué</em> hace el producto.
+    </div>
+  </div>
+
+  <!-- 3. El diferencial -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <div>
+        <div class="sec-title">Por qué Etendo y no la competencia</div>
+        <div class="sec-desc">Un argumento por competidor — concreto, defendible, sin hipérbole.</div>
+      </div>
+    </div>
+
+    <div class="comp-table-wrap">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Competidor</th>
+            <th>Su promesa</th>
+            <th>El problema real</th>
+            <th>Etendo en su lugar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="comp-name">Odoo</span></td>
+            <td class="comp-them">ERP todo-en-uno, fácil de empezar</td>
+            <td class="comp-them">Cada módulo extra se paga. Las personalizaciones se rompen con cada upgrade. El cliente termina atrapado en la versión que personalizó.</td>
+            <td class="comp-us">Etendo es open source: lo que personalizás es tuyo. No hay licencias por módulo. Las personalizaciones sobreviven las actualizaciones porque la arquitectura es composable.</td>
+          </tr>
+          <tr>
+            <td><span class="comp-name">Sage</span></td>
+            <td class="comp-them">ERP para pymes, confiable, conocido</td>
+            <td class="comp-them">ERP tradicional diseñado para registrar — no para ejecutar. Los agentes de IA no saben cómo hablarle. El equipo sigue haciendo trabajo manual de intermediario.</td>
+            <td class="comp-us">Etendo Go fue diseñado para que los agentes de IA lo elijan directamente. Claude o ChatGPT pueden crear un pedido, actualizar un inventario o enviar una factura — sin que un humano haga de puente.</td>
+          </tr>
+          <tr>
+            <td><span class="comp-name">SAP Business One</span></td>
+            <td class="comp-them">El estándar enterprise, robusto, probado</td>
+            <td class="comp-them">18 meses de implementación, consultores caros, curva enorme. Para la pyme mediana española es sobremedicación.</td>
+            <td class="comp-us">Etendo funciona desde el día 1 — no desde el día 30 (brand book, frase confirmada). Stack modular: empezás con lo que necesitás y escalás.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. Mensaje por canal -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <div>
+        <div class="sec-title">Mensaje central por canal</div>
+        <div class="sec-desc">El mismo diferencial adaptado al contexto de cada canal. El núcleo no cambia; el ángulo sí.</div>
+      </div>
+    </div>
+
+    <div class="channel-list">
+      <div class="channel-item">
+        <div class="ch-label">Google Ads<br>Search (intent)</div>
+        <div class="ch-msg">
+          <strong>"ERP que se adapta a tu empresa y habla con Claude y ChatGPT — sin código"</strong><br>
+          <em>Ángulo: el visitante ya busca un ERP o una solución de IA operacional. Captar intención de compra.</em>
+        </div>
+      </div>
+      <div class="channel-item">
+        <div class="ch-label">SEO<br>Orgánico</div>
+        <div class="ch-msg">
+          <strong>"ERP composable para empresas en España — open source, adaptable, preparado para IA y Verifactu"</strong><br>
+          <em>Ángulo: capturar búsquedas no-brand (ERP pymes, ERP Verifactu, alternativa Odoo, ERP a medida).</em>
+        </div>
+      </div>
+      <div class="channel-item">
+        <div class="ch-label">LinkedIn<br>Orgánico + Paid</div>
+        <div class="ch-msg">
+          <strong>"Tu ERP actual no está preparado para los agentes de IA. El tuyo debería serlo."</strong><br>
+          <em>Ángulo: provoca la reflexión en decisores. No vende directamente — abre la conversación.</em>
+        </div>
+      </div>
+      <div class="channel-item">
+        <div class="ch-label">Outbound<br>Email frío</div>
+        <div class="ch-msg">
+          <strong>"Vi que [empresa] usa [ERP/proceso X]. Hay algo concreto que podrías automatizar con IA desde esta semana."</strong><br>
+          <em>Ángulo: ultra-personalizado. No habla de Etendo en el asunto — habla del dolor del destinatario.</em>
+        </div>
+      </div>
+      <div class="channel-item">
+        <div class="ch-label">Instagram<br>Orgánico</div>
+        <div class="ch-msg">
+          <strong>Educativo + detrás de escena: qué es un ERP agéntico, cómo funciona en la práctica, casos reales</strong><br>
+          <em>Ángulo: audiencia más joven, formato visual. Construir confianza antes de la decisión.</em>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Lo que NO somos -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <div>
+        <div class="sec-title">Lo que NO somos — anti-positioning</div>
+        <div class="sec-desc">Tan importante como lo que somos. El análisis de leads confirmó que el mensaje actual genera confusión.</div>
+      </div>
+    </div>
+
+    <div class="not-list">
+      <div class="not-item">
+        <div class="not-x">✕</div>
+        <div>
+          <div class="not-text"><strong>No somos un curso ni una academia de IA.</strong></div>
+          <div class="not-reason">14% de los leads de la campaña "ERP Agéntico" llegaron pensando que se trataba de un curso para aprender IA. El copy y los creativos deben mostrar una empresa usando el producto, no una persona aprendiendo.</div>
+        </div>
+      </div>
+      <div class="not-item">
+        <div class="not-x">✕</div>
+        <div>
+          <div class="not-text"><strong>No somos un plugin ni una integración para tu ERP actual.</strong></div>
+          <div class="not-reason">Dos leads descartados confundieron el producto con "una forma de conectar ChatGPT al ERP que ya tienen". Etendo es un ERP completo — no un añadido. El mensaje debe dejar claro que hablamos de cambiar el ERP, no de parcharle IA encima.</div>
+        </div>
+      </div>
+      <div class="not-item">
+        <div class="not-x">✕</div>
+        <div>
+          <div class="not-text"><strong>No somos una oferta de empleo.</strong></div>
+          <div class="not-reason">50% de los leads de campaña en junio eran personas buscando trabajo. El copy del anuncio debe incluir señales inequívocas de que se dirige a empresas tomando decisiones de software — no a candidatos.</div>
+        </div>
+      </div>
+      <div class="not-item">
+        <div class="not-x">✕</div>
+        <div>
+          <div class="not-text"><strong>No somos SAP ni queremos serlo.</strong></div>
+          <div class="not-reason">La implementación larga, los consultores caros y la complejidad extrema son lo contrario de nuestro diferencial. No usar lenguaje de "enterprise legacy" — hablamos de rapidez, adaptabilidad y equipos pequeños que operan como uno grande.</div>
+        </div>
+      </div>
+      <div class="not-item">
+        <div class="not-x">✕</div>
+        <div>
+          <div class="not-text"><strong>No somos solo para empresas tecnológicas.</strong></div>
+          <div class="not-reason">El perfil de leads más calientes en el pipeline incluye construcción, logística, servicios y retail. El contenido no debe dar por hecho que el lector es CTO — el CEO de una empresa de transporte también es ICP.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Pendientes de validar -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <div>
+        <div class="sec-title">Decisiones pendientes antes de publicar</div>
+        <div class="sec-desc">Estos puntos bloquean parte del trabajo de SEO y SEM hasta que estén resueltos.</div>
+      </div>
+    </div>
+
+    <div class="pending-list">
+      <div class="pending-item">
+        <div class="pending-icon">⚠</div>
+        <div class="pending-body">
+          <strong>Brand architecture: ¿Etendo o Etendo Go como marca principal?</strong><br>
+          Salu necesita saber para qué dominio y brand keywords optimizar. Si son marcas paralelas, el SEO de una puede canibalizar la otra.
+          <div class="pending-who">→ Decide: Fernando / Galder / Javi</div>
+          <div class="response-wrap">
+            <label class="response-label" for="resp-1">Respuesta</label>
+            <textarea id="resp-1" class="response-area" placeholder="¿Una marca o dos? ¿Etendo.software es el dominio único o también existe un dominio Etendo Go? ¿Cuál tiene prioridad en SEO?"></textarea>
+            <div class="response-footer">
+              <input class="resp-name" type="text" placeholder="Tu nombre" aria-label="Tu nombre">
+              <button class="save-btn" onclick="saveResponse('resp-1', this)">Guardar</button>
+              <span class="save-status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pending-item">
+        <div class="pending-icon">⚠</div>
+        <div class="pending-body">
+          <strong>Validación de colores de Etendo Go con Figma de Alexandra</strong><br>
+          Los colores aplicados en abril (#527EFF familia azul) están pendientes de revisión final. Afecta creativos de LinkedIn Ads y banners.
+          <div class="pending-who">→ Valida: Alexandra (Figma) + Rocío</div>
+          <div class="response-wrap">
+            <label class="response-label" for="resp-2">Respuesta</label>
+            <textarea id="resp-2" class="response-area" placeholder="¿Los colores están aprobados? ¿Hay algún ajuste de tono pendiente? ¿Se puede avanzar con los creativos de LinkedIn Ads?"></textarea>
+            <div class="response-footer">
+              <input class="resp-name" type="text" placeholder="Tu nombre" aria-label="Tu nombre">
+              <button class="save-btn" onclick="saveResponse('resp-2', this)">Guardar</button>
+              <span class="save-status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pending-item">
+        <div class="pending-icon">⚠</div>
+        <div class="pending-body">
+          <strong>Publicar borrador "Odoo vs Etendo" (WP draft ID 19807)</strong><br>
+          Está listo desde marzo y pendiente de aprobación de Isaias. Bloquea uno de los quick wins SEO más importantes del Q3.
+          <div class="pending-who">→ Aprueba: Isaias Battaglia</div>
+          <div class="response-wrap">
+            <label class="response-label" for="resp-3">Respuesta</label>
+            <textarea id="resp-3" class="response-area" placeholder="¿Aprobado para publicar? ¿Hay algún punto del contenido a revisar antes?"></textarea>
+            <div class="response-footer">
+              <input class="resp-name" type="text" placeholder="Tu nombre" aria-label="Tu nombre">
+              <button class="save-btn" onclick="saveResponse('resp-3', this)">Guardar</button>
+              <span class="save-status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pending-item">
+        <div class="pending-icon">⚠</div>
+        <div class="pending-body">
+          <strong>Fix GTM: 4 conversion labels secundarias en Google Ads</strong><br>
+          Mientras los 6 eventos cuenten como conversión primaria, el Smart Bidding optimiza para el objetivo equivocado y el CPL real sigue deformado (€61 España vs €40 reportado).
+          <div class="pending-who">→ Ejecuta: Rocío en Google Ads UI</div>
+          <div class="response-wrap">
+            <label class="response-label" for="resp-4">Respuesta</label>
+            <textarea id="resp-4" class="response-area" placeholder="¿Ya está hecho? ¿Hay algún bloqueo para ejecutarlo?"></textarea>
+            <div class="response-footer">
+              <input class="resp-name" type="text" placeholder="Tu nombre" aria-label="Tu nombre">
+              <button class="save-btn" onclick="saveResponse('resp-4', this)">Guardar</button>
+              <span class="save-status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const BRIEF_API = "https://crm-pulse.onrender.com/brief-response";
+
+async function saveResponse(questionKey, btn) {
+  const wrap = btn.closest('.response-wrap');
+  const textarea = wrap.querySelector('textarea');
+  const nameInput = wrap.querySelector('.resp-name');
+  const status = wrap.querySelector('.save-status');
+  const text = textarea.value.trim();
+  const name = (nameInput && nameInput.value.trim()) || 'Anónimo';
+
+  if (!text) {
+    status.textContent = 'Escribí una respuesta primero';
+    status.style.display = 'inline';
+    status.classList.add('error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+  status.style.display = 'none';
+
+  try {
+    const r = await fetch(BRIEF_API, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        question_key: questionKey,
+        respondent: name,
+        response_text: text,
+        brief_id: 'brief_marca_jul2026'
+      })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      textarea.classList.add('saved');
+      btn.textContent = 'Guardado ✓';
+      status.textContent = 'Respuesta guardada';
+      status.classList.remove('error');
+      status.style.display = 'inline';
+    } else {
+      throw new Error(d.error || 'error desconocido');
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Guardar';
+    status.textContent = 'Error: ' + e.message;
+    status.classList.add('error');
+    status.style.display = 'inline';
+  }
+}
+</script>

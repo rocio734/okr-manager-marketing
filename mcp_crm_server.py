@@ -29,6 +29,8 @@ ETENDO_USER     = os.getenv("ETENDO_USERNAME", "")
 ETENDO_PASS     = os.getenv("ETENDO_PASSWORD", "")
 WRITE_URL       = os.getenv("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
 MCP_AUTH_TOKEN  = os.getenv("MCP_AUTH_TOKEN", "")
+SUPABASE_URL    = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY    = os.getenv("SUPABASE_SERVICE_KEY", "")
 _COMERCIAL_ROLE = "8351131DFF384725AB08E06773FE6144"
 _DEAD_STATUSES  = {"dead", "won", "disqualified", "lost"}
 
@@ -338,15 +340,145 @@ async def handle_messages(request: Request):
 
 async def handle_root(_r: Request):
     return Response(
-        '{"service":"etendo-crm-mcp","status":"running","endpoints":["/sse","/health"]}',
+        '{"service":"etendo-crm-mcp","status":"running","endpoints":["/sse","/health","/brief","/brief-response","/brief-responses"]}',
         media_type="application/json",
     )
 
+
+async def handle_brief(_r: Request):
+    brief_path = os.path.join(os.path.dirname(__file__), "brief_marca_etendo_jul2026.html")
+    try:
+        with open(brief_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        return Response(content, media_type="text/html; charset=utf-8")
+    except FileNotFoundError:
+        return Response("Brief no encontrado", status_code=404)
+
+
+# ── Brief response endpoints ────────────────────────────────────────────────
+_CORS_HEADERS = {
+    "Access-Control-Allow-Origin":  "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+}
+
+async def handle_brief_response(request: Request):
+    if request.method == "OPTIONS":
+        return Response("", headers=_CORS_HEADERS)
+    try:
+        body = await request.json()
+    except Exception:
+        return Response('{"error":"invalid json"}', status_code=400,
+                        media_type="application/json", headers=_CORS_HEADERS)
+
+    question_key  = str(body.get("question_key", "")).strip()
+    respondent    = str(body.get("respondent", "Anónimo")).strip() or "Anónimo"
+    response_text = str(body.get("response_text", "")).strip()
+    brief_id      = str(body.get("brief_id", "brief_marca_jul2026")).strip()
+
+    if not question_key or not response_text:
+        return Response('{"error":"question_key and response_text are required"}',
+                        status_code=400, media_type="application/json", headers=_CORS_HEADERS)
+
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return Response('{"error":"supabase not configured"}', status_code=503,
+                        media_type="application/json", headers=_CORS_HEADERS)
+
+    payload = json.dumps([{
+        "brief_id":      brief_id,
+        "question_key":  question_key,
+        "respondent":    respondent,
+        "response_text": response_text,
+    }]).encode()
+    req = urllib.request.Request(
+        f"{SUPABASE_URL}/rest/v1/brief_responses",
+        data=payload, method="POST",
+    )
+    req.add_header("apikey",        SUPABASE_KEY)
+    req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
+    req.add_header("Content-Type",  "application/json")
+    req.add_header("Prefer",        "return=minimal")
+    try:
+        with urllib.request.urlopen(req, timeout=10):
+            pass
+        return Response('{"ok":true}', media_type="application/json", headers=_CORS_HEADERS)
+    except Exception as e:
+        return Response(json.dumps({"error": str(e)}), status_code=500,
+                        media_type="application/json", headers=_CORS_HEADERS)
+
+
+async def handle_brief_responses(request: Request):
+    if not _check_token(request):
+        return Response("Unauthorized", status_code=401)
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return Response('{"error":"supabase not configured"}', status_code=503,
+                        media_type="application/json")
+    req = urllib.request.Request(
+        f"{SUPABASE_URL}/rest/v1/brief_responses?select=*&order=created_at.asc",
+    )
+    req.add_header("apikey",        SUPABASE_KEY)
+    req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read())
+        return Response(
+            _render_responses_html(data),
+            media_type="text/html",
+        )
+    except Exception as e:
+        return Response(json.dumps({"error": str(e)}), status_code=500,
+                        media_type="application/json")
+
+
+def _render_responses_html(rows):
+    LABELS = {
+        "resp-brand-arch":  "Brand architecture (secc. 01)",
+        "resp-1":           "Brand architecture (secc. 06)",
+        "resp-2":           "Colores Etendo Go",
+        "resp-3":           "Publicar Odoo vs Etendo",
+        "resp-4":           "Fix GTM conversion labels",
+    }
+    by_q = {}
+    for r in rows:
+        k = r.get("question_key", "?")
+        by_q.setdefault(k, []).append(r)
+
+    parts = ["<!doctype html><html lang='es'><head><meta charset='UTF-8'>",
+             "<title>Respuestas — Brief Etendo</title>",
+             "<style>body{font-family:system-ui,sans-serif;max-width:700px;margin:40px auto;padding:0 20px;color:#111;}",
+             "h1{font-size:20px;margin-bottom:4px;}p.sub{color:#666;font-size:13px;margin-bottom:32px;}",
+             "h2{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#1863DC;margin:24px 0 8px;}",
+             ".card{background:#f7f9fc;border:1px solid #dde3ed;border-radius:6px;padding:14px 16px;margin-bottom:10px;}",
+             ".who{font-size:11px;font-weight:700;color:#9ca3af;margin-bottom:4px;}",
+             ".text{font-size:14px;line-height:1.5;color:#111;}",
+             ".empty{color:#aaa;font-style:italic;font-size:13px;}",
+             "</style></head><body>",
+             "<h1>Respuestas — Brief de Posicionamiento Etendo</h1>",
+             "<p class='sub'>Actualizado en tiempo real desde Supabase.</p>"]
+
+    for key, label in LABELS.items():
+        parts.append(f"<h2>{label}</h2>")
+        entries = by_q.get(key, [])
+        if not entries:
+            parts.append("<p class='empty'>Sin respuestas aún.</p>")
+        else:
+            for e in entries:
+                ts = (e.get("created_at") or "")[:16].replace("T", " ")
+                parts.append(f"<div class='card'><div class='who'>{e.get('respondent','—')} · {ts}</div>")
+                parts.append(f"<div class='text'>{e.get('response_text','')}</div></div>")
+
+    parts.append("</body></html>")
+    return "".join(parts)
+
+
 app = Starlette(routes=[
-    Route("/",          endpoint=handle_root),
-    Route("/sse",       endpoint=handle_sse),
-    Route("/messages/", endpoint=handle_messages, methods=["POST"]),
-    Route("/health",    endpoint=lambda _r: Response("ok")),
+    Route("/",                 endpoint=handle_root),
+    Route("/sse",              endpoint=handle_sse),
+    Route("/messages/",        endpoint=handle_messages, methods=["POST"]),
+    Route("/health",           endpoint=lambda _r: Response("ok")),
+    Route("/brief",            endpoint=handle_brief,            methods=["GET"]),
+    Route("/brief-response",   endpoint=handle_brief_response,  methods=["POST", "OPTIONS"]),
+    Route("/brief-responses",  endpoint=handle_brief_responses, methods=["GET"]),
 ])
 
 if __name__ == "__main__":
