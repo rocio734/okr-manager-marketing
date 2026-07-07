@@ -322,7 +322,12 @@ sse = SseServerTransport("/messages/")
 def _check_token(request: Request) -> bool:
     if not MCP_AUTH_TOKEN:
         return True
-    return request.query_params.get("token", "") == MCP_AUTH_TOKEN
+    if request.query_params.get("token", "") == MCP_AUTH_TOKEN:
+        return True
+    auth = request.headers.get("authorization", "")
+    if auth.lower().startswith("bearer "):
+        return auth[7:].strip() == MCP_AUTH_TOKEN
+    return False
 
 
 async def handle_sse(request: Request):
