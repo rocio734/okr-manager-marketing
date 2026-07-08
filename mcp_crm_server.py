@@ -9,7 +9,7 @@ Tools expuestos:
   agregar_nota      — guarda nota en ETCRM_Lead_Note
   pipeline_resumen  — agrupado por estado
 """
-import os, json, re, threading
+import os, json, re, base64, threading
 import urllib.request, urllib.parse, http.cookiejar
 from datetime import datetime, timezone
 
@@ -242,34 +242,37 @@ def _tool_agregar_nota(args):
         return f"No encontré ningún lead con '{empresa}'."
     lead = matches[0]
 
-    sid, cookie_str, csrf = _sid_login()
-    if not sid:
-        return "Error de autenticación al conectar con el CRM."
+    payload = json.dumps({"lead": lead["id"], "note": nota_txt}).encode()
+    basic   = base64.b64encode(f"{ETENDO_USER}:{ETENDO_PASS}".encode()).decode()
 
-    payload = json.dumps({
-        "lead": lead["id"],
-        "note": nota_txt,
-    }).encode()
+    # Intento 1: Basic Auth — stateless, no pasa por el filtro CSRF de sesión
     req = urllib.request.Request(
         f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead_Note",
         data=payload, method="POST",
     )
-    req.add_header("Cookie",       cookie_str)
-    req.add_header("Content-Type", "application/json")
-    req.add_header("Accept",       "application/json")
-    if csrf:
-        req.add_header("X-CSRF-Token", csrf)
+    req.add_header("Authorization", f"Basic {basic}")
+    req.add_header("Content-Type",  "application/json")
+    req.add_header("Accept",        "application/json")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             resp = json.loads(r.read())
         status = resp.get("response", {}).get("status")
         if status == 0:
             return f"Nota guardada en {lead['empresa']}:\n\"{nota_txt}\""
-        else:
-            err = resp.get("response", {}).get("error", "respuesta inesperada")
-            return f"Error del CRM: {err} [csrf={'ok' if csrf else 'no encontrado'}]"
+        return f"Error (basic-auth): {resp.get('response',{}).get('error','?')}"
     except Exception as e:
-        return f"Error al guardar la nota: {e} [csrf={'ok' if csrf else 'no encontrado'}]"
+        basic_err = f"{type(e).__name__}: {str(e)[:150]}"
+
+    # Intento 2: sesión + diagnóstico (para entender qué pasa con CSRF)
+    sid, cookie_str, csrf = _sid_login()
+    cookie_names = [p.split("=")[0].strip() for p in cookie_str.split(";")] if cookie_str else []
+    return (
+        f"Ambos intentos fallaron.\n"
+        f"Basic-auth: {basic_err}\n"
+        f"Sesión: sid={'ok' if sid else 'ERR'}, "
+        f"cookies={cookie_names}, "
+        f"csrf={'ok' if csrf else 'no encontrado'}"
+    )
 
 
 def _tool_pipeline_resumen(_args):
