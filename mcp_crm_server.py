@@ -115,11 +115,27 @@ def _sid_login():
     if not csrf:
         csrf = _find_csrf(login_html)
 
-    dbg = [f"login_html={len(login_html)}b,sid={'ok' if sid else 'ERR'},cookies=[{','.join(cookies)}],body={login_html!r}"]
+    dbg = [f"sid={'ok' if sid else 'ERR'},cookies=[{','.join(cookies)}]"]
+
+    # Inicializar sesión con rol antes de llamar al kernel
+    if sid and not csrf:
+        try:
+            init_req = urllib.request.Request(
+                f"{WRITE_URL}/secureApp/HttpSecureAppServlet"
+                f"?Command=DEFAULT&inpadRoleId={_COMERCIAL_ROLE}&inpadIsRTL=N",
+                method="GET",
+            )
+            with opener.open(init_req, timeout=15) as r:
+                init_html = r.read().decode("utf-8", errors="ignore")
+            csrf = _find_csrf(init_html)
+            ci = init_html.lower().find("csrf")
+            ctx = repr(init_html[max(0, ci-20):ci+80]) if ci >= 0 else repr(init_html[:80])
+            dbg.append(f"sess_init={len(init_html)}b,csrf={csrf!r},ctx={ctx}")
+        except Exception as ex:
+            dbg.append(f"sess_init=ERR:{str(ex)[:60]}")
 
     if not csrf and sid:
         for path in (
-            "/org.openbravo.client.kernel?_action=org.openbravo.client.application.DynamicApplicationMenuComponent",
             "/org.openbravo.client.kernel?_action=org.openbravo.client.application.CachedSessionValuesComponent",
             "/",
         ):
@@ -137,39 +153,10 @@ def _sid_login():
                 if found:
                     csrf = found
                     break
-                # For root page: fetch kernel servlet scripts (not static web resources)
+                # For root page: show all src attrs so we can see the real structure
                 if path == "/" and not csrf:
-                    srcs = re.findall(
-                        r'src=["\']([^"\']*org\.openbravo\.client\.kernel\?[^"\']*)["\']',
-                        content
-                    )
-                    dbg.append(f"kernel_scripts={len(srcs)}")
-                    for src in srcs[:3]:
-                        if src.startswith("http"):
-                            script_url = src
-                        elif src.startswith("/"):
-                            script_url = f"https://staff-ui.etendo.cloud{src}"
-                        else:
-                            script_url = f"{WRITE_URL}/{src.lstrip('./')}"
-                        try:
-                            sr = urllib.request.Request(script_url, method="GET")
-                            sr.add_header("Referer", f"{WRITE_URL}/")
-                            sr.add_header("Accept",  "*/*")
-                            with opener.open(sr, timeout=25) as r2:
-                                sc = r2.read().decode("utf-8", errors="ignore")
-                            found = _find_csrf(sc)
-                            ci2   = sc.lower().find("csrf")
-                            if ci2 >= 0:
-                                sctx = repr(sc[max(0, ci2-20):ci2+80])
-                            else:
-                                sctx = repr(sc[:200])  # show full content when small
-                            key = (src.split("?", 1)[1] if "?" in src else src)[:30]
-                            dbg.append(f"js[{key}]={len(sc)}b,csrf={found!r},body={sctx}")
-                            if found:
-                                csrf = found
-                                break
-                        except Exception as ex:
-                            dbg.append(f"js_err={str(ex)[:60]}")
+                    all_srcs = re.findall(r'src=["\']([^"\']{1,120})["\']', content)
+                    dbg.append(f"root_srcs={[s[:60] for s in all_srcs]!r}")
             except Exception as ex:
                 label = path.split("?")[-1][:30] if "?" in path else (path.strip("/") or "root")
                 dbg.append(f"{label}=ERR:{type(ex).__name__}:{str(ex)[:50]}")
