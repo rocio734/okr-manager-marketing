@@ -73,6 +73,7 @@ def _fetch(jwt, entity):
 
 
 def _sid_login():
+    """Login via form and return (jsessionid, all_cookies_string)."""
     jar    = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
     body   = urllib.parse.urlencode({
@@ -87,10 +88,10 @@ def _sid_login():
             pass
     except Exception:
         pass
-    for cookie in jar:
-        if cookie.name == "JSESSIONID":
-            return cookie.value
-    return ""
+    cookies = {c.name: c.value for c in jar}
+    sid = cookies.get("JSESSIONID", "")
+    cookie_str = "; ".join(f"{k}={v}" for k, v in cookies.items())
+    return sid, cookie_str
 
 
 def _days_since(date_str):
@@ -202,7 +203,7 @@ def _tool_agregar_nota(args):
         return f"No encontré ningún lead con '{empresa}'."
     lead = matches[0]
 
-    sid = _sid_login()
+    sid, cookie_str = _sid_login()
     if not sid:
         return "Error de autenticación al conectar con el CRM."
 
@@ -214,9 +215,10 @@ def _tool_agregar_nota(args):
         f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead_Note",
         data=payload, method="POST",
     )
-    req.add_header("Cookie",       f"JSESSIONID={sid}")
-    req.add_header("Content-Type", "application/json")
-    req.add_header("Accept",       "application/json")
+    req.add_header("Cookie",           cookie_str)
+    req.add_header("Content-Type",     "application/json")
+    req.add_header("Accept",           "application/json")
+    req.add_header("X-Requested-With", "XMLHttpRequest")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             resp = json.loads(r.read())
