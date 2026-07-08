@@ -203,22 +203,22 @@ def _tool_agregar_nota(args):
         return f"No encontré ningún lead con '{empresa}'."
     lead = matches[0]
 
-    sid, cookie_str = _sid_login()
-    if not sid:
-        return "Error de autenticación al conectar con el CRM."
+    try:
+        jwt = _login()
+    except Exception as e:
+        return f"Error de autenticación: {e}"
 
     payload = json.dumps({
         "lead": lead["id"],
         "note": nota_txt,
     }).encode()
     req = urllib.request.Request(
-        f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead_Note",
+        f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
         data=payload, method="POST",
     )
-    req.add_header("Cookie",           cookie_str)
-    req.add_header("Content-Type",     "application/json")
-    req.add_header("Accept",           "application/json")
-    req.add_header("X-Requested-With", "XMLHttpRequest")
+    req.add_header("Authorization", f"Bearer {jwt}")
+    req.add_header("Content-Type",  "application/json")
+    req.add_header("Accept",        "application/json")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             resp = json.loads(r.read())
