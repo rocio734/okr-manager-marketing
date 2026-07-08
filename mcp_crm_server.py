@@ -80,6 +80,7 @@ def _find_csrf(text):
         r'name=["\']csrfToken["\'][^>]*value=["\']([\w+/=_-]{8,})["\']',
         r'value=["\']([\w+/=_-]{8,})["\'][^>]*name=["\']csrfToken["\']',
         r"csrfToken['\"]?\s*[,\s:=]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
+        r'csrfToken=([A-Za-z0-9_-]{8,})',  # URL query param sin comillas
     ]:
         m = re.search(p, text, re.IGNORECASE)
         if m:
@@ -118,23 +119,27 @@ def _sid_login():
 
     if not csrf and sid:
         for path in (
+            "/org.openbravo.client.kernel?_action=org.openbravo.client.application.DynamicApplicationMenuComponent",
             "/org.openbravo.client.kernel?_action=org.openbravo.client.application.CachedSessionValuesComponent",
-            "/web/org.openbravo.client.kernel",
             "/",
-            "/index.html",
         ):
             try:
                 pr = urllib.request.Request(f"{WRITE_URL}{path}", method="GET")
                 with opener.open(pr, timeout=15) as r:
                     content = r.read().decode("utf-8", errors="ignore")
                 found = _find_csrf(content)
-                label = path.split("?")[0].split("/")[-1] or "root"
-                dbg.append(f"{label}={len(content)}b,head={content[:60]!r},csrf={found!r}")
+                label = path.split("?")[-1][:30] if "?" in path else (path.strip("/") or "root")
+                # show context around 'csrf' if present but not found by regex
+                csrf_ctx = ""
+                ci = content.lower().find("csrf")
+                if ci >= 0:
+                    csrf_ctx = ",ctx=" + repr(content[max(0,ci-30):ci+100])
+                dbg.append(f"{label}={len(content)}b,csrf={found!r}{csrf_ctx}")
                 if found:
                     csrf = found
                     break
             except Exception as ex:
-                label = path.split("?")[0].split("/")[-1] or "root"
+                label = path.split("?")[-1][:30] if "?" in path else (path.strip("/") or "root")
                 dbg.append(f"{label}=ERR:{type(ex).__name__}:{str(ex)[:50]}")
 
     return sid, cookie_str, csrf, " | ".join(dbg)
