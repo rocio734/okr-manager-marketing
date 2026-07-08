@@ -115,7 +115,7 @@ def _sid_login():
     if not csrf:
         csrf = _find_csrf(login_html)
 
-    dbg = [f"login_html={len(login_html)}b,sid={'ok' if sid else 'ERR'},cookies=[{','.join(cookies)}]"]
+    dbg = [f"login_html={len(login_html)}b,sid={'ok' if sid else 'ERR'},cookies=[{','.join(cookies)}],body={login_html!r}"]
 
     if not csrf and sid:
         for path in (
@@ -260,10 +260,12 @@ def _tool_agregar_nota(args):
     jwt_err = ""
     try:
         jwt  = _login()
+        # Intento 1a: JWT + _csrfToken=jwt (JWT-as-CSRF defense pattern)
         body = urllib.parse.urlencode({
             "_operationType": "add",
             "lead": lead["id"],
             "note": nota_txt,
+            "_csrfToken": jwt,
         }).encode()
         r2 = urllib.request.Request(
             f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
