@@ -259,31 +259,47 @@ def _tool_agregar_nota(args):
     # Intento 1: form-encoded add con JWT (misma ruta que los reads que funcionan)
     jwt_err = ""
     try:
-        jwt  = _login()
-        # Intento 1a: JWT + _csrfToken=jwt (JWT-as-CSRF defense pattern)
-        body = urllib.parse.urlencode({
-            "_operationType": "add",
-            "lead": lead["id"],
-            "note": nota_txt,
-            "_csrfToken": jwt,
-        }).encode()
+        jwt = _login()
+        # Intento 1: JSON puro sin _operationType (evita CSRF check del SmartClient)
+        body_json = json.dumps({"lead": lead["id"], "note": nota_txt}).encode()
         r2 = urllib.request.Request(
             f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
-            data=body, method="POST",
+            data=body_json, method="POST",
         )
         r2.add_header("Authorization", f"Bearer {jwt}")
-        r2.add_header("Content-Type",  "application/x-www-form-urlencoded")
+        r2.add_header("Content-Type",  "application/json")
         r2.add_header("Accept",        "application/json")
         with urllib.request.urlopen(r2, timeout=30) as r:
             resp = json.loads(r.read())
         if resp.get("response", {}).get("status") == 0:
             return f"Nota guardada en {lead['empresa']}:\n\"{nota_txt}\""
-        jwt_err = str(resp.get("response", {}).get("error", resp))[:120]
+        jwt_err = f"json-post:{str(resp.get('response', {}).get('error', resp))[:100]}"
     except Exception as ex:
-        jwt_err = f"{type(ex).__name__}:{str(ex)[:100]}"
+        jwt_err = f"json-post:{type(ex).__name__}:{str(ex)[:80]}"
 
-    # Intento 2: sesión con CSRF extraído + diagnóstico
-    sid, cookie_str, csrf, dbg = _sid_login()
+    # Intento 2: sesión + CachedSessionValuesComponent via POST para obtener CSRF real
+    _, cookie_str, csrf, dbg = _sid_login()
+    if not csrf and cookie_str:
+        try:
+            post_body = urllib.parse.urlencode({
+                "_action": "org.openbravo.client.application.CachedSessionValuesComponent",
+            }).encode()
+            pr = urllib.request.Request(
+                f"{WRITE_URL}/org.openbravo.client.kernel", data=post_body, method="POST"
+            )
+            pr.add_header("Cookie",            cookie_str)
+            pr.add_header("Content-Type",      "application/x-www-form-urlencoded")
+            pr.add_header("X-Requested-With",  "XMLHttpRequest")
+            pr.add_header("Accept",            "*/*")
+            with urllib.request.urlopen(pr, timeout=15) as r:
+                content = r.read().decode("utf-8", errors="ignore")
+            csrf = _find_csrf(content)
+            ci = content.lower().find("csrf")
+            ctx = repr(content[max(0, ci-20):ci+80]) if ci >= 0 else repr(content[:80])
+            dbg += f" | cached_post={len(content)}b,csrf={csrf!r},ctx={ctx}"
+        except Exception as ex:
+            dbg += f" | cached_post=ERR:{ex}"
+
     if csrf:
         req = urllib.request.Request(
             f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead_Note",
@@ -302,7 +318,7 @@ def _tool_agregar_nota(args):
         except Exception as ex:
             return f"Error (session+csrf): {ex}"
 
-    return f"JWT-form: {jwt_err} | {dbg}"
+    return f"{jwt_err} | {dbg}"
 
 
 def _tool_pipeline_resumen(_args):
