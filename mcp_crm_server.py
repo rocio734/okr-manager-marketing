@@ -9,7 +9,7 @@ Tools expuestos:
   agregar_nota      — guarda nota en ETCRM_Lead_Note
   pipeline_resumen  — agrupado por estado
 """
-import os, json, threading
+import os, json, re, threading
 import urllib.request, urllib.parse, http.cookiejar
 from datetime import datetime, timezone
 
@@ -73,7 +73,7 @@ def _fetch(jwt, entity):
 
 
 def _sid_login():
-    """Login via form and return (jsessionid, all_cookies_string)."""
+    """Login via form; return (jsessionid, all_cookies_str, csrf_token)."""
     jar    = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
     body   = urllib.parse.urlencode({
@@ -83,15 +83,46 @@ def _sid_login():
         f"{WRITE_URL}/secureApp/LoginHandler.html", data=body, method="POST"
     )
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    login_html = ""
     try:
-        with opener.open(req):
-            pass
+        with opener.open(req) as r:
+            login_html = r.read().decode("utf-8", errors="ignore")
     except Exception:
         pass
     cookies = {c.name: c.value for c in jar}
     sid = cookies.get("JSESSIONID", "")
     cookie_str = "; ".join(f"{k}={v}" for k, v in cookies.items())
-    return sid, cookie_str
+
+    def _find_csrf(text):
+        for p in [
+            r"['\"]csrfToken['\"]\s*[,:\s]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
+            r'name=["\']csrfToken["\'][^>]*value=["\']([\w+/=_-]{8,})["\']',
+            r'value=["\']([\w+/=_-]{8,})["\'][^>]*name=["\']csrfToken["\']',
+            r"csrfToken['\"]?\s*[,\s:=]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
+        ]:
+            m = re.search(p, text, re.IGNORECASE)
+            if m:
+                return m.group(1)
+        return ""
+
+    # 1) Cookie-based CSRF (double-submit pattern)
+    csrf = (cookies.get("CSRF_TOKEN") or cookies.get("XSRF-TOKEN") or
+            cookies.get("csrfToken") or cookies.get("_csrf") or "")
+    # 2) Login redirect HTML
+    if not csrf:
+        csrf = _find_csrf(login_html)
+    # 3) Kernel / main page
+    if not csrf and sid:
+        for path in ("/web/org.openbravo.client.kernel", "/", "/index.html"):
+            try:
+                pr = urllib.request.Request(f"{WRITE_URL}{path}", method="GET")
+                with opener.open(pr, timeout=15) as r:
+                    csrf = _find_csrf(r.read().decode("utf-8", errors="ignore"))
+                if csrf:
+                    break
+            except Exception:
+                pass
+    return sid, cookie_str, csrf
 
 
 def _days_since(date_str):
@@ -203,22 +234,23 @@ def _tool_agregar_nota(args):
         return f"No encontré ningún lead con '{empresa}'."
     lead = matches[0]
 
-    try:
-        jwt = _login()
-    except Exception as e:
-        return f"Error de autenticación: {e}"
+    sid, cookie_str, csrf = _sid_login()
+    if not sid:
+        return "Error de autenticación al conectar con el CRM."
 
     payload = json.dumps({
         "lead": lead["id"],
         "note": nota_txt,
     }).encode()
     req = urllib.request.Request(
-        f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
+        f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead_Note",
         data=payload, method="POST",
     )
-    req.add_header("Authorization", f"Bearer {jwt}")
-    req.add_header("Content-Type",  "application/json")
-    req.add_header("Accept",        "application/json")
+    req.add_header("Cookie",       cookie_str)
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Accept",       "application/json")
+    if csrf:
+        req.add_header("X-CSRF-Token", csrf)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             resp = json.loads(r.read())
@@ -226,9 +258,10 @@ def _tool_agregar_nota(args):
         if status == 0:
             return f"Nota guardada en {lead['empresa']}:\n\"{nota_txt}\""
         else:
-            return f"Error del CRM al guardar: {resp.get('response',{}).get('error','respuesta inesperada')}"
+            err = resp.get("response", {}).get("error", "respuesta inesperada")
+            return f"Error del CRM: {err} [csrf={'ok' if csrf else 'no encontrado'}]"
     except Exception as e:
-        return f"Error al guardar la nota: {e}"
+        return f"Error al guardar la nota: {e} [csrf={'ok' if csrf else 'no encontrado'}]"
 
 
 def _tool_pipeline_resumen(_args):
