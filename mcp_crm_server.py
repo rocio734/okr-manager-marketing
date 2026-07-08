@@ -9,7 +9,7 @@ Tools expuestos:
   agregar_nota      — guarda nota en ETCRM_Lead_Note
   pipeline_resumen  — agrupado por estado
 """
-import os, json
+import os, json, threading
 import urllib.request, urllib.parse, http.cookiejar
 from datetime import datetime, timezone
 
@@ -333,17 +333,6 @@ def _check_token(request: Request) -> bool:
 async def handle_sse(request: Request):
     if not _check_token(request):
         return Response("Unauthorized", status_code=401)
-    # EventSource auto-reconnects with Last-Event-ID but our server doesn't support
-    # session resumption. Send authentication-needed so mcp-remote does a full
-    # reconnect (with initialize) instead of resuming a stale uninitialized session.
-    if request.headers.get("last-event-id"):
-        async def _force_reinit():
-            yield "event: error\ndata: authentication-needed\n\n"
-        return StreamingResponse(
-            _force_reinit(),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache"},
-        )
     async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
         await server.run(streams[0], streams[1], server.create_initialization_options())
 
@@ -597,6 +586,19 @@ app = Starlette(routes=[
     Route("/brief-responses",       endpoint=handle_brief_responses,    methods=["GET"]),
     Route("/brief-responses-json",  endpoint=handle_brief_responses_json, methods=["GET", "OPTIONS"]),
 ])
+
+def _keepalive():
+    """Ping self every 10 min so Render free tier never sleeps."""
+    import time
+    time.sleep(60)
+    while True:
+        try:
+            urllib.request.urlopen("https://crm-pulse.onrender.com/health", timeout=10)
+        except Exception:
+            pass
+        time.sleep(10 * 60)
+
+threading.Thread(target=_keepalive, daemon=True).start()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8000"))
