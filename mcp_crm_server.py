@@ -137,27 +137,34 @@ def _sid_login():
                 if found:
                     csrf = found
                     break
-                # For root page: also parse and fetch kernel script tags
+                # For root page: fetch kernel servlet scripts (not static web resources)
                 if path == "/" and not csrf:
                     srcs = re.findall(
-                        r'src=["\']([^"\']*org\.openbravo\.client\.kernel[^"\']*)["\']',
+                        r'src=["\']([^"\']*org\.openbravo\.client\.kernel\?[^"\']*)["\']',
                         content
                     )
-                    dbg.append(f"root_kernel_scripts={len(srcs)}")
+                    dbg.append(f"kernel_scripts={len(srcs)}")
                     for src in srcs[:3]:
-                        script_url = (
-                            ("https://staff-ui.etendo.cloud" + src)
-                            if src.startswith("/") else f"{WRITE_URL}/{src}"
-                        )
+                        if src.startswith("http"):
+                            script_url = src
+                        elif src.startswith("/"):
+                            script_url = f"https://staff-ui.etendo.cloud{src}"
+                        else:
+                            script_url = f"{WRITE_URL}/{src.lstrip('./')}"
                         try:
                             sr = urllib.request.Request(script_url, method="GET")
+                            sr.add_header("Referer", f"{WRITE_URL}/")
+                            sr.add_header("Accept",  "*/*")
                             with opener.open(sr, timeout=25) as r2:
                                 sc = r2.read().decode("utf-8", errors="ignore")
                             found = _find_csrf(sc)
-                            ci2 = sc.lower().find("csrf")
-                            sctx = repr(sc[max(0, ci2-20):ci2+80]) if ci2 >= 0 else ""
-                            key  = (src.split("?", 1)[1] if "?" in src else src)[:25]
-                            dbg.append(f"js[{key}]={len(sc)}b,csrf={found!r}" + (f",ctx={sctx}" if sctx else ""))
+                            ci2   = sc.lower().find("csrf")
+                            if ci2 >= 0:
+                                sctx = repr(sc[max(0, ci2-20):ci2+80])
+                            else:
+                                sctx = repr(sc[:200])  # show full content when small
+                            key = (src.split("?", 1)[1] if "?" in src else src)[:30]
+                            dbg.append(f"js[{key}]={len(sc)}b,csrf={found!r},body={sctx}")
                             if found:
                                 csrf = found
                                 break
