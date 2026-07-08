@@ -95,6 +95,8 @@ def _sid_login():
 
     def _find_csrf(text):
         for p in [
+            r'"csrfToken"\s*:\s*"([A-Za-z0-9_-]{8,})"',
+            r"'csrfToken'\s*:\s*'([A-Za-z0-9_-]{8,})'",
             r"['\"]csrfToken['\"]\s*[,:\s]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
             r'name=["\']csrfToken["\'][^>]*value=["\']([\w+/=_-]{8,})["\']',
             r'value=["\']([\w+/=_-]{8,})["\'][^>]*name=["\']csrfToken["\']',
@@ -111,13 +113,19 @@ def _sid_login():
     # 2) Login redirect HTML
     if not csrf:
         csrf = _find_csrf(login_html)
-    # 3) Kernel / main page
+    # 3) OpenBravo/Etendo kernel session component — returns CSRF as JSON
     if not csrf and sid:
-        for path in ("/web/org.openbravo.client.kernel", "/", "/index.html"):
+        for path in (
+            "/org.openbravo.client.kernel?_action=org.openbravo.client.application.CachedSessionValuesComponent",
+            "/web/org.openbravo.client.kernel",
+            "/",
+            "/index.html",
+        ):
             try:
                 pr = urllib.request.Request(f"{WRITE_URL}{path}", method="GET")
                 with opener.open(pr, timeout=15) as r:
-                    csrf = _find_csrf(r.read().decode("utf-8", errors="ignore"))
+                    content = r.read().decode("utf-8", errors="ignore")
+                csrf = _find_csrf(content)
                 if csrf:
                     break
             except Exception:
