@@ -129,15 +129,40 @@ def _sid_login():
                     content = r.read().decode("utf-8", errors="ignore")
                 found = _find_csrf(content)
                 label = path.split("?")[-1][:30] if "?" in path else (path.strip("/") or "root")
-                # show context around 'csrf' if present but not found by regex
                 csrf_ctx = ""
                 ci = content.lower().find("csrf")
                 if ci >= 0:
-                    csrf_ctx = ",ctx=" + repr(content[max(0,ci-30):ci+100])
+                    csrf_ctx = ",ctx=" + repr(content[max(0, ci-30):ci+100])
                 dbg.append(f"{label}={len(content)}b,csrf={found!r}{csrf_ctx}")
                 if found:
                     csrf = found
                     break
+                # For root page: also parse and fetch kernel script tags
+                if path == "/" and not csrf:
+                    srcs = re.findall(
+                        r'src=["\']([^"\']*org\.openbravo\.client\.kernel[^"\']*)["\']',
+                        content
+                    )
+                    dbg.append(f"root_kernel_scripts={len(srcs)}")
+                    for src in srcs[:3]:
+                        script_url = (
+                            ("https://staff-ui.etendo.cloud" + src)
+                            if src.startswith("/") else f"{WRITE_URL}/{src}"
+                        )
+                        try:
+                            sr = urllib.request.Request(script_url, method="GET")
+                            with opener.open(sr, timeout=25) as r2:
+                                sc = r2.read().decode("utf-8", errors="ignore")
+                            found = _find_csrf(sc)
+                            ci2 = sc.lower().find("csrf")
+                            sctx = repr(sc[max(0, ci2-20):ci2+80]) if ci2 >= 0 else ""
+                            key  = (src.split("?", 1)[1] if "?" in src else src)[:25]
+                            dbg.append(f"js[{key}]={len(sc)}b,csrf={found!r}" + (f",ctx={sctx}" if sctx else ""))
+                            if found:
+                                csrf = found
+                                break
+                        except Exception as ex:
+                            dbg.append(f"js_err={str(ex)[:60]}")
             except Exception as ex:
                 label = path.split("?")[-1][:30] if "?" in path else (path.strip("/") or "root")
                 dbg.append(f"{label}=ERR:{type(ex).__name__}:{str(ex)[:50]}")
@@ -256,49 +281,29 @@ def _tool_agregar_nota(args):
 
     payload = json.dumps({"lead": lead["id"], "note": nota_txt}).encode()
 
-    # Intento 1: form-encoded add con JWT (misma ruta que los reads que funcionan)
-    jwt_err = ""
+    # Intento 1: JSON REST service con Basic Auth — endpoint fuera del CSRF filter
+    basic_err = ""
     try:
-        jwt = _login()
-        # Intento 1: JSON puro sin _operationType (evita CSRF check del SmartClient)
-        body_json = json.dumps({"lead": lead["id"], "note": nota_txt}).encode()
-        r2 = urllib.request.Request(
-            f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
-            data=body_json, method="POST",
+        basic     = base64.b64encode(f"{ETENDO_USER}:{ETENDO_PASS}".encode()).decode()
+        body_rest = json.dumps({"data": {"lead": lead["id"], "note": nota_txt}}).encode()
+        req = urllib.request.Request(
+            f"{WRITE_URL}/org.openbravo.service.json/ETCRM_Lead_Note",
+            data=body_rest, method="POST",
         )
-        r2.add_header("Authorization", f"Bearer {jwt}")
-        r2.add_header("Content-Type",  "application/json")
-        r2.add_header("Accept",        "application/json")
-        with urllib.request.urlopen(r2, timeout=30) as r:
-            resp = json.loads(r.read())
+        req.add_header("Authorization", f"Basic {basic}")
+        req.add_header("Content-Type",  "application/json")
+        req.add_header("Accept",        "application/json")
+        with urllib.request.urlopen(req, timeout=30) as r:
+            raw  = r.read().decode("utf-8", errors="ignore")
+            resp = json.loads(raw)
         if resp.get("response", {}).get("status") == 0:
             return f"Nota guardada en {lead['empresa']}:\n\"{nota_txt}\""
-        jwt_err = f"json-post:{str(resp.get('response', {}).get('error', resp))[:100]}"
+        basic_err = f"rest-basic:{raw[:150]}"
     except Exception as ex:
-        jwt_err = f"json-post:{type(ex).__name__}:{str(ex)[:80]}"
+        basic_err = f"rest-basic:{type(ex).__name__}:{str(ex)[:100]}"
 
-    # Intento 2: sesión + CachedSessionValuesComponent via POST para obtener CSRF real
+    # Intento 2: sesión + extraer CSRF de scripts del kernel en el root page
     _, cookie_str, csrf, dbg = _sid_login()
-    if not csrf and cookie_str:
-        try:
-            post_body = urllib.parse.urlencode({
-                "_action": "org.openbravo.client.application.CachedSessionValuesComponent",
-            }).encode()
-            pr = urllib.request.Request(
-                f"{WRITE_URL}/org.openbravo.client.kernel", data=post_body, method="POST"
-            )
-            pr.add_header("Cookie",            cookie_str)
-            pr.add_header("Content-Type",      "application/x-www-form-urlencoded")
-            pr.add_header("X-Requested-With",  "XMLHttpRequest")
-            pr.add_header("Accept",            "*/*")
-            with urllib.request.urlopen(pr, timeout=15) as r:
-                content = r.read().decode("utf-8", errors="ignore")
-            csrf = _find_csrf(content)
-            ci = content.lower().find("csrf")
-            ctx = repr(content[max(0, ci-20):ci+80]) if ci >= 0 else repr(content[:80])
-            dbg += f" | cached_post={len(content)}b,csrf={csrf!r},ctx={ctx}"
-        except Exception as ex:
-            dbg += f" | cached_post=ERR:{ex}"
 
     if csrf:
         req = urllib.request.Request(
@@ -318,7 +323,7 @@ def _tool_agregar_nota(args):
         except Exception as ex:
             return f"Error (session+csrf): {ex}"
 
-    return f"{jwt_err} | {dbg}"
+    return f"{basic_err} | {dbg}"
 
 
 def _tool_pipeline_resumen(_args):
