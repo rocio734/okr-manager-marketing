@@ -72,8 +72,23 @@ def _fetch(jwt, entity):
     return out
 
 
+def _find_csrf(text):
+    for p in [
+        r'"csrfToken"\s*:\s*"([A-Za-z0-9_-]{8,})"',
+        r"'csrfToken'\s*:\s*'([A-Za-z0-9_-]{8,})'",
+        r"['\"]csrfToken['\"]\s*[,:\s]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
+        r'name=["\']csrfToken["\'][^>]*value=["\']([\w+/=_-]{8,})["\']',
+        r'value=["\']([\w+/=_-]{8,})["\'][^>]*name=["\']csrfToken["\']',
+        r"csrfToken['\"]?\s*[,\s:=]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
+    ]:
+        m = re.search(p, text, re.IGNORECASE)
+        if m:
+            return m.group(1)
+    return ""
+
+
 def _sid_login():
-    """Login via form; return (jsessionid, all_cookies_str, csrf_token)."""
+    """Login via form; return (jsessionid, all_cookies_str, csrf_token, debug_str)."""
     jar    = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
     body   = urllib.parse.urlencode({
@@ -87,33 +102,20 @@ def _sid_login():
     try:
         with opener.open(req) as r:
             login_html = r.read().decode("utf-8", errors="ignore")
-    except Exception:
-        pass
+    except Exception as ex:
+        return "", "", "", f"login_err={ex!r:.100}"
+
     cookies = {c.name: c.value for c in jar}
     sid = cookies.get("JSESSIONID", "")
     cookie_str = "; ".join(f"{k}={v}" for k, v in cookies.items())
 
-    def _find_csrf(text):
-        for p in [
-            r'"csrfToken"\s*:\s*"([A-Za-z0-9_-]{8,})"',
-            r"'csrfToken'\s*:\s*'([A-Za-z0-9_-]{8,})'",
-            r"['\"]csrfToken['\"]\s*[,:\s]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
-            r'name=["\']csrfToken["\'][^>]*value=["\']([\w+/=_-]{8,})["\']',
-            r'value=["\']([\w+/=_-]{8,})["\'][^>]*name=["\']csrfToken["\']',
-            r"csrfToken['\"]?\s*[,\s:=]+\s*['\"]([A-Za-z0-9+/=_-]{8,})['\"]",
-        ]:
-            m = re.search(p, text, re.IGNORECASE)
-            if m:
-                return m.group(1)
-        return ""
-
-    # 1) Cookie-based CSRF (double-submit pattern)
     csrf = (cookies.get("CSRF_TOKEN") or cookies.get("XSRF-TOKEN") or
             cookies.get("csrfToken") or cookies.get("_csrf") or "")
-    # 2) Login redirect HTML
     if not csrf:
         csrf = _find_csrf(login_html)
-    # 3) OpenBravo/Etendo kernel session component — returns CSRF as JSON
+
+    dbg = [f"login_html={len(login_html)}b,sid={'ok' if sid else 'ERR'},cookies=[{','.join(cookies)}]"]
+
     if not csrf and sid:
         for path in (
             "/org.openbravo.client.kernel?_action=org.openbravo.client.application.CachedSessionValuesComponent",
@@ -125,12 +127,17 @@ def _sid_login():
                 pr = urllib.request.Request(f"{WRITE_URL}{path}", method="GET")
                 with opener.open(pr, timeout=15) as r:
                     content = r.read().decode("utf-8", errors="ignore")
-                csrf = _find_csrf(content)
-                if csrf:
+                found = _find_csrf(content)
+                label = path.split("?")[0].split("/")[-1] or "root"
+                dbg.append(f"{label}={len(content)}b,head={content[:60]!r},csrf={found!r}")
+                if found:
+                    csrf = found
                     break
-            except Exception:
-                pass
-    return sid, cookie_str, csrf
+            except Exception as ex:
+                label = path.split("?")[0].split("/")[-1] or "root"
+                dbg.append(f"{label}=ERR:{type(ex).__name__}:{str(ex)[:50]}")
+
+    return sid, cookie_str, csrf, " | ".join(dbg)
 
 
 def _days_since(date_str):
@@ -243,36 +250,52 @@ def _tool_agregar_nota(args):
     lead = matches[0]
 
     payload = json.dumps({"lead": lead["id"], "note": nota_txt}).encode()
-    basic   = base64.b64encode(f"{ETENDO_USER}:{ETENDO_PASS}".encode()).decode()
 
-    # Intento 1: Basic Auth — stateless, no pasa por el filtro CSRF de sesión
-    req = urllib.request.Request(
-        f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead_Note",
-        data=payload, method="POST",
-    )
-    req.add_header("Authorization", f"Basic {basic}")
-    req.add_header("Content-Type",  "application/json")
-    req.add_header("Accept",        "application/json")
+    # Intento 1: form-encoded add con JWT (misma ruta que los reads que funcionan)
+    jwt_err = ""
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
+        jwt  = _login()
+        body = urllib.parse.urlencode({
+            "_operationType": "add",
+            "lead": lead["id"],
+            "note": nota_txt,
+        }).encode()
+        r2 = urllib.request.Request(
+            f"{ETENDO_BASE}/api/datasource/ETCRM_Lead_Note",
+            data=body, method="POST",
+        )
+        r2.add_header("Authorization", f"Bearer {jwt}")
+        r2.add_header("Content-Type",  "application/x-www-form-urlencoded")
+        r2.add_header("Accept",        "application/json")
+        with urllib.request.urlopen(r2, timeout=30) as r:
             resp = json.loads(r.read())
-        status = resp.get("response", {}).get("status")
-        if status == 0:
+        if resp.get("response", {}).get("status") == 0:
             return f"Nota guardada en {lead['empresa']}:\n\"{nota_txt}\""
-        return f"Error (basic-auth): {resp.get('response',{}).get('error','?')}"
-    except Exception as e:
-        basic_err = f"{type(e).__name__}: {str(e)[:150]}"
+        jwt_err = str(resp.get("response", {}).get("error", resp))[:120]
+    except Exception as ex:
+        jwt_err = f"{type(ex).__name__}:{str(ex)[:100]}"
 
-    # Intento 2: sesión + diagnóstico (para entender qué pasa con CSRF)
-    sid, cookie_str, csrf = _sid_login()
-    cookie_names = [p.split("=")[0].strip() for p in cookie_str.split(";")] if cookie_str else []
-    return (
-        f"Ambos intentos fallaron.\n"
-        f"Basic-auth: {basic_err}\n"
-        f"Sesión: sid={'ok' if sid else 'ERR'}, "
-        f"cookies={cookie_names}, "
-        f"csrf={'ok' if csrf else 'no encontrado'}"
-    )
+    # Intento 2: sesión con CSRF extraído + diagnóstico
+    sid, cookie_str, csrf, dbg = _sid_login()
+    if csrf:
+        req = urllib.request.Request(
+            f"{WRITE_URL}/org.openbravo.service.datasource/ETCRM_Lead_Note",
+            data=payload, method="POST",
+        )
+        req.add_header("Cookie",       cookie_str)
+        req.add_header("Content-Type", "application/json")
+        req.add_header("Accept",       "application/json")
+        req.add_header("X-CSRF-Token", csrf)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                resp = json.loads(r.read())
+            if resp.get("response", {}).get("status") == 0:
+                return f"Nota guardada en {lead['empresa']}:\n\"{nota_txt}\""
+            return f"Error (session+csrf): {resp.get('response',{}).get('error','?')}"
+        except Exception as ex:
+            return f"Error (session+csrf): {ex}"
+
+    return f"JWT-form: {jwt_err} | {dbg}"
 
 
 def _tool_pipeline_resumen(_args):
