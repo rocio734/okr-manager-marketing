@@ -18,7 +18,7 @@ from mcp.server.sse import SseServerTransport
 from mcp import types
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import Response, StreamingResponse
 from starlette.routing import Route
 import uvicorn
 import anyio
@@ -333,6 +333,17 @@ def _check_token(request: Request) -> bool:
 async def handle_sse(request: Request):
     if not _check_token(request):
         return Response("Unauthorized", status_code=401)
+    # EventSource auto-reconnects with Last-Event-ID but our server doesn't support
+    # session resumption. Send authentication-needed so mcp-remote does a full
+    # reconnect (with initialize) instead of resuming a stale uninitialized session.
+    if request.headers.get("last-event-id"):
+        async def _force_reinit():
+            yield "event: error\ndata: authentication-needed\n\n"
+        return StreamingResponse(
+            _force_reinit(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache"},
+        )
     async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
         await server.run(streams[0], streams[1], server.create_initialization_options())
 
