@@ -16,3 +16,33 @@ services:
         sync: false
       - key: MCP_AUTH_TOKEN
         sync: false
+
+  - type: cron
+    name: crm-reply-checker
+    runtime: python
+    buildCommand: pip install -r mcp_crm_requirements.txt
+    schedule: "0 * * * *"
+    startCommand: python3 scripts/job_reply_checker.py
+    envVars:
+      - key: ETENDO_BASE_URL
+        sync: false
+      - key: ETENDO_USERNAME
+        sync: false
+      - key: ETENDO_PASSWORD
+        sync: false
+      - key: ETENDO_WRITE_URL
+        sync: false
+      - key: IMAP_HOST
+        sync: false
+      - key: IMAP_USER
+        sync: false
+      - key: IMAP_PASS
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
