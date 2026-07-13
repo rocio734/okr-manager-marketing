@@ -15,6 +15,9 @@ Uso:
 
 import os, sys, json, urllib.request, urllib.parse, argparse, re
 import xml.etree.ElementTree as ET
+import time, base64
+import html as _html_mod
+from html.parser import HTMLParser
 from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -33,6 +36,20 @@ def _env(key):
 
 OPENAI_KEY  = _env('OPENAI_API_KEY')
 SERPAPI_KEY = _env('SERPAPI_KEY').replace('}', '')  # corregir typo en .env
+
+# Verificar créditos SerpAPI al inicio — desactivar si cuenta agotada
+def _check_serpapi_quota():
+    if not SERPAPI_KEY:
+        return False
+    try:
+        url = f"https://serpapi.com/account?api_key={SERPAPI_KEY}"
+        with urllib.request.urlopen(url, timeout=8) as r:
+            data = json.loads(r.read())
+        return int(data.get('total_searches_left', 0)) > 0
+    except Exception:
+        return False
+
+_SERPAPI_HAS_QUOTA = _check_serpapi_quota()
 
 SECTORS = ['manufacturing', 'distribution', 'retail', 'services']
 
@@ -138,7 +155,63 @@ TED_KEYWORDS = ['technology', 'future', 'innovation', 'business', 'work', 'digit
                 'robots', 'machine', 'entrepren', 'produc', 'supply', 'sustain']
 
 
-def _serp(query, n=5):
+_BING_LAST_CALL = 0.0
+_BING_MIN_INTERVAL = 2.0  # segundos entre requests
+
+def _serp_bing(query, n=5):
+    """Búsqueda via Bing HTML — sin API key, usa URL decode base64."""
+    global _BING_LAST_CALL
+    elapsed = time.time() - _BING_LAST_CALL
+    if elapsed < _BING_MIN_INTERVAL:
+        time.sleep(_BING_MIN_INTERVAL - elapsed)
+    _BING_LAST_CALL = time.time()
+
+    try:
+        safe_q = urllib.parse.quote_plus(query.encode('utf-8'))
+        url = f"https://www.bing.com/search?q={safe_q}&setlang=es&cc=ES&mkt=es-ES&count={min(n*2, 20)}"
+        req = urllib.request.Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:127.0) Gecko/20100101 Firefox/127.0')
+        req.add_header('Accept-Language', 'es-ES,es;q=0.9,en;q=0.8')
+        req.add_header('Accept', 'text/html')
+        with urllib.request.urlopen(req, timeout=15) as r:
+            raw = r.read().decode('utf-8', errors='replace')
+        unescaped = _html_mod.unescape(raw)
+
+        # Extraer bloques de resultados orgánicos
+        algo_blocks = re.findall(r'<li class="b_algo"[^>]*>(.*?)</li>', unescaped, re.DOTALL)
+        results = []
+        for block in algo_blocks:
+            # Título desde h2 > a
+            h2 = re.search(r'<h2[^>]*>.*?<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', block, re.DOTALL)
+            if not h2:
+                continue
+            href, title_raw = h2.group(1), h2.group(2)
+            title = re.sub(r'<[^>]+>', '', title_raw).strip()
+            if not title:
+                continue
+            # Decodificar URL real desde parámetro u=a1...
+            u_m = re.search(r'[?&]u=a1([A-Za-z0-9_=]+)', href)
+            if u_m:
+                try:
+                    real_url = base64.urlsafe_b64decode(u_m.group(1) + '==').decode('utf-8', errors='replace')
+                except Exception:
+                    real_url = ''
+            else:
+                real_url = href
+            if not real_url.startswith('http'):
+                continue
+            # Snippet desde primer <p>
+            snip_m = re.search(r'<p[^>]*>(.*?)</p>', block, re.DOTALL)
+            snippet = re.sub(r'<[^>]+>', '', snip_m.group(1)).strip() if snip_m else ''
+            results.append({'title': title, 'snippet': snippet[:300], 'url': real_url})
+        return results[:n]
+    except Exception as e:
+        print(f"  [BING] {e}")
+        return []
+
+
+def _serp_api(query, n=5):
+    """Búsqueda via SerpAPI — fallback cuando hay créditos disponibles."""
     if not SERPAPI_KEY:
         return []
     url = (f"https://serpapi.com/search.json?q={urllib.parse.quote(query)}"
@@ -146,17 +219,26 @@ def _serp(query, n=5):
     try:
         with urllib.request.urlopen(url, timeout=15) as r:
             data = json.loads(r.read())
-            results = []
-            for item in data.get('organic_results', [])[:n]:
-                results.append({
-                    'title':   item.get('title', ''),
-                    'snippet': item.get('snippet', ''),
-                    'url':     item.get('link', ''),
-                })
-            return results
+        if 'run out' in data.get('error', '').lower():
+            print(f"  [SERP] cuota agotada")
+            return []
+        return [
+            {'title': i.get('title', ''), 'snippet': i.get('snippet', ''), 'url': i.get('link', '')}
+            for i in data.get('organic_results', [])[:n]
+        ]
     except Exception as e:
         print(f"  [SERP] {e}")
         return []
+
+
+def _serp(query, n=5):
+    """Búsqueda web: Bing primario, SerpAPI como fallback si hay créditos."""
+    results = _serp_bing(query, n)
+    if results:
+        return results
+    if _SERPAPI_HAS_QUOTA:
+        return _serp_api(query, n)
+    return []
 
 
 class _Follow308(urllib.request.HTTPErrorProcessor):
