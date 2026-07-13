@@ -199,107 +199,165 @@ def create_lead_note(lead_id, note_text, sid):
         return None, str(e)
 
 
-# ── AI parsing ───────────────────────────────────────────────────────────────
-def _build_prompt(reply_text, leads_snapshot):
-    leads_list = "\n".join(
-        f"- {l['name']} | {l['company']} | ID: {l['id']} | estado: {l['status']}"
-        for l in leads_snapshot
-    )
-    return f"""Sos asistente de CRM de Etendo. Un vendedor respondió el email semanal de CRM Pulse.
+# ── AI parsing — proceso de dos pasos ────────────────────────────────────────
+#
+# Paso 1: el AI extrae nombres y actualizaciones del texto (SIN IDs).
+#         Solo cambia estado si Vico lo dice explícitamente.
+# Paso 2: el código hace el matching nombre → lead_id por nombre exacto.
+#         Esto es más confiable que pedirle al AI que haga el lookup en
+#         una lista de cientos de leads.
 
-Leads activos en el CRM:
-{leads_list}
+_EXTRACT_PROMPT = """\
+Sos asistente de CRM. Un vendedor respondió el email semanal con novedades sobre algunos leads.
 
-Texto de la respuesta del vendedor:
+Texto de la respuesta:
 ---
-{reply_text[:3000]}
+{reply_text}
 ---
 
-Identificá todos los leads mencionados y el tipo de actualización para cada uno.
-Para cada lead mencionado, devolvé un JSON object con estos campos exactos:
-- "lead_id": ID del lead de la lista (string, o null si no lo podés identificar)
-- "lead_name": nombre del lead identificado (string)
-- "company": empresa del lead (string)
-- "new_status": nuevo estado o null si no cambia. Valores válidos:
-  New, Contacted, Qualified, Converted, Dead
-- "note": descripción breve de la actualización para ESE lead específico, máx 200 caracteres (string)
-- "confidence": "alta", "media" o "baja" según qué tan seguro estás de la identificación
+Extraé TODAS las actualizaciones mencionadas, una por lead.
+Para cada lead devolvé un JSON object con:
+- "mention_name": el nombre o empresa tal como aparece en el texto (string exacto)
+- "new_status": SOLO completar si el vendedor lo dice EXPLÍCITAMENTE con palabras como
+  "se pasa a DEAD", "ganado", "perdido", "cerrado", "won", "dead", "convertido", "descartado".
+  Si el vendedor solo da contexto o cuenta qué hizo sin cambiar el estado → null.
+  Valores válidos: New, Contacted, Qualified, Converted, Dead
+- "note": resumen breve de la actualización para ESE lead, máx 300 caracteres (string)
 
-Reglas de mapeo de estado:
-- "demo realizada / tuve demo / hice demo" → Qualified
-- "propuesta enviada / mandé presupuesto" → Qualified
-- "reunión agendada / le di un turno" → Qualified
-- "negociando / en negociación" → Qualified
-- "firmó / ganado / won / cerrado positivo" → Converted
-- "no responde / perdido / descartado / cold / archivado / dead" → Dead
-- "llamé / escribí / contacté sin respuesta" → Contacted
+IMPORTANTE:
+- No inferir cambios de estado. Solo marcar new_status si el texto lo dice sin ambigüedad.
+- Si el texto dice "se pasa a DEAD" → Dead. Si dice "firmó" o "ganado" → Converted.
+- Si solo dice "le envié un mail" o da contexto sin mención de cambio → new_status = null.
+- La nota debe ser específica al lead, no una copia del email completo.
 
-Devolvé SOLO un JSON array válido, sin texto adicional ni explicaciones.
-Si no hay leads identificables, devolvé [].
+Devolvé SOLO un JSON array válido, sin texto adicional.
+Si no hay actualizaciones, devolvé [].
 """
 
 
-def _call_anthropic(prompt):
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps({
-            "model":      "claude-haiku-4-5-20251001",
-            "max_tokens": 1024,
-            "messages":   [{"role": "user", "content": prompt}],
-        }).encode(),
-        method="POST",
-    )
-    req.add_header("x-api-key",         ANTHROPIC_API_KEY)
-    req.add_header("anthropic-version", "2023-06-01")
-    req.add_header("Content-Type",      "application/json")
-    with urllib.request.urlopen(req, timeout=30) as r:
-        resp = json.loads(r.read())
-    raw = resp["content"][0]["text"].strip()
-    raw = re.sub(r"^```(?:json)?\s*", "", raw)
-    raw = re.sub(r"\s*```$",          "", raw)
-    return json.loads(raw)
-
-
-def _call_openai(prompt):
-    req = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
-        data=json.dumps({
-            "model":       "gpt-4o-mini",
-            "max_tokens":  1024,
-            "temperature": 0,
-            "messages":    [{"role": "user", "content": prompt}],
-        }).encode(),
-        method="POST",
-    )
-    req.add_header("Authorization", f"Bearer {OPENAI_API_KEY}")
-    req.add_header("Content-Type",  "application/json")
-    with urllib.request.urlopen(req, timeout=30) as r:
-        resp = json.loads(r.read())
-    raw = resp["choices"][0]["message"]["content"].strip()
-    raw = re.sub(r"^```(?:json)?\s*", "", raw)
-    raw = re.sub(r"\s*```$",          "", raw)
-    return json.loads(raw)
-
-
-def parse_reply(reply_text, leads_snapshot):
-    """Parse email reply using AI. Returns [] if no API key available — never falls back to basic parser for writes."""
-    prompt = _build_prompt(reply_text, leads_snapshot)
-
+def _call_ai(prompt):
+    """Intenta Anthropic, cae a OpenAI. Lanza excepción si ninguno disponible."""
     if ANTHROPIC_API_KEY:
         try:
-            return _call_anthropic(prompt)
+            req = urllib.request.Request(
+                "https://api.anthropic.com/v1/messages",
+                data=json.dumps({
+                    "model":      "claude-haiku-4-5-20251001",
+                    "max_tokens": 1024,
+                    "messages":   [{"role": "user", "content": prompt}],
+                }).encode(),
+                method="POST",
+            )
+            req.add_header("x-api-key",         ANTHROPIC_API_KEY)
+            req.add_header("anthropic-version", "2023-06-01")
+            req.add_header("Content-Type",      "application/json")
+            with urllib.request.urlopen(req, timeout=30) as r:
+                resp = json.loads(r.read())
+            raw = resp["content"][0]["text"].strip()
+            raw = re.sub(r"^```(?:json)?\s*", "", raw)
+            raw = re.sub(r"\s*```$",          "", raw)
+            return json.loads(raw)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace")[:200]
+            if "credit balance" in body or "too low" in body:
+                LOG("WARN Anthropic: crédito insuficiente — usando OpenAI como fallback")
+            else:
+                LOG(f"WARN Anthropic HTTP {e.code}: {body}")
         except Exception as e:
             LOG(f"WARN Anthropic: {e}")
 
     if OPENAI_API_KEY:
         try:
-            return _call_openai(prompt)
+            req = urllib.request.Request(
+                "https://api.openai.com/v1/chat/completions",
+                data=json.dumps({
+                    "model":       "gpt-4o-mini",
+                    "max_tokens":  1024,
+                    "temperature": 0,
+                    "messages":    [{"role": "user", "content": prompt}],
+                }).encode(),
+                method="POST",
+            )
+            req.add_header("Authorization", f"Bearer {OPENAI_API_KEY}")
+            req.add_header("Content-Type",  "application/json")
+            with urllib.request.urlopen(req, timeout=30) as r:
+                resp = json.loads(r.read())
+            raw = resp["choices"][0]["message"]["content"].strip()
+            raw = re.sub(r"^```(?:json)?\s*", "", raw)
+            raw = re.sub(r"\s*```$",          "", raw)
+            return json.loads(raw)
         except Exception as e:
             LOG(f"WARN OpenAI: {e}")
 
-    LOG("ERROR CRÍTICO: no hay ANTHROPIC_API_KEY ni OPENAI_API_KEY — NO se escribirá nada al CRM.")
-    LOG("  Configurá ANTHROPIC_API_KEY en las env vars de Render o en el .env local.")
-    return []
+    return None
+
+
+def _match_lead(mention_name, leads_snapshot):
+    """Busca el lead que mejor coincide con el nombre mencionado.
+
+    Prioridad: coincidencia exacta de nombre completo > apellido > empresa.
+    Retorna el lead dict o None.
+    """
+    mention_lower = mention_name.lower().strip()
+
+    # 1. Coincidencia exacta de nombre completo
+    for lead in leads_snapshot:
+        if lead["name"].lower() == mention_lower:
+            return lead
+
+    # 2. El mention contiene el nombre del lead (o viceversa) — para "Halsteds" → "Sus Mukuya" (empresa)
+    for lead in leads_snapshot:
+        co = (lead["company"] or "").lower()
+        if co and (co == mention_lower or mention_lower in co or co in mention_lower):
+            return lead
+
+    # 3. Cualquier token del mention matchea el apellido exacto del lead
+    tokens = set(mention_lower.split())
+    for lead in leads_snapshot:
+        name_parts = set(lead["name"].lower().split())
+        if tokens & name_parts:  # intersección no vacía
+            # preferir matches de al menos 2 tokens
+            if len(tokens & name_parts) >= 2 or len(tokens) == 1:
+                return lead
+
+    return None
+
+
+def parse_reply(reply_text, leads_snapshot):
+    """Proceso en dos pasos: AI extrae actualizaciones, código hace el matching por nombre."""
+    if not ANTHROPIC_API_KEY and not OPENAI_API_KEY:
+        LOG("ERROR CRÍTICO: no hay ANTHROPIC_API_KEY ni OPENAI_API_KEY — NO se escribirá nada al CRM.")
+        return []
+
+    prompt   = _EXTRACT_PROMPT.format(reply_text=reply_text[:3000])
+    extracts = _call_ai(prompt)
+
+    if extracts is None:
+        LOG("ERROR: AI no disponible — NO se escribirá nada al CRM.")
+        return []
+
+    results = []
+    for ext in extracts:
+        mention   = ext.get("mention_name", "")
+        note      = ext.get("note", "")
+        new_status = ext.get("new_status")
+
+        lead = _match_lead(mention, leads_snapshot)
+        if not lead:
+            LOG(f"  WARN: '{mention}' no matcheó ningún lead activo — se omite")
+            continue
+
+        results.append({
+            "lead_id":    lead["id"],
+            "lead_name":  lead["name"],
+            "company":    lead["company"],
+            "new_status": new_status,
+            "note":       note,
+            "confidence": "alta",
+        })
+        LOG(f"  Match: '{mention}' → {lead['name']} (ID: {lead['id'][:8]}...)")
+
+    return results
 
 
 def _parse_basic(reply_text, leads_snapshot):
