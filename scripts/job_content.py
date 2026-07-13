@@ -259,10 +259,10 @@ def fetch_research(sector, source_type):
     # ── Gartner: RSS newsroom + fetch de artículo para más contexto ───────────
     if source_type == 'gartner':
         gartner_queries = {
-            'manufacturing': 'site:gartner.com manufacturing ERP "2025" OR "2026"',
-            'distribution':  'site:gartner.com supply chain logistics "2025" OR "2026"',
-            'retail':        'site:gartner.com retail commerce "2025" OR "2026"',
-            'services':      'site:gartner.com "professional services" OR ERP automation "2025" OR "2026"',
+            'manufacturing': 'site:gartner.com manufacturing ERP "2026" OR "2027"',
+            'distribution':  'site:gartner.com supply chain logistics "2026" OR "2027"',
+            'retail':        'site:gartner.com retail commerce "2026" OR "2027"',
+            'services':      'site:gartner.com "professional services" OR ERP automation "2026" OR "2027"',
         }
         serp_results = _serp(gartner_queries.get(sector, f'site:gartner.com {sector} 2026'), n=3)
 
@@ -281,21 +281,21 @@ def fetch_research(sector, source_type):
 
         # Fallback genérico si site: no devuelve nada
         fallback_queries = {
-            'manufacturing': 'Gartner ERP manufacturing Industry 4.0 trends 2025 2026',
-            'distribution':  'Gartner supply chain technology logistics trends 2025 2026',
-            'retail':        'Gartner retail technology unified commerce trends 2025 2026',
-            'services':      'Gartner professional services automation ERP AI 2025 2026',
+            'manufacturing': 'Gartner ERP manufacturing Industry 4.0 trends 2026 2027',
+            'distribution':  'Gartner supply chain technology logistics trends 2026 2027',
+            'retail':        'Gartner retail technology unified commerce trends 2026 2027',
+            'services':      'Gartner professional services automation ERP AI 2026 2027',
         }
         return _serp(fallback_queries.get(sector, f'Gartner {sector} trends 2026'), n=4)
 
     # ── Industry: SerpAPI con estadísticas del mercado español ────────────────
     industry_queries = {
-        'manufacturing': 'estadisticas manufactura digital España transformación 2025',
-        'distribution':  'estadisticas logística cadena suministro España 2025',
-        'retail':        'estadisticas ecommerce retail España omnichannel 2025',
-        'services':      'estadisticas servicios profesionales automatización España 2025',
+        'manufacturing': 'estadisticas manufactura digital España transformación 2026',
+        'distribution':  'estadisticas logística cadena suministro España 2026',
+        'retail':        'estadisticas ecommerce retail España omnichannel 2026',
+        'services':      'estadisticas servicios profesionales automatización España 2026',
     }
-    return _serp(industry_queries.get(sector, f'ERP {sector} España 2025'), n=4)
+    return _serp(industry_queries.get(sector, f'ERP {sector} España 2026'), n=4)
 
 
 # ── Anthropic — generar contenido ─────────────────────────────────────────────
@@ -343,7 +343,7 @@ def generate_post(slot, sector, research, week_start, history=None):
     research_text = "\n".join(
         f"- {r['title']}: {r['snippet']} ({r['url']})"
         for r in research[:3]
-    ) or "No hay resultados de búsqueda — usá tu conocimiento de Gartner 2024-2025."
+    ) or "No hay resultados de búsqueda — usá tu conocimiento de Gartner 2025-2026."
 
     # Construir contexto de posts anteriores para evitar repetición
     history_text = ""
@@ -423,7 +423,7 @@ Investigación encontrada:
 {image_instruction}
 
 INSTRUCCIONES ADICIONALES:
-- Semana del {week_start}
+- Semana del {week_start}. El año actual es 2026.
 - Si el source es 'gartner': abrí con un dato o stat de Gartner (podés citar el Hype Cycle,
   Magic Quadrant, o una encuesta de Gartner del sector)
 - Si el source es 'tedx': abrí con una idea poderosa al estilo TED ("La pregunta no es si
@@ -431,6 +431,10 @@ INSTRUCCIONES ADICIONALES:
 - Si el source es 'industry': abrí con un dato del mercado español o europeo
 - Mencioná Etendo máximo una vez, al final, como solución natural (no como anuncio)
 - Incluí 3-5 hashtags relevantes en español e inglés
+- IMPORTANTE sobre fechas: estamos en 2026. Si la investigación menciona predicciones para
+  "2025" como año futuro, esas predicciones ya pasaron — no las uses como proyección futura.
+  Podés referenciarlas como "según Gartner, en 2025 el X% ya había..." o buscá un dato
+  de 2026 en su lugar. Nunca presentes 2025 como año futuro.
 
 Devolvé SOLO el JSON solicitado, sin texto adicional.
 """
