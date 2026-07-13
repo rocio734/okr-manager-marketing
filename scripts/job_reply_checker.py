@@ -31,6 +31,15 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 
+# ── Load .env early so API keys are available before config constants ──────────
+_ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
+if _ENV_FILE.exists():
+    for _line in _ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if "=" in _line and not _line.startswith("#"):
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+
 # ── Config ──────────────────────────────────────────────────────────────────────
 BASE_URL   = os.getenv("ETENDO_BASE_URL",  "https://futit-staff.etendo.cloud")
 WRITE_URL  = os.getenv("ETENDO_WRITE_URL", "https://staff-ui.etendo.cloud/etendo")
@@ -48,7 +57,8 @@ SMTP_PORT  = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER  = os.getenv("SMTP_USER",  os.getenv("GMAIL_USER",     "victoria.miguez@smfconsulting.es"))
 SMTP_PASS  = os.getenv("SMTP_PASS",  os.getenv("GMAIL_PASSWORD", ""))
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+OPENAI_API_KEY    = os.getenv("OPENAI_API_KEY", "")
 
 # Statuses ETCRM_Lead y sus IDs
 LEAD_STATUS_IDS = {
@@ -189,18 +199,13 @@ def create_lead_note(lead_id, note_text, sid):
         return None, str(e)
 
 
-# ── OpenAI parsing ───────────────────────────────────────────────────────────
-def parse_reply(reply_text, leads_snapshot):
-    if not OPENAI_API_KEY:
-        LOG("WARN: OPENAI_API_KEY no disponible — usando parsing básico")
-        return _parse_basic(reply_text, leads_snapshot)
-
+# ── AI parsing ───────────────────────────────────────────────────────────────
+def _build_prompt(reply_text, leads_snapshot):
     leads_list = "\n".join(
         f"- {l['name']} | {l['company']} | ID: {l['id']} | estado: {l['status']}"
         for l in leads_snapshot
     )
-
-    prompt = f"""Sos asistente de CRM de Etendo. Un vendedor respondió el email semanal de CRM Pulse.
+    return f"""Sos asistente de CRM de Etendo. Un vendedor respondió el email semanal de CRM Pulse.
 
 Leads activos en el CRM:
 {leads_list}
@@ -217,7 +222,7 @@ Para cada lead mencionado, devolvé un JSON object con estos campos exactos:
 - "company": empresa del lead (string)
 - "new_status": nuevo estado o null si no cambia. Valores válidos:
   New, Contacted, Qualified, Converted, Dead
-- "note": descripción breve de la actualización, máx 200 caracteres (string)
+- "note": descripción breve de la actualización para ESE lead específico, máx 200 caracteres (string)
 - "confidence": "alta", "media" o "baja" según qué tan seguro estás de la identificación
 
 Reglas de mapeo de estado:
@@ -226,13 +231,36 @@ Reglas de mapeo de estado:
 - "reunión agendada / le di un turno" → Qualified
 - "negociando / en negociación" → Qualified
 - "firmó / ganado / won / cerrado positivo" → Converted
-- "no responde / perdido / descartado / cold / archivado" → Dead
+- "no responde / perdido / descartado / cold / archivado / dead" → Dead
 - "llamé / escribí / contacté sin respuesta" → Contacted
 
 Devolvé SOLO un JSON array válido, sin texto adicional ni explicaciones.
 Si no hay leads identificables, devolvé [].
 """
 
+
+def _call_anthropic(prompt):
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=json.dumps({
+            "model":      "claude-haiku-4-5-20251001",
+            "max_tokens": 1024,
+            "messages":   [{"role": "user", "content": prompt}],
+        }).encode(),
+        method="POST",
+    )
+    req.add_header("x-api-key",         ANTHROPIC_API_KEY)
+    req.add_header("anthropic-version", "2023-06-01")
+    req.add_header("Content-Type",      "application/json")
+    with urllib.request.urlopen(req, timeout=30) as r:
+        resp = json.loads(r.read())
+    raw = resp["content"][0]["text"].strip()
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$",          "", raw)
+    return json.loads(raw)
+
+
+def _call_openai(prompt):
     req = urllib.request.Request(
         "https://api.openai.com/v1/chat/completions",
         data=json.dumps({
@@ -244,63 +272,50 @@ Si no hay leads identificables, devolvé [].
         method="POST",
     )
     req.add_header("Authorization", f"Bearer {OPENAI_API_KEY}")
-    req.add_header("Content-Type", "application/json")
+    req.add_header("Content-Type",  "application/json")
+    with urllib.request.urlopen(req, timeout=30) as r:
+        resp = json.loads(r.read())
+    raw = resp["choices"][0]["message"]["content"].strip()
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$",          "", raw)
+    return json.loads(raw)
 
-    try:
-        with urllib.request.urlopen(req) as r:
-            resp = json.loads(r.read())
-        raw = resp["choices"][0]["message"]["content"].strip()
-        raw = re.sub(r"^```(?:json)?\s*", "", raw)
-        raw = re.sub(r"\s*```$", "", raw)
-        return json.loads(raw)
-    except Exception as e:
-        LOG(f"ERROR OpenAI: {e} — fallback a parsing básico")
-        return _parse_basic(reply_text, leads_snapshot)
+
+def parse_reply(reply_text, leads_snapshot):
+    """Parse email reply using AI. Returns [] if no API key available — never falls back to basic parser for writes."""
+    prompt = _build_prompt(reply_text, leads_snapshot)
+
+    if ANTHROPIC_API_KEY:
+        try:
+            return _call_anthropic(prompt)
+        except Exception as e:
+            LOG(f"WARN Anthropic: {e}")
+
+    if OPENAI_API_KEY:
+        try:
+            return _call_openai(prompt)
+        except Exception as e:
+            LOG(f"WARN OpenAI: {e}")
+
+    LOG("ERROR CRÍTICO: no hay ANTHROPIC_API_KEY ni OPENAI_API_KEY — NO se escribirá nada al CRM.")
+    LOG("  Configurá ANTHROPIC_API_KEY en las env vars de Render o en el .env local.")
+    return []
 
 
 def _parse_basic(reply_text, leads_snapshot):
-    """Fallback parser: match by name/company, detect action keywords."""
-    STATUS_KEYWORDS = {
-        "demo":         "Qualified",
-        "demostración": "Qualified",
-        "reunión":      "Qualified",
-        "propuesta":    "Qualified",
-        "presupuesto":  "Qualified",
-        "negociación":  "Qualified",
-        "won":          "Converted",
-        "ganado":       "Converted",
-        "firmó":        "Converted",
-        "firmo":        "Converted",
-        "perdido":      "Dead",
-        "lost":         "Dead",
-        "cold":         "Dead",
-        "descartado":   "Dead",
-        "llamé":        "Contacted",
-        "escribí":      "Contacted",
-        "contacté":     "Contacted",
-    }
+    """Diagnóstico solamente — NUNCA usar para escribir al CRM."""
     reply_lower = reply_text.lower()
-    updates = []
-
+    matches = []
     for lead in leads_snapshot:
         name_lower    = lead["name"].lower()
         company_lower = (lead["company"] or "").lower()
         name_match    = len(name_lower) > 3 and bool(re.search(r'\b' + re.escape(name_lower) + r'\b', reply_lower))
         company_match = len(company_lower) > 4 and bool(re.search(r'\b' + re.escape(company_lower) + r'\b', reply_lower))
         if name_match or company_match:
-            new_status = next(
-                (v for k, v in STATUS_KEYWORDS.items() if k in reply_lower), None
-            )
-            updates.append({
-                "lead_id":    lead["id"],
-                "lead_name":  lead["name"],
-                "company":    lead["company"],
-                "new_status": new_status,
-                "note":       reply_text[:200],
-                "confidence": "baja",
-            })
-
-    return updates
+            matches.append(lead["name"])
+    if matches:
+        LOG(f"  _parse_basic (solo diagnóstico): leads detectados = {matches}")
+    return []  # NUNCA devuelve datos para writes
 
 
 # ── IMAP ──────────────────────────────────────────────────────────────────────
@@ -436,18 +451,24 @@ def send_confirmation(to_addr, updates):
   Lucía · CRM Etendo · Actualización automática</p>
 </body></html>"""
 
+    CC_ADDR = os.getenv("CRM_PULSE_CC", "rocio.altamirano@smfconsulting.es")
+    recipients = [to_addr]
+    if CC_ADDR and CC_ADDR != to_addr:
+        recipients.append(CC_ADDR)
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = "Re: [CRM Pulse] — Actualización recibida ✅"
     msg["From"]    = email.utils.formataddr(("Lucía | CRM Etendo", SMTP_USER))
     msg["To"]      = to_addr
+    msg["Cc"]      = CC_ADDR
     msg.attach(MIMEText(html, "html", "utf-8"))
 
     try:
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as srv:
             srv.starttls()
             srv.login(SMTP_USER, SMTP_PASS)
-            srv.sendmail(SMTP_USER, [to_addr], msg.as_bytes())
-        LOG(f"  Confirmación enviada a {to_addr}")
+            srv.sendmail(SMTP_USER, recipients, msg.as_bytes())
+        LOG(f"  Confirmación enviada a {to_addr} (CC: {CC_ADDR})")
     except Exception as e:
         LOG(f"  WARN confirmación: {e}")
 
@@ -466,7 +487,8 @@ def main():
     from _etendo import etendo_login, etendo_fetch
     jwt_token = etendo_login(ROLE_ID)
     all_leads = etendo_fetch(jwt_token, "ETCRM_Lead") if jwt_token else []
-    leads_by_id = {l["id"]: l for l in all_leads if l.get("id")}
+    # Solo leads activos (no Dead) para mantener el prompt manejable
+    ACTIVE_STATUSES = {"New", "Contacted", "Qualified", "Converted"}
     leads_snapshot = [
         {
             "id":      l.get("id", ""),
@@ -479,9 +501,9 @@ def main():
             "summary": l.get("description") or "",
         }
         for l in all_leads
-        if l.get("id")
+        if l.get("id") and (l.get("leadStatus$_identifier") or "") in ACTIVE_STATUSES
     ]
-    LOG(f"  {len(leads_snapshot)} leads cargados")
+    LOG(f"  {len(leads_snapshot)} leads activos cargados (de {len(all_leads)} totales)")
 
     # Fetch IMAP replies
     LOG("Buscando respuestas en IMAP…")
