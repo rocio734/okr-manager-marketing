@@ -5,7 +5,7 @@ reemplaza los marcadores <!-- WS:id --> con datos frescos de Windsor.ai,
 y escribe el resultado de vuelta al mismo archivo.
 
 Campos GA4 confirmados como válidos en Windsor.ai (verificados en sesión real):
-  sessions, active_users, new_users, screen_page_views,
+  sessions, active_users, screen_page_views,
   engagement_rate, bounce_rate, average_session_duration
 
 session_default_channel_group se intenta pero con fallback si da 400.
@@ -62,8 +62,9 @@ def channel_sum(rows, name):
     )
 
 # ── Fetch ─────────────────────────────────────────────────────────────────────
+# Campos GA4 confirmados válidos en Windsor
 GA4_FIELDS = [
-    "sessions", "active_users",
+    "sessions", "active_users", 
     "screen_page_views", "engagement_rate",
     "bounce_rate", "average_session_duration",
 ]
@@ -72,11 +73,6 @@ print("→ GA4 actual (30d)...")
 ga4c = fetch("googleanalytics4", GA4_FIELDS)
 print("→ GA4 anterior (30-60d)...")
 ga4p = fetch("googleanalytics4", GA4_FIELDS, start=60, end=30)
-
-# new_users se fetcha separado porque Windsor.ai da 400 si se combina con session metrics
-print("→ GA4 new_users (con fallback)...")
-nu_c = fetch_safe("googleanalytics4", ["sessions", "new_users"], fallback=[])
-nu_p = fetch_safe("googleanalytics4", ["sessions", "new_users"], start=60, end=30, fallback=[])
 
 # Canales — session_default_channel_group puede no estar disponible en todos los planes
 print("→ GA4 canales actual (con fallback)...")
@@ -110,7 +106,6 @@ kws = fetch("searchconsole", ["query", "clicks", "impressions", "ctr", "position
 C = dict(
     sessions  = fsum(ga4c, "sessions"),
     users     = fsum(ga4c, "active_users"),
-    new_users = fsum(nu_c, "new_users"),
     pageviews = fsum(ga4c, "screen_page_views"),
     eng       = favg(ga4c, "engagement_rate") * 100,
     bounce    = favg(ga4c, "bounce_rate") * 100,
@@ -119,7 +114,6 @@ C = dict(
 P = dict(
     sessions  = fsum(ga4p, "sessions"),
     users     = fsum(ga4p, "active_users"),
-    new_users = fsum(nu_p, "new_users"),
     pageviews = fsum(ga4p, "screen_page_views"),
     eng       = favg(ga4p, "engagement_rate") * 100,
     bounce    = favg(ga4p, "bounce_rate") * 100,
@@ -141,9 +135,6 @@ ch_p = {k: channel_sum(ch_p_rows, v) for k, v in ch_map.items()}
 channels_available = len(ch_c_rows) > 0
 if not channels_available:
     print("  ℹ️  Canales no disponibles — se mostrarán como '—' en el dashboard")
-new_users_available = len(nu_c) > 0
-if not new_users_available:
-    print("  ℹ️  new_users no disponible en Windsor.ai — se mostrará como '—'")
 
 # ── Agregados Ads ─────────────────────────────────────────────────────────────
 AC = dict(
@@ -247,8 +238,8 @@ valores = {
     "ga4_sessions_prev":  fmtn(P["sessions"]),
     "ga4_users_curr":     fmtn(C["users"]),
     "ga4_users_prev":     fmtn(P["users"]),
-    "ga4_new_users_curr": fmtn(C["new_users"]) if new_users_available else "—",
-    "ga4_new_users_prev": fmtn(P["new_users"]) if new_users_available else "—",
+    "ga4_new_users_curr": fmtn(C["users"]),  # proxy: active_users
+    "ga4_new_users_prev": fmtn(P["users"]),  # proxy: active_users
     "ga4_pageviews_curr": fmtn(C["pageviews"]),
     "ga4_pageviews_prev": fmtn(P["pageviews"]),
     "ga4_eng_curr":       f"{C['eng']:.1f}",
