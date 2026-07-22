@@ -119,6 +119,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
   <button class="tab" onclick="showTab('leads',this)">Leads & ROI</button>
   <button class="tab" onclick="showTab('paginas',this)">Top Páginas</button>
   <button class="tab" onclick="showTab('seo',this)">Search Console</button>
+  <button class="tab" onclick="showTab('crm',this)">CRM & Leads</button>
+  <button class="tab" onclick="showTab('mejoras',this)">Mejoras sugeridas</button>
   <button class="tab" onclick="showTab('conclusiones',this)">Conclusiones</button>
 </div>
 
@@ -370,6 +372,276 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
   </div>
 </div>
 
+
+<!-- CRM & LEADS -->
+<div id="crm" class="panel">
+  <div class="sl">Resumen ejecutivo de leads — 22 jun al 21 jul 2026</div>
+  <p class="sd">45 leads totales registrados en el CRM. Todos gestionados por Victoria Miguez y Galder Romo.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi"><p class="kpi-label">Leads totales</p><p class="kpi-def">Formularios recibidos en el período</p><div class="kpi-row"><span class="kpi-val">45</span></div></div>
+    <div class="kpi"><p class="kpi-label">Basura / Buscan trabajo</p><p class="kpi-def">Leads que no son potenciales clientes</p><div class="kpi-row"><span class="kpi-val" style="color:#E24B4A">22</span><span class="kpi-delta down">49%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Contactados activos</p><p class="kpi-def">Leads con conversación abierta</p><div class="kpi-row"><span class="kpi-val">10</span><span class="kpi-delta neu">22%</span></div></div>
+    <div class="kpi"><p class="kpi-label">IQL</p><p class="kpi-def">Interés básico detectado</p><div class="kpi-row"><span class="kpi-val">18</span></div></div>
+    <div class="kpi"><p class="kpi-label">MQL</p><p class="kpi-def">Cualificados para seguimiento comercial</p><div class="kpi-row"><span class="kpi-val">4</span></div></div>
+    <div class="kpi"><p class="kpi-label">SQL</p><p class="kpi-def">Listos para venta — oportunidad real</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A">1</span></div></div>
+    <div class="kpi"><p class="kpi-label">Demo agendada</p><p class="kpi-def">Próximo paso concreto en pipeline</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A">1</span></div></div>
+    <div class="kpi"><p class="kpi-label">Coste real/lead útil</p><p class="kpi-def">€1.200 Ads ÷ 23 leads no-basura</p><div class="kpi-row"><span class="kpi-val">€52</span></div></div>
+  </div>
+
+  <div class="sl">Embudo real de calidad</div>
+  <p class="sd">De los 45 leads, solo una fracción tiene potencial comercial real.</p>
+  <div class="funnel">
+    <div class="funnel-step">
+      <div class="funnel-label">Leads totales</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-cl" style="width:100%">45</div></div>
+      <div class="funnel-val">45</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Buscan trabajo / spam</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-es" style="width:48.9%">22 descartados</div></div>
+      <div class="funnel-val" style="color:#E24B4A">-22</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Malentendido del anuncio</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:13.3%;background:#EDA100">6 descartados</div></div>
+      <div class="funnel-val" style="color:#EDA100">-6</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Sin respuesta / no contactables</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:17.8%;background:#888">8 descartados</div></div>
+      <div class="funnel-val" style="color:#888">-8</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Leads con conversación activa</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-ar" style="width:20%">9 activos</div></div>
+      <div class="funnel-val">9</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Con oportunidad real</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-pm" style="width:8.9%">4 (MQL+SQL)</div></div>
+      <div class="funnel-val" style="color:#1BAF7A">4</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Demo agendada</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2.2%;background:#FFD700;min-width:80px">1</div></div>
+      <div class="funnel-val" style="color:#1BAF7A">1</div>
+    </div>
+  </div>
+
+  <div class="sl">Motivos de descarte</div>
+  <div class="chart-wrap" style="height:200px"><canvas id="descartePie"></canvas></div>
+
+  <div class="sl">⚠️ Problema crítico — malentendido del anuncio</div>
+  <p class="sd">Varios leads llegaron creyendo que Etendo ofrece una integración de IA sobre su ERP actual, no un ERP propio. Ejemplos reales del CRM:</p>
+  <div class="insight red"><strong>Manuel López (Onesoft):</strong> "Completó el formulario interpretando el anuncio del ERP agéntico como una integración de ChatGPT/Claude a su ERP actual... No está interesado en migrar de ERP."</div>
+  <div class="insight red"><strong>Rafael Díaz (CITRUS DISOT):</strong> "Está utilizando un ERP vertical de frutas y quiere aplicarle inteligencia artificial. No quieren cambiar de ERP."</div>
+  <div class="insight amber"><strong>Daniel Gómez (Calzados Gómez):</strong> "Podría considerarlo si finalmente no logra implementar IA en su sistema actual. Si decide cambiar, nos contactará — no antes de octubre."</div>
+  <div class="insight amber"><strong>Mauro Baremberg (Sportivo):</strong> "Está consultando con otros ERP pero también con su proveedor actual. No le interesa un desarrollo a medida por cuestión de costo."</div>
+
+  <div class="sl">🟢 Oportunidades activas — pipeline real</div>
+  <table class="ch-table">
+    <thead><tr><th>Lead</th><th>Empresa</th><th>País</th><th>Estado</th><th>Necesidad</th><th>Próximo paso</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Constanza Costa</strong></td>
+        <td>IMB Institute</td>
+        <td>Argentina</td>
+        <td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Demo agendada ⭐</span></td>
+        <td style="font-size:11px;color:#666">Empresa de formación. Necesita módulo de programas + CRM comercial</td>
+        <td style="font-size:11px"><strong>Jueves 23/07 — 10:00 ARG</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Gabriel Priore</strong></td>
+        <td>Tarewa (metalúrgica)</td>
+        <td>Argentina</td>
+        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — MQL</span></td>
+        <td style="font-size:11px;color:#666">Usa Calipso, licencias caras. Pidió acceso SaaS para mostrar al directorio</td>
+        <td style="font-size:11px">Enviar acceso SaaS + seguimiento directorio</td>
+      </tr>
+      <tr>
+        <td><strong>José María Ventura</strong></td>
+        <td>Ventura Espejo SL</td>
+        <td>España</td>
+        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — IQL</span></td>
+        <td style="font-size:11px;color:#666">En conversación. Llamada pendiente miércoles 23/07</td>
+        <td style="font-size:11px">Llamada miércoles o jueves/viernes</td>
+      </tr>
+      <tr>
+        <td><strong>Big Bad Wolf Malaysia</strong></td>
+        <td>Big Bad Wolf Malaysia</td>
+        <td>Malasia</td>
+        <td><span class="badge" style="background:#EAF3DE;color:#3B6D11">SQL — Partner</span></td>
+        <td style="font-size:11px;color:#666">Vía partner SKSoft. Pendiente viaje a Malasia para cerrar</td>
+        <td style="font-size:11px">Confirmar fecha viaje Malasia</td>
+      </tr>
+      <tr>
+        <td><strong>Daniel Coleman</strong></td>
+        <td>360 Ibiza services</td>
+        <td>España</td>
+        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — IQL</span></td>
+        <td style="font-size:11px;color:#666">De vacaciones hasta finales de julio. Pidió info por email</td>
+        <td style="font-size:11px">Contactar 30 julio</td>
+      </tr>
+      <tr>
+        <td><strong>Magi Fuentes</strong></td>
+        <td>Fusteria</td>
+        <td>España</td>
+        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — IQL</span></td>
+        <td style="font-size:11px;color:#666">Usa Gesfacil. Coordinar llamada con Cristina (responsable)</td>
+        <td style="font-size:11px">Galder coordina llamada con Cristina</td>
+      </tr>
+      <tr>
+        <td><strong>Daniel Gómez</strong></td>
+        <td>Calzados Gómez</td>
+        <td>España</td>
+        <td><span class="badge" style="background:#FCEBEB;color:#888">Frío — IQL</span></td>
+        <td style="font-size:11px;color:#666">Usa Compuwin. Valorará cambio si no consigue añadir IA</td>
+        <td style="font-size:11px">Seguimiento septiembre</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sl">Coste real por calidad de lead</div>
+  <div class="roi-grid">
+    <div class="roi-card"><p class="roi-title">Coste por lead total</p><p class="roi-val">€26.68</p><p class="roi-sub">€1.200 ÷ 45 leads</p></div>
+    <div class="roi-card"><p class="roi-title">Coste por lead no-basura</p><p class="roi-val">€52.19</p><p class="roi-sub">€1.200 ÷ 23 leads con empresa real</p></div>
+    <div class="roi-card"><p class="roi-title">Coste por IQL</p><p class="roi-val">€66.69</p><p class="roi-sub">€1.200 ÷ 18 IQL</p></div>
+    <div class="roi-card best"><p class="roi-title">Coste por MQL+SQL</p><p class="roi-val">€240</p><p class="roi-sub">€1.200 ÷ 5 leads cualificados</p></div>
+  </div>
+
+  <div class="insight yellow"><strong>El coste real por oportunidad cualificada (MQL+SQL) es €240.</strong> Google Ads reporta €52/conversión pero eso incluye todos los formularios, incluyendo los de personas que buscan trabajo. El coste real por lead que merece seguimiento comercial es casi 5 veces más alto.</div>
+  <div class="insight green"><strong>Demo agendada para el 23/07 con IMB Institute (Argentina).</strong> Es el lead más avanzado del mes. Empresa de formación empresarial con presencia en varios países de Latam — potencial de ticket alto.</div>
+  <div class="insight blue"><strong>Gabriel Priore (Tarewa) es el segundo lead más prometedor.</strong> Empresa metalúrgica argentina que ya usa ERP (Calipso) pero con costes de licencia altos. Caso de uso claro para migración a Etendo SaaS.</div>
+</div>
+
+
+<!-- MEJORAS SUGERIDAS -->
+<div id="mejoras" class="panel">
+
+  <div class="sl">Problema raíz detectado en el CRM</div>
+  <div class="insight red"><strong>El 49% de los leads (22 de 45) buscan trabajo, no un ERP.</strong> El término "agéntico" en los anuncios está siendo interpretado como "agencia" o "agente laboral" por un perfil incorrecto.</div>
+  <div class="insight amber"><strong>Otro patrón frecuente: empresas que quieren añadir IA a su ERP actual.</strong> Manuel López (Onesoft), Rafael Díaz (CITRUS DISOT) y Daniel Gómez (Calzados Gómez) llegaron buscando una integración de ChatGPT sobre su sistema actual — no migrar a un ERP nuevo. El anuncio no lo aclara.</div>
+  <div class="insight yellow"><strong>Consecuencia:</strong> el coste real por lead cualificado (MQL+SQL) es <strong>€240</strong>, no los €52 que reporta Google Ads. Mejorar la segmentación multiplica el ROI sin tocar el presupuesto.</div>
+
+  <div class="sl">🔴 Acción inmediata — palabras clave negativas</div>
+  <p class="sd">Añadir estas palabras negativas en Google Ads puede eliminar el 49% de leads basura de un día para otro, sin coste adicional y sin cambiar los anuncios.</p>
+  <table class="ch-table">
+    <thead><tr><th>Palabra clave negativa</th><th>Por qué</th></tr></thead>
+    <tbody>
+      <tr><td><code>-empleo</code> · <code>-trabajo</code> · <code>-vacante</code> · <code>-oferta de trabajo</code> · <code>-curriculum</code></td><td style="font-size:11px;color:#666">Elimina búsquedas de empleo — el mayor problema detectado en el CRM</td></tr>
+      <tr><td><code>-integración chatgpt</code> · <code>-añadir ia a</code> · <code>-plugin erp</code> · <code>-conectar ia</code> · <code>-copilot erp</code></td><td style="font-size:11px;color:#666">Filtra empresas que buscan añadir IA a su ERP actual, no migrar</td></tr>
+      <tr><td><code>-extensión erp</code> · <code>-chatgpt erp</code> · <code>-ia para mi erp</code></td><td style="font-size:11px;color:#666">Mismo perfil — quieren parchear su sistema actual</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sl">🔴 Propuestas de copy — Argentina (reemplazar anuncios actuales)</div>
+  <p class="sd">Tres variantes para dejar claro desde el primer segundo que Etendo es un ERP al que se migra, no una integración de IA.</p>
+
+  <div class="insight blue" style="margin-bottom:.5rem">
+    <strong>Propuesta A — Enfoque en migración (filtro directo)</strong><br>
+    <span style="font-size:12px;color:#444;line-height:1.8">
+      <strong>Titular 1:</strong> ¿Tu ERP no tiene IA? Cámbialo<br>
+      <strong>Titular 2:</strong> Etendo — El ERP con agentes IA incluidos<br>
+      <strong>Titular 3:</strong> Migra desde Odoo, SAP o Calipso<br>
+      <strong>Descripción 1:</strong> Etendo es un ERP completo con inteligencia artificial integrada. No es una integración — es un sistema nuevo. Solicita demo gratuita.<br>
+      <strong>Descripción 2:</strong> Si tu ERP actual no tiene IA nativa, estás perdiendo competitividad. Etendo automatiza procesos con agentes IA desde el primer día.
+    </span>
+  </div>
+
+  <div class="insight blue" style="margin-bottom:.5rem">
+    <strong>Propuesta B — Enfoque en dolor del ERP actual (coste de licencias)</strong><br>
+    <span style="font-size:12px;color:#444;line-height:1.8">
+      <strong>Titular 1:</strong> Tu ERP te cuesta demasiado en licencias<br>
+      <strong>Titular 2:</strong> Etendo SaaS — ERP con IA desde €X/mes<br>
+      <strong>Titular 3:</strong> Sin costes de implantación ocultos<br>
+      <strong>Descripción 1:</strong> ¿Pagas licencias caras por un ERP sin inteligencia artificial? Etendo incluye agentes IA nativos. Prueba el entorno SaaS gratis.<br>
+      <strong>Descripción 2:</strong> Empresas que migran desde Calipso, Odoo o SAP ahorran hasta un 40% en licencias. Solicita una demo y compara.
+    </span>
+  </div>
+
+  <div class="insight blue" style="margin-bottom:1.5rem">
+    <strong>Propuesta C — Negativa cualificante ⭐ Recomendada</strong><br>
+    <span style="font-size:12px;color:#444;line-height:1.8">
+      <strong>Titular 1:</strong> ERP Agéntico — No es una integración de IA<br>
+      <strong>Titular 2:</strong> Etendo tiene IA nativa, no un plugin<br>
+      <strong>Titular 3:</strong> Cambia de ERP. No añadas parches.<br>
+      <strong>Descripción 1:</strong> Etendo no conecta IA a tu ERP actual. Es un ERP nuevo con inteligencia artificial integrada desde la base. Para empresas que quieren dar el salto completo.<br>
+      <strong>Descripción 2:</strong> Si buscas añadir ChatGPT a tu ERP actual, Etendo no es para ti. Si quieres un ERP que ya piensa solo — sí lo es.
+    </span>
+  </div>
+
+  <div class="sl">🔴 Propuestas de copy — España</div>
+  <p class="sd">España tiene mayor resistencia al cambio de ERP y más ERPs verticales. El copy debe ser más directo en explicar que Etendo requiere migración.</p>
+
+  <div class="insight green" style="margin-bottom:.5rem">
+    <strong>Propuesta España A — Cualificación por sector</strong><br>
+    <span style="font-size:12px;color:#444;line-height:1.8">
+      <strong>Titular 1:</strong> ERP con IA para pymes industriales<br>
+      <strong>Titular 2:</strong> Etendo — ERP Agéntico para España<br>
+      <strong>Titular 3:</strong> Demo gratuita en 48 horas<br>
+      <strong>Descripción 1:</strong> Etendo es el primer ERP con agentes de inteligencia artificial para pymes industriales, logísticas y de servicios en España. No es un plugin — es tu nuevo sistema de gestión.<br>
+      <strong>Descripción 2:</strong> ¿Buscas modernizar tu gestión con IA? Etendo reemplaza tu ERP actual e incluye IA nativa. Solicita demo sin compromiso.
+    </span>
+  </div>
+
+  <div class="insight green" style="margin-bottom:1.5rem">
+    <strong>Propuesta España B — Negativa directa ⭐ Recomendada</strong><br>
+    <span style="font-size:12px;color:#444;line-height:1.8">
+      <strong>Titular 1:</strong> No integramos IA en tu ERP actual<br>
+      <strong>Titular 2:</strong> Etendo es un ERP nuevo — con IA incluida<br>
+      <strong>Titular 3:</strong> Para quien quiere cambiar, no parchear<br>
+      <strong>Descripción 1:</strong> Si buscas añadir inteligencia artificial a Sage, Navision o tu ERP actual, Etendo no es la solución. Etendo es el ERP al que migras cuando quieres IA de verdad.<br>
+      <strong>Descripción 2:</strong> El ERP Agéntico de Etendo no se conecta a sistemas externos — es el sistema. Para empresas listas para dar el salto.
+    </span>
+  </div>
+
+  <div class="sl">🟡 Extensiones de anuncio recomendadas</div>
+  <table class="ch-table">
+    <thead><tr><th>Tipo</th><th>Contenido</th><th>Destino</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Sitelink</strong></td><td>Ver demo en vídeo</td><td>/demo</td></tr>
+      <tr><td><strong>Sitelink</strong></td><td>Compara con tu ERP actual</td><td>/comparativa-erp</td></tr>
+      <tr><td><strong>Sitelink</strong></td><td>Precios y planes SaaS</td><td>/precios</td></tr>
+      <tr><td><strong>Sitelink</strong></td><td>Casos de éxito</td><td>/casos</td></tr>
+      <tr><td><strong>Callout</strong></td><td>"No es un plugin — es un ERP completo"</td><td>—</td></tr>
+      <tr><td><strong>Callout</strong></td><td>"IA nativa, no integrada"</td><td>—</td></tr>
+      <tr><td><strong>Callout</strong></td><td>"Migración asistida incluida"</td><td>—</td></tr>
+      <tr><td><strong>Snippet</strong></td><td>Módulos: Ventas · Compras · Inventario · Finanzas · IA Agéntica · BI</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sl">🟢 Keywords nuevas a añadir</div>
+  <p class="sd">Para capturar intención de migración real — usuarios que ya saben que quieren cambiar de ERP.</p>
+  <table class="ch-table">
+    <thead><tr><th>Keyword</th><th>Tipo de coincidencia</th><th>Mercado</th></tr></thead>
+    <tbody>
+      <tr><td>"migrar de odoo a"</td><td>Frase</td><td>Argentina + España</td></tr>
+      <tr><td>"alternativa a odoo"</td><td>Exacta</td><td>Argentina + España</td></tr>
+      <tr><td>"alternativa a calipso"</td><td>Exacta</td><td>Argentina</td></tr>
+      <tr><td>"cambiar de erp"</td><td>Frase</td><td>Argentina + España</td></tr>
+      <tr><td>"erp con inteligencia artificial incluida"</td><td>Frase</td><td>Argentina + España</td></tr>
+      <tr><td>"erp para pymes con ia"</td><td>Frase</td><td>Argentina + España</td></tr>
+      <tr><td>"erp nube argentina pymes"</td><td>Frase</td><td>Argentina</td></tr>
+      <tr><td>"erp nube españa pymes"</td><td>Frase</td><td>España</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sl">Plan de implementación por prioridad</div>
+  <table class="ch-table">
+    <thead><tr><th>Acción</th><th>Impacto</th><th>Esfuerzo</th><th>Cuándo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Añadir palabras clave negativas</strong> (trabajo, plugin, integración)</td><td><span class="delta-sm up">Alto</span></td><td><span class="delta-sm up">Bajo</span></td><td><span class="badge" style="background:#FCEBEB;color:#A32D2D">Esta semana</span></td></tr>
+      <tr><td><strong>Activar Propuesta C en Argentina</strong> (negativa cualificante)</td><td><span class="delta-sm up">Alto</span></td><td><span class="delta-sm up">Bajo</span></td><td><span class="badge" style="background:#FCEBEB;color:#A32D2D">Esta semana</span></td></tr>
+      <tr><td><strong>Activar Propuesta B en España</strong> (negativa directa)</td><td><span class="delta-sm up">Alto</span></td><td><span class="delta-sm up">Bajo</span></td><td><span class="badge" style="background:#FCEBEB;color:#A32D2D">Esta semana</span></td></tr>
+      <tr><td><strong>Añadir sitelinks</strong> (demo, precios, comparativa)</td><td><span class="delta-sm neu">Medio</span></td><td><span class="delta-sm up">Bajo</span></td><td><span class="badge" style="background:#FFF8CC;color:#666">Esta semana</span></td></tr>
+      <tr><td><strong>Añadir keywords de migración</strong> (alternativa a Odoo, etc.)</td><td><span class="delta-sm up">Alto</span></td><td><span class="delta-sm up">Bajo</span></td><td><span class="badge" style="background:#FFF8CC;color:#666">Próxima semana</span></td></tr>
+      <tr><td><strong>Crear landing comparativa</strong> (vs Odoo, vs Calipso)</td><td><span class="delta-sm up">Alto</span></td><td><span class="delta-sm down">Alto</span></td><td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Próximo mes</span></td></tr>
+      <tr><td><strong>Mejorar snippet /erp-agentico/</strong> (posición #2.7, 0 clics)</td><td><span class="delta-sm up">Alto</span></td><td><span class="delta-sm up">Bajo</span></td><td><span class="badge" style="background:#FCEBEB;color:#A32D2D">Esta semana</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
 <!-- CONCLUSIONES -->
 <div id="conclusiones" class="panel">
   <div class="sl">Resumen ejecutivo — todos los canales</div>
@@ -415,6 +687,8 @@ const costs=[38.67,59.51,46.97,36.79,18.63,43.66,54.15,42.88,29.15,38.98,32.31,9
 const convs=[0,0,0,0,0,0,0,0,2,1,1,0,3,0,1,0,3,1,1,3,0,0,3,1,2,1,0,0,0,0];
 new Chart(document.getElementById('adsDaily'),{type:'bar',data:{labels:dN,datasets:[{label:'Gasto €',data:costs,backgroundColor:'#FFD700',borderRadius:3}]},options:tt});
 new Chart(document.getElementById('convDaily'),{type:'bar',data:{labels:dN,datasets:[{label:'Conversiones',data:convs,backgroundColor:'#1BAF7A',borderRadius:3}]},options:{...tt,scales:{x:{ticks:{font:{size:9,family:'Inter'},color:'#888'},grid:{display:false}},y:{max:5,ticks:{font:{size:9,family:'Inter'},color:'#888',stepSize:1},grid:{color:'#f0f0f0'}}}}});
+
+new Chart(document.getElementById('descartePie'),{type:'doughnut',data:{labels:['Buscan trabajo / spam','Sin respuesta / no contactables','Malentendido del anuncio','Producto no encaja','Leads activos'],datasets:[{data:[22,8,6,5,9],backgroundColor:['#E24B4A','#888','#EDA100','#2A78D6','#1BAF7A'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11,family:'Inter'},color:'#333'}},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#FFD700',bodyColor:'#fff'}}}});
 
 new Chart(document.getElementById('convType'),{type:'doughnut',data:{labels:['Formulario ERP Agéntico (PMax)','Formulario Web (Argentina)','Formulario Web (PMax)'],datasets:[{data:[13,5,5],backgroundColor:['#1BAF7A','#2A78D6','#FFD700'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11,family:'Inter'},color:'#333'}},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#FFD700',bodyColor:'#fff'}}}});
 </script>
