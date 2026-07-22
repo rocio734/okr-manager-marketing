@@ -300,7 +300,16 @@ html = f"""<!DOCTYPE html>
 
 <div class="footer">
   <img src="data:image/png;base64,{logo}" alt="Etendo">
-  <div>Actualizado automáticamente · Windsor.ai · etendo.software · {generated}</div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+    <div style="display:flex;align-items:center;gap:8px;background:#F5F5F5;border:1.5px solid #E8E8E8;border-radius:8px;padding:8px 14px">
+      <span style="font-size:16px">🕐</span>
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#666">Última actualización</div>
+        <div style="font-size:13px;font-weight:700;color:#0D0D0D">{generated}</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:#999">Datos via Windsor.ai · etendo.software</div>
+  </div>
 </div>
 
 <script>
