@@ -1,5 +1,12 @@
 services:
   - type: web
+    name: analytics-dashboard
+    env: static
+    staticPublishPath: ./analytics-dashboard
+    plan: free
+    buildCommand: ""
+
+  - type: web
     name: crm-pulse
     runtime: python
     buildCommand: pip install -r mcp_crm_requirements.txt
