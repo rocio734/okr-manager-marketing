@@ -141,6 +141,9 @@ ch_p = {k: channel_sum(ch_p_rows, v) for k, v in ch_map.items()}
 channels_available = len(ch_c_rows) > 0
 if not channels_available:
     print("  ℹ️  Canales no disponibles — se mostrarán como '—' en el dashboard")
+new_users_available = len(nu_c) > 0
+if not new_users_available:
+    print("  ℹ️  new_users no disponible en Windsor.ai — se mostrará como '—'")
 
 # ── Agregados Ads ─────────────────────────────────────────────────────────────
 AC = dict(
@@ -244,8 +247,8 @@ valores = {
     "ga4_sessions_prev":  fmtn(P["sessions"]),
     "ga4_users_curr":     fmtn(C["users"]),
     "ga4_users_prev":     fmtn(P["users"]),
-    "ga4_new_users_curr": fmtn(C["new_users"]),
-    "ga4_new_users_prev": fmtn(P["new_users"]),
+    "ga4_new_users_curr": fmtn(C["new_users"]) if new_users_available else "—",
+    "ga4_new_users_prev": fmtn(P["new_users"]) if new_users_available else "—",
     "ga4_pageviews_curr": fmtn(C["pageviews"]),
     "ga4_pageviews_prev": fmtn(P["pageviews"]),
     "ga4_eng_curr":       f"{C['eng']:.1f}",
