@@ -681,7 +681,7 @@ const convs=[0,0,0,0,0,0,0,0,2,1,1,0,3,0,1,0,3,1,1,3,0,0,3,1,2,1,0,0,0,0];
 new Chart(document.getElementById('adsDaily'),{type:'bar',data:{labels:dN,datasets:[{label:'Gasto €',data:costs,backgroundColor:'#FFD700',borderRadius:3}]},options:tt});
 new Chart(document.getElementById('convDaily'),{type:'bar',data:{labels:dN,datasets:[{label:'Conversiones',data:convs,backgroundColor:'#1BAF7A',borderRadius:3}]},options:{...tt,scales:{x:{ticks:{font:{size:9,family:'Inter'},color:'#888'},grid:{display:false}},y:{max:5,ticks:{font:{size:9,family:'Inter'},color:'#888',stepSize:1},grid:{color:'#f0f0f0'}}}}});
 
-new Chart(document.getElementById('descartePie'),{type:'doughnut',data:{labels:['Buscan trabajo / spam','Sin respuesta / no contactables','Malentendido del anuncio','Producto no encaja','Leads activos'],datasets:[{data:[22,8,6,5,9],backgroundColor:['#E24B4A','#888','#EDA100','#2A78D6','#1BAF7A'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11,family:'Inter'},color:'#333'}},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#FFD700',bodyColor:'#fff'}}}});
+const _descartePie = new Chart(document.getElementById('descartePie'),{type:'doughnut',data:{labels:['Buscan trabajo / spam','Sin respuesta / no contactables','Malentendido del anuncio','Producto no encaja','Leads activos'],datasets:[{data:[22,8,6,5,9],backgroundColor:['#E24B4A','#888','#EDA100','#2A78D6','#1BAF7A'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11,family:'Inter'},color:'#333'}},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#FFD700',bodyColor:'#fff'}}}});
 
 new Chart(document.getElementById('convType'),{type:'doughnut',data:{labels:['Formulario ERP Agéntico (PMax)','Formulario Web (Argentina)','Formulario Web (PMax)'],datasets:[{data:[13,5,5],backgroundColor:['#1BAF7A','#2A78D6','#FFD700'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11,family:'Inter'},color:'#333'}},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#FFD700',bodyColor:'#fff'}}}});
 
@@ -889,6 +889,7 @@ function applyMetrics(data) {
   try { _renderPageQuality(data.pages_quality); } catch(e) { console.error('renderPageQuality:', e); }
   try { _renderCrmRows(data.crm); } catch(e) { console.error('renderCrmRows:', e); }
   try { _renderCrmFunnel(data.crm); } catch(e) { console.error('renderCrmFunnel:', e); }
+  try { _updateDescartePie(data.crm); } catch(e) { console.error('updateDescartePie:', e); }
 
   // 4. CRM subtitle via data-ws
   // Already handled by scalar update above
@@ -1016,6 +1017,19 @@ function _renderCrmFunnel(crm) {
       <div class="funnel-val" style="color:#1BAF7A">${N.format(qualified)}</div>
     </div>
   `;
+}
+
+function _updateDescartePie(crm) {
+  if (typeof _descartePie === 'undefined' || !crm || !crm.descarte) return;
+  const d = crm.descarte;
+  _descartePie.data.datasets[0].data = [
+    d.job            || 0,
+    d.no_response    || 0,
+    d.misunderstanding || 0,
+    d.product_fit    || 0,
+    crm.active       || 0,
+  ];
+  _descartePie.update();
 }
 
 let _fetchController = null;

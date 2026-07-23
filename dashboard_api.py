@@ -15,6 +15,7 @@ import urllib.parse
 import threading
 import time
 from datetime import datetime, timedelta
+from collections import Counter
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 WINDSOR_API_KEY = os.environ.get("WINDSOR_API_KEY", "")
@@ -352,6 +353,31 @@ def build_metrics(period: int) -> dict:
     crm_mql    = [l for l in crm_active if lclass(l) == "MQL"]
     crm_sql    = [l for l in crm_active if lclass(l) == "SQL" or lstatus(l) == "Qualified"]
 
+    def _descarte_reason(l):
+        text = ((l.get("description") or "") + " " + (l.get("leadNote") or "")).lower()
+        if any(w in text for w in ["trabajo", "empleo", "vacante", "curriculum", "curriculo",
+                                    "busca empleo", "busco trabajo", "busca trabajo", "oferta de trabajo"]):
+            return "job"
+        if any(w in text for w in ["integr", "chatgpt", "claude", "plugin", "su erp", "erp actual",
+                                    "conectar ia", "parchear", "añadir ia", "su sistema actual",
+                                    "no quiere cambiar", "no migrar"]):
+            return "misunderstanding"
+        if any(w in text for w in ["sin respuesta", "no responde", "no contesta", "no ha respondido",
+                                    "no contactable", "imposible contactar", "sin contacto"]):
+            return "no_response"
+        if any(w in text for w in ["precio", "caro", "presupuesto", "no encaja", "no le interesa",
+                                    "sin presupuesto"]):
+            return "product_fit"
+        return "other"
+
+    _dc = Counter(_descarte_reason(l) for l in crm_dead)
+    descarte_breakdown = {
+        "job":            _dc.get("job", 0),
+        "misunderstanding": _dc.get("misunderstanding", 0),
+        "no_response":    _dc.get("no_response", 0),
+        "product_fit":    _dc.get("product_fit", 0) + _dc.get("other", 0),
+    }
+
     _CLASS_ORDER = {"SQL": 0, "MQL": 1, "IQL": 2}
     pipeline_sorted = sorted(
         crm_active, key=lambda l: (_CLASS_ORDER.get(lclass(l), 9), lname(l))
@@ -454,6 +480,7 @@ def build_metrics(period: int) -> dict:
                 if crm_ok else "CRM no disponible"
             ),
             "pipeline":  pipeline_list,
+            "descarte":  descarte_breakdown,
         },
     }
 
