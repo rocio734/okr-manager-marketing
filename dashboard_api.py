@@ -6,6 +6,7 @@ Startup warmup en background para period=30.
 """
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 import os
 import json
@@ -61,7 +62,7 @@ def _windsor_raw(connector, fields, date_from, date_to):
         "date_from": date_from,
         "date_to": date_to,
     }
-    r = requests.get(f"{WINDSOR_BASE}/{connector}", params=params, timeout=40)
+    r = requests.get(f"{WINDSOR_BASE}/{connector}", params=params, timeout=20)
     r.raise_for_status()
     d = r.json()
     return d.get("data", d) if isinstance(d, dict) else d
@@ -93,8 +94,8 @@ def _crm_login():
         return json.loads(r.read())["token"]
 
 def _crm_fetch_all(token, entity):
-    out, start = [], 0
-    while True:
+    out, start, seen_ids = [], 0, set()
+    while start < 20000:  # hard cap: 20k rows max
         body = urllib.parse.urlencode({
             "_operationType": "fetch",
             "_startRow": str(start),
@@ -109,9 +110,11 @@ def _crm_fetch_all(token, entity):
             page = json.loads(r.read()).get("response", {}).get("data", [])
         if not page:
             break
-        out.extend(page)
-        if len(page) < 500:
-            break
+        new = [r for r in page if r.get("id") not in seen_ids]
+        if not new:
+            break  # no new records — pagination exhausted
+        seen_ids.update(r.get("id") for r in new)
+        out.extend(new)
         start += 500
     return out
 
@@ -161,29 +164,61 @@ def build_metrics(period: int) -> dict:
     prev_start = period * 2
     prev_end = period
 
-    # ── Fetch all sources ──────────────────────────────────────────────────────
-    ga4c = _windsor("googleanalytics4", GA4_FIELDS, period)
-    ga4p = _windsor("googleanalytics4", GA4_FIELDS, prev_start, prev_end)
-    ch_c_rows = _windsor_safe("googleanalytics4", ["sessions", "session_default_channel_group"], period)
-    ch_p_rows = _windsor_safe("googleanalytics4", ["sessions", "session_default_channel_group"], prev_start, prev_end)
-    adsc = _windsor("google_ads", ["cost", "clicks", "impressions", "conversions", "campaign_name", "campaign_status"], period)
-    adsp = _windsor("google_ads", ["cost", "clicks", "conversions", "campaign_name"], prev_start, prev_end)
-    scc = _windsor("searchconsole", ["clicks", "impressions", "ctr", "position"], period)
-    scp = _windsor("searchconsole", ["clicks", "impressions", "ctr", "position"], prev_start, prev_end)
-    kws = _windsor("searchconsole", ["query", "clicks", "impressions", "ctr", "position"], period)
-    pages_raw = _windsor("googleanalytics4", ["page_path", "sessions", "bounce_rate", "average_session_duration"], period)
+    # ── Fetch all sources IN PARALLEL ─────────────────────────────────────────
+    CH_FIELDS = ["sessions", "session_default_channel_group"]
+    ADS_FIELDS_C = ["cost", "clicks", "impressions", "conversions", "campaign_name", "campaign_status"]
+    ADS_FIELDS_P = ["cost", "clicks", "conversions", "campaign_name"]
+    SC_FIELDS   = ["clicks", "impressions", "ctr", "position"]
+    KW_FIELDS   = ["query", "clicks", "impressions", "ctr", "position"]
+    PG_FIELDS   = ["page_path", "sessions", "bounce_rate", "average_session_duration"]
 
-    # ── CRM ────────────────────────────────────────────────────────────────────
-    crm_ok = False
-    crm_leads = []
-    try:
-        token = _crm_login()
-        all_leads = _crm_fetch_all(token, "ETCRM_Lead")
-        cutoff = (datetime.today() - timedelta(days=period)).strftime("%Y-%m-%d")
-        crm_leads = [l for l in all_leads if (l.get("creationDate") or "")[:10] >= cutoff]
-        crm_ok = True
-    except Exception as e:
-        print(f"CRM error: {e}")
+    _fetches = {
+        "ga4c":      ("googleanalytics4", GA4_FIELDS,   period,      0),
+        "ga4p":      ("googleanalytics4", GA4_FIELDS,   prev_start,  prev_end),
+        "ch_c_rows": ("googleanalytics4", CH_FIELDS,    period,      0),
+        "ch_p_rows": ("googleanalytics4", CH_FIELDS,    prev_start,  prev_end),
+        "adsc":      ("google_ads",       ADS_FIELDS_C, period,      0),
+        "adsp":      ("google_ads",       ADS_FIELDS_P, prev_start,  prev_end),
+        "scc":       ("searchconsole",    SC_FIELDS,    period,      0),
+        "scp":       ("searchconsole",    SC_FIELDS,    prev_start,  prev_end),
+        "kws":       ("searchconsole",    KW_FIELDS,    period,      0),
+        "pages_raw": ("googleanalytics4", PG_FIELDS,    period,      0),
+    }
+
+    def _fetch_crm():
+        try:
+            token = _crm_login()
+            all_leads = _crm_fetch_all(token, "ETCRM_Lead")
+            cutoff = (datetime.today() - timedelta(days=period)).strftime("%Y-%m-%d")
+            return [l for l in all_leads if (l.get("creationDate") or "")[:10] >= cutoff], True
+        except Exception as e:
+            print(f"CRM error: {e}")
+            return [], False
+
+    _results = {}
+    with ThreadPoolExecutor(max_workers=11) as ex:
+        future_map = {
+            ex.submit(_windsor_safe, conn, fields, s, e): key
+            for key, (conn, fields, s, e) in _fetches.items()
+        }
+        crm_future = ex.submit(_fetch_crm)
+        for f in as_completed(list(future_map) + [crm_future]):
+            if f is crm_future:
+                _results["_crm"] = f.result()
+            else:
+                _results[future_map[f]] = f.result()
+
+    ga4c      = _results["ga4c"]
+    ga4p      = _results["ga4p"]
+    ch_c_rows = _results["ch_c_rows"]
+    ch_p_rows = _results["ch_p_rows"]
+    adsc      = _results["adsc"]
+    adsp      = _results["adsp"]
+    scc       = _results["scc"]
+    scp       = _results["scp"]
+    kws       = _results["kws"]
+    pages_raw = _results["pages_raw"]
+    crm_leads, crm_ok = _results["_crm"]
 
     # ── GA4 aggregates ─────────────────────────────────────────────────────────
     C = {
