@@ -166,12 +166,15 @@ def build_metrics(period: int) -> dict:
     prev_end = period
 
     # ── Fetch all sources IN PARALLEL ─────────────────────────────────────────
-    CH_FIELDS = ["sessions", "session_default_channel_group"]
+    CH_FIELDS    = ["sessions", "session_default_channel_group",
+                    "bounce_rate", "average_session_duration"]
     ADS_FIELDS_C = ["cost", "clicks", "impressions", "conversions", "campaign_name", "campaign_status"]
     ADS_FIELDS_P = ["cost", "clicks", "conversions", "campaign_name"]
-    SC_FIELDS   = ["clicks", "impressions", "ctr", "position"]
-    KW_FIELDS   = ["query", "clicks", "impressions", "ctr", "position"]
-    PG_FIELDS   = ["page_path", "sessions", "bounce_rate", "average_session_duration"]
+    SC_FIELDS    = ["clicks", "impressions", "ctr", "position"]
+    KW_FIELDS    = ["query", "clicks", "impressions", "ctr", "position"]
+    PG_FIELDS    = ["page_path", "sessions", "bounce_rate", "average_session_duration"]
+    DAILY_GA4    = ["date", "sessions"]
+    DAILY_ADS    = ["date", "cost", "conversions"]
 
     _fetches = {
         "ga4c":      ("googleanalytics4", GA4_FIELDS,   period,      0),
@@ -184,6 +187,8 @@ def build_metrics(period: int) -> dict:
         "scp":       ("searchconsole",    SC_FIELDS,    prev_start,  prev_end),
         "kws":       ("searchconsole",    KW_FIELDS,    period,      0),
         "pages_raw": ("googleanalytics4", PG_FIELDS,    period,      0),
+        "daily_web": ("googleanalytics4", DAILY_GA4,    period,      0),
+        "daily_ads": ("google_ads",       DAILY_ADS,    period,      0),
     }
 
     def _fetch_crm():
@@ -197,7 +202,7 @@ def build_metrics(period: int) -> dict:
             return [], False
 
     _results = {}
-    with ThreadPoolExecutor(max_workers=11) as ex:
+    with ThreadPoolExecutor(max_workers=13) as ex:
         future_map = {
             ex.submit(_windsor_safe, conn, fields, s, e): key
             for key, (conn, fields, s, e) in _fetches.items()
@@ -209,17 +214,36 @@ def build_metrics(period: int) -> dict:
             else:
                 _results[future_map[f]] = f.result()
 
-    ga4c      = _results["ga4c"]
-    ga4p      = _results["ga4p"]
-    ch_c_rows = _results["ch_c_rows"]
-    ch_p_rows = _results["ch_p_rows"]
-    adsc      = _results["adsc"]
-    adsp      = _results["adsp"]
-    scc       = _results["scc"]
-    scp       = _results["scp"]
-    kws       = _results["kws"]
-    pages_raw = _results["pages_raw"]
+    ga4c         = _results["ga4c"]
+    ga4p         = _results["ga4p"]
+    ch_c_rows    = _results["ch_c_rows"]
+    ch_p_rows    = _results["ch_p_rows"]
+    adsc         = _results["adsc"]
+    adsp         = _results["adsp"]
+    scc          = _results["scc"]
+    scp          = _results["scp"]
+    kws          = _results["kws"]
+    pages_raw    = _results["pages_raw"]
+    daily_web_rows = _results["daily_web"]
+    daily_ads_rows = _results["daily_ads"]
     crm_leads, crm_ok = _results["_crm"]
+
+    def _process_daily(rows, *fields):
+        rows_s = sorted(rows, key=lambda r: r.get("date", ""))
+        labels, vals = [], {f: [] for f in fields}
+        for r in rows_s:
+            d = r.get("date", "")
+            if len(d) >= 10:
+                labels.append(f"{int(d[8:10])}/{int(d[5:7])}")
+            else:
+                labels.append(d)
+            for f in fields:
+                v = r.get(f)
+                vals[f].append(round(float(v), 2) if v else 0)
+        return labels, vals
+
+    web_labels, web_vals = _process_daily(daily_web_rows, "sessions")
+    ads_labels, ads_vals = _process_daily(daily_ads_rows, "cost", "conversions")
 
     # ── GA4 aggregates ─────────────────────────────────────────────────────────
     C = {
@@ -248,6 +272,24 @@ def build_metrics(period: int) -> dict:
     ch_c = {k: channel_sum(ch_c_rows, v) for k, v in ch_map.items()}
     ch_p = {k: channel_sum(ch_p_rows, v) for k, v in ch_map.items()}
     channels_available = len(ch_c_rows) > 0
+
+    def ch_wavg(rows, ch_val, field):
+        rel = [r for r in rows if ch_val.lower() in str(r.get("session_default_channel_group", "")).lower()]
+        total_s = sum(float(r.get("sessions") or 0) for r in rel)
+        if not total_s: return None
+        return sum(float(r.get(field) or 0) * float(r.get("sessions") or 0) for r in rel) / total_s
+
+    ch_bounce_c = {k: ch_wavg(ch_c_rows, v, "bounce_rate") for k, v in ch_map.items()}
+    ch_dur_c    = {k: ch_wavg(ch_c_rows, v, "average_session_duration") for k, v in ch_map.items()}
+
+    def ch_pct(val):
+        return f"{round(val * 100, 1)}%" if val is not None else "—"
+
+    def _page_sessions(path):
+        for p in pages_raw:
+            if p.get("page_path") == path:
+                return int(float(p.get("sessions") or 0))
+        return 0
 
     # ── Ads aggregates ─────────────────────────────────────────────────────────
     AC = {
@@ -435,6 +477,8 @@ def build_metrics(period: int) -> dict:
             "available": channels_available,
             **{f"{k}_curr": int(ch_c[k]) for k in ch_map},
             **{f"{k}_prev": int(ch_p[k]) for k in ch_map},
+            **{f"{k}_bounce_curr": ch_pct(ch_bounce_c.get(k)) for k in ch_map},
+            **{f"{k}_dur_curr": (fmt_dur(ch_dur_c[k]) if ch_dur_c.get(k) else "—") for k in ch_map},
         },
         "ads": {
             "cost_curr":        round(AC["cost"], 2),
@@ -481,6 +525,19 @@ def build_metrics(period: int) -> dict:
             ),
             "pipeline":  pipeline_list,
             "descarte":  descarte_breakdown,
+        },
+        "daily": {
+            "web_labels":  web_labels,
+            "sessions":    web_vals.get("sessions", []),
+            "ads_labels":  ads_labels,
+            "cost":        ads_vals.get("cost", []),
+            "conversions": [int(v) for v in ads_vals.get("conversions", [])],
+        },
+        "leads_funnel": {
+            "sessions":   int(C["sessions"]),
+            "contactanos": _page_sessions("/contactanos/"),
+            "gracias":    _page_sessions("/muchas-gracias/"),
+            "ads_conv":   int(AC["conversions"]),
         },
     }
 
