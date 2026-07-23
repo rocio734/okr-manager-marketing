@@ -95,6 +95,13 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 .page-fill.convert{background:var(--y)}
 .page-val{font-size:11px;font-weight:700;color:var(--bk);width:50px;text-align:right;flex-shrink:0}
 .page-badge{font-size:10px;padding:1px 5px;border-radius:3px;font-weight:600;flex-shrink:0}
+.period-selector{display:flex;gap:8px;margin-bottom:1.5rem;align-items:center;flex-wrap:wrap;padding:10px 14px;background:var(--gl);border-radius:8px;border:1px solid var(--gb)}
+.ps-btn{padding:6px 16px;border-radius:6px;border:1.5px solid var(--gb);font-size:12px;font-weight:600;cursor:pointer;background:var(--wh);color:var(--gm);font-family:'Inter',sans-serif;transition:all .15s}
+.ps-btn:hover{border-color:var(--bk);color:var(--bk)}
+.ps-btn.active{background:var(--bk);color:var(--y);border-color:var(--bk)}
+.ps-label{font-size:12px;color:var(--gm);font-weight:600;margin-right:4px}
+#api-loading{display:none;font-size:11px;color:var(--gm);margin-left:8px}
+#api-loading.vis{display:inline}
 </style>
 </head>
 <body>
@@ -108,7 +115,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
     </div>
   </div>
   <div class="header-meta">
-    <div class="period"><!-- WS:header_period -->23/06/2026 – 23/07/2026 vs. 24/05/2026 – 23/06/2026<!-- /WS:header_period --></div>
+    <div class="period" data-ws="header_period"><!-- WS:header_period -->23/06/2026 – 23/07/2026 vs. 24/05/2026 – 23/06/2026<!-- /WS:header_period --></div>
     <div class="verified">✓ Datos verificados: GA4 · Google Ads · Search Console</div>
   </div>
 </div>
@@ -124,31 +131,39 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
   <button class="tab" onclick="showTab('conclusiones',this)">Conclusiones</button>
 </div>
 
+<div class="period-selector">
+  <span class="ps-label">Período de análisis:</span>
+  <button class="ps-btn" onclick="setPeriod(7,this)">7 días</button>
+  <button class="ps-btn active" onclick="setPeriod(30,this)">30 días</button>
+  <button class="ps-btn" onclick="setPeriod(90,this)">90 días</button>
+  <span id="api-loading">⟳ Actualizando datos…</span>
+</div>
+
 <!-- WEB GA4 -->
 <div id="web" class="panel active">
   <div class="sl">Métricas clave — mes actual vs anterior</div>
   <p class="sd">Número anterior (tachado) → número actual → variación.</p>
   <div class="kpi-grid">
-    <div class="kpi"><p class="kpi-label">Visitas totales</p><p class="kpi-def">Veces que alguien entró a la web</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_sessions_prev -->4.892<!-- /WS:ga4_sessions_prev --></span><span class="kpi-val"><!-- WS:ga4_sessions_curr -->3.440<!-- /WS:ga4_sessions_curr --></span><span class="kpi-delta down">-28.1%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Visitantes únicos</p><p class="kpi-def">Personas distintas que visitaron la web</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_users_prev -->3.371<!-- /WS:ga4_users_prev --></span><span class="kpi-val"><!-- WS:ga4_users_curr -->2.249<!-- /WS:ga4_users_curr --></span><span class="kpi-delta down">-31.7%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Visitantes nuevos</p><p class="kpi-def">Personas que entraron por primera vez</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_new_users_prev -->3.371<!-- /WS:ga4_new_users_prev --></span><span class="kpi-val"><!-- WS:ga4_new_users_curr -->2.249<!-- /WS:ga4_new_users_curr --></span><span class="kpi-delta down">-32.8%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Páginas vistas</p><p class="kpi-def">Total de páginas abiertas</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_pageviews_prev -->8.986<!-- /WS:ga4_pageviews_prev --></span><span class="kpi-val"><!-- WS:ga4_pageviews_curr -->5.754<!-- /WS:ga4_pageviews_curr --></span><span class="kpi-delta down">-32.9%</span></div></div>
-    <div class="kpi"><p class="kpi-label">% Interacción</p><p class="kpi-def">Visitas con interacción real — cuanto más alto, mejor</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_eng_prev -->40.7<!-- /WS:ga4_eng_prev --></span><span class="kpi-val"><!-- WS:ga4_eng_curr -->42.9<!-- /WS:ga4_eng_curr --></span><span class="kpi-delta up">+3.1pp</span></div></div>
-    <div class="kpi"><p class="kpi-label">Tasa de rebote</p><p class="kpi-def">Visitas sin interacción — cuanto más bajo, mejor</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_bounce_prev -->59.3<!-- /WS:ga4_bounce_prev --></span><span class="kpi-val"><!-- WS:ga4_bounce_curr -->57.1<!-- /WS:ga4_bounce_curr --></span><span class="kpi-delta up">-3.1pp</span></div></div>
-    <div class="kpi"><p class="kpi-label">Tiempo en web</p><p class="kpi-def">Duración media de cada visita</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_dur_prev -->—<!-- /WS:ga4_dur_prev --></span><span class="kpi-val"><!-- WS:ga4_dur_curr -->2m 47s<!-- /WS:ga4_dur_curr --></span><span class="kpi-delta neu">≈ igual</span></div></div>
-    <div class="kpi"><p class="kpi-label">Visitas IA</p><p class="kpi-def">Visitas desde Claude, ChatGPT u otros — canal emergente</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ga4_ai_prev -->1347<!-- /WS:ga4_ai_prev --></span><span class="kpi-val"><!-- WS:ga4_ai_curr -->949<!-- /WS:ga4_ai_curr --></span><span class="kpi-delta up">+16.7%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Visitas totales</p><p class="kpi-def">Veces que alguien entró a la web</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_sessions_prev"><!-- WS:ga4_sessions_prev -->4.892<!-- /WS:ga4_sessions_prev --></span><span class="kpi-val" data-ws="ga4_sessions_curr"><!-- WS:ga4_sessions_curr -->3.440<!-- /WS:ga4_sessions_curr --></span><span class="kpi-delta down">-28.1%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Visitantes únicos</p><p class="kpi-def">Personas distintas que visitaron la web</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_users_prev"><!-- WS:ga4_users_prev -->3.371<!-- /WS:ga4_users_prev --></span><span class="kpi-val" data-ws="ga4_users_curr"><!-- WS:ga4_users_curr -->2.249<!-- /WS:ga4_users_curr --></span><span class="kpi-delta down">-31.7%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Visitantes nuevos</p><p class="kpi-def">Personas que entraron por primera vez</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_new_users_prev"><!-- WS:ga4_new_users_prev -->3.371<!-- /WS:ga4_new_users_prev --></span><span class="kpi-val" data-ws="ga4_new_users_curr"><!-- WS:ga4_new_users_curr -->2.249<!-- /WS:ga4_new_users_curr --></span><span class="kpi-delta down">-32.8%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Páginas vistas</p><p class="kpi-def">Total de páginas abiertas</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_pageviews_prev"><!-- WS:ga4_pageviews_prev -->8.986<!-- /WS:ga4_pageviews_prev --></span><span class="kpi-val" data-ws="ga4_pageviews_curr"><!-- WS:ga4_pageviews_curr -->5.754<!-- /WS:ga4_pageviews_curr --></span><span class="kpi-delta down">-32.9%</span></div></div>
+    <div class="kpi"><p class="kpi-label">% Interacción</p><p class="kpi-def">Visitas con interacción real — cuanto más alto, mejor</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_eng_prev"><!-- WS:ga4_eng_prev -->40.7<!-- /WS:ga4_eng_prev --></span><span class="kpi-val" data-ws="ga4_eng_curr"><!-- WS:ga4_eng_curr -->42.9<!-- /WS:ga4_eng_curr --></span><span class="kpi-delta up">+3.1pp</span></div></div>
+    <div class="kpi"><p class="kpi-label">Tasa de rebote</p><p class="kpi-def">Visitas sin interacción — cuanto más bajo, mejor</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_bounce_prev"><!-- WS:ga4_bounce_prev -->59.3<!-- /WS:ga4_bounce_prev --></span><span class="kpi-val" data-ws="ga4_bounce_curr"><!-- WS:ga4_bounce_curr -->57.1<!-- /WS:ga4_bounce_curr --></span><span class="kpi-delta up">-3.1pp</span></div></div>
+    <div class="kpi"><p class="kpi-label">Tiempo en web</p><p class="kpi-def">Duración media de cada visita</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_dur_prev"><!-- WS:ga4_dur_prev -->—<!-- /WS:ga4_dur_prev --></span><span class="kpi-val" data-ws="ga4_dur_curr"><!-- WS:ga4_dur_curr -->2m 47s<!-- /WS:ga4_dur_curr --></span><span class="kpi-delta neu">≈ igual</span></div></div>
+    <div class="kpi"><p class="kpi-label">Visitas IA</p><p class="kpi-def">Visitas desde Claude, ChatGPT u otros — canal emergente</p><div class="kpi-row"><span class="kpi-prev" data-ws="ga4_ai_prev"><!-- WS:ga4_ai_prev -->1347<!-- /WS:ga4_ai_prev --></span><span class="kpi-val" data-ws="ga4_ai_curr"><!-- WS:ga4_ai_curr -->949<!-- /WS:ga4_ai_curr --></span><span class="kpi-delta up">+16.7%</span></div></div>
   </div>
   <div class="sl">Canales de origen</div>
   <table class="ch-table">
     <thead><tr><th>Canal</th><th>¿Qué es?</th><th class="r">Anterior</th><th class="r">Actual</th><th class="r">Variación</th><th class="r">Rebote</th><th class="r">T. medio</th></tr></thead>
     <tbody>
-      <tr><td><span class="badge" style="background:#EEF4FF;color:#185FA5">Directo</span></td><td style="color:#666;font-size:11px">URL directa o marcador</td><td class="r"><!-- WS:ch_direct_prev -->925<!-- /WS:ch_direct_prev --></td><td class="r"><!-- WS:ch_direct_curr -->1.095<!-- /WS:ch_direct_curr --></strong></td><td class="r"><span class="delta-sm up">+15.6%</span></td><td class="r">65.6%</td><td class="r">4m 07s</td></tr>
-      <tr><td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Búsqueda orgánica</span></td><td style="color:#666;font-size:11px">Google sin anuncios — mayor calidad</td><td class="r"><!-- WS:ch_organic_prev -->1.086<!-- /WS:ch_organic_prev --></td><td class="r"><!-- WS:ch_organic_curr -->784<!-- /WS:ch_organic_curr --></strong></td><td class="r"><span class="delta-sm down">-24.4%</span></td><td class="r">42.6%</td><td class="r">4m 18s</td></tr>
-      <tr><td><span class="badge" style="background:#FAEEDA;color:#633806">Búsqueda de pago</span></td><td style="color:#666;font-size:11px">Anuncios Google Ads</td><td class="r"><!-- WS:ch_paid_prev -->1.084<!-- /WS:ch_paid_prev --></td><td class="r"><!-- WS:ch_paid_curr -->617<!-- /WS:ch_paid_curr --></strong></td><td class="r"><span class="delta-sm down">-40.8%</span></td><td class="r">55.3%</td><td class="r">1m 03s</td></tr>
-      <tr><td><span class="badge" style="background:#EEEDFE;color:#3C3489">Cross-network</span></td><td style="color:#666;font-size:11px">Performance Max Google</td><td class="r"><!-- WS:ch_cross_prev -->1.323<!-- /WS:ch_cross_prev --></td><td class="r"><!-- WS:ch_cross_curr -->363<!-- /WS:ch_cross_curr --></strong></td><td class="r"><span class="delta-sm down">-70.7%</span></td><td class="r">49.6%</td><td class="r">1m 30s</td></tr>
-      <tr><td><span class="badge" style="background:#FAECE7;color:#712B13">Redes sociales pago</span></td><td style="color:#666;font-size:11px">Anuncios en redes</td><td class="r"><!-- WS:ch_social_paid_prev -->212<!-- /WS:ch_social_paid_prev --></td><td class="r"><!-- WS:ch_social_paid_curr -->288<!-- /WS:ch_social_paid_curr --></strong></td><td class="r"><span class="delta-sm up">+42%</span></td><td class="r">69%</td><td class="r">0m 47s</td></tr>
-      <tr><td><span class="badge" style="background:#E6F1FB;color:#0C447C">Referencias externas</span></td><td style="color:#666;font-size:11px">Enlace desde otra web</td><td class="r"><!-- WS:ch_ref_prev -->204<!-- /WS:ch_ref_prev --></td><td class="r"><!-- WS:ch_ref_curr -->132<!-- /WS:ch_ref_curr --></strong></td><td class="r"><span class="delta-sm down">-38.6%</span></td><td class="r">48%</td><td class="r">4m 25s</td></tr>
-      <tr><td><span class="badge" style="background:#FFF8CC;color:#666">Asistente IA</span></td><td style="color:#666;font-size:11px">Claude, ChatGPT, etc.</td><td class="r"><!-- WS:ch_ai_prev -->1.347<!-- /WS:ch_ai_prev --></td><td class="r"><!-- WS:ch_ai_curr -->949<!-- /WS:ch_ai_curr --></strong></td><td class="r"><span class="delta-sm up">+16.7%</span></td><td class="r">57.1%</td><td class="r">3m 06s</td></tr>
+      <tr><td><span class="badge" style="background:#EEF4FF;color:#185FA5">Directo</span></td><td style="color:#666;font-size:11px">URL directa o marcador</td><td class="r" data-ws="ch_direct_prev"><!-- WS:ch_direct_prev -->925<!-- /WS:ch_direct_prev --></td><td class="r" data-ws="ch_direct_curr"><!-- WS:ch_direct_curr -->1.095<!-- /WS:ch_direct_curr --></strong></td><td class="r"><span class="delta-sm up">+15.6%</span></td><td class="r">65.6%</td><td class="r">4m 07s</td></tr>
+      <tr><td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Búsqueda orgánica</span></td><td style="color:#666;font-size:11px">Google sin anuncios — mayor calidad</td><td class="r" data-ws="ch_organic_prev"><!-- WS:ch_organic_prev -->1.086<!-- /WS:ch_organic_prev --></td><td class="r" data-ws="ch_organic_curr"><!-- WS:ch_organic_curr -->784<!-- /WS:ch_organic_curr --></strong></td><td class="r"><span class="delta-sm down">-24.4%</span></td><td class="r">42.6%</td><td class="r">4m 18s</td></tr>
+      <tr><td><span class="badge" style="background:#FAEEDA;color:#633806">Búsqueda de pago</span></td><td style="color:#666;font-size:11px">Anuncios Google Ads</td><td class="r" data-ws="ch_paid_prev"><!-- WS:ch_paid_prev -->1.084<!-- /WS:ch_paid_prev --></td><td class="r" data-ws="ch_paid_curr"><!-- WS:ch_paid_curr -->617<!-- /WS:ch_paid_curr --></strong></td><td class="r"><span class="delta-sm down">-40.8%</span></td><td class="r">55.3%</td><td class="r">1m 03s</td></tr>
+      <tr><td><span class="badge" style="background:#EEEDFE;color:#3C3489">Cross-network</span></td><td style="color:#666;font-size:11px">Performance Max Google</td><td class="r" data-ws="ch_cross_prev"><!-- WS:ch_cross_prev -->1.323<!-- /WS:ch_cross_prev --></td><td class="r" data-ws="ch_cross_curr"><!-- WS:ch_cross_curr -->363<!-- /WS:ch_cross_curr --></strong></td><td class="r"><span class="delta-sm down">-70.7%</span></td><td class="r">49.6%</td><td class="r">1m 30s</td></tr>
+      <tr><td><span class="badge" style="background:#FAECE7;color:#712B13">Redes sociales pago</span></td><td style="color:#666;font-size:11px">Anuncios en redes</td><td class="r" data-ws="ch_social_paid_prev"><!-- WS:ch_social_paid_prev -->212<!-- /WS:ch_social_paid_prev --></td><td class="r" data-ws="ch_social_paid_curr"><!-- WS:ch_social_paid_curr -->288<!-- /WS:ch_social_paid_curr --></strong></td><td class="r"><span class="delta-sm up">+42%</span></td><td class="r">69%</td><td class="r">0m 47s</td></tr>
+      <tr><td><span class="badge" style="background:#E6F1FB;color:#0C447C">Referencias externas</span></td><td style="color:#666;font-size:11px">Enlace desde otra web</td><td class="r" data-ws="ch_ref_prev"><!-- WS:ch_ref_prev -->204<!-- /WS:ch_ref_prev --></td><td class="r" data-ws="ch_ref_curr"><!-- WS:ch_ref_curr -->132<!-- /WS:ch_ref_curr --></strong></td><td class="r"><span class="delta-sm down">-38.6%</span></td><td class="r">48%</td><td class="r">4m 25s</td></tr>
+      <tr><td><span class="badge" style="background:#FFF8CC;color:#666">Asistente IA</span></td><td style="color:#666;font-size:11px">Claude, ChatGPT, etc.</td><td class="r" data-ws="ch_ai_prev"><!-- WS:ch_ai_prev -->1.347<!-- /WS:ch_ai_prev --></td><td class="r" data-ws="ch_ai_curr"><!-- WS:ch_ai_curr -->949<!-- /WS:ch_ai_curr --></strong></td><td class="r"><span class="delta-sm up">+16.7%</span></td><td class="r">57.1%</td><td class="r">3m 06s</td></tr>
     </tbody>
   </table>
   <div class="sl">Visitas diarias — mes actual</div>
@@ -159,19 +174,19 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 <div id="ads" class="panel">
   <div class="sl">Resumen de inversión — mes actual vs anterior</div>
   <div class="kpi-grid">
-    <div class="kpi"><p class="kpi-label">Inversión total</p><p class="kpi-def">Gasto total en Google Ads</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_cost_prev -->€1.279.47<!-- /WS:ads_cost_prev --></span><span class="kpi-val"><!-- WS:ads_cost_curr -->€1.212.45<!-- /WS:ads_cost_curr --></span><span class="kpi-delta neu">-2.6%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Clics totales</p><p class="kpi-def">Veces que alguien hizo clic en un anuncio</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_clicks_prev -->2.918<!-- /WS:ads_clicks_prev --></span><span class="kpi-val"><!-- WS:ads_clicks_curr -->1.053<!-- /WS:ads_clicks_curr --></span><span class="kpi-delta down">-44%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Impresiones</p><p class="kpi-def">Veces que se mostró un anuncio</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_impr_prev -->—<!-- /WS:ads_impr_prev --></span><span class="kpi-val"><!-- WS:ads_impr_curr -->13.707<!-- /WS:ads_impr_curr --></span><span class="kpi-delta down">-73.7%</span></div></div>
-    <div class="kpi"><p class="kpi-label">CTR</p><p class="kpi-def">% de veces que se vio el anuncio y se hizo clic</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_ctr_prev -->—<!-- /WS:ads_ctr_prev --></span><span class="kpi-val"><!-- WS:ads_ctr_curr -->7.68<!-- /WS:ads_ctr_curr --></span><span class="kpi-delta up">+4.1pp</span></div></div>
-    <div class="kpi"><p class="kpi-label">Coste por clic</p><p class="kpi-def">Cuánto cuesta en media cada clic</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_cpc_prev -->—<!-- /WS:ads_cpc_prev --></span><span class="kpi-val"><!-- WS:ads_cpc_curr -->€1.15<!-- /WS:ads_cpc_curr --></span><span class="kpi-delta down">+73%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Conversiones</p><p class="kpi-def">Acciones clave completadas</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_conv_prev -->16<!-- /WS:ads_conv_prev --></span><span class="kpi-val"><!-- WS:ads_conv_curr -->23<!-- /WS:ads_conv_curr --></span><span class="kpi-delta up">+43.8%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Coste/conversión</p><p class="kpi-def">Coste medio por conversión conseguida</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_cpconv_prev -->€79.97<!-- /WS:ads_cpconv_prev --></span><span class="kpi-val"><!-- WS:ads_cpconv_curr -->€52.72<!-- /WS:ads_cpconv_curr --></span><span class="kpi-delta up">-32.3%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Coste diario medio</p><p class="kpi-def">Gasto medio por día</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:ads_daily_prev -->€42.65<!-- /WS:ads_daily_prev --></span><span class="kpi-val"><!-- WS:ads_daily_curr -->€40.42<!-- /WS:ads_daily_curr --></span><span class="kpi-delta neu">≈ igual</span></div></div>
+    <div class="kpi"><p class="kpi-label">Inversión total</p><p class="kpi-def">Gasto total en Google Ads</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_cost_prev"><!-- WS:ads_cost_prev -->€1.279.47<!-- /WS:ads_cost_prev --></span><span class="kpi-val" data-ws="ads_cost_curr"><!-- WS:ads_cost_curr -->€1.212.45<!-- /WS:ads_cost_curr --></span><span class="kpi-delta neu">-2.6%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Clics totales</p><p class="kpi-def">Veces que alguien hizo clic en un anuncio</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_clicks_prev"><!-- WS:ads_clicks_prev -->2.918<!-- /WS:ads_clicks_prev --></span><span class="kpi-val" data-ws="ads_clicks_curr"><!-- WS:ads_clicks_curr -->1.053<!-- /WS:ads_clicks_curr --></span><span class="kpi-delta down">-44%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Impresiones</p><p class="kpi-def">Veces que se mostró un anuncio</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_impr_prev"><!-- WS:ads_impr_prev -->—<!-- /WS:ads_impr_prev --></span><span class="kpi-val" data-ws="ads_impr_curr"><!-- WS:ads_impr_curr -->13.707<!-- /WS:ads_impr_curr --></span><span class="kpi-delta down">-73.7%</span></div></div>
+    <div class="kpi"><p class="kpi-label">CTR</p><p class="kpi-def">% de veces que se vio el anuncio y se hizo clic</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_ctr_prev"><!-- WS:ads_ctr_prev -->—<!-- /WS:ads_ctr_prev --></span><span class="kpi-val" data-ws="ads_ctr_curr"><!-- WS:ads_ctr_curr -->7.68<!-- /WS:ads_ctr_curr --></span><span class="kpi-delta up">+4.1pp</span></div></div>
+    <div class="kpi"><p class="kpi-label">Coste por clic</p><p class="kpi-def">Cuánto cuesta en media cada clic</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_cpc_prev"><!-- WS:ads_cpc_prev -->—<!-- /WS:ads_cpc_prev --></span><span class="kpi-val" data-ws="ads_cpc_curr"><!-- WS:ads_cpc_curr -->€1.15<!-- /WS:ads_cpc_curr --></span><span class="kpi-delta down">+73%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Conversiones</p><p class="kpi-def">Acciones clave completadas</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_conv_prev"><!-- WS:ads_conv_prev -->16<!-- /WS:ads_conv_prev --></span><span class="kpi-val" data-ws="ads_conv_curr"><!-- WS:ads_conv_curr -->23<!-- /WS:ads_conv_curr --></span><span class="kpi-delta up">+43.8%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Coste/conversión</p><p class="kpi-def">Coste medio por conversión conseguida</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_cpconv_prev"><!-- WS:ads_cpconv_prev -->€79.97<!-- /WS:ads_cpconv_prev --></span><span class="kpi-val" data-ws="ads_cpconv_curr"><!-- WS:ads_cpconv_curr -->€52.72<!-- /WS:ads_cpconv_curr --></span><span class="kpi-delta up">-32.3%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Coste diario medio</p><p class="kpi-def">Gasto medio por día</p><div class="kpi-row"><span class="kpi-prev" data-ws="ads_daily_prev"><!-- WS:ads_daily_prev -->€42.65<!-- /WS:ads_daily_prev --></span><span class="kpi-val" data-ws="ads_daily_curr"><!-- WS:ads_daily_curr -->€40.42<!-- /WS:ads_daily_curr --></span><span class="kpi-delta neu">≈ igual</span></div></div>
   </div>
   <div class="sl">Rendimiento por campaña</div>
   <table class="ch-table">
     <thead><tr><th>Campaña</th><th>Estado</th><th class="r">Gasto</th><th class="r">Clics</th><th class="r">Conv.</th><th class="r">Coste/Conv.</th></tr></thead>
-    <tbody><!-- WS:CAMP_ROWS -->
+    <tbody data-ws="CAMP_ROWS"><!-- WS:CAMP_ROWS -->
 <tr><td><strong>BUS | Argentina - Búsqueda Leads MQL</strong></td><td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Activa</span></td><td class="r">€629.07</td><td class="r">630</td><td class="r"><strong>5</strong></td><td class="r">€125.81</td></tr>
 <tr><td><strong>PMax | ERP Agéntico | Junio 2026</strong></td><td><span class="badge" style="background:#FCEBEB;color:#A32D2D">Pausada ⚠️</span></td><td class="r">€476.54</td><td class="r">374</td><td class="r"><strong>18</strong></td><td class="r">€26.47</td></tr>
 <tr><td><strong>BUS | España - Búsqueda Leads MQL</strong></td><td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Activa</span></td><td class="r">€106.84</td><td class="r">49</td><td class="r"><strong>0</strong></td><td class="r">—</td></tr>
@@ -297,7 +312,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
   <div class="sl">Páginas de captación — mayor tráfico</div>
   <p class="sd">Las páginas más visitadas de la web orientadas a captar clientes nuevos. La barra muestra el volumen de visitas relativo al máximo.</p>
 
-  <div style="margin-bottom:1.5rem">
+  <div id="page-bars-wrap" style="margin-bottom:1.5rem">
 <!-- WS:PAGE_BARS -->
 <div class="page-bar"><div class="page-name">/erp-agentico/</div><div class="page-track"><div class="page-fill" style="width:100%"></div></div><div class="page-val">592</div><span class="page-badge" style="#FCEBEB;color:#A32D2D">Rebote 61.8%</span></div>
 <div class="page-bar"><div class="page-name">/</div><div class="page-track"><div class="page-fill" style="width:89%"></div></div><div class="page-val">529</div><span class="page-badge" style="#EAF3DE;color:#3B6D11">Rebote 32.5% ⭐</span></div>
@@ -319,7 +334,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 
   <table class="ch-table">
     <thead><tr><th>Página</th><th class="r">Visitas</th><th class="r">Rebote</th><th class="r">Tiempo medio</th><th class="r">Tipo</th></tr></thead>
-    <tbody>
+    <tbody id="page-quality-tbody">
 <!-- WS:PAGE_QUALITY_ROWS -->
 <tr><td>/es/user-guide/etendo-classic/basic-features/general-setup/security/audit-trail/</td><td class="r">4</td><td class="r">0.0%</td><td class="r"><strong>48m 14s</strong></td><td class="r"><span class="badge" style="background:#EEF4FF;color:#185FA5">Doc técnica</span></td></tr>
 <tr><td>/es/developer-guide/etendo-classic/bundles/spain-localization/developer-changelog/apichanges/</td><td class="r">1</td><td class="r">0.0%</td><td class="r"><strong>34m 49s</strong></td><td class="r"><span class="badge" style="background:#EEF4FF;color:#185FA5">Doc técnica</span></td></tr>
@@ -344,10 +359,10 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 <div id="seo" class="panel">
   <div class="sl">Posicionamiento orgánico — mes actual vs anterior</div>
   <div class="kpi-grid">
-    <div class="kpi"><p class="kpi-label">Impresiones en Google</p><p class="kpi-def">Veces que Etendo apareció en resultados de búsqueda</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:sc_impr_prev -->52.905<!-- /WS:sc_impr_prev --></span><span class="kpi-val"><!-- WS:sc_impr_curr -->35.657<!-- /WS:sc_impr_curr --></span><span class="kpi-delta down">-29.3%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Clics orgánicos</p><p class="kpi-def">Veces que alguien hizo clic en el resultado orgánico</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:sc_clicks_prev -->718<!-- /WS:sc_clicks_prev --></span><span class="kpi-val"><!-- WS:sc_clicks_curr -->537<!-- /WS:sc_clicks_curr --></span><span class="kpi-delta down">-19.7%</span></div></div>
-    <div class="kpi"><p class="kpi-label">CTR orgánico</p><p class="kpi-def">% de impresiones que generaron un clic</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:sc_ctr_prev -->1.36<!-- /WS:sc_ctr_prev --></span><span class="kpi-val"><!-- WS:sc_ctr_curr -->1.51<!-- /WS:sc_ctr_curr --></span><span class="kpi-delta up">+0.18pp</span></div></div>
-    <div class="kpi"><p class="kpi-label">Posición media</p><p class="kpi-def">Posición media en Google — cuanto más bajo el número, mejor</p><div class="kpi-row"><span class="kpi-prev"><!-- WS:sc_pos_prev -->14.1<!-- /WS:sc_pos_prev --></span><span class="kpi-val"><!-- WS:sc_pos_curr -->16.9<!-- /WS:sc_pos_curr --></span><span class="kpi-delta down">-2.4 pos</span></div></div>
+    <div class="kpi"><p class="kpi-label">Impresiones en Google</p><p class="kpi-def">Veces que Etendo apareció en resultados de búsqueda</p><div class="kpi-row"><span class="kpi-prev" data-ws="sc_impr_prev"><!-- WS:sc_impr_prev -->52.905<!-- /WS:sc_impr_prev --></span><span class="kpi-val" data-ws="sc_impr_curr"><!-- WS:sc_impr_curr -->35.657<!-- /WS:sc_impr_curr --></span><span class="kpi-delta down">-29.3%</span></div></div>
+    <div class="kpi"><p class="kpi-label">Clics orgánicos</p><p class="kpi-def">Veces que alguien hizo clic en el resultado orgánico</p><div class="kpi-row"><span class="kpi-prev" data-ws="sc_clicks_prev"><!-- WS:sc_clicks_prev -->718<!-- /WS:sc_clicks_prev --></span><span class="kpi-val" data-ws="sc_clicks_curr"><!-- WS:sc_clicks_curr -->537<!-- /WS:sc_clicks_curr --></span><span class="kpi-delta down">-19.7%</span></div></div>
+    <div class="kpi"><p class="kpi-label">CTR orgánico</p><p class="kpi-def">% de impresiones que generaron un clic</p><div class="kpi-row"><span class="kpi-prev" data-ws="sc_ctr_prev"><!-- WS:sc_ctr_prev -->1.36<!-- /WS:sc_ctr_prev --></span><span class="kpi-val" data-ws="sc_ctr_curr"><!-- WS:sc_ctr_curr -->1.51<!-- /WS:sc_ctr_curr --></span><span class="kpi-delta up">+0.18pp</span></div></div>
+    <div class="kpi"><p class="kpi-label">Posición media</p><p class="kpi-def">Posición media en Google — cuanto más bajo el número, mejor</p><div class="kpi-row"><span class="kpi-prev" data-ws="sc_pos_prev"><!-- WS:sc_pos_prev -->14.1<!-- /WS:sc_pos_prev --></span><span class="kpi-val" data-ws="sc_pos_curr"><!-- WS:sc_pos_curr -->16.9<!-- /WS:sc_pos_curr --></span><span class="kpi-delta down">-2.4 pos</span></div></div>
   </div>
   <div class="sl">🏆 Keywords en el TOP 3 — tráfico real</div>
   <table class="kw-table">
@@ -365,7 +380,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
   <div class="sl">⚠️ Alta visibilidad, 0 clics — oportunidades inmediatas</div>
   <table class="kw-table">
     <thead><tr><th>Palabra clave</th><th class="r">Impresiones</th><th class="r">Clics</th><th class="r">Posición</th><th>Acción recomendada</th></tr></thead>
-    <tbody><!-- WS:KW_ROWS -->
+    <tbody data-ws="KW_ROWS"><!-- WS:KW_ROWS -->
 <tr><td><strong>etendo</strong></td><td class="r">528</td><td class="r">135</td><td class="r">25.6%</td><td class="r"><span class="pos-pill pos-top">#1.2</span></td></tr>
 <tr><td><strong>"salvador zapata" "etendo software"</strong></td><td class="r">461</td><td class="r">0</td><td class="r">0.0%</td><td class="r"><span class="pos-pill pos-mid">#5.1</span></td></tr>
 <tr><td><strong>best erp software in india</strong></td><td class="r">236</td><td class="r">1</td><td class="r">0.4%</td><td class="r"><span class="pos-pill pos-low">#27.5</span></td></tr>
@@ -400,16 +415,16 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 <!-- CRM & LEADS -->
 <div id="crm" class="panel">
   <div class="sl">Resumen ejecutivo de leads — 30 días</div>
-  <p class="sd"><!-- WS:crm_subtitle -->1004 leads totales · 18 activos · 986 descartados · Actualizado 23/07/2026<!-- /WS:crm_subtitle --></p>
+  <p class="sd" data-ws="crm_subtitle"><!-- WS:crm_subtitle -->1004 leads totales · 18 activos · 986 descartados · Actualizado 23/07/2026<!-- /WS:crm_subtitle --></p>
 
   <div class="kpi-grid">
-    <div class="kpi"><p class="kpi-label">Leads totales</p><p class="kpi-def">Registrados en el CRM</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_total -->1004<!-- /WS:crm_total --></span></div></div>
-    <div class="kpi"><p class="kpi-label">Descartados (Dead)</p><p class="kpi-def">Leads que no son potenciales clientes</p><div class="kpi-row"><span class="kpi-val" style="color:#E24B4A"><!-- WS:crm_dead -->986<!-- /WS:crm_dead --></span></div></div>
-    <div class="kpi"><p class="kpi-label">Activos</p><p class="kpi-def">Leads no descartados ni cerrados</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_active -->18<!-- /WS:crm_active --></span></div></div>
-    <div class="kpi"><p class="kpi-label">IQL</p><p class="kpi-def">Interés básico detectado</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_iql -->9<!-- /WS:crm_iql --></span></div></div>
-    <div class="kpi"><p class="kpi-label">MQL</p><p class="kpi-def">Cualificados para seguimiento comercial</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_mql -->6<!-- /WS:crm_mql --></span></div></div>
-    <div class="kpi"><p class="kpi-label">SQL / Qualified</p><p class="kpi-def">Listos para venta — oportunidad real</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A"><!-- WS:crm_sql -->6<!-- /WS:crm_sql --></span></div></div>
-    <div class="kpi"><p class="kpi-label">Coste real/lead activo</p><p class="kpi-def">Gasto Ads ÷ leads activos</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_cpl -->€67<!-- /WS:crm_cpl --></span></div></div>
+    <div class="kpi"><p class="kpi-label">Leads totales</p><p class="kpi-def">Registrados en el CRM</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_total"><!-- WS:crm_total -->1004<!-- /WS:crm_total --></span></div></div>
+    <div class="kpi"><p class="kpi-label">Descartados (Dead)</p><p class="kpi-def">Leads que no son potenciales clientes</p><div class="kpi-row"><span class="kpi-val" style="color:#E24B4A" data-ws="crm_dead"><!-- WS:crm_dead -->986<!-- /WS:crm_dead --></span></div></div>
+    <div class="kpi"><p class="kpi-label">Activos</p><p class="kpi-def">Leads no descartados ni cerrados</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_active"><!-- WS:crm_active -->18<!-- /WS:crm_active --></span></div></div>
+    <div class="kpi"><p class="kpi-label">IQL</p><p class="kpi-def">Interés básico detectado</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_iql"><!-- WS:crm_iql -->9<!-- /WS:crm_iql --></span></div></div>
+    <div class="kpi"><p class="kpi-label">MQL</p><p class="kpi-def">Cualificados para seguimiento comercial</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_mql"><!-- WS:crm_mql -->6<!-- /WS:crm_mql --></span></div></div>
+    <div class="kpi"><p class="kpi-label">SQL / Qualified</p><p class="kpi-def">Listos para venta — oportunidad real</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A" data-ws="crm_sql"><!-- WS:crm_sql -->6<!-- /WS:crm_sql --></span></div></div>
+    <div class="kpi"><p class="kpi-label">Coste real/lead activo</p><p class="kpi-def">Gasto Ads ÷ leads activos</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_cpl"><!-- WS:crm_cpl -->€67<!-- /WS:crm_cpl --></span></div></div>
   </div>
 
   <div class="sl">Embudo real de calidad</div>
@@ -465,7 +480,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
   <div class="sl">🟢 Oportunidades activas — pipeline real</div>
   <table class="ch-table">
     <thead><tr><th>Lead</th><th>Empresa</th><th>País</th><th>Estado</th><th>Descripción</th></tr></thead>
-    <tbody>
+    <tbody id="crm-tbody">
 <!-- WS:CRM_ROWS -->
 <tr><td><strong>—</strong></td><td>Big Bad Wolf Malaysia</td><td>—</td><td><span class="badge" style="background:#EAF3DE;color:#3B6D11">SQL ⭐</span></td><td style="font-size:11px;color:#666">Partner SKSoft</td></tr>
 <tr><td><strong>Ana Lupe</strong></td><td>Empresa Logística Hotelera del Caribe.</td><td>—</td><td><span class="badge" style="background:#EAF3DE;color:#3B6D11">SQL ⭐</span></td><td style="font-size:11px;color:#666">29/05 — Contactado y agendada demo para 3 de junio 4/6 — Galder tuvo una primera…</td></tr>
@@ -675,6 +690,283 @@ new Chart(document.getElementById('convDaily'),{type:'bar',data:{labels:dN,datas
 new Chart(document.getElementById('descartePie'),{type:'doughnut',data:{labels:['Buscan trabajo / spam','Sin respuesta / no contactables','Malentendido del anuncio','Producto no encaja','Leads activos'],datasets:[{data:[22,8,6,5,9],backgroundColor:['#E24B4A','#888','#EDA100','#2A78D6','#1BAF7A'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11,family:'Inter'},color:'#333'}},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#FFD700',bodyColor:'#fff'}}}});
 
 new Chart(document.getElementById('convType'),{type:'doughnut',data:{labels:['Formulario ERP Agéntico (PMax)','Formulario Web (Argentina)','Formulario Web (PMax)'],datasets:[{data:[13,5,5],backgroundColor:['#1BAF7A','#2A78D6','#FFD700'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11,family:'Inter'},color:'#333'}},tooltip:{backgroundColor:'#0D0D0D',titleColor:'#FFD700',bodyColor:'#fff'}}}});
+
+// ── Period Selector & Live API ─────────────────────────────────────────────
+const DASHBOARD_API = 'https://etendo-dashboard-api.onrender.com';
+
+// WS key → API response path + format hint
+const WS_MAP = {
+  // GA4
+  ga4_sessions_prev:   {path:'ga4.sessions_prev',   fmt:'num'},
+  ga4_sessions_curr:   {path:'ga4.sessions_curr',   fmt:'num'},
+  ga4_users_prev:      {path:'ga4.users_prev',       fmt:'num'},
+  ga4_users_curr:      {path:'ga4.users_curr',       fmt:'num'},
+  ga4_new_users_prev:  {path:'ga4.users_prev',       fmt:'num'},
+  ga4_new_users_curr:  {path:'ga4.users_curr',       fmt:'num'},
+  ga4_pageviews_prev:  {path:'ga4.pageviews_prev',   fmt:'num'},
+  ga4_pageviews_curr:  {path:'ga4.pageviews_curr',   fmt:'num'},
+  ga4_eng_prev:        {path:'ga4.engagement_prev',  fmt:'f1'},
+  ga4_eng_curr:        {path:'ga4.engagement_curr',  fmt:'f1'},
+  ga4_bounce_prev:     {path:'ga4.bounce_prev',      fmt:'f1'},
+  ga4_bounce_curr:     {path:'ga4.bounce_curr',      fmt:'f1'},
+  ga4_dur_curr:        {path:'ga4.duration_curr',    fmt:'str'},
+  ga4_ai_prev:         {path:'ga4.ai_prev',          fmt:'num'},
+  ga4_ai_curr:         {path:'ga4.ai_curr',          fmt:'num'},
+  // Channels
+  ch_direct_prev:      {path:'channels.direct_prev',      fmt:'num'},
+  ch_direct_curr:      {path:'channels.direct_curr',      fmt:'num'},
+  ch_organic_prev:     {path:'channels.organic_prev',     fmt:'num'},
+  ch_organic_curr:     {path:'channels.organic_curr',     fmt:'num'},
+  ch_paid_prev:        {path:'channels.paid_search_prev', fmt:'num'},
+  ch_paid_curr:        {path:'channels.paid_search_curr', fmt:'num'},
+  ch_cross_prev:       {path:'channels.cross_prev',       fmt:'num'},
+  ch_cross_curr:       {path:'channels.cross_curr',       fmt:'num'},
+  ch_social_paid_prev: {path:'channels.paid_social_prev', fmt:'num'},
+  ch_social_paid_curr: {path:'channels.paid_social_curr', fmt:'num'},
+  ch_ref_prev:         {path:'channels.referral_prev',    fmt:'num'},
+  ch_ref_curr:         {path:'channels.referral_curr',    fmt:'num'},
+  ch_ai_prev:          {path:'channels.ai_prev',          fmt:'num'},
+  ch_ai_curr:          {path:'channels.ai_curr',          fmt:'num'},
+  // Ads
+  ads_cost_prev:       {path:'ads.cost_prev',        fmt:'eur'},
+  ads_cost_curr:       {path:'ads.cost_curr',        fmt:'eur'},
+  ads_clicks_prev:     {path:'ads.clicks_prev',      fmt:'num'},
+  ads_clicks_curr:     {path:'ads.clicks_curr',      fmt:'num'},
+  ads_impr_curr:       {path:'ads.impressions_curr', fmt:'num'},
+  ads_ctr_curr:        {path:'ads.ctr_curr',         fmt:'f2pct'},
+  ads_cpc_curr:        {path:'ads.cpc_curr',         fmt:'eur'},
+  ads_conv_prev:       {path:'ads.conversions_prev', fmt:'num'},
+  ads_conv_curr:       {path:'ads.conversions_curr', fmt:'num'},
+  ads_cpconv_prev:     {path:'ads.cpl_prev',         fmt:'eur'},
+  ads_cpconv_curr:     {path:'ads.cpl_curr',         fmt:'eur'},
+  ads_daily_prev:      {path:'ads.daily_prev',       fmt:'eur'},
+  ads_daily_curr:      {path:'ads.daily_curr',       fmt:'eur'},
+  // Search Console
+  sc_impr_prev:        {path:'search_console.impressions_prev', fmt:'num'},
+  sc_impr_curr:        {path:'search_console.impressions_curr', fmt:'num'},
+  sc_clicks_prev:      {path:'search_console.clicks_prev',      fmt:'num'},
+  sc_clicks_curr:      {path:'search_console.clicks_curr',      fmt:'num'},
+  sc_ctr_prev:         {path:'search_console.ctr_prev',         fmt:'f2'},
+  sc_ctr_curr:         {path:'search_console.ctr_curr',         fmt:'f2'},
+  sc_pos_prev:         {path:'search_console.position_prev',    fmt:'f1'},
+  sc_pos_curr:         {path:'search_console.position_curr',    fmt:'f1'},
+  // CRM scalars
+  crm_subtitle:        {path:'crm.subtitle', fmt:'str'},
+  crm_total:           {path:'crm.total',    fmt:'num'},
+  crm_dead:            {path:'crm.dead',     fmt:'num'},
+  crm_active:          {path:'crm.active',   fmt:'num'},
+  crm_iql:             {path:'crm.iql',      fmt:'num'},
+  crm_mql:             {path:'crm.mql',      fmt:'num'},
+  crm_sql:             {path:'crm.sql',      fmt:'num'},
+  crm_cpl:             {path:'crm.cpl',      fmt:'eur0'},
+  // Header
+  header_period:       {path:'_header_period', fmt:'str'},
+  footer_date:         {path:'_footer_date',   fmt:'str'},
+};
+
+// Delta pairs: wsKey_curr → wsKey_prev
+const DELTA_PAIRS = {
+  ga4_sessions: ['ga4_sessions_curr','ga4_sessions_prev'],
+  ga4_users:    ['ga4_users_curr','ga4_users_prev'],
+  ga4_new_users:['ga4_new_users_curr','ga4_new_users_prev'],
+  ga4_pageviews:['ga4_pageviews_curr','ga4_pageviews_prev'],
+  ga4_eng:      ['ga4_eng_curr','ga4_eng_prev'],
+  ga4_bounce:   ['ga4_bounce_curr','ga4_bounce_prev'],
+  ga4_ai:       ['ga4_ai_curr','ga4_ai_prev'],
+  ads_cost:     ['ads_cost_curr','ads_cost_prev'],
+  ads_clicks:   ['ads_clicks_curr','ads_clicks_prev'],
+  ads_conv:     ['ads_conv_curr','ads_conv_prev'],
+  ads_cpconv:   ['ads_cpconv_curr','ads_cpconv_prev'],
+  ads_daily:    ['ads_daily_curr','ads_daily_prev'],
+  sc_impr:      ['sc_impr_curr','sc_impr_prev'],
+  sc_clicks:    ['sc_clicks_curr','sc_clicks_prev'],
+  sc_ctr:       ['sc_ctr_curr','sc_ctr_prev'],
+  sc_pos:       ['sc_pos_curr','sc_pos_prev'],
+};
+
+function _getPath(data, path) {
+  return path.split('.').reduce((o, k) => (o != null ? o[k] : null), data);
+}
+
+function _fmt(val, fmt) {
+  if (val == null) return '—';
+  const N = new Intl.NumberFormat('es-ES');
+  const N2 = new Intl.NumberFormat('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2});
+  switch (fmt) {
+    case 'num':   return N.format(Math.round(val));
+    case 'f1':    return typeof val==='number' ? val.toFixed(1) : String(val);
+    case 'f2':    return typeof val==='number' ? val.toFixed(2) : String(val);
+    case 'f2pct': return typeof val==='number' ? val.toFixed(2) + '%' : String(val);
+    case 'eur':   return '€' + N2.format(val);
+    case 'eur0':  return val ? '€' + N.format(Math.round(val)) : '—';
+    case 'str':   return String(val);
+    default:      return String(val);
+  }
+}
+
+function _pct(curr, prev, higherIsBetter) {
+  if (prev == null || curr == null || prev === 0) return null;
+  const d = (curr - prev) / Math.abs(prev) * 100;
+  return {d, cls: d > 0.5 ? (higherIsBetter ? 'up' : 'down') : d < -0.5 ? (higherIsBetter ? 'down' : 'up') : 'neu'};
+}
+
+function _buildData(data, period) {
+  // Synthesize virtual keys
+  data._header_period = data.date_from + ' – ' + data.date_to + ' vs. ' + data.date_from_prev + ' – ' + data.date_to_prev;
+  data._footer_date = data.date_to;
+  return data;
+}
+
+function applyMetrics(data) {
+  _buildData(data);
+
+  // 1. Update all [data-ws] scalar elements
+  document.querySelectorAll('[data-ws]').forEach(el => {
+    const wsKey = el.getAttribute('data-ws');
+    const def = WS_MAP[wsKey];
+    if (!def) return;
+    const val = _getPath(data, def.path);
+    if (val == null) return;
+    // Replace only the text nodes (keep HTML comments intact for next static build)
+    // Simple approach: set textContent only for leaf elements that have no child elements
+    if (el.children.length === 0) {
+      el.textContent = _fmt(val, def.fmt);
+    }
+  });
+
+  // 2. Update delta badges — find .kpi-delta and .delta-sm by their sibling [data-ws]
+  // For each pair defined in DELTA_PAIRS, find the curr element's parent row
+  // and update the adjacent delta badge
+  Object.values(DELTA_PAIRS).forEach(([currKey, prevKey]) => {
+    const currEl = document.querySelector(`[data-ws="${currKey}"]`);
+    const prevEl = document.querySelector(`[data-ws="${prevKey}"]`);
+    if (!currEl || !prevEl) return;
+    const currDef = WS_MAP[currKey];
+    const prevDef = WS_MAP[prevKey];
+    const currVal = _getPath(data, currDef.path);
+    const prevVal = _getPath(data, prevDef.path);
+    if (currVal == null || prevVal == null) return;
+
+    // Is this a "lower is better" metric?
+    const lowerBetter = currKey.includes('bounce') || currKey.includes('sc_pos') || currKey.includes('cpconv') || currKey.includes('cpl');
+    const higherBetter = !lowerBetter;
+    const result = _pct(currVal, prevVal, higherBetter);
+    if (!result) return;
+    const sign = result.d >= 0 ? '+' : '';
+
+    // Find the delta badge: sibling of currEl in the same .kpi-row, or same <tr>
+    const row = currEl.closest('.kpi-row') || currEl.closest('tr');
+    if (!row) return;
+    const badge = row.querySelector('.kpi-delta') || row.querySelector('.delta-sm');
+    if (!badge) return;
+    badge.textContent = sign + result.d.toFixed(1) + '%';
+    badge.className = (badge.className.replace(/\b(up|down|neu)\b/, '')).trim() + ' ' + result.cls;
+  });
+
+  // 3. Dynamic tables
+  _renderCampaigns(data.ads && data.ads.campaigns, period);
+  _renderKeywords(data.search_console && data.search_console.keywords);
+  _renderPageBars(data.pages);
+  _renderPageQuality(data.pages_quality);
+  _renderCrmRows(data.crm);
+
+  // 4. CRM subtitle via data-ws
+  // Already handled by scalar update above
+}
+
+function _renderCampaigns(camps, period) {
+  const tbody = document.querySelector('[data-ws="CAMP_ROWS"]');
+  if (!tbody || !camps) return;
+  tbody.innerHTML = camps.map(c => {
+    const st = c.active
+      ? `<span class="badge" style="background:#EAF3DE;color:#3B6D11">Activa</span>`
+      : `<span class="badge" style="background:#FCEBEB;color:#A32D2D">Pausada ⚠️</span>`;
+    const cpl = c.cpl != null ? '€' + c.cpl.toFixed(2) : '—';
+    const N = new Intl.NumberFormat('es-ES');
+    return `<tr><td><strong>${c.name}</strong></td><td>${st}</td><td class="r">€${c.cost.toFixed(2)}</td><td class="r">${N.format(c.clicks)}</td><td class="r"><strong>${c.conversions}</strong></td><td class="r">${cpl}</td></tr>`;
+  }).join('');
+}
+
+function _posClass(pos) {
+  if (pos <= 5) return 'pos-top';
+  if (pos <= 15) return 'pos-mid';
+  return 'pos-low';
+}
+
+function _renderKeywords(kws) {
+  const tbody = document.querySelector('[data-ws="KW_ROWS"]');
+  if (!tbody || !kws) return;
+  const N = new Intl.NumberFormat('es-ES');
+  tbody.innerHTML = kws.map(kw => {
+    const pc = _posClass(kw.position);
+    return `<tr><td><strong>${kw.query}</strong></td><td class="r">${N.format(kw.impressions)}</td><td class="r">${N.format(kw.clicks)}</td><td class="r">${kw.ctr.toFixed(1)}%</td><td class="r"><span class="pos-pill ${pc}">#${kw.position.toFixed(1)}</span></td></tr>`;
+  }).join('');
+}
+
+function _renderPageBars(pages) {
+  const wrap = document.getElementById('page-bars-wrap');
+  if (!wrap || !pages || !pages.length) return;
+  const max = Math.max(...pages.map(p => p.sessions), 1);
+  const N = new Intl.NumberFormat('es-ES');
+  wrap.innerHTML = pages.map(p => {
+    const pct = Math.round(p.sessions / max * 100);
+    const bg = p.bounce_pct < 35 ? '#EAF3DE' : p.bounce_pct < 55 ? '#FFF8CC' : '#FCEBEB';
+    const fc = p.bounce_pct < 35 ? '#3B6D11' : p.bounce_pct < 55 ? '#666' : '#A32D2D';
+    const star = p.bounce_pct < 35 ? ' ⭐' : '';
+    return `<div class="page-bar"><div class="page-name">${p.path}</div><div class="page-track"><div class="page-fill" style="width:${pct}%"></div></div><div class="page-val">${N.format(p.sessions)}</div><span class="page-badge" style="background:${bg};color:${fc}">Rebote ${p.bounce_pct}%${star}</span></div>`;
+  }).join('');
+}
+
+function _fmtDur(s) {
+  if (!s) return '—';
+  return Math.floor(s/60) + 'm ' + String(Math.floor(s%60)).padStart(2,'0') + 's';
+}
+
+function _renderPageQuality(pages) {
+  const tbody = document.getElementById('page-quality-tbody');
+  if (!tbody || !pages) return;
+  const typeStyle = {
+    'Doc técnica':'background:#EEF4FF;color:#185FA5',
+    'Blog':'background:#EAF3DE;color:#3B6D11',
+    'Conversión':'background:#FFF8CC;color:#666',
+    'Producto':'background:#FAECE7;color:#712B13',
+    'Captación':'background:#EEEDFE;color:#3C3489',
+  };
+  const N = new Intl.NumberFormat('es-ES');
+  tbody.innerHTML = pages.map(p => {
+    const ts = typeStyle[p.type] || 'background:#F5F5F5;color:#666';
+    return `<tr><td>${p.path}</td><td class="r">${N.format(p.sessions)}</td><td class="r">${p.bounce_pct}%</td><td class="r"><strong>${_fmtDur(p.duration_s)}</strong></td><td class="r"><span class="badge" style="${ts}">${p.type}</span></td></tr>`;
+  }).join('');
+}
+
+function _clsBadge(cls, status) {
+  if (cls==='SQL'||status==='Qualified') return `<span class="badge" style="background:#EAF3DE;color:#3B6D11">SQL ⭐</span>`;
+  if (cls==='MQL') return `<span class="badge" style="background:#FFF8CC;color:#666">MQL</span>`;
+  return `<span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span>`;
+}
+
+function _renderCrmRows(crm) {
+  const tbody = document.getElementById('crm-tbody');
+  if (!tbody) return;
+  if (!crm || !crm.available || !crm.pipeline || !crm.pipeline.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:20px">Sin datos de CRM disponibles para este período</td></tr>';
+    return;
+  }
+  tbody.innerHTML = crm.pipeline.map(l =>
+    `<tr><td><strong>${l.name||'—'}</strong></td><td>${l.company}</td><td>${l.country}</td><td>${_clsBadge(l.cls,l.status)}</td><td style="font-size:11px;color:#666">${l.description}</td></tr>`
+  ).join('');
+}
+
+function setPeriod(p, btn) {
+  document.querySelectorAll('.ps-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const loader = document.getElementById('api-loading');
+  loader.classList.add('vis');
+  fetch(DASHBOARD_API + '/api/metrics?period=' + p)
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => { loader.classList.remove('vis'); applyMetrics(data); })
+    .catch(err => { loader.classList.remove('vis'); console.error('Dashboard API:', err); });
+}
 </script>
 </body>
 </html>
