@@ -1,11 +1,183 @@
 {
   "comp_hashes": {
-    "odoo": "b00207f7447c",
+    "odoo": "d9114fa046b5",
     "sap": "1fe4fbdecd28",
-    "holded": "ce2e41bac300"
+    "holded": "ce2e41bac300",
+    "sage": "f81898f89dd8"
   },
-  "changes_history": [],
-  "leads_history": [],
+  "changes_history": [
+    {
+      "date": "23/07/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    }
+  ],
+  "leads_history": [
+    {
+      "company": "APTITUDSF- OIL & GAS",
+      "domain": "aptitudsf.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://aptitudsf.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "jmartiarena@aptitudsf.com",
+      "contact_name": "Joaquín Martiarena",
+      "contact_pos": "Talent Acquisition Specialist",
+      "phone": "—",
+      "linkedin_org": "https://www.linkedin.com/in/joaquín-martiarena-88a376161"
+    },
+    {
+      "company": "Claire Joster",
+      "domain": "clairejoster.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://clairejoster.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "gemma.ciudad@clairejoster.com",
+      "contact_name": "Gemma Ciudad",
+      "contact_pos": "Retail Leader",
+      "phone": "—",
+      "linkedin_org": "https://www.linkedin.com/in/gemmasolis"
+    },
+    {
+      "company": "Infoempleo.com",
+      "domain": "infoempleo.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://infoempleo.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "ttomas@infoempleo.com",
+      "contact_name": "Teresa Tomás",
+      "contact_pos": "Business Strategy Director",
+      "phone": "—",
+      "linkedin_org": "https://www.linkedin.com/in/teresa-tomás-762a4618"
+    },
+    {
+      "company": "EmpleoJob",
+      "domain": "empleojob.es",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://empleojob.es",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "—",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "—",
+      "linkedin_org": "—"
+    },
+    {
+      "company": "Bizneo HR",
+      "domain": "bizneo.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://bizneo.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "vanesa.torres@bizneo.com",
+      "contact_name": "Vanesa Torres",
+      "contact_pos": "Sales Development Representative",
+      "phone": "—",
+      "linkedin_org": "https://www.linkedin.com/in/vanesa-torres-5a96a6204"
+    },
+    {
+      "company": "Catenon",
+      "domain": "catenon.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://catenon.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "ghannaoui@catenon.com",
+      "contact_name": "Ghita Hannaoui",
+      "contact_pos": "Business Unit Director",
+      "phone": "—",
+      "linkedin_org": "https://www.linkedin.com/in/ghita-hannaoui-9496132a"
+    },
+    {
+      "company": "Norconsulting Global Recruitment",
+      "domain": "gnorcon.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://gnorcon.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "info@gnorcon.com",
+      "contact_name": "None None",
+      "contact_pos": null,
+      "phone": "—",
+      "linkedin_org": null
+    },
+    {
+      "company": "MarketingDirecto.com",
+      "domain": "marketingdirecto.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://marketingdirecto.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "javier@marketingdirecto.com",
+      "contact_name": "Javier Piedrahita",
+      "contact_pos": "CEO",
+      "phone": "—",
+      "linkedin_org": "https://www.linkedin.com/in/javierpiedrahita"
+    },
+    {
+      "company": "Talent Search People",
+      "domain": "talentsearchpeople.com",
+      "sector": "General",
+      "signal": "erp",
+      "signal_label": "Busca ERP (Apollo)",
+      "signal_class": "s-erp",
+      "source_url": "https://talentsearchpeople.com",
+      "snippet": "Apollo.io · 0 empleados · —",
+      "score": 1,
+      "date": "23/07/2026",
+      "source_type": "apollo",
+      "email": "ckrause@talentsearchpeople.com",
+      "contact_name": "Cande Krause",
+      "contact_pos": "Director of Talent and Operations",
+      "phone": "—",
+      "linkedin_org": "https://www.linkedin.com/in/candekrause"
+    }
+  ],
   "prices": {
     "odoo": {
       "basic": "—",
@@ -24,6 +196,12 @@
       "mid": "€30/mes",
       "advanced": "€199/mes",
       "publishes": true
+    },
+    "sage": {
+      "basic": "—",
+      "mid": "—",
+      "advanced": "—",
+      "publishes": false
     }
   },
   "features": {
@@ -34,6 +212,9 @@
     ],
     "holded": [
       "Factura electrónica obligatoria: ¿quién deberá hacerla?"
+    ],
+    "sage": [
+      "Biblioteca Empresarial"
     ]
   }
 }
