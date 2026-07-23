@@ -399,18 +399,17 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 
 <!-- CRM & LEADS -->
 <div id="crm" class="panel">
-  <div class="sl">Resumen ejecutivo de leads — 22 jun al 21 jul 2026</div>
-  <p class="sd">45 leads totales registrados en el CRM. Todos gestionados por Victoria Miguez y Galder Romo.</p>
+  <div class="sl">Resumen ejecutivo de leads — 30 días</div>
+  <p class="sd"><!-- WS:crm_subtitle -->45 leads totales registrados en el CRM.<!-- /WS:crm_subtitle --></p>
 
   <div class="kpi-grid">
-    <div class="kpi"><p class="kpi-label">Leads totales</p><p class="kpi-def">Formularios recibidos en el período</p><div class="kpi-row"><span class="kpi-val">45</span></div></div>
-    <div class="kpi"><p class="kpi-label">Basura / Buscan trabajo</p><p class="kpi-def">Leads que no son potenciales clientes</p><div class="kpi-row"><span class="kpi-val" style="color:#E24B4A">22</span><span class="kpi-delta down">49%</span></div></div>
-    <div class="kpi"><p class="kpi-label">Contactados activos</p><p class="kpi-def">Leads con conversación abierta</p><div class="kpi-row"><span class="kpi-val">10</span><span class="kpi-delta neu">22%</span></div></div>
-    <div class="kpi"><p class="kpi-label">IQL</p><p class="kpi-def">Interés básico detectado</p><div class="kpi-row"><span class="kpi-val">18</span></div></div>
-    <div class="kpi"><p class="kpi-label">MQL</p><p class="kpi-def">Cualificados para seguimiento comercial</p><div class="kpi-row"><span class="kpi-val">4</span></div></div>
-    <div class="kpi"><p class="kpi-label">SQL</p><p class="kpi-def">Listos para venta — oportunidad real</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A">1</span></div></div>
-    <div class="kpi"><p class="kpi-label">Demo agendada</p><p class="kpi-def">Próximo paso concreto en pipeline</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A">1</span></div></div>
-    <div class="kpi"><p class="kpi-label">Coste real/lead útil</p><p class="kpi-def">€1.200 Ads ÷ 23 leads no-basura</p><div class="kpi-row"><span class="kpi-val">€52</span></div></div>
+    <div class="kpi"><p class="kpi-label">Leads totales</p><p class="kpi-def">Registrados en el CRM</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_total -->45<!-- /WS:crm_total --></span></div></div>
+    <div class="kpi"><p class="kpi-label">Descartados (Dead)</p><p class="kpi-def">Leads que no son potenciales clientes</p><div class="kpi-row"><span class="kpi-val" style="color:#E24B4A"><!-- WS:crm_dead -->22<!-- /WS:crm_dead --></span></div></div>
+    <div class="kpi"><p class="kpi-label">Activos</p><p class="kpi-def">Leads no descartados ni cerrados</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_active -->10<!-- /WS:crm_active --></span></div></div>
+    <div class="kpi"><p class="kpi-label">IQL</p><p class="kpi-def">Interés básico detectado</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_iql -->18<!-- /WS:crm_iql --></span></div></div>
+    <div class="kpi"><p class="kpi-label">MQL</p><p class="kpi-def">Cualificados para seguimiento comercial</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_mql -->4<!-- /WS:crm_mql --></span></div></div>
+    <div class="kpi"><p class="kpi-label">SQL / Qualified</p><p class="kpi-def">Listos para venta — oportunidad real</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A"><!-- WS:crm_sql -->1<!-- /WS:crm_sql --></span></div></div>
+    <div class="kpi"><p class="kpi-label">Coste real/lead activo</p><p class="kpi-def">Gasto Ads ÷ leads activos</p><div class="kpi-row"><span class="kpi-val"><!-- WS:crm_cpl -->€52<!-- /WS:crm_cpl --></span></div></div>
   </div>
 
   <div class="sl">Embudo real de calidad</div>
@@ -465,64 +464,17 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 
   <div class="sl">🟢 Oportunidades activas — pipeline real</div>
   <table class="ch-table">
-    <thead><tr><th>Lead</th><th>Empresa</th><th>País</th><th>Estado</th><th>Necesidad</th><th>Próximo paso</th></tr></thead>
+    <thead><tr><th>Lead</th><th>Empresa</th><th>País</th><th>Estado</th><th>Descripción</th></tr></thead>
     <tbody>
+<!-- WS:CRM_ROWS -->
       <tr>
         <td><strong>Constanza Costa</strong></td>
         <td>IMB Institute</td>
         <td>Argentina</td>
         <td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Demo agendada ⭐</span></td>
         <td style="font-size:11px;color:#666">Empresa de formación. Necesita módulo de programas + CRM comercial</td>
-        <td style="font-size:11px"><strong>Jueves 23/07 — 10:00 ARG</strong></td>
       </tr>
-      <tr>
-        <td><strong>Gabriel Priore</strong></td>
-        <td>Tarewa (metalúrgica)</td>
-        <td>Argentina</td>
-        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — MQL</span></td>
-        <td style="font-size:11px;color:#666">Usa Calipso, licencias caras. Pidió acceso SaaS para mostrar al directorio</td>
-        <td style="font-size:11px">Enviar acceso SaaS + seguimiento directorio</td>
-      </tr>
-      <tr>
-        <td><strong>José María Ventura</strong></td>
-        <td>Ventura Espejo SL</td>
-        <td>España</td>
-        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — IQL</span></td>
-        <td style="font-size:11px;color:#666">En conversación. Llamada pendiente miércoles 23/07</td>
-        <td style="font-size:11px">Llamada miércoles o jueves/viernes</td>
-      </tr>
-      <tr>
-        <td><strong>Big Bad Wolf Malaysia</strong></td>
-        <td>Big Bad Wolf Malaysia</td>
-        <td>Malasia</td>
-        <td><span class="badge" style="background:#EAF3DE;color:#3B6D11">SQL — Partner</span></td>
-        <td style="font-size:11px;color:#666">Vía partner SKSoft. Pendiente viaje a Malasia para cerrar</td>
-        <td style="font-size:11px">Confirmar fecha viaje Malasia</td>
-      </tr>
-      <tr>
-        <td><strong>Daniel Coleman</strong></td>
-        <td>360 Ibiza services</td>
-        <td>España</td>
-        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — IQL</span></td>
-        <td style="font-size:11px;color:#666">De vacaciones hasta finales de julio. Pidió info por email</td>
-        <td style="font-size:11px">Contactar 30 julio</td>
-      </tr>
-      <tr>
-        <td><strong>Magi Fuentes</strong></td>
-        <td>Fusteria</td>
-        <td>España</td>
-        <td><span class="badge" style="background:#FFF8CC;color:#666">Activo — IQL</span></td>
-        <td style="font-size:11px;color:#666">Usa Gesfacil. Coordinar llamada con Cristina (responsable)</td>
-        <td style="font-size:11px">Galder coordina llamada con Cristina</td>
-      </tr>
-      <tr>
-        <td><strong>Daniel Gómez</strong></td>
-        <td>Calzados Gómez</td>
-        <td>España</td>
-        <td><span class="badge" style="background:#FCEBEB;color:#888">Frío — IQL</span></td>
-        <td style="font-size:11px;color:#666">Usa Compuwin. Valorará cambio si no consigue añadir IA</td>
-        <td style="font-size:11px">Seguimiento septiembre</td>
-      </tr>
+<!-- /WS:CRM_ROWS -->
     </tbody>
   </table>
 

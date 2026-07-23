@@ -13,9 +13,66 @@ session_default_channel_group se intenta pero con fallback si da 400.
 import requests
 import os
 import re
+import json
+import urllib.request
+import urllib.parse
 from datetime import datetime, timedelta
 
 WINDSOR_API_KEY = os.environ["WINDSOR_API_KEY"]
+
+# ── CRM (Etendo) ───────────────────────────────────────────────────────────────
+_CRM_BASE  = os.environ.get("ETENDO_BASE_URL", "")
+_CRM_USER  = os.environ.get("ETENDO_USERNAME", "")
+_CRM_PASS  = os.environ.get("ETENDO_PASSWORD", "")
+_CRM_ROLE  = "8351131DFF384725AB08E06773FE6144"
+
+def crm_login():
+    body = json.dumps({"username": _CRM_USER, "password": _CRM_PASS, "role": _CRM_ROLE}).encode()
+    req  = urllib.request.Request(f"{_CRM_BASE}/api/auth/login", data=body, method="POST")
+    req.add_header("Content-Type", "application/json")
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read())["token"]
+
+def crm_fetch_all(token, entity):
+    out, start = [], 0
+    while True:
+        body = urllib.parse.urlencode({
+            "_operationType": "fetch",
+            "_startRow": str(start),
+            "_endRow": str(start + 500),
+        }).encode()
+        req = urllib.request.Request(f"{_CRM_BASE}/api/datasource/{entity}", data=body, method="POST")
+        req.add_header("Authorization", f"Bearer {token}")
+        req.add_header("Content-Type", "application/x-www-form-urlencoded")
+        with urllib.request.urlopen(req, timeout=30) as r:
+            page = json.loads(r.read()).get("response", {}).get("data", [])
+        if not page:
+            break
+        out.extend(page)
+        if len(page) < 500:
+            break
+        start += 500
+    return out
+
+def phone_country(phone):
+    if not phone:
+        return "—"
+    p = str(phone).replace(" ", "").replace("-", "")
+    if p.startswith("+54") or p.startswith("54"):
+        return "Argentina"
+    if p.startswith("+34") or p.startswith("34"):
+        return "España"
+    if p.startswith("+52") or p.startswith("52"):
+        return "México"
+    if p.startswith("+57"):
+        return "Colombia"
+    if p.startswith("+56"):
+        return "Chile"
+    if p.startswith("+51"):
+        return "Perú"
+    if p.startswith("+60"):
+        return "Malasia"
+    return "—"
 BASE      = "https://connectors.windsor.ai"
 REPO_DIR  = os.path.dirname(os.path.abspath(__file__))
 HTML_FILE = os.path.join(REPO_DIR, "analytics-dashboard", "index.html")
@@ -107,6 +164,37 @@ pages_raw = fetch("googleanalytics4", ["page_path", "sessions", "bounce_rate", "
 pages_top     = sorted(pages_raw, key=lambda x: float(x.get("sessions") or 0), reverse=True)[:12]
 pages_quality = sorted(pages_raw, key=lambda x: float(x.get("average_session_duration") or 0), reverse=True)[:10]
 
+print("→ CRM leads...")
+crm_leads, crm_ok = [], False
+try:
+    crm_token = crm_login()
+    crm_leads = crm_fetch_all(crm_token, "ETCRM_Lead")
+    crm_ok = True
+    print(f"  ✅ {len(crm_leads)} leads obtenidos")
+except Exception as e:
+    print(f"  ⚠️  CRM no disponible: {e}")
+
+_INACTIVE = {"Dead", "Converted"}
+def _lstatus(l): return l.get("leadStatus$_identifier") or ""
+def _lclass(l):  return l.get("classification$_identifier") or ""
+def _lname(l):
+    fn = (l.get("firstname") or "").strip()
+    ln = (l.get("lastname") or "").strip()
+    return (fn + (" " + ln if ln else "")) or "—"
+
+crm_active  = [l for l in crm_leads if _lstatus(l) not in _INACTIVE]
+crm_dead    = [l for l in crm_leads if _lstatus(l) == "Dead"]
+crm_conv    = [l for l in crm_leads if _lstatus(l) == "Converted"]
+crm_iql     = [l for l in crm_active if _lclass(l) == "IQL"]
+crm_mql     = [l for l in crm_active if _lclass(l) == "MQL"]
+crm_sql     = [l for l in crm_active if _lclass(l) == "SQL"]
+crm_qual    = [l for l in crm_active if _lstatus(l) == "Qualified"]
+
+# Orden pipeline: SQL > MQL > IQL > resto activos
+_CLASS_ORDER = {"SQL": 0, "MQL": 1, "IQL": 2}
+crm_pipeline = sorted(crm_active,
+    key=lambda l: (_CLASS_ORDER.get(_lclass(l), 9), _lname(l)))
+
 # ── Agregados GA4 ─────────────────────────────────────────────────────────────
 C = dict(
     sessions  = fsum(ga4c, "sessions"),
@@ -194,6 +282,40 @@ date_fr_p = (today - timedelta(days=60)).strftime("%d/%m/%Y")
 generated = today.strftime("%d/%m/%Y %H:%M UTC")
 
 # ── Tablas HTML ───────────────────────────────────────────────────────────────
+def crm_badge(cls, status):
+    if cls == "SQL" or status == "Qualified":
+        return '<span class="badge" style="background:#EAF3DE;color:#3B6D11">SQL ⭐</span>'
+    if cls == "MQL":
+        return '<span class="badge" style="background:#FFF8CC;color:#666">MQL</span>'
+    if cls == "IQL":
+        return '<span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span>'
+    if status == "Dead":
+        return '<span class="badge" style="background:#FCEBEB;color:#A32D2D">Dead</span>'
+    return f'<span class="badge" style="background:#F5F5F5;color:#666">{status or "Nuevo"}</span>'
+
+def crm_rows():
+    if not crm_pipeline:
+        return "<tr><td colspan='5' style='text-align:center;color:#999'>Sin datos CRM</td></tr>\n"
+    out = ""
+    for l in crm_pipeline[:15]:
+        name    = _lname(l)
+        company = (l.get("company") or "—").strip() or "—"
+        phone   = l.get("phone") or ""
+        country = phone_country(phone)
+        cls     = _lclass(l)
+        status  = _lstatus(l)
+        badge   = crm_badge(cls, status)
+        desc    = (l.get("description") or "").replace("\n", " ").strip()
+        desc    = desc[:80] + "…" if len(desc) > 80 else desc
+        out += (
+            f'<tr><td><strong>{name}</strong></td>'
+            f'<td>{company}</td>'
+            f'<td>{country}</td>'
+            f'<td>{badge}</td>'
+            f'<td style="font-size:11px;color:#666">{desc}</td></tr>\n'
+        )
+    return out
+
 def page_type(path):
     if any(x in path for x in ["/user-guide/", "/developer-guide/", "/whats-new/"]):
         return '<span class="badge" style="background:#EEF4FF;color:#185FA5">Doc técnica</span>'
@@ -352,6 +474,19 @@ valores = {
     "sc_ctr_prev":    f"{SP['ctr']:.2f}",
     "sc_pos_curr":    f"{SC['pos']:.1f}",
     "sc_pos_prev":    f"{SP['pos']:.1f}",
+    # CRM
+    "crm_total":   str(len(crm_leads)) if crm_ok else "—",
+    "crm_dead":    str(len(crm_dead))  if crm_ok else "—",
+    "crm_active":  str(len(crm_active)) if crm_ok else "—",
+    "crm_iql":     str(len(crm_iql))  if crm_ok else "—",
+    "crm_mql":     str(len(crm_mql))  if crm_ok else "—",
+    "crm_sql":     str(len(crm_sql) + len(crm_qual)) if crm_ok else "—",
+    "crm_cpl":     (f"€{AC['cost']/len(crm_active):.0f}" if crm_ok and crm_active else "—"),
+    "crm_subtitle": (
+        f"{len(crm_leads)} leads totales · {len(crm_active)} activos · "
+        f"{len(crm_dead)} descartados · Actualizado {today.strftime('%d/%m/%Y')}"
+        if crm_ok else "CRM no disponible"
+    ),
 }
 
 # ── Leer template ─────────────────────────────────────────────────────────────
@@ -375,6 +510,7 @@ for marker, fn, label in [
     ("KW_ROWS",           kw_rows,           f"keywords ({len(kw_top)})"),
     ("PAGE_BARS",         page_bars,         f"páginas top ({len(pages_top)})"),
     ("PAGE_QUALITY_ROWS", page_quality_rows, f"páginas calidad ({len(pages_quality)})"),
+    ("CRM_ROWS",          crm_rows,          f"CRM pipeline ({len(crm_pipeline)})"),
 ]:
     pat = f"<!-- WS:{marker} -->.*?<!-- /WS:{marker} -->"
     rep = f"<!-- WS:{marker} -->\n{fn()}<!-- /WS:{marker} -->"

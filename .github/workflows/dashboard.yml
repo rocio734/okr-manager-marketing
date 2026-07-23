@@ -28,6 +28,9 @@ jobs:
       - name: Generar dashboard
         env:
           WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
+          ETENDO_BASE_URL: ${{ secrets.ETENDO_BASE_URL }}
+          ETENDO_USERNAME: ${{ secrets.ETENDO_USERNAME }}
+          ETENDO_PASSWORD: ${{ secrets.ETENDO_PASSWORD }}
         run: python fetch_and_build.py
 
       - name: Commit y push del index.html actualizado
