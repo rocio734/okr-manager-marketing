@@ -225,29 +225,66 @@ def maps_details(place_id):
 
 def scrape_partners():
     all_p=[]
-    # Odoo partners España
+    # Odoo partners España — extraer nombre + URL externa del partner
     html=fetch("https://www.odoo.com/es/partners/country/69-spain")
     if html:
         soup=BeautifulSoup(html,"html.parser")
-        for a in soup.find_all("a",href=True):
-            t=a.get_text(strip=True)
-            h=a.get("href","")
-            if "/partners/" in h and 5<len(t)<60 and t not in [p["name"] for p in all_p]:
-                all_p.append({"name":t,"competitor":"Odoo","url":f"https://www.odoo.com{h}" if h.startswith("/") else h})
+        # Buscar cards de partners con su web externa
+        for card in soup.select("[class*='partner']"):
+            name_el = card.find(["h3","h4","strong","[class*='name']"])
+            web_el  = card.find("a",href=re.compile(r"^https?://(?!.*odoo.com)"))
+            name = name_el.get_text(strip=True) if name_el else ""
+            web  = web_el.get("href","") if web_el else ""
+            if name and 5<len(name)<70:
+                d = domain_from_url(web) if web else ""
+                all_p.append({"name":name,"competitor":"Odoo","url":web or "https://www.odoo.com/es/partners","domain":d})
+        # Fallback: links externos en la página
+        if not all_p:
+            for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*odoo.com)")):
+                t=a.get_text(strip=True)
+                h=a.get("href","")
+                d=domain_from_url(h)
+                if 5<len(t)<70 and d and not should_skip(d):
+                    all_p.append({"name":t,"competitor":"Odoo","url":h,"domain":d})
+    print(f"    Odoo partners: {len(all_p)}")
+
     # Holded partners
     html=fetch("https://www.holded.com/es/partners")
+    holded_count=0
     if html:
         soup=BeautifulSoup(html,"html.parser")
-        for el in soup.select("h2,h3,.partner-name,[class*='partner']")[:20]:
-            t=el.get_text(strip=True)
-            if 5<len(t)<60:
-                all_p.append({"name":t,"competitor":"Holded","url":"https://www.holded.com/es/partners"})
-    # Sage via Google
-    for r in google_search("partners certificados Sage España ERP consultores", num=5):
+        # Buscar links externos (webs de partners)
+        for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*holded.com)")):
+            t=a.get_text(strip=True)
+            h=a.get("href","")
+            d=domain_from_url(h)
+            if 5<len(t)<70 and d and not should_skip(d):
+                all_p.append({"name":t,"competitor":"Holded","url":h,"domain":d})
+                holded_count+=1
+        # Fallback: elementos con clase partner
+        if holded_count==0:
+            for el in soup.select("h2,h3,[class*='partner'],[class*='agency']")[:20]:
+                t=el.get_text(strip=True)
+                if 5<len(t)<70:
+                    all_p.append({"name":t,"competitor":"Holded","url":"https://www.holded.com/es/partners","domain":""})
+    print(f"    Holded partners: {holded_count}")
+
+    # SAP partners via Google
+    sap_results=google_search('"partner SAP Business One" España consultor implementador', num=5)
+    for r in sap_results:
         d=domain_from_url(r["url"])
-        if d and "sage.com" not in d and not should_skip(d):
+        if d and not should_skip(d) and "sap.com" not in d:
+            all_p.append({"name":r["title"].split("|")[0].strip(),"competitor":"SAP","url":r["url"],"domain":d})
+
+    # Sage partners via Google
+    sage_results=google_search('"partner Sage" España consultor ERP autorizado', num=5)
+    for r in sage_results:
+        d=domain_from_url(r["url"])
+        if d and not should_skip(d) and "sage.com" not in d:
             all_p.append({"name":r["title"].split("|")[0].strip(),"competitor":"Sage","url":r["url"],"domain":d})
-    return all_p[:30]
+
+    print(f"    Total partners antes de filtrar: {len(all_p)}")
+    return all_p[:40]
 
 # ── Datos históricos ────────────────────────────────────────────────────────
 def load_data():
@@ -313,6 +350,7 @@ def search_all_leads(data):
     print("  [3/4] Google Maps...")
     maps_count=0
     if GOOGLE_MAPS_KEY:
+        print(f"    Usando Maps key: {GOOGLE_MAPS_KEY[:8]}...")
         for ms in MAPS_SEARCHES[:3]:
             for city in SPAIN_CITIES[:3]:
                 for place in maps_places(ms["query"],city):
