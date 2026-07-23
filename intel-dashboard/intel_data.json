@@ -1,11 +1,39 @@
 {
   "comp_hashes": {
-    "odoo": "d9114fa046b5",
-    "sap": "1fe4fbdecd28",
-    "holded": "ce2e41bac300",
-    "sage": "f81898f89dd8"
+    "odoo": "83981fb6f3a0",
+    "sap": "00dd480a6a9f",
+    "holded": "29fb01fc400e",
+    "sage": "8ed9d1c68334"
   },
   "changes_history": [
+    {
+      "date": "23/07/2026",
+      "competitor": "Sage",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sage.com/es-es/erp/"
+    },
+    {
+      "date": "23/07/2026",
+      "competitor": "Holded",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.holded.com"
+    },
+    {
+      "date": "23/07/2026",
+      "competitor": "SAP Business One",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sap.com/spain/products/erp/business-one.html"
+    },
+    {
+      "date": "23/07/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "23/07/2026",
       "competitor": "Odoo",
@@ -15,6 +43,24 @@
     }
   ],
   "leads_history": [
+    {
+      "company": "WhatsApp",
+      "domain": "wa.me",
+      "sector": "Consultoría ERP",
+      "signal": "partner",
+      "signal_label": "Partner Holded",
+      "signal_class": "s-par",
+      "source_url": "https://wa.me/34932718670",
+      "snippet": "Partner certificado de Holded en España",
+      "score": 2,
+      "date": "23/07/2026",
+      "source_type": "partner_scraping",
+      "email": "—",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "—",
+      "linkedin_org": "—"
+    },
     {
       "company": "Cómo Migrar tu ERP a Odoo: Guía Completa de Migración",
       "domain": "aerya.net",
@@ -548,10 +594,7 @@
   },
   "features": {
     "odoo": [],
-    "sap": [
-      "Obtenga un mayor control sobre su negocio o subsidiaria",
-      "Navegar por las olas de la industria marÃ­tima"
-    ],
+    "sap": [],
     "holded": [
       "Factura electrónica obligatoria: ¿quién deberá hacerla?"
     ],
