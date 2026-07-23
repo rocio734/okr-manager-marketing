@@ -18,17 +18,25 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias base
         run: pip install requests beautifulsoup4 cryptography
+
+      - name: Instalar Scrapling con fetchers
+        run: |
+          pip install "scrapling[fetchers]"
+          scrapling install || echo "⚠️ Scrapling browsers install falló — continuando sin browser headless"
+        continue-on-error: true
 
       - name: Ejecutar script
         env:
-          BRAVE_API_KEY:               ${{ secrets.BRAVE_API_KEY }}
+          GOOGLE_API_KEY:              ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CSE_ID:               ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_MAPS_API_KEY:         ${{ secrets.GOOGLE_MAPS_API_KEY }}
           GOOGLE_SHEET_ID:             ${{ secrets.GOOGLE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           HUNTER_API_KEY:              ${{ secrets.HUNTER_API_KEY }}
           APOLLO_API_KEY:              ${{ secrets.APOLLO_API_KEY }}
+          BRAVE_API_KEY:               ${{ secrets.BRAVE_API_KEY }}
         run: cd intel-dashboard && python fetch_intel.py
 
       - name: Commit y push

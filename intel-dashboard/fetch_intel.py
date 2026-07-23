@@ -23,6 +23,15 @@ import os, re, json, hashlib, requests, datetime, time
 from pathlib import Path
 from bs4 import BeautifulSoup
 
+# Scrapling — scraping adaptativo con bypass anti-bot
+try:
+    from scrapling.fetchers import Fetcher, StealthyFetcher
+    SCRAPLING_OK = True
+    print("✅ Scrapling disponible")
+except ImportError:
+    SCRAPLING_OK = False
+    print("⚠️  Scrapling no disponible — usando requests como fallback")
+
 REPO_DIR  = Path(__file__).parent
 HTML_FILE = REPO_DIR / "index.html"
 DATA_FILE = REPO_DIR / "intel_data.json"
@@ -64,7 +73,26 @@ SPAIN_CITIES = ["Madrid,Spain","Barcelona,Spain","Valencia,Spain","Bilbao,Spain"
 
 SKIP_DOMAINS = {"odoo","sap","sage","holded","linkedin","infojobs","wikipedia","youtube","google","bing","microsoft","facebook","twitter"}
 
-def fetch(url, timeout=15):
+def fetch(url, timeout=15, dynamic=False):
+    """
+    Fetcher universal con Scrapling.
+    - dynamic=True: usa StealthyFetcher (renderiza JS, bypasea Cloudflare)
+    - dynamic=False: usa Fetcher (HTTP rápido con TLS fingerprint spoofing)
+    - fallback: requests estándar si Scrapling no está disponible
+    """
+    if SCRAPLING_OK:
+        try:
+            if dynamic:
+                # Para páginas con JS (Odoo partners, etc.)
+                page = StealthyFetcher.fetch(url, headless=True, network_idle=True, timeout=timeout*1000)
+                return page.html_content if page else ""
+            else:
+                # Para páginas estáticas — más rápido que requests y bypasea anti-bot básico
+                page = Fetcher().get(url, timeout=timeout, stealthy_headers=True)
+                return page.html_content if page else ""
+        except Exception as e:
+            print(f"    ⚠️ Scrapling {url[:60]}: {e}")
+            # Fallback a requests
     try:
         r = requests.get(url, headers=HEADERS, timeout=timeout)
         r.raise_for_status()
@@ -227,7 +255,7 @@ def maps_details(place_id):
 def scrape_partners():
     all_p=[]
     # Odoo partners España — extraer nombre + URL externa del partner
-    html=fetch("https://www.odoo.com/es/partners")
+    html=fetch("https://www.odoo.com/es/partners", dynamic=True)
     if html:
         soup=BeautifulSoup(html,"html.parser")
         # Buscar cards de partners con su web externa
@@ -239,7 +267,7 @@ def scrape_partners():
             if name and 5<len(name)<70:
                 d = domain_from_url(web) if web else ""
                 all_p.append({"name":name,"competitor":"Odoo","url":web or "https://www.odoo.com/es/partners","domain":d})
-        # Fallback: links de páginas de country o partner (no genéricos)
+        # Fallback: links de páginas de country o partner
         if not all_p:
             for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*odoo.com)")):
                 t=a.get_text(strip=True)
@@ -250,7 +278,7 @@ def scrape_partners():
     print(f"    Odoo partners: {len(all_p)}")
 
     # Holded partners
-    html=fetch("https://www.holded.com/es/partners")
+    html=fetch("https://www.holded.com/es/partners", dynamic=True)  # JS rendering via Scrapling
     holded_count=0
     if html:
         soup=BeautifulSoup(html,"html.parser")
@@ -302,7 +330,7 @@ def scrape_competitors(data):
     results,changes=[],[]
     for comp in COMPETITORS:
         print(f"  {comp['name']}...")
-        html=fetch(comp["url"])
+        html=fetch(comp["url"], dynamic=("holded" in comp["id"] or "odoo" in comp["id"]))  # JS para Odoo y Holded
         if not html:
             results.append({"comp":comp,"change":"error","prices":{},"features":[]}); continue
         h=text_hash(clean(html)); ph=data["comp_hashes"].get(comp["id"],"")
