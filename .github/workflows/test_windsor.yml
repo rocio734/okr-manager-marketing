@@ -15,4 +15,4 @@ jobs:
       - name: Run field tests
         env:
           WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
-        run: python test_windsor_fields.py
+        run: python test_windsor_pages.py
