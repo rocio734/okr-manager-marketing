@@ -212,21 +212,23 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
       <p class="roi-sub">Coste por conversión — PMax ERP Agéntico<br>18 conversiones totales (13 formulario agéntico + 5 formulario web)</p>
     </div>
     <div class="roi-card">
-      <p class="roi-title">Conversiones totales mes actual</p>
-      <p class="roi-val">23</p>
-      <p class="roi-sub">vs 16 el mes anterior (+43.8%)<br>10 formulario_web_gtm · 13 formulario_erp_agéntico</p>
+      <p class="roi-title">Conversiones totales período</p>
+      <p class="roi-val" data-ws="ads_conv_curr">23</p>
+      <p class="roi-sub">Formularios completados Google Ads<br>(período seleccionado)</p>
     </div>
     <div class="roi-card">
       <p class="roi-title">Leads reales (formularios)</p>
-      <p class="roi-val">23</p>
-      <p class="roi-sub">Todos son formularios completados<br>0 clics de llamada · 0 WhatsApp · 0 SaaS</p>
+      <p class="roi-val" data-ws="ads_conv_curr">23</p>
+      <p class="roi-sub">Total formularios · período seleccionado</p>
     </div>
     <div class="roi-card">
       <p class="roi-title">Inversión total / Lead</p>
-      <p class="roi-val">€52.19</p>
-      <p class="roi-sub">Coste medio por lead conseguido<br>vs €77.05 el mes anterior (-32.3%)</p>
+      <p class="roi-val" data-ws="ads_cpconv_curr">€52.19</p>
+      <p class="roi-sub">Coste medio por lead · período seleccionado</p>
     </div>
   </div>
+
+  <div class="insight yellow" style="margin-bottom:0.5rem">El desglose por campaña, el embudo y los insights de abajo reflejan el <strong>último análisis diario generado (30 días)</strong>. Los 3 KPIs de arriba se actualizan con el período seleccionado.</div>
 
   <div class="sl">Desglose de conversiones por campaña y tipo</div>
   <p class="sd">Cada conversión es un formulario completado. Se distinguen dos tipos: el formulario general de la web y el formulario específico de ERP Agéntico.</p>
@@ -876,17 +878,17 @@ function applyMetrics(data) {
   });
 
   // 3. Dynamic tables
-  _renderCampaigns(data.ads && data.ads.campaigns, period);
-  _renderKeywords(data.search_console && data.search_console.keywords);
-  _renderPageBars(data.pages);
-  _renderPageQuality(data.pages_quality);
-  _renderCrmRows(data.crm);
+  try { _renderCampaigns(data.ads && data.ads.campaigns); } catch(e) { console.error('renderCampaigns:', e); }
+  try { _renderKeywords(data.search_console && data.search_console.keywords); } catch(e) { console.error('renderKeywords:', e); }
+  try { _renderPageBars(data.pages); } catch(e) { console.error('renderPageBars:', e); }
+  try { _renderPageQuality(data.pages_quality); } catch(e) { console.error('renderPageQuality:', e); }
+  try { _renderCrmRows(data.crm); } catch(e) { console.error('renderCrmRows:', e); }
 
   // 4. CRM subtitle via data-ws
   // Already handled by scalar update above
 }
 
-function _renderCampaigns(camps, period) {
+function _renderCampaigns(camps) {
   const tbody = document.querySelector('[data-ws="CAMP_ROWS"]');
   if (!tbody || !camps) return;
   tbody.innerHTML = camps.map(c => {
