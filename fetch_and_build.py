@@ -102,6 +102,11 @@ scp = fetch("searchconsole", ["clicks", "impressions", "ctr", "position"],
 print("→ Keywords top 20...")
 kws = fetch("searchconsole", ["query", "clicks", "impressions", "ctr", "position"])
 
+print("→ GA4 top páginas...")
+pages_raw = fetch("googleanalytics4", ["page_path", "sessions", "bounce_rate", "average_session_duration"])
+pages_top     = sorted(pages_raw, key=lambda x: float(x.get("sessions") or 0), reverse=True)[:12]
+pages_quality = sorted(pages_raw, key=lambda x: float(x.get("average_session_duration") or 0), reverse=True)[:10]
+
 # ── Agregados GA4 ─────────────────────────────────────────────────────────────
 C = dict(
     sessions  = fsum(ga4c, "sessions"),
@@ -189,6 +194,60 @@ date_fr_p = (today - timedelta(days=60)).strftime("%d/%m/%Y")
 generated = today.strftime("%d/%m/%Y %H:%M UTC")
 
 # ── Tablas HTML ───────────────────────────────────────────────────────────────
+def page_type(path):
+    if any(x in path for x in ["/user-guide/", "/developer-guide/", "/whats-new/"]):
+        return '<span class="badge" style="background:#EEF4FF;color:#185FA5">Doc técnica</span>'
+    if "/blog/" in path:
+        return '<span class="badge" style="background:#EAF3DE;color:#3B6D11">Blog</span>'
+    if path in ["/contactanos/", "/muchas-gracias/", "/en/contactanos/"]:
+        return '<span class="badge" style="background:#EAF3DE;color:#3B6D11">Conversión</span>'
+    if any(x in path for x in ["/copilot/", "/etendo-go/", "/etendo-next/"]):
+        return '<span class="badge" style="background:#FFF8CC;color:#666">Producto</span>'
+    return '<span class="badge" style="background:#E2F0FF;color:#0a3c6e">Captación</span>'
+
+def page_bars():
+    if not pages_top:
+        return "<p>— Sin datos —</p>"
+    max_s = max(float(p.get("sessions") or 0) for p in pages_top) or 1
+    out = ""
+    for p in pages_top:
+        path    = p.get("page_path", "—")
+        sess    = float(p.get("sessions") or 0)
+        bounce  = float(p.get("bounce_rate") or 0) * 100
+        pct     = sess / max_s * 100
+        if bounce < 35:
+            bs, star = "#EAF3DE;color:#3B6D11", " ⭐"
+        elif bounce < 55:
+            bs, star = "#FFF8CC;color:#666", ""
+        else:
+            bs, star = "#FCEBEB;color:#A32D2D", ""
+        out += (
+            f'<div class="page-bar">'
+            f'<div class="page-name">{path}</div>'
+            f'<div class="page-track"><div class="page-fill" style="width:{pct:.0f}%"></div></div>'
+            f'<div class="page-val">{int(sess)}</div>'
+            f'<span class="page-badge" style="{bs}">Rebote {bounce:.1f}%{star}</span>'
+            f'</div>\n'
+        )
+    return out
+
+def page_quality_rows():
+    out = ""
+    for p in pages_quality:
+        path   = p.get("page_path", "—")
+        sess   = int(float(p.get("sessions") or 0))
+        bounce = float(p.get("bounce_rate") or 0) * 100
+        dur    = float(p.get("average_session_duration") or 0)
+        dur_s  = f"{int(dur//60)}m {int(dur%60):02d}s"
+        out += (
+            f'<tr><td>{path}</td>'
+            f'<td class="r">{sess}</td>'
+            f'<td class="r">{bounce:.1f}%</td>'
+            f'<td class="r"><strong>{dur_s}</strong></td>'
+            f'<td class="r">{page_type(path)}</td></tr>\n'
+        )
+    return out
+
 def camp_rows():
     out = ""
     for name, d in camps.items():
@@ -312,8 +371,10 @@ for mid, val in valores.items():
 
 # ── Tablas dinámicas ──────────────────────────────────────────────────────────
 for marker, fn, label in [
-    ("CAMP_ROWS", camp_rows, f"campañas ({len(camps)})"),
-    ("KW_ROWS",   kw_rows,   f"keywords ({len(kw_top)})"),
+    ("CAMP_ROWS",         camp_rows,         f"campañas ({len(camps)})"),
+    ("KW_ROWS",           kw_rows,           f"keywords ({len(kw_top)})"),
+    ("PAGE_BARS",         page_bars,         f"páginas top ({len(pages_top)})"),
+    ("PAGE_QUALITY_ROWS", page_quality_rows, f"páginas calidad ({len(pages_quality)})"),
 ]:
     pat = f"<!-- WS:{marker} -->.*?<!-- /WS:{marker} -->"
     rep = f"<!-- WS:{marker} -->\n{fn()}<!-- /WS:{marker} -->"
