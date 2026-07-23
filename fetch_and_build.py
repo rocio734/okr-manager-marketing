@@ -165,14 +165,23 @@ pages_top     = sorted(pages_raw, key=lambda x: float(x.get("sessions") or 0), r
 pages_quality = sorted(pages_raw, key=lambda x: float(x.get("average_session_duration") or 0), reverse=True)[:10]
 
 print("→ CRM leads...")
-crm_leads, crm_ok = [], False
+crm_leads_all, crm_ok = [], False
 try:
     crm_token = crm_login()
-    crm_leads = crm_fetch_all(crm_token, "ETCRM_Lead")
+    crm_leads_all = crm_fetch_all(crm_token, "ETCRM_Lead")
     crm_ok = True
-    print(f"  ✅ {len(crm_leads)} leads obtenidos")
+    print(f"  ✅ {len(crm_leads_all)} leads obtenidos (total)")
 except Exception as e:
     print(f"  ⚠️  CRM no disponible: {e}")
+
+# Ventana 30 días — igual que GA4
+_crm_cutoff = (datetime.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+def _crm_in_window(l):
+    d = (l.get("creationDate") or "")[:10]
+    return d >= _crm_cutoff
+
+crm_leads = [l for l in crm_leads_all if _crm_in_window(l)]
+print(f"  → {len(crm_leads)} leads en últimos 30 días")
 
 _INACTIVE = {"Dead", "Converted"}
 def _lstatus(l): return l.get("leadStatus$_identifier") or ""
@@ -483,7 +492,7 @@ valores = {
     "crm_sql":     str(len(crm_sql) + len(crm_qual)) if crm_ok else "—",
     "crm_cpl":     (f"€{AC['cost']/len(crm_active):.0f}" if crm_ok and crm_active else "—"),
     "crm_subtitle": (
-        f"{len(crm_leads)} leads totales · {len(crm_active)} activos · "
+        f"{len(crm_leads)} leads últimos 30 días · {len(crm_active)} activos · "
         f"{len(crm_dead)} descartados · Actualizado {today.strftime('%d/%m/%Y')}"
         if crm_ok else "CRM no disponible"
     ),
