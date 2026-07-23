@@ -7,6 +7,22 @@ services:
     buildCommand: ""
 
   - type: web
+    name: etendo-dashboard-api
+    runtime: python
+    buildCommand: pip install -r requirements_api.txt
+    startCommand: uvicorn dashboard_api:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: WINDSOR_API_KEY
+        sync: false
+      - key: ETENDO_BASE_URL
+        sync: false
+      - key: ETENDO_USERNAME
+        sync: false
+      - key: ETENDO_PASSWORD
+        sync: false
+
+  - type: web
     name: crm-pulse
     runtime: python
     buildCommand: pip install -r mcp_crm_requirements.txt

@@ -1,0 +1,453 @@
+"""
+Etendo Dashboard API — FastAPI backend
+GET /api/metrics?period=30  →  JSON con datos de Windsor.ai + Etendo CRM
+Caché en memoria por período, TTL 55 minutos.
+Startup warmup en background para period=30.
+"""
+from fastapi import FastAPI, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import requests
+import os
+import json
+import urllib.request
+import urllib.parse
+import threading
+import time
+from datetime import datetime, timedelta
+
+# ── Config ─────────────────────────────────────────────────────────────────────
+WINDSOR_API_KEY = os.environ.get("WINDSOR_API_KEY", "")
+_CRM_BASE = os.environ.get("ETENDO_BASE_URL", "")
+_CRM_USER = os.environ.get("ETENDO_USERNAME", "")
+_CRM_PASS = os.environ.get("ETENDO_PASSWORD", "")
+_CRM_ROLE = "8351131DFF384725AB08E06773FE6144"
+WINDSOR_BASE = "https://connectors.windsor.ai"
+CACHE_TTL = 55 * 60  # 55 minutos
+
+GA4_FIELDS = [
+    "sessions", "active_users", "screen_page_views",
+    "engagement_rate", "bounce_rate", "average_session_duration",
+]
+
+# ── App ────────────────────────────────────────────────────────────────────────
+app = FastAPI(title="Etendo Dashboard API", version="1.0.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+# ── Cache ──────────────────────────────────────────────────────────────────────
+_cache: dict = {}
+_cache_lock = threading.Lock()
+
+def _cache_get(period: int):
+    with _cache_lock:
+        entry = _cache.get(period)
+        if entry and (time.time() - entry["ts"]) < CACHE_TTL:
+            return entry["data"]
+    return None
+
+def _cache_set(period: int, data: dict):
+    with _cache_lock:
+        _cache[period] = {"data": data, "ts": time.time()}
+
+# ── Windsor.ai ─────────────────────────────────────────────────────────────────
+def _windsor_raw(connector, fields, date_from, date_to):
+    params = {
+        "api_key": WINDSOR_API_KEY,
+        "fields": ",".join(fields),
+        "date_from": date_from,
+        "date_to": date_to,
+    }
+    r = requests.get(f"{WINDSOR_BASE}/{connector}", params=params, timeout=40)
+    r.raise_for_status()
+    d = r.json()
+    return d.get("data", d) if isinstance(d, dict) else d
+
+def _windsor(connector, fields, start_days, end_days=0):
+    t = datetime.today()
+    df = (t - timedelta(days=start_days)).strftime("%Y-%m-%d")
+    dt = (t - timedelta(days=end_days)).strftime("%Y-%m-%d")
+    return _windsor_raw(connector, fields, df, dt)
+
+def _windsor_safe(connector, fields, start_days, end_days=0):
+    try:
+        return _windsor(connector, fields, start_days, end_days)
+    except Exception:
+        return []
+
+# ── Etendo CRM ─────────────────────────────────────────────────────────────────
+def _crm_login():
+    body = json.dumps({
+        "username": _CRM_USER,
+        "password": _CRM_PASS,
+        "role": _CRM_ROLE,
+    }).encode()
+    req = urllib.request.Request(
+        f"{_CRM_BASE}/api/auth/login", data=body, method="POST"
+    )
+    req.add_header("Content-Type", "application/json")
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read())["token"]
+
+def _crm_fetch_all(token, entity):
+    out, start = [], 0
+    while True:
+        body = urllib.parse.urlencode({
+            "_operationType": "fetch",
+            "_startRow": str(start),
+            "_endRow": str(start + 500),
+        }).encode()
+        req = urllib.request.Request(
+            f"{_CRM_BASE}/api/datasource/{entity}", data=body, method="POST"
+        )
+        req.add_header("Authorization", f"Bearer {token}")
+        req.add_header("Content-Type", "application/x-www-form-urlencoded")
+        with urllib.request.urlopen(req, timeout=30) as r:
+            page = json.loads(r.read()).get("response", {}).get("data", [])
+        if not page:
+            break
+        out.extend(page)
+        if len(page) < 500:
+            break
+        start += 500
+    return out
+
+# ── Helpers ────────────────────────────────────────────────────────────────────
+def fsum(rows, f):
+    return sum(float(r.get(f) or 0) for r in rows)
+
+def favg(rows, f):
+    v = [float(r.get(f) or 0) for r in rows if r.get(f) is not None]
+    return sum(v) / len(v) if v else 0
+
+def channel_sum(rows, name):
+    return sum(
+        float(r.get("sessions") or 0) for r in rows
+        if name.lower() in str(r.get("session_default_channel_group", "")).lower()
+    )
+
+def phone_country(phone):
+    if not phone:
+        return "—"
+    p = str(phone).replace(" ", "").replace("-", "")
+    if p.startswith(("+54", "54")): return "Argentina"
+    if p.startswith(("+34", "34")): return "España"
+    if p.startswith(("+52", "52")): return "México"
+    if p.startswith("+57"): return "Colombia"
+    if p.startswith("+56"): return "Chile"
+    if p.startswith("+51"): return "Perú"
+    if p.startswith("+60"): return "Malasia"
+    return "—"
+
+def fmt_dur(s):
+    return f"{int(s // 60)}m {int(s % 60):02d}s"
+
+def page_type_label(path):
+    if any(x in path for x in ["/user-guide/", "/developer-guide/", "/whats-new/"]):
+        return "Doc técnica"
+    if "/blog/" in path:
+        return "Blog"
+    if path in ["/contactanos/", "/muchas-gracias/", "/en/contactanos/"]:
+        return "Conversión"
+    if any(x in path for x in ["/copilot/", "/etendo-go/", "/etendo-next/"]):
+        return "Producto"
+    return "Captación"
+
+# ── Core data builder ──────────────────────────────────────────────────────────
+def build_metrics(period: int) -> dict:
+    prev_start = period * 2
+    prev_end = period
+
+    # ── Fetch all sources ──────────────────────────────────────────────────────
+    ga4c = _windsor("googleanalytics4", GA4_FIELDS, period)
+    ga4p = _windsor("googleanalytics4", GA4_FIELDS, prev_start, prev_end)
+    ch_c_rows = _windsor_safe("googleanalytics4", ["sessions", "session_default_channel_group"], period)
+    ch_p_rows = _windsor_safe("googleanalytics4", ["sessions", "session_default_channel_group"], prev_start, prev_end)
+    adsc = _windsor("google_ads", ["cost", "clicks", "impressions", "conversions", "campaign_name", "campaign_status"], period)
+    adsp = _windsor("google_ads", ["cost", "clicks", "conversions", "campaign_name"], prev_start, prev_end)
+    scc = _windsor("searchconsole", ["clicks", "impressions", "ctr", "position"], period)
+    scp = _windsor("searchconsole", ["clicks", "impressions", "ctr", "position"], prev_start, prev_end)
+    kws = _windsor("searchconsole", ["query", "clicks", "impressions", "ctr", "position"], period)
+    pages_raw = _windsor("googleanalytics4", ["page_path", "sessions", "bounce_rate", "average_session_duration"], period)
+
+    # ── CRM ────────────────────────────────────────────────────────────────────
+    crm_ok = False
+    crm_leads = []
+    try:
+        token = _crm_login()
+        all_leads = _crm_fetch_all(token, "ETCRM_Lead")
+        cutoff = (datetime.today() - timedelta(days=period)).strftime("%Y-%m-%d")
+        crm_leads = [l for l in all_leads if (l.get("creationDate") or "")[:10] >= cutoff]
+        crm_ok = True
+    except Exception as e:
+        print(f"CRM error: {e}")
+
+    # ── GA4 aggregates ─────────────────────────────────────────────────────────
+    C = {
+        "sessions":   fsum(ga4c, "sessions"),
+        "users":      fsum(ga4c, "active_users"),
+        "pageviews":  fsum(ga4c, "screen_page_views"),
+        "engagement": favg(ga4c, "engagement_rate") * 100,
+        "bounce":     favg(ga4c, "bounce_rate") * 100,
+        "duration":   favg(ga4c, "average_session_duration"),
+    }
+    P = {
+        "sessions":   fsum(ga4p, "sessions"),
+        "users":      fsum(ga4p, "active_users"),
+        "pageviews":  fsum(ga4p, "screen_page_views"),
+        "engagement": favg(ga4p, "engagement_rate") * 100,
+        "bounce":     favg(ga4p, "bounce_rate") * 100,
+    }
+
+    # ── Channels ───────────────────────────────────────────────────────────────
+    ch_map = {
+        "direct": "direct", "organic": "organic search",
+        "paid_search": "paid search", "cross": "cross-network",
+        "paid_social": "paid social", "referral": "referral",
+        "organic_social": "organic social", "ai": "ai",
+    }
+    ch_c = {k: channel_sum(ch_c_rows, v) for k, v in ch_map.items()}
+    ch_p = {k: channel_sum(ch_p_rows, v) for k, v in ch_map.items()}
+    channels_available = len(ch_c_rows) > 0
+
+    # ── Ads aggregates ─────────────────────────────────────────────────────────
+    AC = {
+        "cost":        fsum(adsc, "cost"),
+        "clicks":      fsum(adsc, "clicks"),
+        "impressions": fsum(adsc, "impressions"),
+        "conversions": fsum(adsc, "conversions"),
+    }
+    AC["ctr"]   = AC["clicks"] / AC["impressions"] * 100 if AC["impressions"] else 0
+    AC["cpc"]   = AC["cost"] / AC["clicks"] if AC["clicks"] else 0
+    AC["cpl"]   = AC["cost"] / AC["conversions"] if AC["conversions"] else 0
+    AC["daily"] = AC["cost"] / period
+
+    AP = {
+        "cost":        fsum(adsp, "cost"),
+        "clicks":      fsum(adsp, "clicks"),
+        "conversions": fsum(adsp, "conversions"),
+    }
+    AP["cpl"]   = AP["cost"] / AP["conversions"] if AP["conversions"] else 0
+    AP["daily"] = AP["cost"] / period
+
+    camps = {}
+    for r in adsc:
+        n = r.get("campaign_name", "—")
+        if n not in camps:
+            camps[n] = {"cost": 0.0, "clicks": 0.0, "conversions": 0.0, "status": r.get("campaign_status", "—")}
+        camps[n]["cost"]        += float(r.get("cost") or 0)
+        camps[n]["clicks"]      += float(r.get("clicks") or 0)
+        camps[n]["conversions"] += float(r.get("conversions") or 0)
+
+    campaigns_list = []
+    for name, d in camps.items():
+        cpl = d["cost"] / d["conversions"] if d["conversions"] else None
+        campaigns_list.append({
+            "name":        name,
+            "active":      "ENABLED" in d["status"],
+            "cost":        round(d["cost"], 2),
+            "clicks":      int(d["clicks"]),
+            "conversions": int(d["conversions"]),
+            "cpl":         round(cpl, 2) if cpl is not None else None,
+        })
+
+    # ── Search Console aggregates ──────────────────────────────────────────────
+    SC = {
+        "clicks":      fsum(scc, "clicks"),
+        "impressions": fsum(scc, "impressions"),
+        "ctr":         favg(scc, "ctr") * 100,
+        "position":    favg(scc, "position"),
+    }
+    SP = {
+        "clicks":      fsum(scp, "clicks"),
+        "impressions": fsum(scp, "impressions"),
+        "ctr":         favg(scp, "ctr") * 100,
+        "position":    favg(scp, "position"),
+    }
+
+    keywords_list = [
+        {
+            "query":       kw.get("query", "—"),
+            "impressions": int(float(kw.get("impressions") or 0)),
+            "clicks":      int(float(kw.get("clicks") or 0)),
+            "ctr":         round(float(kw.get("ctr") or 0) * 100, 1),
+            "position":    round(float(kw.get("position") or 0), 1),
+        }
+        for kw in sorted(kws, key=lambda x: float(x.get("impressions") or 0), reverse=True)[:20]
+    ]
+
+    # ── Pages ──────────────────────────────────────────────────────────────────
+    pages_sorted = sorted(pages_raw, key=lambda x: float(x.get("sessions") or 0), reverse=True)
+    pages_list = [
+        {
+            "path":       p.get("page_path", "—"),
+            "sessions":   int(float(p.get("sessions") or 0)),
+            "bounce_pct": round(float(p.get("bounce_rate") or 0) * 100, 1),
+            "duration_s": float(p.get("average_session_duration") or 0),
+            "type":       page_type_label(p.get("page_path", "")),
+        }
+        for p in pages_sorted[:12]
+    ]
+    pages_quality_list = [
+        {
+            "path":       p.get("page_path", "—"),
+            "sessions":   int(float(p.get("sessions") or 0)),
+            "bounce_pct": round(float(p.get("bounce_rate") or 0) * 100, 1),
+            "duration_s": float(p.get("average_session_duration") or 0),
+            "type":       page_type_label(p.get("page_path", "")),
+        }
+        for p in sorted(pages_raw, key=lambda x: float(x.get("average_session_duration") or 0), reverse=True)[:10]
+    ]
+
+    # ── CRM processing ─────────────────────────────────────────────────────────
+    _INACTIVE = {"Dead", "Converted"}
+    def lstatus(l): return l.get("leadStatus$_identifier") or ""
+    def lclass(l):  return l.get("classification$_identifier") or ""
+    def lname(l):
+        fn = (l.get("firstname") or "").strip()
+        ln = (l.get("lastname") or "").strip()
+        return (fn + (" " + ln if ln else "")) or "—"
+
+    crm_active = [l for l in crm_leads if lstatus(l) not in _INACTIVE]
+    crm_dead   = [l for l in crm_leads if lstatus(l) == "Dead"]
+    crm_iql    = [l for l in crm_active if lclass(l) == "IQL"]
+    crm_mql    = [l for l in crm_active if lclass(l) == "MQL"]
+    crm_sql    = [l for l in crm_active if lclass(l) == "SQL" or lstatus(l) == "Qualified"]
+
+    _CLASS_ORDER = {"SQL": 0, "MQL": 1, "IQL": 2}
+    pipeline_sorted = sorted(
+        crm_active, key=lambda l: (_CLASS_ORDER.get(lclass(l), 9), lname(l))
+    )
+    pipeline_list = []
+    for l in pipeline_sorted[:15]:
+        desc = (l.get("description") or "").replace("\n", " ").strip()
+        desc = desc[:80] + "…" if len(desc) > 80 else desc
+        pipeline_list.append({
+            "name":        lname(l),
+            "company":     (l.get("company") or "—").strip() or "—",
+            "country":     phone_country(l.get("phone") or ""),
+            "cls":         lclass(l),
+            "status":      lstatus(l),
+            "description": desc,
+        })
+
+    cpl_val = (
+        round(AC["cost"] / len(crm_active), 0) if crm_ok and crm_active else None
+    )
+
+    # ── Dates ──────────────────────────────────────────────────────────────────
+    today    = datetime.today()
+    date_to  = today.strftime("%d/%m/%Y")
+    date_fr  = (today - timedelta(days=period)).strftime("%d/%m/%Y")
+    date_top = (today - timedelta(days=period)).strftime("%d/%m/%Y")
+    date_frp = (today - timedelta(days=period * 2)).strftime("%d/%m/%Y")
+
+    period_labels = {7: "últimos 7 días", 30: "últimos 30 días", 90: "últimos 90 días"}
+
+    return {
+        "period":          period,
+        "period_label":    period_labels.get(period, f"últimos {period} días"),
+        "date_from":       date_fr,
+        "date_to":         date_to,
+        "date_from_prev":  date_frp,
+        "date_to_prev":    date_top,
+        "generated_at":    today.strftime("%d/%m/%Y %H:%M UTC"),
+        "ga4": {
+            "sessions_curr":   int(C["sessions"]),
+            "sessions_prev":   int(P["sessions"]),
+            "users_curr":      int(C["users"]),
+            "users_prev":      int(P["users"]),
+            "pageviews_curr":  int(C["pageviews"]),
+            "pageviews_prev":  int(P["pageviews"]),
+            "engagement_curr": round(C["engagement"], 1),
+            "engagement_prev": round(P["engagement"], 1),
+            "bounce_curr":     round(C["bounce"], 1),
+            "bounce_prev":     round(P["bounce"], 1),
+            "duration_curr":   fmt_dur(C["duration"]),
+            "ai_curr":         int(ch_c.get("ai", 0)) if channels_available else None,
+            "ai_prev":         int(ch_p.get("ai", 0)) if channels_available else None,
+        },
+        "channels": {
+            "available": channels_available,
+            **{f"{k}_curr": int(ch_c[k]) for k in ch_map},
+            **{f"{k}_prev": int(ch_p[k]) for k in ch_map},
+        },
+        "ads": {
+            "cost_curr":        round(AC["cost"], 2),
+            "cost_prev":        round(AP["cost"], 2),
+            "clicks_curr":      int(AC["clicks"]),
+            "clicks_prev":      int(AP["clicks"]),
+            "impressions_curr": int(AC["impressions"]),
+            "ctr_curr":         round(AC["ctr"], 2),
+            "cpc_curr":         round(AC["cpc"], 2),
+            "conversions_curr": int(AC["conversions"]),
+            "conversions_prev": int(AP["conversions"]),
+            "cpl_curr":         round(AC["cpl"], 2),
+            "cpl_prev":         round(AP["cpl"], 2),
+            "daily_curr":       round(AC["daily"], 2),
+            "daily_prev":       round(AP["daily"], 2),
+            "campaigns":        campaigns_list,
+        },
+        "search_console": {
+            "impressions_curr": int(SC["impressions"]),
+            "impressions_prev": int(SP["impressions"]),
+            "clicks_curr":      int(SC["clicks"]),
+            "clicks_prev":      int(SP["clicks"]),
+            "ctr_curr":         round(SC["ctr"], 2),
+            "ctr_prev":         round(SP["ctr"], 2),
+            "position_curr":    round(SC["position"], 1),
+            "position_prev":    round(SP["position"], 1),
+            "keywords":         keywords_list,
+        },
+        "pages":         pages_list,
+        "pages_quality": pages_quality_list,
+        "crm": {
+            "available": crm_ok,
+            "total":     len(crm_leads),
+            "active":    len(crm_active),
+            "dead":      len(crm_dead),
+            "iql":       len(crm_iql),
+            "mql":       len(crm_mql),
+            "sql":       len(crm_sql),
+            "cpl":       int(cpl_val) if cpl_val is not None else None,
+            "subtitle":  (
+                f"{len(crm_leads)} leads · {len(crm_active)} activos · "
+                f"{len(crm_dead)} descartados · {today.strftime('%d/%m/%Y')}"
+                if crm_ok else "CRM no disponible"
+            ),
+            "pipeline":  pipeline_list,
+        },
+    }
+
+# ── Routes ─────────────────────────────────────────────────────────────────────
+@app.get("/health")
+def health():
+    cached = list(_cache.keys())
+    return {"ok": True, "cached_periods": cached}
+
+@app.get("/api/metrics")
+def metrics(period: int = Query(default=30, ge=7, le=180)):
+    cached = _cache_get(period)
+    if cached:
+        return {**cached, "_from_cache": True}
+    try:
+        data = build_metrics(period)
+        _cache_set(period, data)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ── Startup warmup ─────────────────────────────────────────────────────────────
+@app.on_event("startup")
+async def startup_warmup():
+    def _warmup():
+        try:
+            data = build_metrics(30)
+            _cache_set(30, data)
+            print("✅ Cache pre-warmed for period=30")
+        except Exception as e:
+            print(f"⚠️  Warmup failed: {e}")
+    threading.Thread(target=_warmup, daemon=True).start()
