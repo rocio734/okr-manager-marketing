@@ -194,9 +194,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 <!-- /WS:CAMP_ROWS -->
 </tbody>
   </table>
-  <div class="sl">Gasto diario e inversión — mes actual</div>
+  <div class="sl" id="ads-daily-label">Gasto diario e inversión — último build</div>
   <div class="chart-wrap"><canvas id="adsDaily"></canvas></div>
-  <div class="sl">Conversiones diarias — mes actual</div>
+  <div class="sl" id="conv-daily-label">Conversiones diarias — último build</div>
   <div class="chart-wrap" style="height:160px"><canvas id="convDaily"></canvas></div>
 </div>
 
@@ -1052,6 +1052,16 @@ function _updateDailyCharts(daily) {
     _convDaily.data.labels = daily.ads_labels;
     _convDaily.data.datasets[0].data = daily.conversions;
     _convDaily.update();
+    const l1 = document.getElementById('ads-daily-label');
+    const l2 = document.getElementById('conv-daily-label');
+    if (l1) l1.textContent = 'Gasto diario e inversión — período seleccionado';
+    if (l2) l2.textContent = 'Conversiones diarias — período seleccionado';
+  } else {
+    const note = ' <span style="font-size:10px;font-weight:400;color:#999">(datos estáticos del último build — Ads no soporta desglose diario en tiempo real)</span>';
+    const l1 = document.getElementById('ads-daily-label');
+    const l2 = document.getElementById('conv-daily-label');
+    if (l1) l1.innerHTML = 'Gasto diario e inversión' + note;
+    if (l2) l2.innerHTML = 'Conversiones diarias' + note;
   }
 }
 
