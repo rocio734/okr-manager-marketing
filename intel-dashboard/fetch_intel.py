@@ -39,7 +39,7 @@ NOW   = datetime.datetime.now().strftime("%d/%m/%Y %H:%M UTC")
 HEADERS = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36","Accept-Language":"es-ES,es;q=0.9"}
 
 COMPETITORS = [
-    {"name":"Odoo","id":"odoo","url":"https://www.odoo.com/es","pricing_url":"https://www.odoo.com/es/pricing","blog_url":"https://www.odoo.com/es/blog","partners_url":"https://www.odoo.com/es/partners/country/69-spain"},
+    {"name":"Odoo","id":"odoo","url":"https://www.odoo.com/es","pricing_url":"https://www.odoo.com/es/pricing","blog_url":"https://www.odoo.com/es/blog","partners_url":"https://www.odoo.com/es/partners"},
     {"name":"SAP Business One","id":"sap","url":"https://www.sap.com/spain/products/erp/business-one.html","pricing_url":"https://www.sap.com/spain/products/erp/business-one.html","blog_url":"https://www.sap.com/spain/products/erp/business-one.html","partners_url":"https://www.sap.com/spain/partner-finder.html"},
     {"name":"Holded","id":"holded","url":"https://www.holded.com","pricing_url":"https://www.holded.com/es/precios","blog_url":"https://www.holded.com/es/blog","partners_url":"https://www.holded.com/es/partners"},
     {"name":"Sage","id":"sage","url":"https://www.sage.com/es-es/erp/","pricing_url":"https://www.sage.com/es-es/erp/","blog_url":"https://www.sage.com/es-es/blog/","partners_url":"https://www.sage.com/es-es/partners/find-a-partner/"},
@@ -227,7 +227,7 @@ def maps_details(place_id):
 def scrape_partners():
     all_p=[]
     # Odoo partners España — extraer nombre + URL externa del partner
-    html=fetch("https://www.odoo.com/es/partners/country/69-spain")
+    html=fetch("https://www.odoo.com/es/partners")
     if html:
         soup=BeautifulSoup(html,"html.parser")
         # Buscar cards de partners con su web externa
@@ -239,13 +239,13 @@ def scrape_partners():
             if name and 5<len(name)<70:
                 d = domain_from_url(web) if web else ""
                 all_p.append({"name":name,"competitor":"Odoo","url":web or "https://www.odoo.com/es/partners","domain":d})
-        # Fallback: links externos en la página
+        # Fallback: links de páginas de country o partner (no genéricos)
         if not all_p:
             for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*odoo.com)")):
                 t=a.get_text(strip=True)
                 h=a.get("href","")
                 d=domain_from_url(h)
-                if 5<len(t)<70 and d and not should_skip(d):
+                if 5<len(t)<70 and d and not should_skip(d) and any(k in h for k in ["country","partner","reseller"]):
                     all_p.append({"name":t,"competitor":"Odoo","url":h,"domain":d})
     print(f"    Odoo partners: {len(all_p)}")
 
