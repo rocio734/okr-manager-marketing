@@ -957,15 +957,19 @@ function _renderCrmRows(crm) {
   ).join('');
 }
 
+let _fetchController = null;
+
 function setPeriod(p, btn) {
+  if (_fetchController) _fetchController.abort();
+  _fetchController = new AbortController();
   document.querySelectorAll('.ps-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const loader = document.getElementById('api-loading');
   loader.classList.add('vis');
-  fetch(DASHBOARD_API + '/api/metrics?period=' + p)
+  fetch(DASHBOARD_API + '/api/metrics?period=' + p, { signal: _fetchController.signal })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(data => { loader.classList.remove('vis'); applyMetrics(data); })
-    .catch(err => { loader.classList.remove('vis'); console.error('Dashboard API:', err); });
+    .catch(err => { if (err.name !== 'AbortError') { loader.classList.remove('vis'); console.error('Dashboard API:', err); } });
 }
 </script>
 </body>
