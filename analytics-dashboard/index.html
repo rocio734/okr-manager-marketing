@@ -431,46 +431,37 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
   </div>
 
   <div class="sl">Embudo real de calidad</div>
-  <p class="sd">De los 45 leads, solo una fracción tiene potencial comercial real.</p>
-  <div class="funnel">
+  <p class="sd" id="crm-funnel-desc">De los 45 leads, solo una fracción tiene potencial comercial real.</p>
+  <div class="funnel" id="crm-funnel">
     <div class="funnel-step">
       <div class="funnel-label">Leads totales</div>
       <div class="funnel-bar-wrap"><div class="funnel-bar bar-cl" style="width:100%">45</div></div>
       <div class="funnel-val">45</div>
     </div>
     <div class="funnel-step">
-      <div class="funnel-label">Buscan trabajo / spam</div>
-      <div class="funnel-bar-wrap"><div class="funnel-bar bar-es" style="width:48.9%">22 descartados</div></div>
-      <div class="funnel-val" style="color:#E24B4A">-22</div>
+      <div class="funnel-label">Descartados (no cualificados)</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-es" style="width:80%">36 descartados</div></div>
+      <div class="funnel-val" style="color:#E24B4A">-36</div>
     </div>
     <div class="funnel-step">
-      <div class="funnel-label">Malentendido del anuncio</div>
-      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:13.3%;background:#EDA100">6 descartados</div></div>
-      <div class="funnel-val" style="color:#EDA100">-6</div>
-    </div>
-    <div class="funnel-step">
-      <div class="funnel-label">Sin respuesta / no contactables</div>
-      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:17.8%;background:#888">8 descartados</div></div>
-      <div class="funnel-val" style="color:#888">-8</div>
-    </div>
-    <div class="funnel-step">
-      <div class="funnel-label">Leads con conversación activa</div>
+      <div class="funnel-label">Leads activos</div>
       <div class="funnel-bar-wrap"><div class="funnel-bar bar-ar" style="width:20%">9 activos</div></div>
       <div class="funnel-val">9</div>
     </div>
     <div class="funnel-step">
-      <div class="funnel-label">Con oportunidad real</div>
-      <div class="funnel-bar-wrap"><div class="funnel-bar bar-pm" style="width:8.9%">4 (MQL+SQL)</div></div>
-      <div class="funnel-val" style="color:#1BAF7A">4</div>
+      <div class="funnel-label">IQL — interés confirmado</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:18%;background:#4A90D9">8 IQL</div></div>
+      <div class="funnel-val">8</div>
     </div>
     <div class="funnel-step">
-      <div class="funnel-label">Demo agendada</div>
-      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2.2%;background:#FFD700;min-width:80px">1</div></div>
-      <div class="funnel-val" style="color:#1BAF7A">1</div>
+      <div class="funnel-label">Con oportunidad real (MQL+SQL)</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-pm" style="width:9%">4 (MQL+SQL)</div></div>
+      <div class="funnel-val" style="color:#1BAF7A">4</div>
     </div>
   </div>
 
   <div class="sl">Motivos de descarte</div>
+  <p class="sd" style="font-size:11px;color:#888;margin-bottom:4px">Análisis del último ciclo diario — el CRM no expone motivo de descarte por API.</p>
   <div class="chart-wrap" style="height:200px"><canvas id="descartePie"></canvas></div>
 
   <div class="sl">⚠️ Problema crítico — malentendido del anuncio</div>
@@ -506,10 +497,10 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 
   <div class="sl">Coste real por calidad de lead</div>
   <div class="roi-grid">
-    <div class="roi-card"><p class="roi-title">Coste por lead total</p><p class="roi-val">€26.68</p><p class="roi-sub">€1.200 ÷ 45 leads</p></div>
-    <div class="roi-card"><p class="roi-title">Coste por lead no-basura</p><p class="roi-val">€52.19</p><p class="roi-sub">€1.200 ÷ 23 leads con empresa real</p></div>
-    <div class="roi-card"><p class="roi-title">Coste por IQL</p><p class="roi-val">€66.69</p><p class="roi-sub">€1.200 ÷ 18 IQL</p></div>
-    <div class="roi-card best"><p class="roi-title">Coste por MQL+SQL</p><p class="roi-val">€240</p><p class="roi-sub">€1.200 ÷ 5 leads cualificados</p></div>
+    <div class="roi-card"><p class="roi-title">Coste por lead total</p><p class="roi-val" data-ws="_crm_cpl_total">€26</p><p class="roi-sub">Gasto Ads ÷ leads totales CRM</p></div>
+    <div class="roi-card"><p class="roi-title">Coste por lead (Google Ads)</p><p class="roi-val" data-ws="ads_cpconv_curr">€52.19</p><p class="roi-sub">Gasto Ads ÷ conversiones reportadas</p></div>
+    <div class="roi-card"><p class="roi-title">Coste por IQL</p><p class="roi-val" data-ws="_crm_cpl_iql">€66</p><p class="roi-sub">Gasto Ads ÷ leads con interés confirmado</p></div>
+    <div class="roi-card best"><p class="roi-title">Coste por MQL+SQL</p><p class="roi-val" data-ws="_crm_cpl_qualified">€240</p><p class="roi-sub">Gasto Ads ÷ leads cualificados (MQL+SQL)</p></div>
   </div>
 
   <div class="insight yellow"><strong>El coste real por oportunidad cualificada (MQL+SQL) es €240.</strong> Google Ads reporta €52/conversión pero eso incluye todos los formularios, incluyendo los de personas que buscan trabajo. El coste real por lead que merece seguimiento comercial es casi 5 veces más alto.</div>
@@ -767,6 +758,10 @@ const WS_MAP = {
   // Header
   header_period:       {path:'_header_period', fmt:'str'},
   footer_date:         {path:'_footer_date',   fmt:'str'},
+  // CRM computed quality costs (derived in _buildData)
+  _crm_cpl_total:      {path:'_crm_cpl_total',     fmt:'eur0'},
+  _crm_cpl_iql:        {path:'_crm_cpl_iql',       fmt:'eur0'},
+  _crm_cpl_qualified:  {path:'_crm_cpl_qualified',  fmt:'eur0'},
 };
 
 // Delta pairs: wsKey_curr → wsKey_prev
@@ -823,11 +818,21 @@ function _pct(curr, prev, higherIsBetter) {
   return {d, cls: d > 0.5 ? (higherIsBetter ? 'up' : 'down') : d < -0.5 ? (higherIsBetter ? 'down' : 'up') : 'neu'};
 }
 
-function _buildData(data, period) {
+function _buildData(data) {
   data._header_period = data.date_from + ' – ' + data.date_to + ' vs. ' + data.date_from_prev + ' – ' + data.date_to_prev;
   const _months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const [_d, _m, _y] = (data.date_to || '').split('/');
   data._footer_date = _d ? `${parseInt(_d)} de ${_months[parseInt(_m)-1]} de ${_y}` : data.date_to;
+  // Compute CRM quality cost breakdowns from existing data
+  if (data.ads && data.crm) {
+    const spend = data.ads.cost_curr || 0;
+    const total = data.crm.total || 0;
+    const iql = data.crm.iql || 0;
+    const qualified = (data.crm.mql || 0) + (data.crm.sql || 0);
+    data._crm_cpl_total     = total > 0 ? spend / total : null;
+    data._crm_cpl_iql       = iql > 0   ? spend / iql   : null;
+    data._crm_cpl_qualified = qualified > 0 ? spend / qualified : null;
+  }
   return data;
 }
 
@@ -883,6 +888,7 @@ function applyMetrics(data) {
   try { _renderPageBars(data.pages); } catch(e) { console.error('renderPageBars:', e); }
   try { _renderPageQuality(data.pages_quality); } catch(e) { console.error('renderPageQuality:', e); }
   try { _renderCrmRows(data.crm); } catch(e) { console.error('renderCrmRows:', e); }
+  try { _renderCrmFunnel(data.crm); } catch(e) { console.error('renderCrmFunnel:', e); }
 
   // 4. CRM subtitle via data-ws
   // Already handled by scalar update above
@@ -969,6 +975,47 @@ function _renderCrmRows(crm) {
   tbody.innerHTML = crm.pipeline.map(l =>
     `<tr><td><strong>${l.name||'—'}</strong></td><td>${l.company}</td><td>${l.country}</td><td>${_clsBadge(l.cls,l.status)}</td><td style="font-size:11px;color:#666">${l.description}</td></tr>`
   ).join('');
+}
+
+function _renderCrmFunnel(crm) {
+  const el = document.getElementById('crm-funnel');
+  const desc = document.getElementById('crm-funnel-desc');
+  if (!el || !crm) return;
+  const N = new Intl.NumberFormat('es-ES');
+  const total     = crm.total   || 0;
+  const dead      = crm.dead    || 0;
+  const active    = crm.active  || 0;
+  const iql       = crm.iql     || 0;
+  const qualified = (crm.mql || 0) + (crm.sql || 0);
+  const w = v => total > 0 ? Math.max(Math.round(v / total * 100), 3) : 3;
+  if (desc) desc.textContent = `De los ${N.format(total)} leads captados, solo una fracción tiene potencial comercial real.`;
+  el.innerHTML = `
+    <div class="funnel-step">
+      <div class="funnel-label">Leads totales</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-cl" style="width:100%">${N.format(total)}</div></div>
+      <div class="funnel-val">${N.format(total)}</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Descartados (no cualificados)</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-es" style="width:${w(dead)}%">${N.format(dead)} descartados</div></div>
+      <div class="funnel-val" style="color:#E24B4A">-${N.format(dead)}</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Leads activos</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-ar" style="width:${w(active)}%">${N.format(active)} activos</div></div>
+      <div class="funnel-val">${N.format(active)}</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">IQL — interés confirmado</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${w(iql)}%;background:#4A90D9">${N.format(iql)} IQL</div></div>
+      <div class="funnel-val">${N.format(iql)}</div>
+    </div>
+    <div class="funnel-step">
+      <div class="funnel-label">Con oportunidad real (MQL+SQL)</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar bar-pm" style="width:${w(qualified)}%">${N.format(qualified)} (MQL+SQL)</div></div>
+      <div class="funnel-val" style="color:#1BAF7A">${N.format(qualified)}</div>
+    </div>
+  `;
 }
 
 let _fetchController = null;
