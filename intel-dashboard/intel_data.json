@@ -1,0 +1,39 @@
+{
+  "comp_hashes": {
+    "odoo": "b00207f7447c",
+    "sap": "1fe4fbdecd28",
+    "holded": "ce2e41bac300"
+  },
+  "changes_history": [],
+  "leads_history": [],
+  "prices": {
+    "odoo": {
+      "basic": "—",
+      "mid": "—",
+      "advanced": "—",
+      "publishes": false
+    },
+    "sap": {
+      "basic": "—",
+      "mid": "—",
+      "advanced": "—",
+      "publishes": false
+    },
+    "holded": {
+      "basic": "€2/mes",
+      "mid": "€30/mes",
+      "advanced": "€199/mes",
+      "publishes": true
+    }
+  },
+  "features": {
+    "odoo": [],
+    "sap": [
+      "Obtenga un mayor control sobre su negocio o subsidiaria",
+      "Navegar por las olas de la industria marÃ­tima"
+    ],
+    "holded": [
+      "Factura electrónica obligatoria: ¿quién deberá hacerla?"
+    ]
+  }
+}

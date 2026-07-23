@@ -1,0 +1,41 @@
+name: Etendo Intelligence — Actualización diaria
+
+on:
+  schedule:
+    - cron: '30 6 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install requests beautifulsoup4 cryptography
+
+      - name: Ejecutar script
+        env:
+          GOOGLE_API_KEY:              ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CSE_ID:               ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_MAPS_API_KEY:         ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          GOOGLE_SHEET_ID:             ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          HUNTER_API_KEY:              ${{ secrets.HUNTER_API_KEY }}
+          APOLLO_API_KEY:              ${{ secrets.APOLLO_API_KEY }}
+        run: cd intel-dashboard && python fetch_intel.py
+
+      - name: Commit y push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add intel-dashboard/index.html intel-dashboard/intel_data.json
+          git diff --staged --quiet || git commit -m "Intelligence $(date +'%Y-%m-%d %H:%M UTC')"
+          git push
