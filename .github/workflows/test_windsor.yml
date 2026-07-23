@@ -14,5 +14,7 @@ jobs:
       - run: pip install requests
       - name: Run field tests
         env:
-          WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
-        run: python test_windsor_pages.py
+          ETENDO_BASE_URL: ${{ secrets.ETENDO_BASE_URL }}
+          ETENDO_USERNAME: ${{ secrets.ETENDO_USERNAME }}
+          ETENDO_PASSWORD: ${{ secrets.ETENDO_PASSWORD }}
+        run: python test_crm_fields.py
