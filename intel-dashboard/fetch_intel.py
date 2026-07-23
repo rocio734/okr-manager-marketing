@@ -15,7 +15,7 @@ Persistencia:
   - Google Sheets (acumulativo, permanente)
 
 Secrets necesarios:
-  GOOGLE_API_KEY, GOOGLE_CSE_ID, GOOGLE_MAPS_API_KEY
+  BRAVE_API_KEY, GOOGLE_MAPS_API_KEY
   GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_JSON
   HUNTER_API_KEY, APOLLO_API_KEY
 """
@@ -27,9 +27,8 @@ REPO_DIR  = Path(__file__).parent
 HTML_FILE = REPO_DIR / "index.html"
 DATA_FILE = REPO_DIR / "intel_data.json"
 
-GOOGLE_API_KEY  = os.environ.get("GOOGLE_API_KEY","")
-GOOGLE_CSE_ID   = os.environ.get("GOOGLE_CSE_ID","")
-GOOGLE_MAPS_KEY = os.environ.get("GOOGLE_MAPS_API_KEY","") or GOOGLE_API_KEY
+BRAVE_API_KEY   = os.environ.get("BRAVE_API_KEY","")
+GOOGLE_MAPS_KEY = os.environ.get("GOOGLE_MAPS_API_KEY","")
 GOOGLE_SHEET_ID = os.environ.get("GOOGLE_SHEET_ID","")
 GOOGLE_SA_JSON  = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON","")
 HUNTER_KEY      = os.environ.get("HUNTER_API_KEY","")
@@ -129,14 +128,16 @@ def should_skip(domain):
     return not domain or any(s in domain for s in SKIP_DOMAINS)
 
 # ── APIs ────────────────────────────────────────────────────────────────────
-def google_search(query, num=5):
-    if not GOOGLE_API_KEY or not GOOGLE_CSE_ID: return []
+def brave_search(query, num=5):
+    if not BRAVE_API_KEY: return []
     try:
-        r=requests.get("https://www.googleapis.com/customsearch/v1",params={"key":GOOGLE_API_KEY,"cx":GOOGLE_CSE_ID,"q":query,"num":num,"gl":"es","hl":"es"},timeout=15)
+        r=requests.get("https://api.search.brave.com/res/v1/web/search",
+            headers={"Accept":"application/json","Accept-Encoding":"gzip","X-Subscription-Token":BRAVE_API_KEY},
+            params={"q":query,"count":min(num,20),"country":"es","search_lang":"es","text_decorations":0},timeout=15)
         r.raise_for_status()
-        return [{"title":i.get("title",""),"url":i.get("link",""),"snippet":i.get("snippet","")} for i in r.json().get("items",[])]
+        return [{"title":i.get("title",""),"url":i.get("url",""),"snippet":i.get("description","")} for i in r.json().get("web",{}).get("results",[])]
     except Exception as e:
-        print(f"    ⚠️ Google Search: {e}")
+        print(f"    ⚠️ Brave Search: {e}")
         return []
 
 def apollo_companies():
@@ -270,14 +271,14 @@ def scrape_partners():
     print(f"    Holded partners: {holded_count}")
 
     # SAP partners via Google
-    sap_results=google_search('"partner SAP Business One" España consultor implementador', num=5)
+    sap_results=brave_search('"partner SAP Business One" España consultor implementador', num=5)
     for r in sap_results:
         d=domain_from_url(r["url"])
         if d and not should_skip(d) and "sap.com" not in d:
             all_p.append({"name":r["title"].split("|")[0].strip(),"competitor":"SAP","url":r["url"],"domain":d})
 
     # Sage partners via Google
-    sage_results=google_search('"partner Sage" España consultor ERP autorizado', num=5)
+    sage_results=brave_search('"partner Sage" España consultor ERP autorizado', num=5)
     for r in sage_results:
         d=domain_from_url(r["url"])
         if d and not should_skip(d) and "sage.com" not in d:
@@ -325,13 +326,13 @@ def search_all_leads(data):
     # 1. Google Custom Search
     print("  [1/4] Google Search...")
     for s in LEAD_SEARCHES:
-        for r in google_search(s["query"],num=5):
+        for r in brave_search(s["query"],num=5):
             d=domain_from_url(r["url"])
             if d in seen or should_skip(d): continue
             co=r["title"].split("|")[0].split("-")[0].strip()
             if len(co)>60: co=d
             txt=r["title"]+r["snippet"]
-            lead=make_lead(co,d,detect_sector(txt),s["signal"],s["signal_label"],s["signal_class"],r["url"],r["snippet"],score_lead(txt.lower(),s["signal"]),"google_search")
+            lead=make_lead(co,d,detect_sector(txt),s["signal"],s["signal_label"],s["signal_class"],r["url"],r["snippet"],score_lead(txt.lower(),s["signal"]),"brave_search")
             new.append(lead); seen.add(d)
 
     # 2. Apollo empresas
@@ -375,7 +376,7 @@ def search_all_leads(data):
     for p in raw_partners:
         d=p.get("domain","")
         if not d:
-            res=google_search(f'"{p["name"]}" España ERP consultoría',num=1)
+            res=brave_search(f'"{p["name"]}" España ERP consultoría',num=1)
             if res: d=domain_from_url(res[0]["url"])
         if not d or d in seen or should_skip(d): continue
         lead=make_lead(p["name"],d,"Consultoría ERP","partner",f"Partner {p['competitor']}","s-par",p.get("url",f"https://{d}"),f"Partner certificado de {p['competitor']} en España",2,"partner_scraping")
@@ -445,7 +446,7 @@ def inject(html,mid,val):
     return new
 
 def src_badge(st):
-    return {"google_search":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#E6F1FB;color:#0C447C">Google</span>',"apollo":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EEEDFE;color:#3C3489">Apollo</span>',"google_maps":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EAF3DE;color:#27500A">Maps</span>',"partner_scraping":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#FAEEDA;color:#633806">Partner</span>',"selection":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EEEDFE;color:#3C3489">Selección</span>'}.get(st,"")
+    return {"brave_search":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#E6F1FB;color:#0C447C">Brave</span>',"apollo":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EEEDFE;color:#3C3489">Apollo</span>',"google_maps":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EAF3DE;color:#27500A">Maps</span>',"partner_scraping":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#FAEEDA;color:#633806">Partner</span>',"selection":'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EEEDFE;color:#3C3489">Selección</span>'}.get(st,"")
 
 def render_comp_cards(results,data):
     html=""
