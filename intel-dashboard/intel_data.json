@@ -1,11 +1,39 @@
 {
   "comp_hashes": {
-    "odoo": "83981fb6f3a0",
-    "sap": "00dd480a6a9f",
-    "holded": "29fb01fc400e",
-    "sage": "8ed9d1c68334"
+    "odoo": "4461dce50858",
+    "sap": "442b8800b6f1",
+    "holded": "3514ecfb9262",
+    "sage": "249d54ef8321"
   },
   "changes_history": [
+    {
+      "date": "24/07/2026",
+      "competitor": "Sage",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sage.com/es-es/erp/"
+    },
+    {
+      "date": "24/07/2026",
+      "competitor": "Holded",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.holded.com"
+    },
+    {
+      "date": "24/07/2026",
+      "competitor": "SAP Business One",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sap.com/spain/products/erp/business-one.html"
+    },
+    {
+      "date": "24/07/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "23/07/2026",
       "competitor": "Sage",
@@ -594,7 +622,10 @@
   },
   "features": {
     "odoo": [],
-    "sap": [],
+    "sap": [
+      "Obtenga un mayor control sobre su negocio o subsidiaria",
+      "Navegar por las olas de la industria marítima"
+    ],
     "holded": [
       "Factura electrónica obligatoria: ¿quién deberá hacerla?"
     ],
