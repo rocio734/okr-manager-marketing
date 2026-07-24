@@ -156,16 +156,23 @@ def clean(html_or_page):
     for t in soup(["script","style","nav","footer","header"]): t.decompose()
     return " ".join(soup.get_text().split())[:5000]
 
+PLAN_KEYWORDS = ["básico","esencial","starter","estándar","profesional","pro","business","enterprise","premium","plus","advanced","basic","standard","free","gratis"]
+
 def extract_prices(html_or_page):
     html = html_or_page if isinstance(html_or_page, str) else (getattr(html_or_page, 'html_content', '') or '')
-    p = {"basic":"—","mid":"—","advanced":"—","publishes":False}
-    found = re.findall(r'(\d+[\.,]?\d*)\s*€\s*(?:/\s*(?:mes|month|usuario|user))?', BeautifulSoup(html,"html.parser").get_text(), re.I)
+    soup = BeautifulSoup(html,"html.parser")
+    p = {"tiers":[],"publishes":False}
+    found = re.findall(r'(\d+[\.,]?\d*)\s*€\s*(?:/\s*(?:mes|month|usuario|user|usr))?', soup.get_text(), re.I)
+    plan_names = []
+    for tag in soup.find_all(["h1","h2","h3","h4","th","strong","b","span"],limit=50):
+        t = tag.get_text(strip=True)
+        if 2 < len(t) < 35 and any(k in t.lower() for k in PLAN_KEYWORDS):
+            if t not in plan_names: plan_names.append(t)
     if found:
         p["publishes"] = True
-        u = sorted(set(float(x.replace(",",".")) for x in found if float(x.replace(",","."))>0))
-        if u: p["basic"] = f"€{u[0]:.0f}/mes"
-        if len(u)>1: p["mid"] = f"€{u[len(u)//2]:.0f}/mes"
-        if len(u)>2: p["advanced"] = f"€{u[-1]:.0f}/mes"
+        u = sorted(set(float(x.replace(",",".")) for x in found if 0 < float(x.replace(",",".")) < 50000))
+        labels = plan_names[:len(u)] if plan_names else [f"Plan {i+1}" for i in range(len(u))]
+        p["tiers"] = [{"label":labels[i] if i<len(labels) else f"Plan {i+1}", "price":f"€{v:.0f}/mes"} for i,v in enumerate(u[:4])]
     return p
 
 def extract_features(html_or_page):
@@ -787,11 +794,16 @@ def render_comp_cards(results,data):
         ch=cr["change"]
         badge={"changed":"⚠️ Cambio","new":"Primera visita","none":"Sin cambios","error":"Sin acceso"}
         bcls={"changed":"warn","new":"ok","none":"ok","error":"no"}
-        feats="".join(f'<div class="crow">• {x}</div>' for x in f) or '<div class="crow" style="color:var(--text-muted)">Sin novedades</div>'
-        ps=f"{p.get('basic','—')} · {p.get('mid','—')} · {p.get('advanced','—')}" if p.get("publishes") else "No publica precios"
+        feats="".join(f'<div class="crow">• {x}</div>' for x in f) or '<div class="crow" style="color:var(--text-muted)">Sin novedades detectadas</div>'
+        tiers = p.get("tiers",[])
+        if tiers:
+            tiers_html = "".join(f'<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:4px;background:var(--gb);font-size:11px"><b>{t["label"]}</b> {t["price"]}</span>' for t in tiers)
+            ps_html = f'<div class="crow">Precios públicos:<br>{tiers_html}</div>'
+        else:
+            ps_html = '<div class="crow" style="color:var(--text-muted)">Precio a consulta — sin tarifa pública</div>'
         bdr=' style="border-color:#EDA100"' if ch=="changed" else ""
         hbg=' style="background:#FAEEDA22"' if ch=="changed" else ""
-        html+=f'<div class="ccard"{bdr}><div class="chead"{hbg}><div><p class="cname">{c["name"]}</p><p class="curl">{c["url"].replace("https://","")}</p></div><span class="pill {bcls[ch]}">{badge[ch]}</span></div><div class="cbody"><div class="crow">Precios: <b>{ps}</b></div>{feats}<div class="crow" style="color:var(--text-muted)">Revisado: {TODAY}</div></div></div>'
+        html+=f'<div class="ccard"{bdr}><div class="chead"{hbg}><div><p class="cname">{c["name"]}</p><p class="curl">{c["url"].replace("https://","")}</p></div><span class="pill {bcls[ch]}">{badge[ch]}</span></div><div class="cbody">{ps_html}{feats}<div class="crow" style="color:var(--text-muted)">Revisado: {TODAY}</div></div></div>'
     return html
 
 def render_changes(data):

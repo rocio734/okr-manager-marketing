@@ -1773,27 +1773,32 @@
   ],
   "prices": {
     "odoo": {
-      "basic": "—",
-      "mid": "—",
-      "advanced": "—",
+      "tiers": [],
       "publishes": false
     },
     "sap": {
-      "basic": "—",
-      "mid": "—",
-      "advanced": "—",
+      "tiers": [],
       "publishes": false
     },
     "holded": {
-      "basic": "€2/mes",
-      "mid": "€30/mes",
-      "advanced": "€199/mes",
+      "tiers": [
+        {
+          "label": "Básico",
+          "price": "€2/mes"
+        },
+        {
+          "label": "Estándar",
+          "price": "€30/mes"
+        },
+        {
+          "label": "Avanzado",
+          "price": "€199/mes"
+        }
+      ],
       "publishes": true
     },
     "sage": {
-      "basic": "—",
-      "mid": "—",
-      "advanced": "—",
+      "tiers": [],
       "publishes": false
     }
   },
