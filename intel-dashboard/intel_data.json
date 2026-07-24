@@ -3,9 +3,16 @@
     "odoo": "4461dce50858",
     "sap": "442b8800b6f1",
     "holded": "3514ecfb9262",
-    "sage": "249d54ef8321"
+    "sage": "36b0a8f09162"
   },
   "changes_history": [
+    {
+      "date": "24/07/2026",
+      "competitor": "Sage",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sage.com/es-es/erp/"
+    },
     {
       "date": "24/07/2026",
       "competitor": "Sage",
