@@ -58,11 +58,20 @@ COMPETITORS = [
     {"name":"Sage","id":"sage","url":"https://www.sage.com/es-es/erp/","pricing_url":"https://www.sage.com/es-es/erp/","blog_url":"https://www.sage.com/es-es/blog/","partners_url":"https://www.sage.com/es-es/partners/find-a-partner/"},
 ]
 
+_DOW   = datetime.date.today().weekday()   # 0=Lun … 4=Vie
+_YEAR  = datetime.date.today().year
+_CITIES = ["Madrid","Barcelona","Valencia","Bilbao","Sevilla","Zaragoza","Málaga"]
+_SECTORS = ["industrial","logística","construcción","alimentación","tecnología"]
+_CITY   = _CITIES[_DOW % len(_CITIES)]
+_SECTOR = _SECTORS[_DOW % len(_SECTORS)]
+
 LEAD_SEARCHES = [
-    {"query":'"implementar ERP" OR "implantar ERP" España pyme 2025 OR 2026',"signal":"erp","signal_label":"Busca ERP","signal_class":"s-erp"},
-    {"query":'"migrar de Odoo" OR "migrar de Sage" OR "migrar de SAP" España empresa',"signal":"migrate","signal_label":"Migración ERP","signal_class":"s-mig"},
-    {"query":'"partner ERP" OR "consultor ERP" España selección proveedor pyme',"signal":"partner","signal_label":"Busca partner","signal_class":"s-par"},
-    {"query":'"selección ERP" OR "evaluar ERP" OR "comparar ERP" España empresa 2025 OR 2026',"signal":"selection","signal_label":"Selección ERP","signal_class":"s-sel"},
+    {"query":f'"implementar ERP" OR "implantar ERP" {_CITY} empresa {_YEAR}',"signal":"erp","signal_label":"Busca ERP","signal_class":"s-erp"},
+    {"query":f'"migrar de Odoo" OR "migrar de Sage" OR "migrar de SAP" {_CITY} empresa',"signal":"migrate","signal_label":"Migración ERP","signal_class":"s-mig"},
+    {"query":f'"selección ERP" OR "evaluar ERP" OR "comparar ERP" España sector {_SECTOR}',"signal":"selection","signal_label":"Selección ERP","signal_class":"s-sel"},
+    {"query":f'"partner ERP" OR "consultor ERP" {_CITY} pyme selección',"signal":"partner","signal_label":"Busca partner","signal_class":"s-par"},
+    {"query":f'"licitación ERP" OR "concurso ERP" OR "pliego ERP" España {_YEAR}',"signal":"erp","signal_label":"Licitación ERP","signal_class":"s-erp"},
+    {"query":f'"software ERP" {_CITY} {_SECTOR} empresa presupuesto',"signal":"erp","signal_label":"Busca ERP","signal_class":"s-erp"},
 ]
 
 MAPS_SEARCHES = [
@@ -446,7 +455,7 @@ def linkedin_get_contact(company_name, domain):
 def scrape_partners():
     all_p=[]
     # Odoo partners España — extraer nombre + URL externa del partner
-    html=fetch_html("https://www.odoo.com/es/partners", dynamic=True)
+    html=fetch("https://www.odoo.com/es/partners/country/69-spain")
     if html:
         soup=BeautifulSoup(html,"html.parser")
         # Buscar cards de partners con su web externa
@@ -541,15 +550,19 @@ def scrape_competitors(data):
 # ── Búsqueda de leads ───────────────────────────────────────────────────────
 def search_all_leads(data):
     print("→ Buscando leads...")
-    new=[]; seen={l.get("domain","") for l in data["leads_history"]}
+    new=[]
+    # Dedup solo contra leads de los últimos 30 días — no contra todo el historial
+    # Esto permite que un lead vuelva a aparecer si hay señal nueva después de un mes
+    from datetime import datetime, timedelta
+    cutoff = (datetime.today() - timedelta(days=30)).strftime("%d/%m/%Y")
+    recent = [l for l in data["leads_history"] if l.get("date","") >= cutoff]
+    seen = {l.get("domain","") for l in recent}
+    print(f"  Dominios en dedup (últimos 30d): {len(seen)}")
 
-    # 1. Brave Search
-    print("  [1/4] Brave Search...")
-    brave_total=0
+    # 1. Google Custom Search
+    print(f"  [1/4] Brave Search... (ciudad hoy: {_CITY}, sector: {_SECTOR})")
     for s in LEAD_SEARCHES:
-        results=brave_search(s["query"],num=5)
-        brave_total+=len(results)
-        for r in results:
+        for r in brave_search(s["query"],num=5):
             d=domain_from_url(r["url"])
             if d in seen or should_skip(d): continue
             co=r["title"].split("|")[0].split("-")[0].strip()
@@ -557,7 +570,6 @@ def search_all_leads(data):
             txt=r["title"]+r["snippet"]
             lead=make_lead(co,d,detect_sector(txt),s["signal"],s["signal_label"],s["signal_class"],r["url"],r["snippet"],score_lead(txt.lower(),s["signal"]),"brave_search")
             new.append(lead); seen.add(d)
-    print(f"    → {brave_total} resultados Brave, {len([l for l in new if l['source_type']=='brave_search'])} nuevos")
 
     # 2. Apollo empresas
     print("  [2/4] Apollo.io...")
@@ -644,7 +656,9 @@ def search_all_leads(data):
         lead.update({"email":c.get("email","—"),"contact_name":c.get("name","—"),"contact_pos":c.get("position","—"),"phone":c.get("phone",lead.get("phone","—")),"linkedin_org":c.get("linkedin",lead.get("linkedin_org","—"))})
         if i%5==0: time.sleep(0.3)
 
-    data["leads_history"]=(new+data["leads_history"])[:300]
+    # Acumular preservando histórico — límite 500 para tener más datos
+    data["leads_history"]=(new+data["leads_history"])[:500]
+    print(f"  Total acumulado en historial: {len(data['leads_history'])}")
     return new
 
 # ── Google Sheets ───────────────────────────────────────────────────────────
