@@ -802,9 +802,10 @@ def main():
     by_src={}
     for l in new_leads: by_src[l.get("source_type","?")] = by_src.get(l.get("source_type","?"),0)+1
     html=inject(html,"generated_at",NOW); html=inject(html,"footer_date",TODAY)
-    html=inject(html,"leads_total",str(len(new_leads)))
-    html=inject(html,"leads_high",str(len([l for l in new_leads if l["score"]==3])))
-    html=inject(html,"leads_email",str(len([l for l in new_leads if l.get("email","—")!="—"])))
+    html=inject(html,"leads_total",str(len(data["leads_history"])))
+    html=inject(html,"leads_new_today",str(len(new_leads)))
+    html=inject(html,"leads_high",str(len([l for l in data["leads_history"] if l["score"]==3])))
+    html=inject(html,"leads_email",str(len([l for l in data["leads_history"] if l.get("email","—")!="—"])))
     html=inject(html,"changes_total",str(len(new_changes)))
     html=inject(html,"ALERTS",render_alerts(new_changes,new_leads))
     html=inject(html,"LEADS_PREVIEW",render_preview(new_leads))
