@@ -171,12 +171,31 @@ def extract_prices(html_or_page):
 def extract_features(html_or_page):
     html = html_or_page if isinstance(html_or_page, str) else (getattr(html_or_page, 'html_content', '') or '')
     soup = BeautifulSoup(html,"html.parser")
+    keywords = ["ia","inteligencia","nuevo","nueva","lanza","mejora","feature","agent","copilot",
+                "update","automatiz","versión","release","integra","módulo","precio","descuento",
+                "oferta","gratis","trial","prueba","partner","certif","award","fusion","adquiere","compra"]
     out=[]
-    for tag in soup.find_all(["h2","h3","h4"],limit=10):
+    for tag in soup.find_all(["h1","h2","h3","h4","title"],limit=20):
         t=tag.get_text(strip=True)
-        if len(t)>20 and any(k in t.lower() for k in ["ia","inteligencia","nuevo","nueva","lanza","mejora","feature","agent","copilot","update","automatiz"]):
+        if len(t)>15 and any(k in t.lower() for k in keywords):
             out.append(t[:120])
-    return out[:4]
+    # También extraer meta description
+    meta = soup.find("meta", attrs={"name":"description"})
+    if meta and meta.get("content",""):
+        out.insert(0, meta["content"][:120])
+    return out[:5]
+
+def brave_comp_news(comp_name):
+    queries = [
+        f'"{comp_name}" España novedad OR lanzamiento OR precio OR actualización 2026',
+        f'"{comp_name}" ERP nuevo módulo OR integración OR IA 2026',
+    ]
+    items = []
+    for q in queries:
+        for r in brave_search(q, num=3):
+            if comp_name.lower() in r.get("title","").lower() or comp_name.lower() in r.get("snippet","").lower():
+                items.append(r.get("title","")[:100])
+    return list(dict.fromkeys(items))[:4]
 
 def detect_sector(text):
     t=text.lower()
@@ -535,7 +554,10 @@ def scrape_competitors(data):
         ph2=fetch(comp["pricing_url"]) if comp["pricing_url"]!=comp["url"] else html
         prices=extract_prices(ph2 or html); data["prices"][comp["id"]]=prices
         bh=fetch(comp["blog_url"]) if comp["blog_url"]!=comp["url"] else html
-        features=extract_features(bh or html); data["features"][comp["id"]]=features
+        scraped_feats=extract_features(bh or html)
+        brave_feats=brave_comp_news(comp["name"])
+        features=list(dict.fromkeys(brave_feats+scraped_feats))[:5]
+        data["features"][comp["id"]]=features
         if changed:
             e={"date":TODAY,"competitor":comp["name"],"section":"Web principal","type":"Contenido modificado","detail":f"Cambios en {comp['url']}"}
             data["changes_history"].insert(0,e); changes.append(e)

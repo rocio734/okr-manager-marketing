@@ -215,6 +215,11 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <button class="fbtn" onclick="fl('google_maps',this,'src')">Maps</button>
     <button class="fbtn" onclick="fl('partner_scraping',this,'src')">Partners</button>
   </div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+    <input id="srch" type="text" placeholder="Buscar empresa, dominio, sector, email…" oninput="search(this.value)"
+      style="flex:1;padding:7px 12px;border:1px solid var(--gb);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);outline:none">
+    <button onclick="exportCSV()" style="padding:7px 14px;background:var(--y);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">⬇ Exportar CSV</button>
+  </div>
   <div class="tbl-wrap">
     <table class="tbl">
       <thead><tr><th>Empresa</th><th>Sector</th><th>Señal</th><th>Score</th><th>Contacto</th><th>Email</th><th>Teléfono</th><th>Web</th><th>Fuente</th><th>Fecha</th></tr></thead>
@@ -250,15 +255,44 @@ function st(id,el){
   document.getElementById(id).classList.add('on');
   el.classList.add('on');
 }
+let _activeFilter={val:'all',mode:null};
 function fl(val,el,mode){
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
+  _activeFilter={val,mode};
+  applyFilters();
+}
+function search(q){
+  document.getElementById('srch').value=q;
+  applyFilters();
+}
+function applyFilters(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const {val,mode}=_activeFilter;
   document.querySelectorAll('#ltb tr[data-s]').forEach(r=>{
-    if(val==='all') r.style.display='';
-    else if(val==='h') r.style.display=r.dataset.q==='h'?'':'none';
-    else if(mode==='src') r.style.display=r.dataset.src===val?'':'none';
-    else r.style.display=r.dataset.s===val?'':'none';
+    let show=true;
+    if(val!=='all'){
+      if(val==='h') show=r.dataset.q==='h';
+      else if(mode==='src') show=r.dataset.src===val;
+      else show=r.dataset.s===val;
+    }
+    if(show&&q) show=r.innerText.toLowerCase().includes(q);
+    r.style.display=show?'':'none';
   });
+}
+function exportCSV(){
+  const headers=['Empresa','Dominio','Sector','Señal','Score','Contacto','Email','Teléfono','Web','Fuente','Fecha'];
+  const rows=[headers];
+  document.querySelectorAll('#ltb tr[data-s]').forEach(r=>{
+    if(r.style.display==='none') return;
+    const cells=[...r.querySelectorAll('td')].map(td=>td.innerText.replace(/\n/g,' ').trim());
+    rows.push(cells);
+  });
+  const csv=rows.map(r=>r.map(c=>'"'+c.replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
+  a.download='etendo_intel_leads.csv';
+  a.click();
 }
 </script>
 </body>
