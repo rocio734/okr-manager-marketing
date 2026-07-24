@@ -455,7 +455,7 @@ def linkedin_get_contact(company_name, domain):
 def scrape_partners():
     all_p=[]
     # Odoo partners España — extraer nombre + URL externa del partner
-    html=fetch("https://www.odoo.com/es/partners/country/69-spain")
+    html=fetch_html("https://www.odoo.com/es/partners", dynamic=True)
     if html:
         soup=BeautifulSoup(html,"html.parser")
         # Buscar cards de partners con su web externa
@@ -467,11 +467,13 @@ def scrape_partners():
             if name and 5<len(name)<70:
                 d = domain_from_url(web) if web else ""
                 all_p.append({"name":name,"competitor":"Odoo","url":web or "https://www.odoo.com/es/partners","domain":d})
-        # Fallback: links externos en la página
+        # Fallback: links externos con "country", "partner" o "reseller" en el href
         if not all_p:
             for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*odoo.com)")):
-                t=a.get_text(strip=True)
                 h=a.get("href","")
+                if not any(k in h for k in ("country","partner","reseller")):
+                    continue
+                t=a.get_text(strip=True)
                 d=domain_from_url(h)
                 if 5<len(t)<70 and d and not should_skip(d):
                     all_p.append({"name":t,"competitor":"Odoo","url":h,"domain":d})
