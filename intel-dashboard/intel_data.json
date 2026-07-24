@@ -1,11 +1,32 @@
 {
   "comp_hashes": {
-    "odoo": "4461dce50858",
-    "sap": "00dd480a6a9f",
+    "odoo": "fd409554a1a0",
+    "sap": "442b8800b6f1",
     "holded": "3514ecfb9262",
-    "sage": "9ea55d58a2cd"
+    "sage": "3797d2a1377a"
   },
   "changes_history": [
+    {
+      "date": "24/07/2026",
+      "competitor": "Sage",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sage.com/es-es/erp/"
+    },
+    {
+      "date": "24/07/2026",
+      "competitor": "SAP Business One",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sap.com/spain/products/erp/business-one.html"
+    },
+    {
+      "date": "24/07/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "24/07/2026",
       "competitor": "Sage",
@@ -204,6 +225,24 @@
     }
   ],
   "leads_history": [
+    {
+      "company": "Consultoria SAP Business One Barcelona i Girona - GSP",
+      "domain": "gsp.es",
+      "sector": "Consultoría ERP",
+      "signal": "partner",
+      "signal_label": "Partner SAP",
+      "signal_class": "s-par",
+      "source_url": "https://gsp.es/ca/",
+      "snippet": "Partner certificado de SAP en España",
+      "score": 2,
+      "date": "24/07/2026",
+      "source_type": "partner_scraping",
+      "email": "—",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "—",
+      "linkedin_org": "—"
+    },
     {
       "company": "PARTNER ODOO OFICIAL EN ESPAÑA",
       "domain": "garber.es",
@@ -1783,16 +1822,20 @@
     "holded": {
       "tiers": [
         {
-          "label": "Básico",
+          "label": "14 días de prueba gratis",
           "price": "€2/mes"
         },
         {
-          "label": "Estándar",
-          "price": "€30/mes"
+          "label": "Básico",
+          "price": "€5/mes"
         },
         {
-          "label": "Avanzado",
-          "price": "€199/mes"
+          "label": "Estándar",
+          "price": "€8/mes"
+        },
+        {
+          "label": "Plan 4",
+          "price": "€10/mes"
         }
       ],
       "publishes": true
@@ -1804,9 +1847,9 @@
   },
   "features": {
     "odoo": [
+      "Notas de lanzamiento de Odoo | Odoo",
       "Precios de Odoo en 2026 en España: planes y costes",
       "Odoo precios 2026: licencias, costes y tarifas reales (Community y Enterprise)",
-      "Notas de lanzamiento de Odoo | Odoo",
       "Odoo CE y la Inteligencia Artificial: La Revolución que tu Empresa Necesita"
     ],
     "sap": [
