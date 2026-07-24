@@ -90,13 +90,13 @@ def _fetch(connector, fields, date_from, date_to):
     d = r.json()
     return d.get("data", d) if isinstance(d, dict) else d
 
-def fetch(connector, fields, start=30, end=0):
+def fetch(connector, fields, start=30, end=1):
     t  = datetime.today()
     df = (t - timedelta(days=start)).strftime("%Y-%m-%d")
     dt = (t - timedelta(days=end)).strftime("%Y-%m-%d")
     return _fetch(connector, fields, df, dt)
 
-def fetch_safe(connector, fields, start=30, end=0, fallback=None):
+def fetch_safe(connector, fields, start=30, end=1, fallback=None):
     """Igual que fetch pero devuelve fallback si la API retorna error."""
     try:
         return fetch(connector, fields, start, end)
