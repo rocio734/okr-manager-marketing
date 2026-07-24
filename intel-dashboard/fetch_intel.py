@@ -446,7 +446,7 @@ def linkedin_get_contact(company_name, domain):
 def scrape_partners():
     all_p=[]
     # Odoo partners España — extraer nombre + URL externa del partner
-    html=fetch("https://www.odoo.com/es/partners/country/69-spain")
+    html=fetch_html("https://www.odoo.com/es/partners", dynamic=True)
     if html:
         soup=BeautifulSoup(html,"html.parser")
         # Buscar cards de partners con su web externa
