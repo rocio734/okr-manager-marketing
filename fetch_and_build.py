@@ -423,10 +423,29 @@ kw_top = sorted(kws, key=lambda x: float(x.get("impressions") or 0), reverse=Tru
 _BRAND = ["etendo"]
 kws_nb = [k for k in kws if not any(b in (k.get("query") or "").lower() for b in _BRAND)]
 sc_nb_clicks   = int(fsum(kws_nb, "clicks"))
-# ≥50 impresiones para excluir queries de una sola aparición y nombres de empresas puntuales
+# Keywords ERP-relevantes: solo queries sobre ERP, inventario, picking, contabilidad, automatización
+# Excluye "copilot" (GitHub Copilot noise) y nombres de empresas aleatorias
+_ERP_TERMS = [
+    "erp", "enterprise resource",
+    "software empresarial", "gestión empresarial", "sistema de gestión",
+    "business software", "business management",
+    "agéntico", "agentico",
+    "factura", "facturación", "invoice",
+    "inventario", "almacén", "warehouse",
+    "contabil", "cuenta contable",
+    "automatizaci", "automation",
+    "manufactura", "manufacturing",
+    "supply chain", "cadena de suministro",
+    "picking",
+    "implementaci",
+    "open source erp",
+]
+_ERP_NOISE = ["india", " in india", ".json", "pispl", "fichier", "recruitment"]
 sc_nb_kw_top10 = len([k for k in kws_nb
                       if float(k.get("position") or 99) <= 10
-                      and float(k.get("impressions") or 0) >= 50])
+                      and float(k.get("impressions") or 0) >= 10
+                      and any(t in (k.get("query") or "").lower() for t in _ERP_TERMS)
+                      and not any(n in (k.get("query") or "").lower() for n in _ERP_NOISE)])
 
 # ── Fechas ────────────────────────────────────────────────────────────────────
 today     = datetime.today()
