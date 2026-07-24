@@ -26,6 +26,48 @@ _CRM_USER  = os.environ.get("ETENDO_USERNAME", "")
 _CRM_PASS  = os.environ.get("ETENDO_PASSWORD", "")
 _CRM_ROLE  = "8351131DFF384725AB08E06773FE6144"
 
+# ── GA4 OAuth directo (para key events reales — CPL correcto) ─────────────────
+_GA4_CLIENT_ID     = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
+_GA4_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
+_GA4_REFRESH_TOKEN = os.environ.get("GOOGLE_REFRESH_TOKEN_GA4_SC", "")
+_GA4_PROPERTY_ID   = os.environ.get("GA4_PROPERTY_ID", "353675924")
+
+def fetch_ga4_key_events(date_from_str, date_to_str):
+    """Cuenta form_submit_web directamente desde GA4 API para CPL real."""
+    if not all([_GA4_CLIENT_ID, _GA4_CLIENT_SECRET, _GA4_REFRESH_TOKEN]):
+        return 0
+    try:
+        resp = urllib.request.urlopen(urllib.request.Request(
+            "https://oauth2.googleapis.com/token",
+            data=urllib.parse.urlencode({
+                "client_id": _GA4_CLIENT_ID, "client_secret": _GA4_CLIENT_SECRET,
+                "refresh_token": _GA4_REFRESH_TOKEN, "grant_type": "refresh_token",
+            }).encode(), headers={"Content-Type": "application/x-www-form-urlencoded"}
+        ), timeout=15)
+        token = json.loads(resp.read()).get("access_token", "")
+        if not token:
+            return 0
+        body = json.dumps({
+            "dateRanges": [{"startDate": date_from_str, "endDate": date_to_str}],
+            "dimensions": [{"name": "eventName"}],
+            "metrics": [{"name": "eventCount"}],
+            "dimensionFilter": {"filter": {
+                "fieldName": "eventName",
+                "stringFilter": {"matchType": "EXACT", "value": "form_submit_web"}
+            }}
+        }).encode()
+        req = urllib.request.Request(
+            f"https://analyticsdata.googleapis.com/v1beta/properties/{_GA4_PROPERTY_ID}:runReport",
+            data=body, method="POST",
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            rows = json.loads(r.read()).get("rows", [])
+            return int(rows[0]["metricValues"][0]["value"]) if rows else 0
+    except Exception as e:
+        print(f"  ⚠️  GA4 key events error: {e}")
+        return 0
+
 def crm_login():
     body = json.dumps({"username": _CRM_USER, "password": _CRM_PASS, "role": _CRM_ROLE}).encode()
     req  = urllib.request.Request(f"{_CRM_BASE}/api/auth/login", data=body, method="POST")
@@ -159,6 +201,12 @@ scp = fetch("searchconsole", ["clicks", "impressions", "ctr", "position"],
 print("→ Keywords top 20...")
 kws = fetch("searchconsole", ["query", "clicks", "impressions", "ctr", "position"])
 
+print("→ GA4 key events (form_submit_web)...")
+_kev_from = (datetime.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+_kev_to   = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+ga4_key_events = fetch_ga4_key_events(_kev_from, _kev_to)
+print(f"  form_submit_web: {ga4_key_events}")
+
 print("→ GA4 top páginas...")
 pages_raw = fetch("googleanalytics4", ["page_path", "sessions", "bounce_rate", "average_session_duration"])
 pages_top     = sorted(pages_raw, key=lambda x: float(x.get("sessions") or 0), reverse=True)[:12]
@@ -203,6 +251,15 @@ crm_qual    = [l for l in crm_active if _lstatus(l) == "Qualified"]
 _CLASS_ORDER = {"SQL": 0, "MQL": 1, "IQL": 2}
 crm_pipeline = sorted(crm_active,
     key=lambda l: (_CLASS_ORDER.get(_lclass(l), 9), _lname(l)))
+
+# ── KRs Q3 — cálculos CRM ─────────────────────────────────────────────────────
+crm_deals_won = [l for l in crm_leads_all if _lstatus(l) in ("Converted", "Won")]
+crm_fit_yes   = [l for l in crm_leads if (l.get("strategicFit") or "") == "strategic_fit_yes"]
+_month_start  = datetime.today().replace(day=1).strftime("%Y-%m-%d")
+crm_sqls_out  = [l for l in crm_leads_all
+                 if _lclass(l) == "SQL"
+                 and "outbound" in (l.get("description") or "").lower()
+                 and (l.get("creationDate") or "")[:10] >= _month_start]
 
 # ── Agregados GA4 ─────────────────────────────────────────────────────────────
 C = dict(
@@ -249,6 +306,8 @@ AC["ctr"]    = AC["clicks"] / AC["impr"] * 100 if AC["impr"]   else 0
 AC["cpc"]    = AC["cost"]   / AC["clicks"]      if AC["clicks"] else 0
 AC["cpconv"] = AC["cost"]   / AC["conv"]        if AC["conv"]   else 0
 AC["daily"]  = AC["cost"]   / 30
+# KR: CPL real = Ads spend / GA4 key events form_submit_web
+cpl_real = AC["cost"] / ga4_key_events if ga4_key_events else AC["cpconv"]
 
 AP = dict(
     cost  = fsum(adsp, "cost"),
@@ -281,6 +340,12 @@ SP = dict(
     pos    = favg(scp, "position"),
 )
 kw_top = sorted(kws, key=lambda x: float(x.get("impressions") or 0), reverse=True)[:20]
+
+# ── KRs Q3 — non-brand SC (excluir queries con "etendo") ──────────────────────
+_BRAND = ["etendo"]
+kws_nb = [k for k in kws if not any(b in (k.get("query") or "").lower() for b in _BRAND)]
+sc_nb_clicks   = int(fsum(kws_nb, "clicks"))
+sc_nb_kw_top10 = len([k for k in kws_nb if float(k.get("position") or 99) <= 10])
 
 # ── Fechas ────────────────────────────────────────────────────────────────────
 today     = datetime.today()
@@ -414,6 +479,28 @@ def kw_rows():
         )
     return out
 
+def _kr_badge(val, baseline, target):
+    """Badge de progreso para KRs ascendentes (más = mejor)."""
+    if target <= baseline:
+        return "—"
+    pct = (val - baseline) / (target - baseline) * 100 if target != baseline else 0
+    pct = max(0, min(pct, 100))
+    if pct >= 100:
+        bg, label = "#EAF3DE;color:#3B6D11", f"✅ {pct:.0f}%"
+    elif pct >= 50:
+        bg, label = "#FFF8CC;color:#7A6000", f"🟡 {pct:.0f}%"
+    else:
+        bg, label = "#FCEBEB;color:#A32D2D", f"🔴 {pct:.0f}%"
+    return f'<span class="badge" style="background:{bg}">{label}</span>'
+
+def _kr_badge_inv(val, target):
+    """Badge para KRs descendentes (menos = mejor), como CPL."""
+    if val <= target:
+        return f'<span class="badge" style="background:#EAF3DE;color:#3B6D11">✅ €{val:.0f} &lt; €{target:.0f}</span>'
+    elif val <= target * 1.2:
+        return f'<span class="badge" style="background:#FFF8CC;color:#7A6000">🟡 €{val:.0f} / meta €{target:.0f}</span>'
+    return f'<span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 €{val:.0f} / meta €{target:.0f}</span>'
+
 def ch_val(d, key):
     """Devuelve valor de canal o '—' si no hay datos de dimensión."""
     return fmtn(d[key]) if channels_available else "—"
@@ -491,6 +578,20 @@ valores = {
     "crm_mql":     str(len(crm_mql))  if crm_ok else "—",
     "crm_sql":     str(len(crm_sql) + len(crm_qual)) if crm_ok else "—",
     "crm_cpl":     (f"€{AC['cost']/len(crm_active):.0f}" if crm_ok and crm_active else "—"),
+    # KRs Q3 — valores actuales y badges de progreso
+    "kr_sc_nb_clicks":        str(sc_nb_clicks),
+    "kr_sc_nb_clicks_badge":  _kr_badge(sc_nb_clicks, 48, 200),
+    "kr_sc_nb_kw_top10":      str(sc_nb_kw_top10),
+    "kr_sc_nb_kw_top10_badge":_kr_badge(sc_nb_kw_top10, 1, 8),
+    "kr_deals_won":           str(len(crm_deals_won)) if crm_ok else "—",
+    "kr_deals_won_badge":     _kr_badge(len(crm_deals_won), 0, 2) if crm_ok else "—",
+    "kr_fit_yes":             str(len(crm_fit_yes)) if crm_ok else "—",
+    "kr_fit_yes_badge":       _kr_badge(len(crm_fit_yes), 3, 20) if crm_ok else "—",
+    "kr_sqls_out":            str(len(crm_sqls_out)) if crm_ok else "—",
+    "kr_sqls_out_badge":      _kr_badge(len(crm_sqls_out), 0, 3) if crm_ok else "—",
+    "kr_cpl_real":            f"€{cpl_real:.0f}",
+    "kr_cpl_real_badge":      _kr_badge_inv(cpl_real, 50),
+    "kr_ga4_kev":             str(ga4_key_events),
     "crm_subtitle": (
         f"{len(crm_leads)} leads últimos 30 días · {len(crm_active)} activos · "
         f"{len(crm_dead)} descartados · Actualizado {today.strftime('%d/%m/%Y')}"

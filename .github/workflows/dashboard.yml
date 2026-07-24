@@ -27,10 +27,14 @@ jobs:
 
       - name: Generar dashboard
         env:
-          WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
-          ETENDO_BASE_URL: ${{ secrets.ETENDO_BASE_URL }}
-          ETENDO_USERNAME: ${{ secrets.ETENDO_USERNAME }}
-          ETENDO_PASSWORD: ${{ secrets.ETENDO_PASSWORD }}
+          WINDSOR_API_KEY:             ${{ secrets.WINDSOR_API_KEY }}
+          ETENDO_BASE_URL:             ${{ secrets.ETENDO_BASE_URL }}
+          ETENDO_USERNAME:             ${{ secrets.ETENDO_USERNAME }}
+          ETENDO_PASSWORD:             ${{ secrets.ETENDO_PASSWORD }}
+          GOOGLE_OAUTH_CLIENT_ID:      ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET:  ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN_GA4_SC: ${{ secrets.GOOGLE_REFRESH_TOKEN_GA4_SC }}
+          GA4_PROPERTY_ID:             ${{ secrets.GA4_PROPERTY_ID }}
         run: python fetch_and_build.py
 
       - name: Commit y push del index.html actualizado
