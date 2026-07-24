@@ -423,7 +423,10 @@ kw_top = sorted(kws, key=lambda x: float(x.get("impressions") or 0), reverse=Tru
 _BRAND = ["etendo"]
 kws_nb = [k for k in kws if not any(b in (k.get("query") or "").lower() for b in _BRAND)]
 sc_nb_clicks   = int(fsum(kws_nb, "clicks"))
-sc_nb_kw_top10 = len([k for k in kws_nb if float(k.get("position") or 99) <= 10])
+# ≥50 impresiones para excluir queries de una sola aparición y nombres de empresas puntuales
+sc_nb_kw_top10 = len([k for k in kws_nb
+                      if float(k.get("position") or 99) <= 10
+                      and float(k.get("impressions") or 0) >= 50])
 
 # ── Fechas ────────────────────────────────────────────────────────────────────
 today     = datetime.today()
