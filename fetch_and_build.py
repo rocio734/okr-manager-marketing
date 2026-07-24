@@ -261,6 +261,84 @@ crm_sqls_out  = [l for l in crm_leads_all
                  and "outbound" in (l.get("description") or "").lower()
                  and (l.get("creationDate") or "")[:10] >= _month_start]
 
+# Meetings: leads activos con keywords de reunión, actualizados este mes calendario
+MEETING_KW = ["reunión", "reunion", "llamada", "demo agend", "agendada",
+              "cita agend", "videollamada", "zoom", " teams", "sesión", "sesion",
+              "meeting", "reunid"]
+crm_meetings = ([l for l in crm_leads_all
+                 if _lstatus(l) not in _INACTIVE
+                 and any(kw in (l.get("description") or "").lower() for kw in MEETING_KW)
+                 and (l.get("updated") or "")[:10] >= _month_start]
+                if crm_ok else [])
+
+# Negociación activa: leads activos con keywords de propuesta/contrato
+NEGO_KW = ["propuesta", "contrato", "negociaci", "acuerdo", "cierre", "presupuesto"]
+crm_nego = ([l for l in crm_leads_all
+             if _lstatus(l) not in _INACTIVE
+             and any(kw in (l.get("description") or "").lower() for kw in NEGO_KW)]
+            if crm_ok else [])
+
+# Tiempo primer contacto: avg días creación→última actualización para MQL/SQL activos (30d)
+_ct_days = []
+for _l in (crm_leads if crm_ok else []):
+    if _lstatus(_l) in _INACTIVE or _lclass(_l) not in ("MQL", "SQL"):
+        continue
+    _cd = (_l.get("creationDate") or "")[:10]
+    _ud = (_l.get("updated") or "")[:10]
+    if _cd and _ud and _cd != _ud:
+        try:
+            _d = (datetime.strptime(_ud, "%Y-%m-%d") - datetime.strptime(_cd, "%Y-%m-%d")).days
+            if 0 < _d < 60:
+                _ct_days.append(_d)
+        except Exception:
+            pass
+crm_contact_time = round(sum(_ct_days) / len(_ct_days), 1) if _ct_days else None
+
+# WP: posts publicados en Q3 (desde 1 julio)
+wp_q3_posts = 0
+print("→ WordPress — posts Q3...")
+try:
+    wp_url = ("https://etendo.software/wp-json/wp/v2/posts"
+              "?after=2026-07-01T00:00:00&per_page=50&status=publish")
+    _wreq = urllib.request.Request(wp_url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(_wreq, timeout=15) as _wr:
+        wp_q3_posts = len(json.loads(_wr.read()))
+    print(f"  ✅ WP Q3 posts: {wp_q3_posts}")
+except Exception as e:
+    print(f"  ⚠️  WP Q3: {e}")
+
+# PSI: PageSpeed Insights — mobile score promedio en landings principales
+def _fetch_psi(urls):
+    scores = []
+    for url in urls:
+        try:
+            api_url = (f"https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
+                       f"?url={urllib.parse.quote(url, safe='')}&strategy=mobile"
+                       f"&fields=lighthouseResult.categories.performance.score")
+            with urllib.request.urlopen(api_url, timeout=25) as _r:
+                _d = json.loads(_r.read())
+                _s = (_d.get("lighthouseResult", {}).get("categories", {})
+                        .get("performance", {}).get("score"))
+                if _s is not None:
+                    scores.append(float(_s) * 100)
+                    print(f"  PSI {url}: {float(_s)*100:.0f}")
+                elif _d.get("error"):
+                    err_code = _d["error"].get("code", 0)
+                    print(f"  ⚠️  PSI {url} error {err_code}: {_d['error'].get('message','')[:80]}")
+                    if err_code == 429:
+                        break
+        except Exception as _e:
+            print(f"  ⚠️  PSI {url}: {_e}")
+            if "429" in str(_e) or "quota" in str(_e).lower():
+                break
+    return round(sum(scores) / len(scores)) if scores else None
+
+_PSI_URLS = ["https://etendo.software/", "https://etendo.software/etendo-go/",
+             "https://etendo.software/etendo-next/", "https://etendo.software/copilot/"]
+print("→ PageSpeed Insights (mobile)...")
+psi_score = _fetch_psi(_PSI_URLS)
+print(f"  PSI score avg: {psi_score}")
+
 # ── Agregados GA4 ─────────────────────────────────────────────────────────────
 C = dict(
     sessions  = fsum(ga4c, "sessions"),
@@ -501,6 +579,26 @@ def _kr_badge_inv(val, target):
         return f'<span class="badge" style="background:#FFF8CC;color:#7A6000">🟡 €{val:.0f} / meta €{target:.0f}</span>'
     return f'<span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 €{val:.0f} / meta €{target:.0f}</span>'
 
+def _kr_badge_days(val, target):
+    """Badge para tiempo en días (menor = mejor)."""
+    if val is None:
+        return "—"
+    if val <= target:
+        return f'<span class="badge" style="background:#EAF3DE;color:#3B6D11">✅ {val:.1f}d ≤ {target}d</span>'
+    elif val <= target * 3:
+        return f'<span class="badge" style="background:#FFF8CC;color:#7A6000">🟡 {val:.1f}d / meta &lt;{target}d</span>'
+    return f'<span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 {val:.1f}d / meta &lt;{target}d</span>'
+
+def _kr_badge_psi(score):
+    """Badge para score PageSpeed (mayor = mejor, meta ≥80)."""
+    if score is None:
+        return '<span class="badge" style="background:#F5F5F5;color:#666">— sin datos</span>'
+    if score >= 80:
+        return f'<span class="badge" style="background:#EAF3DE;color:#3B6D11">✅ {score:.0f}/100</span>'
+    elif score >= 60:
+        return f'<span class="badge" style="background:#FFF8CC;color:#7A6000">🟡 {score:.0f}/100 / meta ≥80</span>'
+    return f'<span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 {score:.0f}/100 / meta ≥80</span>'
+
 def ch_val(d, key):
     """Devuelve valor de canal o '—' si no hay datos de dimensión."""
     return fmtn(d[key]) if channels_available else "—"
@@ -592,6 +690,21 @@ valores = {
     "kr_cpl_real":            f"€{cpl_real:.0f}",
     "kr_cpl_real_badge":      _kr_badge_inv(cpl_real, 50),
     "kr_ga4_kev":             str(ga4_key_events),
+    # KRs Q3 — 7 adicionales
+    "kr_psi_score":           (f"{psi_score:.0f}/100" if psi_score is not None else "—"),
+    "kr_psi_score_badge":     _kr_badge_psi(psi_score),
+    "kr_meetings":            str(len(crm_meetings)) if crm_ok else "—",
+    "kr_meetings_badge":      _kr_badge(len(crm_meetings), 0, 5) if crm_ok else "—",
+    "kr_nego":                str(len(crm_nego)) if crm_ok else "—",
+    "kr_nego_badge":          _kr_badge(len(crm_nego), 0, 3) if crm_ok else "—",
+    "kr_contact_time":        (f"{crm_contact_time:.1f}d" if crm_contact_time is not None else "—") if crm_ok else "—",
+    "kr_contact_time_badge":  (_kr_badge_days(crm_contact_time, 2) if crm_contact_time is not None else "—") if crm_ok else "—",
+    "kr_wp_pilar":            str(wp_q3_posts),
+    "kr_wp_pilar_badge":      _kr_badge(wp_q3_posts, 0, 6),
+    "kr_social_impr":         "—",   # LinkedIn/IG — sin API disponible aún
+    "kr_social_impr_badge":   '<span class="badge" style="background:#F5F5F5;color:#666">manual</span>',
+    "kr_posts_week":          "—",   # Seguimiento manual
+    "kr_posts_week_badge":    '<span class="badge" style="background:#F5F5F5;color:#666">manual</span>',
     "crm_subtitle": (
         f"{len(crm_leads)} leads últimos 30 días · {len(crm_active)} activos · "
         f"{len(crm_dead)} descartados · Actualizado {today.strftime('%d/%m/%Y')}"

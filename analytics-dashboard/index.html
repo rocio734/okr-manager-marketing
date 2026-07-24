@@ -420,7 +420,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
     <div class="kpi"><p class="kpi-label">Leads totales</p><p class="kpi-def">Registrados en el CRM</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_total"><!-- WS:crm_total -->48<!-- /WS:crm_total --></span></div></div>
     <div class="kpi"><p class="kpi-label">Descartados (Dead)</p><p class="kpi-def">Leads que no son potenciales clientes</p><div class="kpi-row"><span class="kpi-val" style="color:#E24B4A" data-ws="crm_dead"><!-- WS:crm_dead -->37<!-- /WS:crm_dead --></span></div></div>
     <div class="kpi"><p class="kpi-label">Activos</p><p class="kpi-def">Leads no descartados ni cerrados</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_active"><!-- WS:crm_active -->11<!-- /WS:crm_active --></span></div></div>
-    <div class="kpi"><p class="kpi-label">IQL</p><p class="kpi-def">Interés básico detectado</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_iql"><!-- WS:crm_iql -->9<!-- /WS:crm_iql --></span></div></div>
+    <div class="kpi"><p class="kpi-label">IQL</p><p class="kpi-def">Interés básico detectado</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_iql"><!-- WS:crm_iql -->8<!-- /WS:crm_iql --></span></div></div>
     <div class="kpi"><p class="kpi-label">MQL</p><p class="kpi-def">Cualificados para seguimiento comercial</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_mql"><!-- WS:crm_mql -->1<!-- /WS:crm_mql --></span></div></div>
     <div class="kpi"><p class="kpi-label">SQL / Qualified</p><p class="kpi-def">Listos para venta — oportunidad real</p><div class="kpi-row"><span class="kpi-val" style="color:#1BAF7A" data-ws="crm_sql"><!-- WS:crm_sql -->1<!-- /WS:crm_sql --></span></div></div>
     <div class="kpi"><p class="kpi-label">Coste real/lead activo</p><p class="kpi-def">Gasto Ads ÷ leads activos</p><div class="kpi-row"><span class="kpi-val" data-ws="crm_cpl"><!-- WS:crm_cpl -->€108<!-- /WS:crm_cpl --></span></div></div>
@@ -478,11 +478,11 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
 <tr><td><strong>Daniel Coleman</strong></td><td>360 Ibiza services</td><td>—</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: ERP Agéntico | País: España</td></tr>
 <tr><td><strong>Gabriel Priore</strong></td><td>Todarello y Cia. S.R.L.</td><td>Argentina</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: Mejorar mi ERP Actual | País: Argentina</td></tr>
 <tr><td><strong>Gaspar Saez</strong></td><td>Novasonix</td><td>—</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: ERP Agéntico | País: España</td></tr>
-<tr><td><strong>Issa Sissoko</strong></td><td>Gi group</td><td>España</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: Plataforma para desarrolladores | País: Mali</td></tr>
 <tr><td><strong>José María Ventura Murillo</strong></td><td>Ventura Esoejo SL</td><td>—</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: ERP Agéntico | País: España</td></tr>
 <tr><td><strong>Magi Fuentes Serrano</strong></td><td>Fusteria</td><td>—</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: ERP Agéntico | País: España</td></tr>
 <tr><td><strong>Somnath Das</strong></td><td>Jalan Infrastructure LLP</td><td>—</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: Sales, Customer and Account Management | País: India [2026-07-14 12:00:…</td></tr>
 <tr><td><strong>Tabara Wade Gueye</strong></td><td>Ahora</td><td>España</td><td><span class="badge" style="background:#EEF4FF;color:#185FA5">IQL</span></td><td style="font-size:11px;color:#666">Interés: ERP Agéntico | País: España</td></tr>
+<tr><td><strong>Issa Sissoko</strong></td><td>Gi group</td><td>España</td><td><span class="badge" style="background:#F5F5F5;color:#666">Contacted</span></td><td style="font-size:11px;color:#666">Interés: Plataforma para desarrolladores | País: Mali</td></tr>
 <!-- /WS:CRM_ROWS -->
     </tbody>
   </table>
@@ -564,6 +564,62 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--wh);color:var
         <td class="r"><strong><!-- WS:kr_sqls_out -->0<!-- /WS:kr_sqls_out --></strong></td>
         <td class="r">3</td>
         <td><!-- WS:kr_sqls_out_badge --><span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 0%</span><!-- /WS:kr_sqls_out_badge --></td>
+      </tr>
+      <tr>
+        <td><strong>Score SEO landings (mobile)</strong><br><span style="font-size:11px;color:#888">PageSpeed Insights — promedio 4 landings principales</span></td>
+        <td>SEO</td>
+        <td class="r">—</td>
+        <td class="r"><strong><!-- WS:kr_psi_score -->—<!-- /WS:kr_psi_score --></strong></td>
+        <td class="r">≥80</td>
+        <td><!-- WS:kr_psi_score_badge --><span class="badge" style="background:#F5F5F5;color:#666">— sin datos</span><!-- /WS:kr_psi_score_badge --></td>
+      </tr>
+      <tr>
+        <td><strong>Meetings realizadas / mes</strong><br><span style="font-size:11px;color:#888">CRM — leads activos con keywords reunión, actualizados este mes</span></td>
+        <td>Sales</td>
+        <td class="r">0</td>
+        <td class="r"><strong><!-- WS:kr_meetings -->1<!-- /WS:kr_meetings --></strong></td>
+        <td class="r">5</td>
+        <td><!-- WS:kr_meetings_badge --><span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 20%</span><!-- /WS:kr_meetings_badge --></td>
+      </tr>
+      <tr>
+        <td><strong>Leads en negociación activa</strong><br><span style="font-size:11px;color:#888">CRM — leads activos con keywords propuesta/contrato/cierre</span></td>
+        <td>Sales</td>
+        <td class="r">0</td>
+        <td class="r"><strong><!-- WS:kr_nego -->0<!-- /WS:kr_nego --></strong></td>
+        <td class="r">3</td>
+        <td><!-- WS:kr_nego_badge --><span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 0%</span><!-- /WS:kr_nego_badge --></td>
+      </tr>
+      <tr>
+        <td><strong>Tiempo primer contacto (proxy)</strong><br><span style="font-size:11px;color:#888">CRM — avg días creación→última actualización, MQL/SQL activos 30d</span></td>
+        <td>Sales</td>
+        <td class="r">~5d</td>
+        <td class="r"><strong><!-- WS:kr_contact_time -->11.0d<!-- /WS:kr_contact_time --></strong></td>
+        <td class="r">&lt;2d</td>
+        <td><!-- WS:kr_contact_time_badge --><span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 11.0d / meta &lt;2d</span><!-- /WS:kr_contact_time_badge --></td>
+      </tr>
+      <tr>
+        <td><strong>Páginas pilar publicadas Q3</strong><br><span style="font-size:11px;color:#888">WordPress — posts desde 1 julio 2026</span></td>
+        <td>Content</td>
+        <td class="r">0</td>
+        <td class="r"><strong><!-- WS:kr_wp_pilar -->0<!-- /WS:kr_wp_pilar --></strong></td>
+        <td class="r">6</td>
+        <td><!-- WS:kr_wp_pilar_badge --><span class="badge" style="background:#FCEBEB;color:#A32D2D">🔴 0%</span><!-- /WS:kr_wp_pilar_badge --></td>
+      </tr>
+      <tr>
+        <td><strong>Impresiones orgánicas redes / mes</strong><br><span style="font-size:11px;color:#888">LinkedIn + Instagram — seguimiento manual</span></td>
+        <td>Social</td>
+        <td class="r">—</td>
+        <td class="r"><strong><!-- WS:kr_social_impr -->—<!-- /WS:kr_social_impr --></strong></td>
+        <td class="r">50K</td>
+        <td><!-- WS:kr_social_impr_badge --><span class="badge" style="background:#F5F5F5;color:#666">manual</span><!-- /WS:kr_social_impr_badge --></td>
+      </tr>
+      <tr>
+        <td><strong>Posts publicados / semana</strong><br><span style="font-size:11px;color:#888">LinkedIn + Blog — seguimiento manual</span></td>
+        <td>Social</td>
+        <td class="r">—</td>
+        <td class="r"><strong><!-- WS:kr_posts_week -->—<!-- /WS:kr_posts_week --></strong></td>
+        <td class="r">2/sem</td>
+        <td><!-- WS:kr_posts_week_badge --><span class="badge" style="background:#F5F5F5;color:#666">manual</span><!-- /WS:kr_posts_week_badge --></td>
       </tr>
     </tbody>
   </table>
