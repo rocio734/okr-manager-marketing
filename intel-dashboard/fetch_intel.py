@@ -654,7 +654,7 @@ def search_all_leads(data):
     # Enriquecimiento
     print(f"  Enriqueciendo {len(new)} leads...")
     for i,lead in enumerate(new):
-        c=enrich(lead["domain"], lead.get("company",""))
+        c=enrich(lead["domain"])
         lead.update({"email":c.get("email","—"),"contact_name":c.get("name","—"),"contact_pos":c.get("position","—"),"phone":c.get("phone",lead.get("phone","—")),"linkedin_org":c.get("linkedin",lead.get("linkedin_org","—"))})
         if i%5==0: time.sleep(0.3)
 
