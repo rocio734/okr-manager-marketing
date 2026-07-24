@@ -454,30 +454,21 @@ def linkedin_get_contact(company_name, domain):
 
 def scrape_partners():
     all_p=[]
-    # Odoo partners España — extraer nombre + URL externa del partner
-    html=fetch_html("https://www.odoo.com/es/partners", dynamic=True)
-    if html:
-        soup=BeautifulSoup(html,"html.parser")
-        # Buscar cards de partners con su web externa
-        for card in soup.select("[class*='partner']"):
-            name_el = card.find(["h3","h4","strong","[class*='name']"])
-            web_el  = card.find("a",href=re.compile(r"^https?://(?!.*odoo.com)"))
-            name = name_el.get_text(strip=True) if name_el else ""
-            web  = web_el.get("href","") if web_el else ""
-            if name and 5<len(name)<70:
-                d = domain_from_url(web) if web else ""
-                all_p.append({"name":name,"competitor":"Odoo","url":web or "https://www.odoo.com/es/partners","domain":d})
-        # Fallback: links externos con "country", "partner" o "reseller" en el href
-        if not all_p:
-            for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*odoo.com)")):
-                h=a.get("href","")
-                if not any(k in h for k in ("country","partner","reseller")):
-                    continue
-                t=a.get_text(strip=True)
-                d=domain_from_url(h)
-                if 5<len(t)<70 and d and not should_skip(d):
-                    all_p.append({"name":t,"competitor":"Odoo","url":h,"domain":d})
-    print(f"    Odoo partners: {len(all_p)}")
+    # Odoo partners España — la web carga partners por AJAX (SPA), imposible scraping fiable
+    # Usamos Brave Search para encontrar partners que se presentan públicamente
+    odoo_queries = [
+        '"partner de Odoo" OR "partner Odoo" España empresa',
+        '"implementador Odoo" OR "consultor Odoo" España pyme',
+        '"Gold Partner Odoo" OR "Silver Partner Odoo" España',
+    ]
+    for q in odoo_queries:
+        for r in brave_search(q, num=8):
+            d = domain_from_url(r["url"])
+            if not d or should_skip(d) or "odoo.com" in d: continue
+            t = r["title"].split(" - ")[0].split(" | ")[0].strip()
+            if 3 < len(t) < 70 and not any(p["domain"]==d for p in all_p):
+                all_p.append({"name":t,"competitor":"Odoo","url":r["url"],"domain":d})
+    print(f"    Odoo partners (Brave): {len(all_p)}")
 
     # Holded partners
     page=fetch("https://www.holded.com/es/partners", dynamic=True)  # JS rendering via Scrapling
