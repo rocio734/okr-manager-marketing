@@ -45,6 +45,8 @@ GOOGLE_MAPS_KEY = os.environ.get("GOOGLE_MAPS_API_KEY","")
 GOOGLE_SHEET_ID = os.environ.get("GOOGLE_SHEET_ID","")
 GOOGLE_SA_JSON  = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON","")
 HUNTER_KEY      = os.environ.get("HUNTER_API_KEY","")
+GMAIL_USER      = os.environ.get("GMAIL_USER","")
+GMAIL_PASS      = os.environ.get("GMAIL_PASSWORD_ROCIO","")
 APOLLO_KEY      = os.environ.get("APOLLO_API_KEY","")
 
 TODAY = datetime.date.today().strftime("%d/%m/%Y")
@@ -686,6 +688,52 @@ def sheets_domains(sheet_id,tok):
         return {row[0] for row in r.json().get("values",[])[1:] if row}
     except: return set()
 
+def send_digest_email(today_leads):
+    if not GMAIL_USER or not GMAIL_PASS:
+        print("  ⚠️ Email: faltan GMAIL_USER o GMAIL_PASSWORD_ROCIO"); return
+    top = sorted([l for l in today_leads if l["score"]==3], key=lambda x: x.get("email","—")!="—", reverse=True)[:8] or today_leads[:8]
+    if not top: print("  ℹ️ Email: sin leads hoy"); return
+    rows_html = ""
+    for l in top:
+        em = l.get("email","—")
+        em_cell = f'<a href="mailto:{em}">{em}</a>' if em != "—" else "—"
+        sc_color = "#2E7D32" if l["score"]==3 else "#E65100" if l["score"]==2 else "#616161"
+        sc_txt = "⭐ Alto" if l["score"]==3 else "▲ Medio" if l["score"]==2 else "▼ Bajo"
+        rows_html += f'<tr><td style="padding:8px 12px;border-bottom:1px solid #eee"><b>{l["company"]}</b><br><span style="font-size:11px;color:#888">{l["domain"]}</span></td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px">{l["signal_label"]}</td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px;color:{sc_color}">{sc_txt}</td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px">{em_cell}</td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px">{l.get("contact_name","—")}</td></tr>'
+    html_body = f"""<div style="font-family:Inter,sans-serif;max-width:700px;margin:0 auto">
+<div style="background:#EDA100;padding:16px 24px;border-radius:8px 8px 0 0">
+  <b style="color:#fff;font-size:18px">Etendo Intelligence — {TODAY}</b>
+  <span style="color:#fff;opacity:.8;font-size:13px;margin-left:12px">{len(top)} leads de hoy</span>
+</div>
+<table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-top:none">
+  <thead><tr style="background:#f9f9f9">
+    <th style="padding:8px 12px;text-align:left;font-size:12px;color:#555">Empresa</th>
+    <th style="padding:8px 12px;text-align:left;font-size:12px;color:#555">Señal</th>
+    <th style="padding:8px 12px;text-align:left;font-size:12px;color:#555">Score</th>
+    <th style="padding:8px 12px;text-align:left;font-size:12px;color:#555">Email</th>
+    <th style="padding:8px 12px;text-align:left;font-size:12px;color:#555">Contacto</th>
+  </tr></thead>
+  <tbody>{rows_html}</tbody>
+</table>
+<div style="padding:12px 24px;background:#f9f9f9;border:1px solid #eee;border-top:none;border-radius:0 0 8px 8px;font-size:12px;color:#888">
+  <a href="https://intel-dashboard.onrender.com" style="color:#EDA100;font-weight:600">Ver dashboard completo →</a>
+</div></div>"""
+    try:
+        import smtplib
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"🟡 Etendo Intel {TODAY} — {len(top)} leads nuevos"
+        msg["From"] = GMAIL_USER
+        msg["To"] = GMAIL_USER
+        msg.attach(MIMEText(html_body, "html"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(GMAIL_USER, GMAIL_PASS)
+            smtp.send_message(msg)
+        print(f"  ✅ Email enviado: {len(top)} leads → {GMAIL_USER}")
+    except Exception as e:
+        print(f"  ⚠️ Email: {e}")
+
 def save_to_sheets(new_leads,new_changes,sheet_id,tok):
     if not sheet_id or not tok: print("  ℹ️ Sheets no config"); return
     existing=sheets_domains(sheet_id,tok)
@@ -743,14 +791,28 @@ def render_features(data):
         if fs: html+=f'<div class="acard b" style="margin-bottom:6px"><b>{c["name"]}</b> — {" · ".join(fs)}</div>'
     return html or '<div style="color:var(--text-muted);font-size:12px;padding:8px">Sin novedades hoy</div>'
 
+def _age_badge(lead_date_str):
+    try:
+        d = datetime.datetime.strptime(lead_date_str, "%d/%m/%Y")
+        days = (datetime.datetime.today() - d).days
+        if days == 0:
+            return '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:#E8F5E9;color:#2E7D32;font-weight:700">Nuevo</span>'
+        return f'<span style="font-size:9px;color:var(--text-muted)">{days}d</span>'
+    except Exception:
+        return ""
+
+PARTNER_SOURCES = {"partner_scraping","partner_spider"}
+
 def render_leads(leads):
-    if not leads: return '<tr><td colspan="10" style="padding:16px;text-align:center;color:var(--text-muted)">Sin leads — ejecutar el script</td></tr>'
+    direct = [l for l in leads if l.get("source_type","") not in PARTNER_SOURCES]
+    if not direct: return '<tr><td colspan="10" style="padding:16px;text-align:center;color:var(--text-muted)">Sin leads directos</td></tr>'
     rows=""
-    for l in leads[:100]:
+    for l in direct[:100]:
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l"); sc_txt="⭐ Alto" if sc==3 else("▲ Medio" if sc==2 else"▼ Bajo")
         em=l.get("email","—"); em_h=f'<a href="mailto:{em}" class="lnk">{em[:22]}{"…" if len(em)>22 else ""}</a>' if em!="—" else '<span style="color:var(--text-muted)">—</span>'
+        age=_age_badge(l.get("date",""))
         rows+=f'<tr data-s="{l["signal"]}" data-q="{"h" if sc==3 else("m" if sc==2 else"l")}" data-src="{l.get("source_type","")}">'
-        rows+=f'<td><b>{l["company"]}</b><div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
+        rows+=f'<td><b>{l["company"]}</b>{age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
         rows+=f'<td style="color:var(--text-secondary);font-size:11px">{l["sector"]}</td>'
         rows+=f'<td><span class="sig {l["signal_class"]}">{l["signal_label"]}</span>{src_badge(l.get("source_type",""))}</td>'
         rows+=f'<td><span class="{sc_cls}">{sc_txt}</span></td>'
@@ -759,6 +821,25 @@ def render_leads(leads):
         rows+=f'<td style="font-size:11px">{l.get("phone","—")}</td>'
         rows+=f'<td><a href="https://{l["domain"]}" target="_blank" class="lnk">Web</a></td>'
         rows+=f'<td><a href="{l["source_url"]}" target="_blank" class="lnk">Fuente</a></td>'
+        rows+=f'<td style="font-size:10px;color:var(--text-muted)">{l["date"]}</td></tr>'
+    return rows
+
+def render_partner_leads(leads):
+    partners = [l for l in leads if l.get("source_type","") in PARTNER_SOURCES]
+    if not partners: return '<tr><td colspan="7" style="padding:16px;text-align:center;color:var(--text-muted)">Sin partners detectados</td></tr>'
+    rows=""
+    for l in partners[:60]:
+        sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l")
+        age=_age_badge(l.get("date",""))
+        comp=l.get("snippet","").split("—")[0].replace("Partner ","").strip()[:30] or "—"
+        em=l.get("email","—"); em_h=f'<a href="mailto:{em}" class="lnk">{em[:22]}{"…" if len(em)>22 else ""}</a>' if em!="—" else '<span style="color:var(--text-muted)">—</span>'
+        rows+=f'<tr>'
+        rows+=f'<td><b>{l["company"]}</b>{age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
+        rows+=f'<td style="font-size:11px;color:var(--text-secondary)">{comp}</td>'
+        rows+=f'<td style="font-size:11px">{l.get("sector","—")}</td>'
+        rows+=f'<td><span class="{sc_cls}" style="font-size:10px">{"⭐" if sc==3 else "▲" if sc==2 else "▼"}</span></td>'
+        rows+=f'<td style="font-size:11px">{em_h}</td>'
+        rows+=f'<td><a href="https://{l["domain"]}" target="_blank" class="lnk">Web</a></td>'
         rows+=f'<td style="font-size:10px;color:var(--text-muted)">{l["date"]}</td></tr>'
     return rows
 
@@ -815,6 +896,9 @@ def main():
     html=inject(html,"PRICES_ROWS",render_prices(data))
     html=inject(html,"FEATURES",render_features(data))
     html=inject(html,"LEADS_ROWS",render_leads(data["leads_history"]))
+    html=inject(html,"PARTNER_ROWS",render_partner_leads(data["leads_history"]))
+    print("→ Email digest...")
+    send_digest_email(today_leads)
     open(HTML_FILE,"w",encoding="utf-8").write(html)
     print(f"\n✅ {NOW}")
     print(f"   Leads nuevos: {len(new_leads)} {by_src}")

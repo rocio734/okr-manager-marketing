@@ -37,6 +37,8 @@ jobs:
           HUNTER_API_KEY:              ${{ secrets.HUNTER_API_KEY }}
           APOLLO_API_KEY:              ${{ secrets.APOLLO_API_KEY }}
           BRAVE_API_KEY:               ${{ secrets.BRAVE_API_KEY }}
+          GMAIL_USER:                  ${{ secrets.GMAIL_USER }}
+          GMAIL_PASSWORD_ROCIO:        ${{ secrets.GMAIL_PASSWORD_ROCIO }}
         run: cd intel-dashboard && python fetch_intel.py
 
       - name: Commit y push
