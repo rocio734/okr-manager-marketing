@@ -1,11 +1,32 @@
 {
   "comp_hashes": {
-    "odoo": "60a5663e1fd8",
-    "sap": "442b8800b6f1",
+    "odoo": "4461dce50858",
+    "sap": "00dd480a6a9f",
     "holded": "3514ecfb9262",
-    "sage": "f6ed247713f0"
+    "sage": "9ea55d58a2cd"
   },
   "changes_history": [
+    {
+      "date": "24/07/2026",
+      "competitor": "Sage",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sage.com/es-es/erp/"
+    },
+    {
+      "date": "24/07/2026",
+      "competitor": "SAP Business One",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sap.com/spain/products/erp/business-one.html"
+    },
+    {
+      "date": "24/07/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "24/07/2026",
       "competitor": "Sage",
