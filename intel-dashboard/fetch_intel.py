@@ -543,10 +543,13 @@ def search_all_leads(data):
     print("→ Buscando leads...")
     new=[]; seen={l.get("domain","") for l in data["leads_history"]}
 
-    # 1. Google Custom Search
-    print("  [1/4] Google Search...")
+    # 1. Brave Search
+    print("  [1/4] Brave Search...")
+    brave_total=0
     for s in LEAD_SEARCHES:
-        for r in brave_search(s["query"],num=5):
+        results=brave_search(s["query"],num=5)
+        brave_total+=len(results)
+        for r in results:
             d=domain_from_url(r["url"])
             if d in seen or should_skip(d): continue
             co=r["title"].split("|")[0].split("-")[0].strip()
@@ -554,6 +557,7 @@ def search_all_leads(data):
             txt=r["title"]+r["snippet"]
             lead=make_lead(co,d,detect_sector(txt),s["signal"],s["signal_label"],s["signal_class"],r["url"],r["snippet"],score_lead(txt.lower(),s["signal"]),"brave_search")
             new.append(lead); seen.add(d)
+    print(f"    → {brave_total} resultados Brave, {len([l for l in new if l['source_type']=='brave_search'])} nuevos")
 
     # 2. Apollo empresas
     print("  [2/4] Apollo.io...")
