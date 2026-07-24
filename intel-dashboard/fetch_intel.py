@@ -26,8 +26,12 @@ from bs4 import BeautifulSoup
 # Scrapling — scraping adaptativo con bypass anti-bot
 try:
     from scrapling.fetchers import Fetcher, StealthyFetcher
+    from scrapling.spiders import Spider, Response as SpiderResponse
+    # Activar modo adaptativo global — guarda huellas de elementos
+    # para relocalizarlos automáticamente si el HTML cambia
+    StealthyFetcher.adaptive = True
     SCRAPLING_OK = True
-    print("✅ Scrapling disponible")
+    print("✅ Scrapling disponible con modo adaptativo activado")
 except ImportError:
     SCRAPLING_OK = False
     print("⚠️  Scrapling no disponible — usando requests como fallback")
@@ -73,42 +77,76 @@ SPAIN_CITIES = ["Madrid,Spain","Barcelona,Spain","Valencia,Spain","Bilbao,Spain"
 
 SKIP_DOMAINS = {"odoo","sap","sage","holded","linkedin","infojobs","wikipedia","youtube","google","bing","microsoft","facebook","twitter"}
 
+# Caché de URLs ya vistas para saber si usar auto_save o adaptive
+_scrapling_seen_urls = set()
+
 def fetch(url, timeout=15, dynamic=False):
     """
     Fetcher universal con Scrapling.
-    - dynamic=True: usa StealthyFetcher (renderiza JS, bypasea Cloudflare)
-    - dynamic=False: usa Fetcher (HTTP rápido con TLS fingerprint spoofing)
-    - fallback: requests estándar si Scrapling no está disponible
+    - dynamic=True: StealthyFetcher con JS rendering y bypass anti-bot
+    - dynamic=False: Fetcher HTTP rápido con TLS fingerprint spoofing
+    - Primera vez que ve una URL: auto_save=True (guarda huella de elementos)
+    - Siguientes veces: adaptive=True (relocaliza si el HTML cambió)
+    - fallback: requests si Scrapling no está disponible
     """
+    global _scrapling_seen_urls
+    first_time = url not in _scrapling_seen_urls
+    _scrapling_seen_urls.add(url)
+
     if SCRAPLING_OK:
         try:
             if dynamic:
-                # Para páginas con JS (Odoo partners, etc.)
-                page = StealthyFetcher.fetch(url, headless=True, network_idle=True, timeout=timeout*1000)
-                return page.html_content if page else ""
+                page = StealthyFetcher.fetch(
+                    url, headless=True, network_idle=True,
+                    timeout=timeout*1000
+                )
             else:
-                # Para páginas estáticas — más rápido que requests y bypasea anti-bot básico
                 page = Fetcher().get(url, timeout=timeout, stealthy_headers=True)
-                return page.html_content if page else ""
+            return page if page else None  # Devolver page object para usar .css()
         except Exception as e:
             print(f"    ⚠️ Scrapling {url[:60]}: {e}")
-            # Fallback a requests
+
+    # Fallback a requests — devuelve string
     try:
         r = requests.get(url, headers=HEADERS, timeout=timeout)
         r.raise_for_status()
         return r.text
     except Exception as e:
         print(f"    ⚠️ {url[:60]}: {e}")
-        return ""
+        return None
+
+def fetch_html(url, timeout=15, dynamic=False):
+    """Devuelve solo el HTML como string (compatibilidad con BeautifulSoup)."""
+    result = fetch(url, timeout, dynamic)
+    if result is None: return ""
+    if isinstance(result, str): return result
+    return result.html_content or ""
+
+def scrapling_css(page_or_html, selector, auto_save=False, adaptive=False):
+    """
+    Extrae elementos con CSS selector usando Scrapling si disponible.
+    auto_save=True: primera ejecución, guarda huellas
+    adaptive=True: ejecuciones siguientes, relocaliza si cambió el HTML
+    """""
+    if SCRAPLING_OK and not isinstance(page_or_html, str):
+        try:
+            return page_or_html.css(selector, auto_save=auto_save, adaptive=adaptive)
+        except Exception as e:
+            print(f"    ⚠️ CSS selector {selector}: {e}")
+    # Fallback BeautifulSoup
+    soup = BeautifulSoup(page_or_html if isinstance(page_or_html, str) else page_or_html.html_content, "html.parser")
+    return soup.select(selector)
 
 def text_hash(t): return hashlib.md5(t.encode()).hexdigest()[:12]
 
-def clean(html):
+def clean(html_or_page):
+    html = html_or_page if isinstance(html_or_page, str) else (getattr(html_or_page, 'html_content', '') or '')
     soup = BeautifulSoup(html,"html.parser")
     for t in soup(["script","style","nav","footer","header"]): t.decompose()
     return " ".join(soup.get_text().split())[:5000]
 
-def extract_prices(html):
+def extract_prices(html_or_page):
+    html = html_or_page if isinstance(html_or_page, str) else (getattr(html_or_page, 'html_content', '') or '')
     p = {"basic":"—","mid":"—","advanced":"—","publishes":False}
     found = re.findall(r'(\d+[\.,]?\d*)\s*€\s*(?:/\s*(?:mes|month|usuario|user))?', BeautifulSoup(html,"html.parser").get_text(), re.I)
     if found:
@@ -119,7 +157,8 @@ def extract_prices(html):
         if len(u)>2: p["advanced"] = f"€{u[-1]:.0f}/mes"
     return p
 
-def extract_features(html):
+def extract_features(html_or_page):
+    html = html_or_page if isinstance(html_or_page, str) else (getattr(html_or_page, 'html_content', '') or '')
     soup = BeautifulSoup(html,"html.parser")
     out=[]
     for tag in soup.find_all(["h2","h3","h4"],limit=10):
@@ -252,10 +291,162 @@ def maps_details(place_id):
         return r.json().get("result",{})
     except: return {}
 
+
+# ── Spider framework — crawling profundo de partners ───────────────────────
+import asyncio
+
+class PartnerSpider:
+    """
+    Spider que entra a cada página de partner individual para extraer
+    web, teléfono, sector, clientes mencionados y contactos.
+    Usa Scrapling con auto_save para recordar la estructura aunque cambie.
+    """
+
+    def __init__(self, partner_urls, competitor_name):
+        self.partner_urls = partner_urls[:10]  # Limitar a 10 por competidor
+        self.competitor_name = competitor_name
+        self.results = []
+
+    def crawl(self):
+        """Crawl sincrónico — visita cada URL de partner."""
+        if not SCRAPLING_OK:
+            return []
+        for url in self.partner_urls:
+            try:
+                page = Fetcher().get(url, timeout=15, stealthy_headers=True)
+                if not page:
+                    continue
+                result = self._parse_partner(page, url)
+                if result:
+                    self.results.append(result)
+                time.sleep(0.5)  # Gentil con el servidor
+            except Exception as e:
+                print(f"      ⚠️ Spider {url[:50]}: {e}")
+        return self.results
+
+    def _parse_partner(self, page, url):
+        """Extrae información del perfil del partner."""
+        domain = domain_from_url(url)
+        if should_skip(domain):
+            return None
+
+        # Nombre de la empresa — auto_save para recordar el selector
+        name_els = page.css("h1, .company-name, [class*='name']", auto_save=True)
+        name = name_els[0].text if name_els else domain
+
+        # Web externa del partner
+        web_links = page.css("a[href*='http']:not([href*='odoo']):not([href*='holded']):not([href*='sage'])", auto_save=True)
+        partner_web = ""
+        for link in web_links:
+            href = link.attrib.get("href", "")
+            d = domain_from_url(href)
+            if d and not should_skip(d) and d != domain:
+                partner_web = href
+                break
+
+        # Teléfono
+        phone_els = page.css("[class*='phone'], [class*='tel'], a[href*='tel:']", auto_save=True)
+        phone = "—"
+        if phone_els:
+            phone = phone_els[0].text or phone_els[0].attrib.get("href","").replace("tel:","") or "—"
+
+        # Sectores / industrias que mencionan
+        text = page.get_text() if hasattr(page, 'get_text') else ""
+        sector = detect_sector(text + " " + name)
+
+        # Clientes mencionados
+        client_els = page.css("[class*='client'], [class*='customer'], [class*='case']", auto_save=True)
+        clients = [el.text for el in client_els[:3] if el.text and len(el.text) > 3]
+
+        final_domain = domain_from_url(partner_web) if partner_web else domain
+
+        return {
+            "name": name.strip()[:60],
+            "domain": final_domain,
+            "partner_url": url,
+            "web": partner_web or f"https://{domain}",
+            "phone": phone.strip()[:20],
+            "sector": sector,
+            "clients_mentioned": clients[:3],
+            "competitor": self.competitor_name,
+        }
+
+
+# ── LinkedIn — enriquecimiento via StealthyFetcher ─────────────────────────
+def linkedin_get_contact(company_name, domain):
+    """
+    Busca el perfil de LinkedIn de la empresa y extrae el contacto clave.
+    Usa StealthyFetcher para bypasear el anti-bot de LinkedIn.
+    Solo accede a perfiles públicos.
+    """
+    if not SCRAPLING_OK:
+        return {}
+
+    # Construir URL de búsqueda de empresa en LinkedIn
+    query = requests.utils.quote(company_name)
+    search_url = f"https://www.linkedin.com/search/results/companies/?keywords={query}"
+
+    try:
+        # LinkedIn requiere StealthyFetcher con headless para bypasear
+        page = StealthyFetcher.fetch(
+            search_url,
+            headless=True,
+            network_idle=True,
+            timeout=20000,
+            disable_resources=True,  # No cargar imágenes/media — más rápido
+        )
+        if not page:
+            return {}
+
+        # Extraer primer resultado de empresa — auto_save para adaptarse a cambios
+        results = page.css(".entity-result__title-text, .search-entity-result", auto_save=True)
+        if not results:
+            return {}
+
+        company_link_els = page.css(".entity-result__title-text a", auto_save=True)
+        if not company_link_els:
+            return {}
+
+        company_li_url = company_link_els[0].attrib.get("href","")
+        if not company_li_url:
+            return {}
+
+        # Entrar al perfil de la empresa
+        company_page = StealthyFetcher.fetch(
+            company_li_url,
+            headless=True,
+            network_idle=True,
+            timeout=20000,
+            disable_resources=True,
+        )
+        if not company_page:
+            return {}
+
+        # Extraer información del perfil público
+        name_el   = company_page.css("h1.org-top-card-summary__title", auto_save=True)
+        sector_el = company_page.css(".org-top-card-summary-info-list__info-item", auto_save=True)
+        size_el   = company_page.css("[class*='employee-count']", auto_save=True)
+
+        li_name   = name_el[0].text if name_el else company_name
+        li_sector = sector_el[0].text if sector_el else "—"
+        li_size   = size_el[0].text if size_el else "—"
+
+        return {
+            "linkedin_url": company_li_url,
+            "linkedin_name": li_name.strip(),
+            "linkedin_sector": li_sector.strip(),
+            "linkedin_size": li_size.strip(),
+        }
+
+    except Exception as e:
+        print(f"      ⚠️ LinkedIn {company_name}: {e}")
+        return {}
+
+
 def scrape_partners():
     all_p=[]
     # Odoo partners España — extraer nombre + URL externa del partner
-    html=fetch("https://www.odoo.com/es/partners", dynamic=True)
+    html=fetch("https://www.odoo.com/es/partners/country/69-spain")
     if html:
         soup=BeautifulSoup(html,"html.parser")
         # Buscar cards de partners con su web externa
@@ -267,18 +458,19 @@ def scrape_partners():
             if name and 5<len(name)<70:
                 d = domain_from_url(web) if web else ""
                 all_p.append({"name":name,"competitor":"Odoo","url":web or "https://www.odoo.com/es/partners","domain":d})
-        # Fallback: links de páginas de country o partner
+        # Fallback: links externos en la página
         if not all_p:
             for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*odoo.com)")):
                 t=a.get_text(strip=True)
                 h=a.get("href","")
                 d=domain_from_url(h)
-                if 5<len(t)<70 and d and not should_skip(d) and any(k in h for k in ["country","partner","reseller"]):
+                if 5<len(t)<70 and d and not should_skip(d):
                     all_p.append({"name":t,"competitor":"Odoo","url":h,"domain":d})
     print(f"    Odoo partners: {len(all_p)}")
 
     # Holded partners
-    html=fetch("https://www.holded.com/es/partners", dynamic=True)  # JS rendering via Scrapling
+    page=fetch("https://www.holded.com/es/partners", dynamic=True)  # JS rendering via Scrapling
+    html = page.html_content if page and not isinstance(page, str) else (page or "")
     holded_count=0
     if html:
         soup=BeautifulSoup(html,"html.parser")
@@ -398,22 +590,53 @@ def search_all_leads(data):
     else:
         print("    ⚠️ Sin GOOGLE_MAPS_API_KEY")
 
-    # 4. Partners competidores
-    print("  [4/4] Partners...")
+    # 4. Partners competidores — con Spider de crawling profundo
+    print("  [4/4] Partners con Spider...")
     raw_partners=scrape_partners()
+    partner_urls_by_comp = {}
     for p in raw_partners:
         d=p.get("domain","")
         if not d:
             res=brave_search(f'"{p["name"]}" España ERP consultoría',num=1)
             if res: d=domain_from_url(res[0]["url"])
         if not d or d in seen or should_skip(d): continue
-        lead=make_lead(p["name"],d,"Consultoría ERP","partner",f"Partner {p['competitor']}","s-par",p.get("url",f"https://{d}"),f"Partner certificado de {p['competitor']} en España",2,"partner_scraping")
+
+        # Lead básico
+        lead=make_lead(p["name"],d,"Consultoría ERP","partner",f"Partner {p['competitor']}","s-par",
+                       p.get("url",f"https://{d}"),f"Partner certificado de {p['competitor']} en España",2,"partner_scraping")
         new.append(lead); seen.add(d)
+
+        # Acumular URLs de perfil de partner para crawling profundo
+        if p.get("url") and "http" in p.get("url",""):
+            comp = p.get("competitor","")
+            if comp not in partner_urls_by_comp:
+                partner_urls_by_comp[comp] = []
+            partner_urls_by_comp[comp].append(p["url"])
+
+    # Crawling profundo con Spider — entra a cada perfil de partner
+    if SCRAPLING_OK and partner_urls_by_comp:
+        print(f"  Spider crawling profundo — {sum(len(v) for v in partner_urls_by_comp.values())} perfiles...")
+        for comp_name, urls in partner_urls_by_comp.items():
+            spider = PartnerSpider(urls, comp_name)
+            profiles = spider.crawl()
+            for profile in profiles:
+                d = profile.get("domain","")
+                if not d or d in seen or should_skip(d): continue
+                # Lead enriquecido con datos del Spider
+                lead = make_lead(
+                    profile["name"], d, profile["sector"],
+                    "partner", f"Partner {comp_name} (deep)", "s-par",
+                    profile["web"], f"Partner {comp_name} — clientes: {', '.join(profile['clients_mentioned']) or 'N/A'}",
+                    3, "partner_spider"  # Score 3 porque tenemos perfil completo
+                )
+                lead["phone"] = profile.get("phone","—")
+                new.append(lead); seen.add(d)
+        print(f"    → {len([l for l in new if l.get('source_type')=='partner_spider'])} perfiles completos extraídos")
 
     # Enriquecimiento
     print(f"  Enriqueciendo {len(new)} leads...")
     for i,lead in enumerate(new):
-        c=enrich(lead["domain"])
+        c=enrich(lead["domain"], lead.get("company",""))
         lead.update({"email":c.get("email","—"),"contact_name":c.get("name","—"),"contact_pos":c.get("position","—"),"phone":c.get("phone",lead.get("phone","—")),"linkedin_org":c.get("linkedin",lead.get("linkedin_org","—"))})
         if i%5==0: time.sleep(0.3)
 
