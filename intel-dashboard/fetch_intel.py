@@ -808,7 +808,8 @@ def main():
     html=inject(html,"leads_email",str(len([l for l in data["leads_history"] if l.get("email","—")!="—"])))
     html=inject(html,"changes_total",str(len(new_changes)))
     html=inject(html,"ALERTS",render_alerts(new_changes,new_leads))
-    html=inject(html,"LEADS_PREVIEW",render_preview(new_leads))
+    today_leads=[l for l in data["leads_history"] if l.get("date","")==TODAY]
+    html=inject(html,"LEADS_PREVIEW",render_preview(new_leads or today_leads))
     html=inject(html,"COMP_CARDS",render_comp_cards(comp_results,data))
     html=inject(html,"CHANGES_HISTORY",render_changes(data))
     html=inject(html,"PRICES_ROWS",render_prices(data))
