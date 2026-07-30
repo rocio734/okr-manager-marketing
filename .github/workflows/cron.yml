@@ -62,7 +62,7 @@ jobs:
               "0 18 * * *")   echo "job=daily_sweep"       >> $GITHUB_OUTPUT ;;
               "0 15 * * 5")   echo "job=friday"            >> $GITHUB_OUTPUT ;;
               "5 7 * * 1")    echo "job=crm_pulse"         >> $GITHUB_OUTPUT ;;
-              "0 8 * * *")    echo "job=reply_checker"     >> $GITHUB_OUTPUT ;;
+              "30 * * * *")   echo "job=reply_checker"     >> $GITHUB_OUTPUT ;;
               "0 6 * * *")    echo "job=crm_scoring"       >> $GITHUB_OUTPUT ;;
               "0 * * * *")    echo "job=generate_backlog"  >> $GITHUB_OUTPUT ;;
               "0 7 * * 4")    echo "job=hot_leads_alert"   >> $GITHUB_OUTPUT ;;
