@@ -5,6 +5,6 @@ window.OKR_CONFIG = {
   approver_email: "rocio.altamirano@smfconsulting.es",
   team: "marketing",
   // Token con scope "workflow" únicamente — solo sirve para disparar Actions
-  github_token: "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",
+  github_token: "",  // cargar manualmente en local, nunca commitear
   github_repo:  "rocio734/okr-manager-marketing"
 };
