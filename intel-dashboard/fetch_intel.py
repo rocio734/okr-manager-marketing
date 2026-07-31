@@ -76,6 +76,31 @@ LEAD_SEARCHES = [
     {"query":f'"software ERP" {_CITY} {_SECTOR} empresa presupuesto',"signal":"erp","signal_label":"Busca ERP","signal_class":"s-erp"},
 ]
 
+# Búsquedas de oportunidades de engagement (foros, posts, hilos con comentarios abiertos)
+ENGAGEMENT_SEARCHES = [
+    {"query": f'site:reddit.com ERP España {_YEAR}',                                        "label": "Reddit ES"},
+    {"query": f'site:reddit.com "ERP" OR "enterprise software" pyme automatización',        "label": "Reddit ERP"},
+    {"query": f'site:reddit.com "Odoo" OR "SAP" OR "ERP" España migrar alternativa',        "label": "Reddit migración"},
+    {"query": f'site:quora.com ERP España pyme automatización recomendación',                "label": "Quora"},
+    {"query": f'site:forocoches.com ERP software empresa gestión',                          "label": "Forocoches"},
+    {"query": f'site:rankia.com ERP software empresa {_YEAR}',                              "label": "Rankia"},
+    {"query": f'site:xataka.com ERP automatización empresa IA {_YEAR}',                     "label": "Xataka"},
+    {"query": f'site:news.ycombinator.com "ERP" OR "agentic" enterprise Spain',             "label": "HackerNews"},
+    {"query": f'"qué ERP" OR "qué erp recomendáis" OR "mejor ERP pyme" España {_YEAR}',    "label": "Pregunta ERP"},
+    {"query": f'"ERP agéntico" OR "agentic ERP" OR "ERP con IA" España {_YEAR} foro',      "label": "Agentic ERP"},
+    {"query": f'"cambiar de ERP" OR "abandonar Odoo" OR "dejar SAP" España {_YEAR}',       "label": "Cambio ERP"},
+    {"query": f'site:linkedin.com/posts "ERP" "automatización" España {_YEAR}',             "label": "LinkedIn posts"},
+]
+
+# Dominios que sabemos son interactuables (foros, comunidades, medios con comentarios)
+ENGAGEMENT_DOMAINS = {
+    "reddit.com","quora.com","forocoches.com","rankia.com","xataka.com",
+    "news.ycombinator.com","ycombinator.com","medium.com","dev.to",
+    "forofinanciero.com","comunidad.ieb.es","stackoverflow.com",
+    "elconfidencial.com","cincodias.elpais.com","expansion.com",
+    "g2.com","capterra.es","softwareadvice.es","getapp.es",
+}
+
 MAPS_SEARCHES = [
     {"query":"empresa industrial manufacturing Spain","sector":"Industrial"},
     {"query":"empresa logistica distribucion Spain","sector":"Logística"},
@@ -540,11 +565,65 @@ def scrape_partners():
 # ── Datos históricos ────────────────────────────────────────────────────────
 def load_data():
     if DATA_FILE.exists():
-        with open(DATA_FILE) as f: return json.load(f)
-    return {"comp_hashes":{},"changes_history":[],"leads_history":[],"prices":{},"features":{}}
+        d = json.load(open(DATA_FILE))
+        if "engagement_history" not in d: d["engagement_history"] = []
+        return d
+    return {"comp_hashes":{},"changes_history":[],"leads_history":[],"engagement_history":[],"prices":{},"features":{}}
 
 def save_data(data):
     with open(DATA_FILE,"w") as f: json.dump(data,f,ensure_ascii=False,indent=2)
+
+# ── Búsqueda de posts interactuables para engagement ───────────────────────
+def search_engagement_posts(data):
+    print("→ Buscando posts para engagement...")
+    new = []
+    from datetime import datetime, timedelta
+    cutoff = (datetime.today() - timedelta(days=14)).strftime("%d/%m/%Y")
+    seen = {p.get("url","") for p in data["engagement_history"] if p.get("date","") >= cutoff}
+
+    for s in ENGAGEMENT_SEARCHES:
+        results = brave_search(s["query"], num=5)
+        for r in results:
+            url = r.get("url","")
+            if not url or url in seen: continue
+            domain = domain_from_url(url)
+
+            # Solo pasar si es dominio interactuable conocido O la URL tiene patrones de post/hilo
+            is_known_domain = any(eng in domain for eng in ENGAGEMENT_DOMAINS)
+            is_thread_url   = any(p in url.lower() for p in ["/comments/","/post/","/thread/","/pregunta/","/question/","/discussion/","/t/","/r/"])
+            if not is_known_domain and not is_thread_url:
+                continue
+
+            post = {
+                "url":         url,
+                "domain":      domain,
+                "title":       r.get("title","")[:120],
+                "snippet":     r.get("snippet","")[:300],
+                "label":       s["label"],
+                "date":        TODAY,
+                "commented":   False,
+                "comment_draft": "",
+            }
+            new.append(post)
+            seen.add(url)
+            data["engagement_history"].insert(0, post)
+
+    # Mantener solo los últimos 200 en historial
+    data["engagement_history"] = data["engagement_history"][:200]
+    print(f"  → {len(new)} posts nuevos para engagement")
+    return new
+
+# ── Exportar oportunidades para el agente forum-monitor ────────────────────
+def export_engagement_json(posts):
+    out_path = REPO_DIR / "engagement_opportunities.json"
+    pending = [p for p in posts if not p.get("commented", False)]
+    with open(out_path, "w") as f:
+        json.dump({
+            "generated_at": NOW,
+            "pending_count": len(pending),
+            "posts": pending
+        }, f, ensure_ascii=False, indent=2)
+    print(f"  → engagement_opportunities.json: {len(pending)} posts pendientes")
 
 # ── Scraping competidores ───────────────────────────────────────────────────
 def scrape_competitors(data):
@@ -887,6 +966,36 @@ def render_preview(leads):
         rows+=f'<tr><td><b>{l["company"]}</b></td><td><span class="sig {l["signal_class"]}">{l["signal_label"]}</span></td><td><span class="{sc_cls}">{sc_txt}</span></td><td style="font-size:11px">{em_h}</td><td><a href="https://{l["domain"]}" target="_blank" class="lnk">Web</a></td><td style="font-size:10px;color:var(--text-muted)">{l["date"]}</td></tr>'
     return rows
 
+def render_engagement(data):
+    posts = data.get("engagement_history", [])
+    if not posts:
+        return '<tr><td colspan="5" style="padding:16px;text-align:center;color:var(--text-muted)">Sin posts detectados aún — ejecuta el script para buscar oportunidades</td></tr>'
+    rows = ""
+    for p in posts[:50]:
+        ready   = p.get("comment_ready", False)
+        skipped = p.get("skipped", False)
+        draft   = p.get("comment_draft", "")
+        score   = p.get("relevance_score", "—")
+        if ready:
+            badge = '<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:#E6F4EA;color:#1B5E20;font-weight:600">✅ Listo</span>'
+        elif skipped:
+            badge = '<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:#F5F5F5;color:#757575">Descartado</span>'
+        else:
+            badge = '<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:#FFF8E1;color:#E65100">Pendiente</span>'
+        draft_html = f'<details style="margin-top:4px"><summary style="cursor:pointer;font-size:10px;color:var(--text-muted)">Ver borrador</summary><div style="margin-top:6px;padding:8px;background:var(--gb);border-radius:4px;font-size:11px;line-height:1.5">{draft}</div></details>' if draft else '<span style="font-size:10px;color:var(--text-muted)">—</span>'
+        label_badge = f'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#E6F1FB;color:#0C447C">{p.get("label","")}</span>'
+        rows += f'''<tr>
+          <td style="padding:8px 10px;max-width:240px">
+            <a href="{p.get("url","")}" target="_blank" class="lnk" style="font-size:12px;font-weight:600">{p.get("title","")[:60]}{"…" if len(p.get("title",""))>60 else ""}</a>
+            <div style="font-size:10px;color:var(--text-muted)">{p.get("domain","")}</div>
+          </td>
+          <td style="padding:8px 10px">{label_badge}</td>
+          <td style="padding:8px 10px;font-size:11px">{score}/10</td>
+          <td style="padding:8px 10px">{badge}</td>
+          <td style="padding:8px 10px;max-width:300px">{draft_html}</td>
+        </tr>'''
+    return rows
+
 def render_alerts(changes,new_leads):
     html=""
     for c in changes: html+=f'<div class="acard warn"><b>⚠️ {c["competitor"]}</b> — {c["detail"]}</div>'
@@ -906,7 +1015,10 @@ def main():
     data=load_data()
     comp_results,new_changes=scrape_competitors(data)
     new_leads=search_all_leads(data)
+    search_engagement_posts(data)
     save_data(data)
+    print("→ Exportando engagement JSON...")
+    export_engagement_json(data["engagement_history"])
     if GOOGLE_SHEET_ID:
         print("→ Google Sheets...")
         tok=sheets_token()
@@ -931,6 +1043,10 @@ def main():
     html=inject(html,"FEATURES",render_features(data))
     html=inject(html,"LEADS_ROWS",render_leads(data["leads_history"]))
     html=inject(html,"PARTNER_ROWS",render_partner_leads(data["leads_history"]))
+    engagement_posts = data.get("engagement_history",[])
+    html=inject(html,"ENGAGEMENT_ROWS",render_engagement(data))
+    html=inject(html,"engagement_total",str(len(engagement_posts)))
+    html=inject(html,"engagement_ready",str(len([p for p in engagement_posts if p.get("comment_ready")])))
     print("→ Email digest...")
     send_digest_email(today_leads)
     open(HTML_FILE,"w",encoding="utf-8").write(html)
