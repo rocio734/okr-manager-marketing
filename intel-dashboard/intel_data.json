@@ -6220,7 +6220,7 @@
     "odoo": [
       "Notas de lanzamiento de Odoo | Odoo",
       "Precios de Odoo en 2026 en España: planes y costes",
-      "Odoo precios 2026: licencias, costes y tarifas reales (Community y Enterprise)",
+      "¿Cuál es el plan de precios de Odoo en 2026? | Process Control",
       "Odoo CE y la Inteligencia Artificial: La Revolución que tu Empresa Necesita"
     ],
     "sap": [
@@ -6246,6 +6246,16 @@
     ]
   },
   "engagement_history": [
+    {
+      "url": "https://news.ycombinator.com/item?id=48430923",
+      "domain": "news.ycombinator.com",
+      "title": "Tokenomics: Quantifying Where Tokens Are Used in Agentic Software Engineering | Hacker News",
+      "snippet": "You give it a problem, you then refine that problem where a fast, cheaper model asks you questions which you answer to get a better input prompt. You then choose a MA strategy for example take problem break up to sections then final judge concludes or you do multi turn where agents debate then ...",
+      "label": "HackerNews",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
     {
       "url": "https://news.ycombinator.com/item?id=48615680",
       "domain": "news.ycombinator.com",

@@ -1,7 +1,17 @@
 {
-  "generated_at": "31/07/2026 00:20 UTC",
-  "pending_count": 44,
+  "generated_at": "31/07/2026 00:59 UTC",
+  "pending_count": 45,
   "posts": [
+    {
+      "url": "https://news.ycombinator.com/item?id=48430923",
+      "domain": "news.ycombinator.com",
+      "title": "Tokenomics: Quantifying Where Tokens Are Used in Agentic Software Engineering | Hacker News",
+      "snippet": "You give it a problem, you then refine that problem where a fast, cheaper model asks you questions which you answer to get a better input prompt. You then choose a MA strategy for example take problem break up to sections then final judge concludes or you do multi turn where agents debate then ...",
+      "label": "HackerNews",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
     {
       "url": "https://news.ycombinator.com/item?id=48615680",
       "domain": "news.ycombinator.com",
@@ -511,7 +521,5 @@
       "skip_reason": "Score 4/10 — poco relevante",
       "processed_at": "30/07/2026 23:00"
     }
-  ],
-  "last_batch": "31/07/2026 00:39",
-  "ready_count": 12
+  ]
 }
