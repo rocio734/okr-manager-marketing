@@ -19,7 +19,7 @@ jobs:
           python-version: '3.11'
 
       - name: Instalar dependencias base
-        run: pip install requests beautifulsoup4 cryptography
+        run: pip install requests beautifulsoup4 cryptography openai
 
       - name: Instalar Scrapling con fetchers
         run: |
@@ -37,14 +37,20 @@ jobs:
           HUNTER_API_KEY:              ${{ secrets.HUNTER_API_KEY }}
           APOLLO_API_KEY:              ${{ secrets.APOLLO_API_KEY }}
           BRAVE_API_KEY:               ${{ secrets.BRAVE_API_KEY }}
+          OPENAI_API_KEY:              ${{ secrets.OPENAI_API_KEY }}
           GMAIL_USER:                  ${{ secrets.GMAIL_USER }}
           GMAIL_PASSWORD_ROCIO:        ${{ secrets.GMAIL_PASSWORD_ROCIO }}
         run: cd intel-dashboard && python fetch_intel.py
+
+      - name: Generar borradores de engagement
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/agent_forum_monitor.py --mode batch --max 15
 
       - name: Commit y push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add intel-dashboard/index.html intel-dashboard/intel_data.json
+          git add intel-dashboard/index.html intel-dashboard/intel_data.json intel-dashboard/engagement_opportunities.json
           git diff --staged --quiet || git commit -m "Intelligence $(date +'%Y-%m-%d %H:%M UTC')"
           git push
