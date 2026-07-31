@@ -1,7 +1,47 @@
 {
-  "generated_at": "31/07/2026 00:59 UTC",
-  "pending_count": 45,
+  "generated_at": "31/07/2026 09:25 UTC",
+  "pending_count": 49,
   "posts": [
+    {
+      "url": "https://news.ycombinator.com/item?id=47341827",
+      "domain": "news.ycombinator.com",
+      "title": "SuperPowers: Agentic skills framework that works | Hacker News",
+      "snippet": "Once it&#x27;s teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest · After you&#x27;ve signed off on the design, your agent puts together an implementation plan that&#x27;s clear enough for an enthusiastic junior engineer with poor taste, no j",
+      "label": "HackerNews",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.xataka.com/robotica-e-ia/ahora-software-se-estaba-comiendo-mundo-ahora-ia-se-esta-comiendo-software",
+      "domain": "xataka.com",
+      "title": "Hasta ahora “el software se estaba comiendo el mundo”. Ahora la IA se está comiendo el software",
+      "snippet": "Plataformas como la europea Lovable han empujado esa idea al gran público: menos barreras técnicas, más iteración rápida, menos “proyecto” y más prueba y error. Esto no significa que una empresa vaya a reemplazar mañana su ERP por un sistema generado al vuelo, pero sí ayuda a entender por qué el mer",
+      "label": "Xataka",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/eurovision/comments/1p86scf/rtve_maintains_its_position_spain_will_not/",
+      "domain": "reddit.com",
+      "title": "r/eurovision on Reddit: RTVE maintains its position: Spain will not participate in Eurovision 2026 if Israel participate",
+      "snippet": "In September, RTVE&#x27;s Board of Directors approved by an absolute majority that Spain would not participate in Eurovision 2026 if Israel remained in the competition, becoming the first member of the Big Five to take such a drastic stance.",
+      "label": "Reddit ES",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/es/comments/1pert26/espa%C3%B1a_irlanda_eslovenia_y_los_pa%C3%ADses_bajos_se/",
+      "domain": "reddit.com",
+      "title": "r/es on Reddit: España, Irlanda, Eslovenia y los Países Bajos se han retirado de Eurovisión 2026 tras la decisión de la ",
+      "snippet": "España se une a otros paises europeos, avisando su salida de Eurovision si participa Israel. ... Why Portugal has won Eurovision only once when all the Western European countries have won at least 2-3 times? ... Eurovision 2026 : l’Espagne, l’Irlande et la Slovénie ne diffuseront pas le concours en ",
+      "label": "Reddit ES",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
     {
       "url": "https://news.ycombinator.com/item?id=48430923",
       "domain": "news.ycombinator.com",

@@ -1,11 +1,39 @@
 {
   "comp_hashes": {
-    "odoo": "47bcded2586e",
-    "sap": "1fe4fbdecd28",
-    "holded": "96270ed8bfe1",
-    "sage": "f81898f89dd8"
+    "odoo": "4461dce50858",
+    "sap": "442b8800b6f1",
+    "holded": "17c9564ca1ee",
+    "sage": "d36d31c53830"
   },
   "changes_history": [
+    {
+      "date": "31/07/2026",
+      "competitor": "Sage",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sage.com/es-es/erp/"
+    },
+    {
+      "date": "31/07/2026",
+      "competitor": "Holded",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.holded.com"
+    },
+    {
+      "date": "31/07/2026",
+      "competitor": "SAP Business One",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.sap.com/spain/products/erp/business-one.html"
+    },
+    {
+      "date": "31/07/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "30/07/2026",
       "competitor": "Sage",
@@ -6228,7 +6256,7 @@
       "SAP Business One - Opiniones, precios y características - Capterra España 2026",
       "Licencias y Precios de SAP Business One (para empresas españolas) - Itop",
       "Nuevas funcionalidades de SAP Business One en 2026 - Tecnologías de la información y comunicación",
-      "Obtenga mayor control sobre su pequeÃ±a empresa con la aplicaciÃ³n SAP Business One. Optimice los procesos usando un sof"
+      "Obtenga mayor control sobre su pequeña empresa con la aplicación SAP Business One. Optimice los procesos usando un softw"
     ],
     "holded": [
       "Precios de Holded en 2026: planes, tarifas y cuál elegir",
@@ -6240,12 +6268,52 @@
     "sage": [
       "Sage Contabilidad 2026: precios y opiniones reales",
       "Nueva versión Sage 200C | 2026.28.000 - Anuncios - Sage 200 España - Community Hub",
-      "Sage 50: Nueva versión 2026.1.0 - Aelis",
+      "Sage 50 Accounting: precios, funciones y opiniones | GetApp España 2026",
       "Sage 200: el ERP modular que crece con tu pyme",
       "Descubre los artículos y consejos empresariales de nuestros expertos en temática legal, contabilidad, facturación, recur"
     ]
   },
   "engagement_history": [
+    {
+      "url": "https://news.ycombinator.com/item?id=47341827",
+      "domain": "news.ycombinator.com",
+      "title": "SuperPowers: Agentic skills framework that works | Hacker News",
+      "snippet": "Once it&#x27;s teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest · After you&#x27;ve signed off on the design, your agent puts together an implementation plan that&#x27;s clear enough for an enthusiastic junior engineer with poor taste, no j",
+      "label": "HackerNews",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.xataka.com/robotica-e-ia/ahora-software-se-estaba-comiendo-mundo-ahora-ia-se-esta-comiendo-software",
+      "domain": "xataka.com",
+      "title": "Hasta ahora “el software se estaba comiendo el mundo”. Ahora la IA se está comiendo el software",
+      "snippet": "Plataformas como la europea Lovable han empujado esa idea al gran público: menos barreras técnicas, más iteración rápida, menos “proyecto” y más prueba y error. Esto no significa que una empresa vaya a reemplazar mañana su ERP por un sistema generado al vuelo, pero sí ayuda a entender por qué el mer",
+      "label": "Xataka",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/eurovision/comments/1p86scf/rtve_maintains_its_position_spain_will_not/",
+      "domain": "reddit.com",
+      "title": "r/eurovision on Reddit: RTVE maintains its position: Spain will not participate in Eurovision 2026 if Israel participate",
+      "snippet": "In September, RTVE&#x27;s Board of Directors approved by an absolute majority that Spain would not participate in Eurovision 2026 if Israel remained in the competition, becoming the first member of the Big Five to take such a drastic stance.",
+      "label": "Reddit ES",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/es/comments/1pert26/espa%C3%B1a_irlanda_eslovenia_y_los_pa%C3%ADses_bajos_se/",
+      "domain": "reddit.com",
+      "title": "r/es on Reddit: España, Irlanda, Eslovenia y los Países Bajos se han retirado de Eurovisión 2026 tras la decisión de la ",
+      "snippet": "España se une a otros paises europeos, avisando su salida de Eurovision si participa Israel. ... Why Portugal has won Eurovision only once when all the Western European countries have won at least 2-3 times? ... Eurovision 2026 : l’Espagne, l’Irlande et la Slovénie ne diffuseront pas le concours en ",
+      "label": "Reddit ES",
+      "date": "31/07/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
     {
       "url": "https://news.ycombinator.com/item?id=48430923",
       "domain": "news.ycombinator.com",
