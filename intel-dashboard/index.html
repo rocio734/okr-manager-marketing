@@ -309,6 +309,47 @@ function exportCSV(){
   a.download='etendo_intel_leads.csv';
   a.click();
 }
+
+// ── Engagement approval (localStorage) ──────────────────────────────────────
+const ENG_KEY='eng_approvals';
+const ENG_LABELS={pending:'⏳ Pendiente',approved:'✅ Aprobado',discarded:'🚫 Descartado',published:'📤 Publicado'};
+const ENG_STYLES={
+  pending:'font-size:10px;padding:2px 7px;border-radius:4px;background:#FFF8E1;color:#E65100',
+  approved:'font-size:10px;padding:2px 7px;border-radius:4px;background:#E6F4EA;color:#1B5E20;font-weight:600',
+  discarded:'font-size:10px;padding:2px 7px;border-radius:4px;background:#F5F5F5;color:#9E9E9E',
+  published:'font-size:10px;padding:2px 7px;border-radius:4px;background:#E3F2FD;color:#0D47A1;font-weight:600'
+};
+function engGet(){return JSON.parse(localStorage.getItem(ENG_KEY)||'{}');}
+function engSet(url,state){const d=engGet();d[url]=state;localStorage.setItem(ENG_KEY,JSON.stringify(d));renderEngagementStatus();}
+function engApprove(url){engSet(url,'approved');}
+function engDiscard(url){engSet(url,'discarded');}
+function engPublished(url){engSet(url,'published');}
+function engUndo(url){const d=engGet();delete d[url];localStorage.setItem(ENG_KEY,JSON.stringify(d));renderEngagementStatus();}
+function engCopy(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=event.target;btn.textContent='✅ Copiado';setTimeout(()=>{btn.textContent='📋 Copiar borrador';},2000);
+  }).catch(()=>alert(text));
+}
+function renderEngagementStatus(){
+  const approvals=engGet();
+  document.querySelectorAll('tr[data-eng-url]').forEach(row=>{
+    const url=row.dataset.engUrl;
+    const state=approvals[url]||'pending';
+    const badge=row.querySelector('.eng-status');
+    const actions=row.querySelector('.eng-actions');
+    if(badge) badge.innerHTML=`<span style="${ENG_STYLES[state]}">${ENG_LABELS[state]}</span>`;
+    if(!actions) return;
+    const u=url.replace(/'/g,"\\'");
+    if(state==='approved'){
+      actions.innerHTML=`<button onclick="engPublished('${u}')" style="font-size:10px;padding:2px 7px;border-radius:4px;border:none;background:#1976D2;color:#fff;cursor:pointer;margin-right:4px">📤 Publicado</button><button onclick="engUndo('${u}')" style="font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid #ccc;background:none;cursor:pointer">↩</button>`;
+    } else if(state==='discarded'||state==='published'){
+      actions.innerHTML=`<button onclick="engUndo('${u}')" style="font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid #ccc;background:none;cursor:pointer">↩ Deshacer</button>`;
+    } else {
+      actions.innerHTML=`<button onclick="engApprove('${u}')" style="font-size:10px;padding:2px 7px;border-radius:4px;border:none;background:#388E3C;color:#fff;cursor:pointer;margin-right:4px">✅ Aprobar</button><button onclick="engDiscard('${u}')" style="font-size:10px;padding:2px 7px;border-radius:4px;border:none;background:#616161;color:#fff;cursor:pointer">✕</button>`;
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded',renderEngagementStatus);
 </script>
 </body>
 </html>

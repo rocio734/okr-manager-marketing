@@ -972,26 +972,24 @@ def render_engagement(data):
         return '<tr><td colspan="5" style="padding:16px;text-align:center;color:var(--text-muted)">Sin posts detectados aún — ejecuta el script para buscar oportunidades</td></tr>'
     rows = ""
     for p in posts[:50]:
-        ready   = p.get("comment_ready", False)
-        skipped = p.get("skipped", False)
         draft   = p.get("comment_draft", "")
         score   = p.get("relevance_score", "—")
-        if ready:
-            badge = '<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:#E6F4EA;color:#1B5E20;font-weight:600">✅ Listo</span>'
-        elif skipped:
-            badge = '<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:#F5F5F5;color:#757575">Descartado</span>'
-        else:
-            badge = '<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:#FFF8E1;color:#E65100">Pendiente</span>'
-        draft_html = f'<details style="margin-top:4px"><summary style="cursor:pointer;font-size:10px;color:var(--text-muted)">Ver borrador</summary><div style="margin-top:6px;padding:8px;background:var(--gb);border-radius:4px;font-size:11px;line-height:1.5">{draft}</div></details>' if draft else '<span style="font-size:10px;color:var(--text-muted)">—</span>'
+        url     = p.get("url","").replace('"','&quot;')
+        title   = p.get("title","")
+        draft_escaped = draft.replace("`","\\`").replace("${","$\\{")
+        draft_html = f'<details style="margin-top:4px"><summary style="cursor:pointer;font-size:10px;color:var(--text-muted)">Ver borrador</summary><div id="draft-{hash(url)}" style="margin-top:6px;padding:8px;background:var(--gb);border-radius:4px;font-size:11px;line-height:1.5;white-space:pre-wrap">{draft}</div><button onclick="engCopy(`{draft_escaped}`)" style="margin-top:4px;font-size:10px;padding:2px 8px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--gb)">📋 Copiar borrador</button></details>' if draft else '<span style="font-size:10px;color:var(--text-muted)">—</span>'
         label_badge = f'<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#E6F1FB;color:#0C447C">{p.get("label","")}</span>'
-        rows += f'''<tr>
-          <td style="padding:8px 10px;max-width:240px">
-            <a href="{p.get("url","")}" target="_blank" class="lnk" style="font-size:12px;font-weight:600">{p.get("title","")[:60]}{"…" if len(p.get("title",""))>60 else ""}</a>
+        rows += f'''<tr data-eng-url="{url}">
+          <td style="padding:8px 10px;max-width:220px">
+            <a href="{url}" target="_blank" class="lnk" style="font-size:12px;font-weight:600">{title[:60]}{"…" if len(title)>60 else ""}</a>
             <div style="font-size:10px;color:var(--text-muted)">{p.get("domain","")}</div>
           </td>
           <td style="padding:8px 10px">{label_badge}</td>
           <td style="padding:8px 10px;font-size:11px">{score}/10</td>
-          <td style="padding:8px 10px">{badge}</td>
+          <td style="padding:8px 10px;min-width:120px">
+            <div class="eng-status"></div>
+            <div class="eng-actions" style="margin-top:4px"></div>
+          </td>
           <td style="padding:8px 10px;max-width:300px">{draft_html}</td>
         </tr>'''
     return rows
