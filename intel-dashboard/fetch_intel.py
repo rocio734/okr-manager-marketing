@@ -78,27 +78,27 @@ LEAD_SEARCHES = [
 
 # Búsquedas de oportunidades de engagement (foros, posts, hilos con comentarios abiertos)
 ENGAGEMENT_SEARCHES = [
-    {"query": f'site:reddit.com ERP España {_YEAR}',                                        "label": "Reddit ES"},
-    {"query": f'site:reddit.com "ERP" OR "enterprise software" pyme automatización',        "label": "Reddit ERP"},
-    {"query": f'site:reddit.com "Odoo" OR "SAP" OR "ERP" España migrar alternativa',        "label": "Reddit migración"},
-    {"query": f'site:quora.com ERP España pyme automatización recomendación',                "label": "Quora"},
-    {"query": f'site:forocoches.com ERP software empresa gestión',                          "label": "Forocoches"},
-    {"query": f'site:rankia.com ERP software empresa {_YEAR}',                              "label": "Rankia"},
-    {"query": f'site:xataka.com ERP automatización empresa IA {_YEAR}',                     "label": "Xataka"},
-    {"query": f'site:news.ycombinator.com "ERP" OR "agentic" enterprise Spain',             "label": "HackerNews"},
-    {"query": f'"qué ERP" OR "qué erp recomendáis" OR "mejor ERP pyme" España {_YEAR}',    "label": "Pregunta ERP"},
-    {"query": f'"ERP agéntico" OR "agentic ERP" OR "ERP con IA" España {_YEAR} foro',      "label": "Agentic ERP"},
-    {"query": f'"cambiar de ERP" OR "abandonar Odoo" OR "dejar SAP" España {_YEAR}',       "label": "Cambio ERP"},
-    {"query": f'site:linkedin.com/posts "ERP" "automatización" España {_YEAR}',             "label": "LinkedIn posts"},
+    {"query": f'site:reddit.com ERP España {_YEAR}',                                           "label": "Reddit ES"},
+    {"query": f'site:reddit.com "ERP" OR "enterprise software" pyme automatización',           "label": "Reddit ERP"},
+    {"query": f'site:reddit.com "Odoo" OR "SAP" OR "ERP" España migrar alternativa',           "label": "Reddit migración"},
+    {"query": f'site:reddit.com "agentic ERP" OR "ERP IA" OR "ERP agentes"',                  "label": "Reddit Agentic"},
+    {"query": f'site:quora.com ERP España pyme automatización recomendación',                   "label": "Quora ES"},
+    {"query": f'site:quora.com "ERP" "open source" recommendation Spain',                      "label": "Quora EN"},
+    {"query": f'site:forocoches.com ERP software empresa gestión',                             "label": "Forocoches"},
+    {"query": f'site:news.ycombinator.com "ERP" OR "agentic" enterprise Spain',               "label": "HackerNews"},
+    {"query": f'site:stackoverflow.com "ERP" OR "agentic ERP" open source',                   "label": "StackOverflow"},
+    {"query": f'site:dev.to "ERP" OR "agentic" enterprise automation {_YEAR}',                "label": "dev.to"},
+    {"query": f'"qué ERP" OR "qué erp recomendáis" OR "mejor ERP pyme" España {_YEAR} foro', "label": "Pregunta ERP"},
+    {"query": f'"cambiar de ERP" OR "abandonar Odoo" OR "dejar SAP" España {_YEAR} foro',    "label": "Cambio ERP"},
 ]
 
-# Dominios que sabemos son interactuables (foros, comunidades, medios con comentarios)
+# Solo dominios donde se puede comentar (foros y comunidades reales)
 ENGAGEMENT_DOMAINS = {
-    "reddit.com","quora.com","forocoches.com","rankia.com","xataka.com",
-    "news.ycombinator.com","ycombinator.com","medium.com","dev.to",
-    "forofinanciero.com","comunidad.ieb.es","stackoverflow.com",
-    "elconfidencial.com","cincodias.elpais.com","expansion.com",
-    "g2.com","capterra.es","softwareadvice.es","getapp.es",
+    "reddit.com", "quora.com", "forocoches.com",
+    "news.ycombinator.com", "ycombinator.com",
+    "stackoverflow.com", "dev.to",
+    "forofinanciero.com", "comunidad.ieb.es",
+    "g2.com", "capterra.es", "softwareadvice.es", "getapp.es",
 }
 
 MAPS_SEARCHES = [
@@ -111,7 +111,21 @@ MAPS_SEARCHES = [
 
 SPAIN_CITIES = ["Madrid,Spain","Barcelona,Spain","Valencia,Spain","Bilbao,Spain","Zaragoza,Spain","Sevilla,Spain"]
 
-SKIP_DOMAINS = {"odoo","sap","sage","holded","linkedin","infojobs","wikipedia","youtube","google","bing","microsoft","facebook","twitter"}
+SKIP_DOMAINS = {
+    # Competidores ERP
+    "odoo","sap","sage","holded","netsuite","cegid","zucchetti","abas",
+    "navision","dynamics","visma","syca","solmicro","a3erp","epicor",
+    # Plataformas tech gigantes (falsos positivos del partner spider)
+    "linkedin","infojobs","wikipedia","youtube","google","bing","microsoft","ibm",
+    "facebook","twitter","instagram","tiktok","apple","wordpress","termsfeed",
+    "medium","reddit","quora","pinterest","shopify","wix","squarespace",
+    "github","dropbox","slack","zoom","paypal","stripe","amazon","hubspot",
+    "salesforce","oracle","adobe","netflix","spotify","airbnb","uber",
+    "bebee","g2","capterra","softwareadvice","getapp","trustradius",
+    # Medios de comunicación (no son prospectos)
+    "elpais","expansion","cincodias","elconfidencial","xataka","eleconomista",
+    "cinco","rankia","ihlservices","hpcwire","forbes","gartner","mckinsey",
+}
 
 # Caché de URLs ya vistas para saber si usar auto_save o adaptive
 _scrapling_seen_urls = set()
@@ -420,7 +434,13 @@ class PartnerSpider:
         client_els = page.css("[class*='client'], [class*='customer'], [class*='case']", auto_save=True)
         clients = [el.text for el in client_els[:3] if el.text and len(el.text) > 3]
 
-        final_domain = domain_from_url(partner_web) if partner_web else domain
+        # Validar que el dominio externo sea una empresa real, no un gigante tech
+        candidate = domain_from_url(partner_web) if partner_web else domain
+        final_domain = candidate if (candidate and not should_skip(candidate)) else domain
+
+        # Si el dominio final sigue siendo inválido, descartar
+        if should_skip(final_domain):
+            return None
 
         return {
             "name": name.strip()[:60],
@@ -746,7 +766,7 @@ def search_all_leads(data):
                     profile["name"], d, profile["sector"],
                     "partner", f"Partner {comp_name} (deep)", "s-par",
                     profile["web"], f"Partner {comp_name} — clientes: {', '.join(profile['clients_mentioned']) or 'N/A'}",
-                    3, "partner_spider"  # Score 3 porque tenemos perfil completo
+                    2, "partner_spider"  # Score 2 — son partners de competidores, no leads directos
                 )
                 lead["phone"] = profile.get("phone","—")
                 new.append(lead); seen.add(d)
