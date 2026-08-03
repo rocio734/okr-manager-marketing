@@ -40,12 +40,12 @@ OUTREACH_SOURCE   = "intel_dashboard"
 PIPELINE_ID       = "11d2089f-a64e-4001-b8af-9210787f3fce"
 STAGE_MAP = {
     "Nuevo Lead":        "2f7828bf-51eb-4a5e-a645-026a7e06834b",
-    "Contactado":        "5f230c21-de90-4b4d-9c05-c6dcdb2a1e7a",
-    "Reunión Agendada":  "943efba8-d11e-42ce-8753-88b8aabf02b9",
-    "Propuesta Enviada": "7c113042-33a6-4a6d-b851-1cdfe9e5ccea",
-    "Negociación":       "21df17b6-e0cf-4ff0-b605-47cb61a6b9f6",
-    "Cerrado Ganado":    "50217db0-7f61-4dba-a78c-4eb0803ebf89",
-    "Cerrado Perdido":   "18ac2275-7d73-4b33-baf8-fa78b8c5a1cf",
+    "Contactado":        "5f230c21-f6e8-4a1d-8b85-4a49655a1a5d",
+    "Reunión Agendada":  "943efba8-7576-458c-a174-759d48bc8bd2",
+    "Propuesta Enviada": "7c113042-bbbf-4fbc-9f0c-7430ba5e8dd0",
+    "Negociación":       "21df17b6-7d79-46e9-b988-5bb14642b189",
+    "Cerrado Ganado":    "50217db0-be0f-4ddc-9d92-25fca24cce7e",
+    "Cerrado Perdido":   "18ac2275-509c-443d-8460-10b4f322ddd0",
 }
 
 # 1x1 transparent GIF
@@ -634,28 +634,24 @@ def outreach_list():
     if not SUPABASE_URL:
         raise HTTPException(status_code=503, detail="Supabase not configured")
     try:
-        # Contacts tagged as intel leads
         c_r = requests.get(
             f"{SUPABASE_URL}/rest/v1/contacts?fuente=eq.{OUTREACH_SOURCE}"
-            f"&select=id,nombre,email,empresa,custom_fields",
+            f"&select=id,nombre,email,empresa,notas_internas,custom_fields",
             headers=_SB_HEADERS(), timeout=10)
         contacts = c_r.json() if c_r.status_code == 200 else []
-
         if not contacts:
             return {"leads": []}
 
         contact_ids = [c["id"] for c in contacts]
         id_filter = ",".join(contact_ids)
 
-        # Deals for those contacts
         d_r = requests.get(
             f"{SUPABASE_URL}/rest/v1/deals?contact_id=in.({id_filter})"
-            f"&select=id,contact_id,stage_id,prioridad,updated,notas_internas",
+            f"&select=id,contact_id,stage_id,prioridad,updated_at",
             headers=_SB_HEADERS(), timeout=10)
         deals = d_r.json() if d_r.status_code == 200 else []
         deal_by_contact = {d["contact_id"]: d for d in deals}
 
-        # Email opens per contact email
         emails = [c["email"] for c in contacts if c.get("email")]
         open_counts: dict = {}
         open_last: dict = {}
@@ -689,11 +685,11 @@ def outreach_list():
                 "score":        cf.get("score", 0),
                 "stage":        stage_name.get(deal.get("stage_id", ""), "Nuevo Lead"),
                 "stage_id":     deal.get("stage_id", STAGE_MAP["Nuevo Lead"]),
-                "prioridad":    deal.get("prioridad", "media"),
                 "opens":        open_counts.get(email, 0),
                 "last_open":    open_last.get(email, ""),
-                "updated":      deal.get("updated", ""),
-                "notas":        deal.get("notas_internas", ""),
+                "notas":        c.get("notas_internas", ""),
+                "sent_at":      cf.get("sent_at", ""),
+                "attempts":     cf.get("attempts", 0),
                 "subject":      cf.get("outreach_subject", ""),
                 "pixel_url":    f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif",
             })
@@ -707,24 +703,51 @@ def outreach_list():
 
 @app.put("/api/outreach/{deal_id}")
 def outreach_update(deal_id: str, stage: Optional[str] = None,
-                    notas: Optional[str] = None):
-    """Actualiza stage y/o notas de un deal de outreach."""
+                    notas: Optional[str] = None, sent: Optional[bool] = None):
+    """Actualiza stage, notas y/o registra un intento de envío."""
     if not SUPABASE_URL:
         raise HTTPException(status_code=503, detail="Supabase not configured")
-    payload: dict = {}
+
+    # Fetch deal to get contact_id
+    dr = requests.get(f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}&select=contact_id",
+                      headers=_SB_HEADERS(), timeout=10)
+    deal_rows = dr.json() if dr.status_code == 200 else []
+    if not deal_rows:
+        raise HTTPException(status_code=404, detail="Deal no encontrado")
+    contact_id = deal_rows[0]["contact_id"]
+
+    # Update deal stage if requested
     if stage and stage in STAGE_MAP:
-        payload["stage_id"] = STAGE_MAP[stage]
+        requests.patch(
+            f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}",
+            headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+            json={"stage_id": STAGE_MAP[stage]}, timeout=10)
+
+    # Update contact notes and/or sent tracking
+    contact_payload: dict = {}
     if notas is not None:
-        payload["notas_internas"] = notas
-    if not payload:
-        raise HTTPException(status_code=400, detail="Nada que actualizar")
-    r = requests.patch(
-        f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}",
-        headers={**_SB_HEADERS(), "Prefer": "return=representation"},
-        json=payload, timeout=10)
-    if r.status_code in (200, 201):
-        return {"ok": True, "updated": r.json()}
-    raise HTTPException(status_code=r.status_code, detail=r.text)
+        contact_payload["notas_internas"] = notas
+
+    if sent:
+        # Fetch current custom_fields to increment attempts
+        cr = requests.get(
+            f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}&select=custom_fields",
+            headers=_SB_HEADERS(), timeout=10)
+        cf = (cr.json() or [{}])[0].get("custom_fields") or {}
+        now_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        cf["attempts"] = cf.get("attempts", 0) + 1
+        if not cf.get("sent_at"):
+            cf["sent_at"] = now_iso
+        cf["last_sent_at"] = now_iso
+        contact_payload["custom_fields"] = cf
+
+    if contact_payload:
+        requests.patch(
+            f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}",
+            headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+            json=contact_payload, timeout=10)
+
+    return {"ok": True}
 
 
 # ── Startup warmup ─────────────────────────────────────────────────────────────

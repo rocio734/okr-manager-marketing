@@ -878,11 +878,11 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <table class="tbl" id="or-table">
       <thead><tr>
         <th>Empresa</th><th>Email</th><th>Sector</th><th>Score</th>
-        <th>Etapa</th><th>Aperturas</th><th>Última apertura</th>
+        <th>Etapa</th><th>Enviado</th><th>Aperturas</th><th>Última apertura</th>
         <th>Pixel</th><th>Notas</th><th>Acción</th>
       </tr></thead>
       <tbody id="or-tbody">
-        <tr><td colspan="10" style="text-align:center;padding:24px;color:var(--gm)">Cargando leads…</td></tr>
+        <tr><td colspan="11" style="text-align:center;padding:24px;color:var(--gm)">Cargando leads…</td></tr>
       </tbody>
     </table>
   </div>
@@ -988,6 +988,7 @@ document.addEventListener('DOMContentLoaded',renderEngagementStatus);
 const OR_API = 'https://etendo-dashboard-api.onrender.com';
 let _orData = [];
 let _orFilter = 'all';
+let _orRefreshTimer = null;
 
 const OR_STAGE_COLORS = {
   'Nuevo Lead':        '#E3F2FD:#1565C0',
@@ -1010,8 +1011,8 @@ function orScoreDot(s){
   return `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px"></span>${s}`;
 }
 
-async function loadOutreach(){
-  document.getElementById('or-tbody').innerHTML='<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--gm)">Cargando…</td></tr>';
+async function loadOutreach(silent=false){
+  if(!silent) document.getElementById('or-tbody').innerHTML='<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--gm)">Cargando…</td></tr>';
   try {
     const r = await fetch(`${OR_API}/api/outreach`);
     const d = await r.json();
@@ -1019,8 +1020,11 @@ async function loadOutreach(){
     renderOutreach();
     document.getElementById('or-updated').textContent = `Actualizado: ${new Date().toLocaleTimeString('es-ES')}`;
   } catch(e) {
-    document.getElementById('or-tbody').innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--rd)">Error al cargar: ${e.message}</td></tr>`;
+    if(!silent) document.getElementById('or-tbody').innerHTML=`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--rd)">Error al cargar: ${e.message}</td></tr>`;
   }
+  // Auto-refresh cada 5 min
+  clearTimeout(_orRefreshTimer);
+  _orRefreshTimer = setTimeout(()=>loadOutreach(true), 5*60*1000);
 }
 
 function orFilter(val, el){
@@ -1047,29 +1051,36 @@ function renderOutreach(){
   const stageOpts = STAGES.map(s=>`<option value="${s}">${s}</option>`).join('');
 
   document.getElementById('or-tbody').innerHTML = rows.map(l=>{
-    const pixelTag = l.email ? `<code style="font-size:9px;word-break:break-all">&lt;img src="${l.pixel_url}" width="1" height="1"&gt;</code>` : '—';
+    const pixelTag = l.email
+      ? `<button onclick="orCopyPixel('${l.pixel_url}',this)" style="font-size:10px;padding:2px 8px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">📋 Copiar pixel</button>`
+      : '—';
     const openBadge = l.opens>0
-      ? `<span style="background:#E8F5E9;color:#2E7D32;padding:2px 6px;border-radius:10px;font-size:10px">✓ ${l.opens}×</span>`
-      : `<span style="color:var(--gm);font-size:10px">No abierto</span>`;
+      ? `<span style="background:#E8F5E9;color:#2E7D32;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600">✓ ${l.opens}×</span>`
+      : `<span style="color:var(--gm);font-size:10px">Sin aperturas</span>`;
     const lastOpen = l.last_open ? new Date(l.last_open).toLocaleDateString('es-ES') : '';
+    const sentInfo = l.sent_at
+      ? `<span style="font-size:10px;color:var(--gm)">${new Date(l.sent_at).toLocaleDateString('es-ES')}<br><b>${l.attempts}× enviado</b></span>`
+      : `<span style="font-size:10px;color:var(--gm)">Sin enviar</span>`;
     return `<tr>
       <td style="padding:8px 10px;font-weight:500">${l.empresa}</td>
       <td style="padding:8px 10px;font-size:11px">${l.email||'—'}</td>
       <td style="padding:8px 10px;font-size:11px">${l.sector||'—'}</td>
       <td style="padding:8px 10px">${orScoreDot(l.score)}</td>
       <td style="padding:8px 10px">${orStageBadge(l.stage)}</td>
+      <td style="padding:8px 10px">${sentInfo}</td>
       <td style="padding:8px 10px">${openBadge}</td>
       <td style="padding:8px 10px;font-size:11px;color:var(--gm)">${lastOpen}</td>
-      <td style="padding:8px 6px;max-width:220px">${pixelTag}</td>
+      <td style="padding:8px 6px">${pixelTag}</td>
       <td style="padding:8px 6px">
         <input id="note-${l.deal_id}" value="${(l.notas||'').replaceAll('"','&quot;')}" placeholder="Notas…"
-          style="width:120px;font-size:11px;padding:3px 6px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk)">
+          style="width:110px;font-size:11px;padding:3px 6px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk)">
       </td>
       <td style="padding:8px 6px;white-space:nowrap">
         <select id="stage-${l.deal_id}" style="font-size:11px;padding:3px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk)">
           ${STAGES.map(s=>`<option value="${s}"${s===l.stage?' selected':''}>${s}</option>`).join('')}
-        </select>
-        <button onclick="orSave('${l.deal_id}')" style="font-size:10px;padding:3px 8px;border:none;border-radius:4px;background:var(--y);cursor:pointer;margin-left:4px">✓</button>
+        </select><br>
+        <button onclick="orSave('${l.deal_id}')" style="font-size:10px;padding:3px 7px;border:none;border-radius:4px;background:var(--y);cursor:pointer;margin-top:4px">✓ Guardar</button>
+        <button onclick="orMarkSent('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #43A047;border-radius:4px;background:transparent;color:#43A047;cursor:pointer;margin-top:4px;margin-left:2px">📤 Enviado</button>
       </td>
     </tr>`;
   }).join('');
@@ -1091,6 +1102,34 @@ async function orSave(dealId){
   } catch(e){
     alert('Error: '+e.message);
   }
+}
+
+async function orMarkSent(dealId, btn){
+  btn.disabled = true;
+  btn.textContent = '…';
+  try {
+    const r = await fetch(`${OR_API}/api/outreach/${dealId}?sent=true`,{method:'PUT'});
+    const d = await r.json();
+    if(d.ok){
+      await loadOutreach(true);
+    } else {
+      alert('Error: '+JSON.stringify(d));
+      btn.disabled=false; btn.textContent='📤 Enviado';
+    }
+  } catch(e){
+    alert('Error: '+e.message);
+    btn.disabled=false; btn.textContent='📤 Enviado';
+  }
+}
+
+function orCopyPixel(url, btn){
+  const tag = `<img src="${url}" width="1" height="1" style="display:none">`;
+  navigator.clipboard.writeText(tag).then(()=>{
+    btn.textContent='✅ Copiado';
+    setTimeout(()=>{btn.textContent='📋 Copiar pixel';},2500);
+  }).catch(()=>{
+    prompt('Copia este pixel:',tag);
+  });
 }
 </script>
 </body>
