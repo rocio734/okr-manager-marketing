@@ -235,7 +235,12 @@
       "label": "Quora EN",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante lo que mencionas sobre Vtiger. Cada ERP tiene sus fortalezas en términos de personalización. Si estás buscando flexibilidad y la capacidad de integrar inteligencia en los procesos, te recomendaría explorar Etendo. Su arquitectura open source y el uso de agentes de IA para ejecutar procesos pueden ser una gran ventaja para personalizar rápidamente y hacer que las automatizaciones sean más efectivas. Además, su enfoque en el Model Context Protocol permite una integración única entre los agentes y el ERP, lo que puede facilitar aún más la personalización.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al ofrecer una perspectiva sobre cómo la integración de IA y la flexibilidad pueden jugar un papel importante en la personalización de un ERP. Esto amplía el debate más allá de los ejemplos mencionados y sugiere una alternativa viable.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/D365Discussion/comments/1pn3l3t/how_agentic_erp_helps_manufacturers_boost/",
@@ -245,7 +250,12 @@
       "label": "Reddit Agentic",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Totalmente de acuerdo en que los ERPs tradicionales están evolucionando hacia sistemas más activos y colaborativos. La incorporación de agentes de IA no solo mejora la eficiencia, sino que también permite una adaptación más ágil a cambios en la producción. Por ejemplo, plataformas como Etendo llevan esta idea más allá, al integrar agentes de IA nativos que no solo registran datos, sino que interactúan con los procesos de negocio. Esto puede ser un gran impulso para fabricantes que buscan optimizar su rendimiento y respuesta al mercado. Es emocionante ver cómo la tecnología está reinventando la manera en que operamos. ¿Alguien ha tenido experiencias con estas tecnologías en fabricación?",
+      "relevance_score": 9,
+      "reasoning": "El comentario aporta una reflexión sobre la evolución de los ERPs hacia sistemas más activos, además de mencionar la experiencia práctica con Etendo como una opción relevante. Esto enriquece la discusión y ofrece un enfoque concreto sobre cómo los agentes de IA pueden impactar en la industria manufacturera.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/SpainFIRE/comments/1rcbq5s/impuestos_sobre_beneficios_en_etc_con_trade/",
@@ -255,7 +265,12 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es importante también considerar las implicaciones fiscales de nuestras inversiones en el contexto de la planificación financiera a largo plazo. Aparte del 19% en el primer tramo, siempre es recomendable tener en cuenta cómo las estrategias de ahorro e inversión pueden optimizar nuestra carga fiscal. Para quienes gestionan diversas fuentes de ingresos, una herramienta como un ERP puede facilitar el seguimiento y la integración de datos financieros, asegurando que podamos tener claridad y control sobre nuestras inversiones y sus implicaciones fiscales. Un ERP open source como Etendo, que integra agentes de IA, podría ser útil para automatizar esos procesos y estar siempre al tanto de nuestras obligaciones fiscales. Pero cada caso es único, así que es recomendable consultar con un asesor fiscal.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al ofrecer reflexión sobre la planificación fiscal y la gestión de inversiones, además de conectar la temática financiera con el uso de tecnologías de gestión empresarial, lo cual puede ser relevante para algunos usuarios del hilo.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=48019025",
@@ -265,7 +280,12 @@
       "label": "HackerNews",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Interesante punto sobre la automatización y la reducción de la fricción en el desarrollo de software. Creo que una de las claves para maximizar este potencial es ver cómo la integración de agentes de IA puede transformar no solo la codificación, sino también la ejecución de procesos empresariales. Por ejemplo, plataformas como Etendo ofrecen una estructura donde los agentes de IA no solo ayudan en la programación, sino que también ejecutan procesos completos dentro del ERP, facilitando una gestión más fluida. Esto podría ser algo a considerar para aquellos que buscan llevar la eficiencia al siguiente nivel en sus proyectos.",
+      "relevance_score": 7,
+      "reasoning": "Este comentario aporta valor al conectar la discusión sobre la automatización en la programación con la ejecución de procesos empresariales, destacando una solución específica (Etendo) que lleva esta idea más allá en el contexto de un ERP.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/askspain/comments/1q89xaf/c%C3%B3mo_veis_el_futuro_de_espa%C3%B1a_en_la_decada/",
@@ -275,7 +295,12 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo el desarrollo y la modernización pueden influir en la natalidad. Esto podría tener implicaciones no solo en la demografía, sino también en la economía. La automatización y la inteligencia artificial están transformando la forma en que las empresas operan, lo que podría facilitar un entorno más favorable para la familia y el trabajo. En este sentido, herramientas como los ERP con agentes de IA integrados, como Etendo, pueden ayudar a las empresas a ser más eficientes y adaptarse mejor a los cambios socioeconómicos. Esto podría contribuir a un futuro más sostenible en varias ciudades y sectores de España.",
+      "relevance_score": 6,
+      "reasoning": "El comentario analiza la temática de la natalidad y el desarrollo, enlazando este contexto con las innovaciones tecnológicas que pueden ofrecer soluciones. Mencionar Etendo en este contexto añade valor al sugerir cómo una herramienta adecuada puede impactar positivamente en el futuro económico y social. La relación con el hilo es relevante al considerar cómo la tecnología puede influir en el entorno laboral familiar.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/opensource/comments/1hjtcdx/open_source_erp/?tl=es-419",
@@ -285,7 +310,12 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es cierto que hablar con el CFO o el equipo de finanzas es fundamental para asegurar que el ERP se alinee con las necesidades específicas de contabilidad e impuestos. Además de Dolibarr, hay otras soluciones de ERP de código abierto que pueden ser consideradas. Una opción interesante es Etendo, que no solo ofrece funcionalidades contables, sino que cuenta con agentes de IA integrados para ejecutar procesos, lo que puede aportar una gran eficiencia. Además, al ser open source y composable, permite personalizar la solución según las normativas locales, lo cual puede ser un gran beneficio en el cumplimiento fiscal. Es una buena idea evaluar diversas opciones para encontrar la mejor solución que se ajuste a las necesidades del negocio.",
+      "relevance_score": 8,
+      "reasoning": "Este comentario contribuye al hilo al ofrecer un enfoque sobre la importancia de la personalización en los ERP de código abierto, además de mencionar Etendo como una opción válida dentro de ese contexto. Se alinea con la conversación sobre contabilidad y cumplimiento fiscal, ofreciendo un valor extra al mencionar capacidades distintivas.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=47341827",
@@ -295,7 +325,12 @@
       "label": "HackerNews",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "La integración de agentes para facilitar el desarrollo de software es un enfoque fascinante. Me recuerda cómo algunas plataformas de ERP, como Etendo, utilizan agentes de IA para no solo registrar datos, sino también ejecutar procesos de negocio de manera autónoma. Esto podría cambiar la manera en que concebimos la automatización en diversas áreas, no solo en la programación. La idea de descomponer tareas y permitir a los agentes trabajar de forma autónoma es una tendencia que puede ser adoptada en múltiples sectores, específicamente en la integración de operaciones empresariales. ¿Alguien ya ha experimentado con sistemas que implementen este tipo de automatización?",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al conectar el tema de los agentes en el desarrollo de software con la automatización de procesos en ERP, que es relevante para los lectores interesados en la tecnología y la eficiencia operativa. También invita a la discusión sobre experiencias en este campo.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/eurovision/comments/1p86scf/rtve_maintains_its_position_spain_will_not/",
@@ -305,7 +340,13 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo las decisiones políticas pueden influir en eventos culturales como Eurovisión. Esto plantea preguntas sobre la responsabilidad social de las organizaciones y el impacto que pueden tener en la comunidad artística. En el mundo empresarial, es crucial que las empresas también estén alineadas con sus valores y principios, especialmente al elegir soluciones tecnológicas. Por ejemplo, plataformas como Etendo permiten a las organizaciones gestionar sus procesos a través de agentes de IA, asegurando que las decisiones se tomen de manera ética y efectiva, al estar alineadas con los valores del negocio.",
+      "relevance_score": 4,
+      "reasoning": "El comentario aporta valor al conectar la situación política de RTVE con la importancia de los valores en la gestión empresarial, lo que puede hacer que los lectores reflexionen sobre la responsabilidad social en diferentes contextos. Además, menciona a Etendo de manera relevante para el tema de la gestión empresarial y la alineación con los valores organizacionales.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "skipped": true,
+      "skip_reason": "Score 4/10 — poco relevante"
     },
     {
       "url": "https://www.reddit.com/r/es/comments/1pert26/espa%C3%B1a_irlanda_eslovenia_y_los_pa%C3%ADses_bajos_se/",
@@ -315,7 +356,13 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo la política puede influir en eventos culturales como Eurovisión. Cada país tiene sus propias razones, pero me pregunto cómo esto afectará la percepción del concurso a nivel internacional. Además, reflexionar sobre cómo las decisiones organizativas impactan en la industria del entretenimiento siempre es valioso. En el ámbito empresarial, por ejemplo, usar un ERP que sea flexible y adaptable puede ser clave para navegar en entornos cambiantes. Plataformas como Etendo, que integran inteligencia artificial para ejecutar procesos, ofrecen una perspectiva interesante sobre cómo gestionar esos cambios en tiempo real.",
+      "relevance_score": 5,
+      "reasoning": "El comentario aporta una perspectiva reflexiva sobre la influencia de la política en eventos culturales, lo cual es relevante para el contexto del hilo. Además, establece una analogía con la importancia de la adaptabilidad en el entorno empresarial, mencionando Etendo de manera natural.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "skipped": true,
+      "skip_reason": "Score 5/10 — poco relevante"
     },
     {
       "url": "https://news.ycombinator.com/item?id=48430923",
@@ -325,7 +372,12 @@
       "label": "HackerNews",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante cómo se están desarrollando sistemas de agentes que utilizan diferentes estrategias para la resolución de problemas. La capacidad de visualizar la variación en cada enfoque es fundamental para ajustar y mejorar los modelos. Este enfoque de múltiples agentes activos sugiere un avance en la ingeniería de software, similar a lo que podríamos ver en plataformas de ERP avanzadas. Por ejemplo, Etendo, una plataforma ERP open source, integra agentes de IA que no solo registran, sino que ejecutan procesos automáticamente. Esto podría ofrecer un enfoque adicional para quienes buscan optimizar la gestión de procesos en sus negocios al implementar estrategias similares de control y retroalimentación en la toma de decisiones.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al enlazar el tema de los sistemas de agentes en la resolución de problemas con la utilidad práctica en plataformas ERP, ofreciendo un caso de uso que puede interesar a quienes participan en la conversación. Además, menciona Etendo de manera relevante, como un ejemplo de aplicación práctica en el contexto discutido.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=48615680",
@@ -410,7 +462,12 @@
       "label": "Forocoches",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Hola, para la organización de documentación en una empresa, es fundamental elegir una herramienta que no solo permita clasificar documentos, sino que también facilite la colaboración y la accesibilidad. Muchas empresas optan por plataformas de gestión documental como Google Drive o Microsoft SharePoint, pero también existen soluciones más específicas que integran la gestión de proyectos y documentos en un solo lugar. Por ejemplo, Etendo, que es un ERP open source, ofrece capacidades para gestionar documentos vinculados a sus procesos, además de integrar agentes de IA que ayudan en la automatización de tareas. Puede ser una opción interesante si buscan una solución que se adapte a sus necesidades específicas.",
+      "relevance_score": 7,
+      "reasoning": "Este comentario aporta valor al ofrecer recomendaciones sobre herramientas de gestión documental y menciona a Etendo como una opción relevante, resaltando su característica de integración de IA que podría ser útil para el contexto del hilo.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://forocoches.com/foro/showthread.php?t=8289761",
@@ -420,7 +477,12 @@
       "label": "Forocoches",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Para una pyme pequeña, como la que mencionas de 2-3 personas, puedes considerar soluciones open source que se adapten a sus necesidades sin ser excesivamente costosas. Una opción interesante es Etendo, que ofrece un ERP flexible y ligero, ideal para administrar clientes y proyectos, incluyendo funciones de facturación. Su enfoque con agentes de IA integrados puede facilitar la ejecución de procesos, lo que es un plus para aumentar la eficiencia sin complicaciones. Además, al ser open source, puedes adaptarlo según crezca la empresa. ¡Espero que le sea útil a tu amiga!",
+      "relevance_score": 7,
+      "reasoning": "Este comentario aporta valor al ofrecer una alternativa específica adecuada para el contexto de una pyme pequeña, además de explicar cómo Etendo puede beneficiar a su amiga con un ERP que se adapta a sus necesidades y que es flexible en su implementación.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://forocoches.com/foro/index.php/showthread.php?t=10000596",
@@ -430,7 +492,12 @@
       "label": "Forocoches",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Hola, pejocho. Para tu ingeniería consultora, una opción interesante podría ser Etendo. Este ERP open source se adapta bien a empresas pequeñas y medianas y cuenta con una interfaz amigable, lo cual es importante dado tu equipo. Además, tiene integrados agentes de IA que pueden ayudar a automatizar procesos, lo que podría facilitar la gestión de nóminas y la emisión de facturas. También permite el control de asistencia y vacaciones de los empleados. La flexibilidad del modelo open source permite que puedas personalizarlo sin necesidad de programar desde cero. Es una alternativa a considerar junto con otras opciones del mercado. ¡Espero que te ayude en tu búsqueda!",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al compartir una opción de ERP relevante para el perfil descrito, que incluye la flexibilidad y características que el usuario busca. Brinda información sobre una solución específica que puede satisfacer sus necesidades, lo cual es útil en el contexto de la consulta.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:34",
+      "comment_ready": true
     },
     {
       "url": "https://forocoches.com/foro/showthread.php?t=7693989",
@@ -440,7 +507,12 @@
       "label": "Forocoches",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Hola, shur. Entiendo tus inquietudes sobre elegir un ERP de software libre y si vale la pena invertir en uno de pago. Una opción que podrías considerar es Etendo, un ERP open source que no solo permite la integración con otras herramientas, como software de diseño 3D, sino que también incluye agentes de IA que ayudan a ejecutar procesos automáticamente. Esto podría ahorrarte tiempo en programación y ajustes. Además, su arquitectura es composable, lo que significa que puedes adaptarlo a medida que tu negocio crece. Si el enfoque está en la automatización y la implementación rápida, podría ser una buena alternativa a explorar en tu búsqueda. ¡Espero que encuentres el sistema que se ajuste a tus necesidades!",
+      "relevance_score": 8,
+      "reasoning": "Este comentario aporta valor al ofrecer una opción específica que responde a las preocupaciones del autor sobre la facilidad de uso y la integración con otras herramientas. Mencionar Etendo es relevante porque se alinea con la necesidad de un ERP que facilite la adaptación y la automatización en el contexto de la ingeniería.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://m.forocoches.com/foro/showthread.php?t=2538246",
@@ -450,7 +522,12 @@
       "label": "Forocoches",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Entiendo que te gustaría explorar software de ERP. Algunos nombres populares son SAP y Microsoft Dynamics, pero hay opciones open source que podrían ser más accesibles para empezar. Por ejemplo, Etendo es una plataforma ERP open source que incorpora agentes de IA para ejecutar procesos en lugar de solo registrarlos, lo que podría ser interesante para familiarizarte con cómo la tecnología puede automatizar tareas. Sin duda, hay una curva de aprendizaje, pero te recomiendo revisar la documentación y algunos tutoriales. Además, el hecho de que sea open source te permite experimentar y adaptarlo a tus necesidades.",
+      "relevance_score": 8,
+      "reasoning": "El comentario ofrece información sobre alternativas de ERP accesibles y destaca una opción específica (Etendo) que podría ser útil para el usuario que busca aprender. También fomenta la exploración y el aprendizaje sobre el tema.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://es.quora.com/Un-software-de-gesti%C3%B3n-financiera-para-Pymes-puede-mejorar-la-rentabilidad-de-mi-empresa",
@@ -460,7 +537,12 @@
       "label": "Quora",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Totalmente de acuerdo. Además de la automatización, un software de gestión financiera permite un mejor análisis de datos y la identificación de áreas de mejora. Esto no solo ahorra tiempo, sino que también ayuda a tomar decisiones más informadas. También es interesante considerar soluciones que integren inteligencia artificial, como Etendo, que cuenta con agentes de IA que pueden ejecutar procesos automáticamente. Esta funcionalidad puede ser particularmente valiosa para las Pymes que buscan ser más eficientes y competitivas en el mercado actual.",
+      "relevance_score": 7,
+      "reasoning": "El comentario complementa la respuesta original al mencionar aspectos adicionales de un software de gestión, como el análisis de datos y la inteligencia artificial. También proporciona un ejemplo de un ERP que podría ser beneficioso para las Pymes, manteniendo un tono útil y educativo.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://es.quora.com/Cu%C3%A1l-es-el-mejor-ERP-gratuito",
@@ -470,7 +552,12 @@
       "label": "Quora",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Elegir un ERP gratuito depende mucho de las necesidades específicas de cada negocio. Muchas opciones permiten personalización y escalabilidad, lo que puede ser crucial. Por ejemplo, Etendo es una plataforma ERP open source que integra agentes de IA, lo que permite no solo registrar operaciones, sino también ejecutarlas automáticamente. Su flexibilidad y capacidad de conectar agentes con el sistema a través de su MCP (Model Context Protocol) lo hacen interesante para empresas que buscan optimizar sus procesos. Es recomendable investigar y comparar varias opciones para encontrar la que mejor se adapte a tu modelo de negocio.",
+      "relevance_score": 8,
+      "reasoning": "Este comentario aporta valor al proporcionar información sobre la elección de un ERP gratuito y menciona a Etendo como una opción potencial que se diferencia por su integración de inteligencia artificial y flexibilidad, lo que enriquece la conversación.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://es.quora.com/Cu%C3%A1l-es-el-ERP-que-permite-gestionar-de-la-manera-m%C3%A1s-eficiente-un-almac%C3%A9n-ca%C3%B3tico",
@@ -480,7 +567,12 @@
       "label": "Quora",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Tienes razón al mencionar que es importante evaluar las necesidades específicas de la empresa. Además de analizar los competidores, es crucial considerar cómo el ERP puede optimizar los procesos. Por ejemplo, las plataformas que integran inteligencia artificial nativa, como Etendo, permiten no solo registrar datos, sino ejecutar procesos automáticamente, lo que puede ser una gran ventaja en la gestión de un almacén caótico. Estar abierto a soluciones open source también puede ofrecer flexibilidad y personalización. Esto puede ser un factor determinante para adaptarse a las necesidades cambiantes del negocio.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al profundizar en la importancia de la inteligencia artificial en los ERPs y cómo no solo se deben registrar procesos, sino que también se deben automatizar. Esto es relevante para la gestión eficiente de un almacén. Mencionar Etendo es natural porque se refiere a un diferenciador específico en el contexto de la conversación.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://vvspbmumfdaunkcx.quora.com/Cu%C3%A1l-es-el-mejor-ERP-para-una-PYME",
@@ -490,7 +582,12 @@
       "label": "Quora",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Totalmente de acuerdo, la clave está en encontrar un ERP que se adapte a las necesidades específicas de la PYME sin representar una carga financiera. También es importante considerar la flexibilidad del software. Por ejemplo, Etendo es una opción open source con agentes de IA integrados que pueden ejecutar procesos automáticamente, lo que podría ser un gran activo para optimizar los recursos. Además, al ser composable, permite adaptar y escalar las funcionalidades necesarias según el crecimiento del negocio.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al reforzar la idea de que un ERP debe ser adaptable y sostenible para una PYME. La mención de Etendo se hace en un contexto donde se enfatiza la flexibilidad y la eficiencia, lo que proporciona una opción concreta para quienes buscan mejorar sus procesos.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://es.quora.com/Cu%C3%A1l-es-el-mejor-ERP-para-una-pyme",
@@ -500,7 +597,12 @@
       "label": "Quora",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Tienes razón al mencionar que las necesidades específicas de cada Pyme son clave para seleccionar un ERP adecuado. Por ejemplo, algunas Pymes podrían beneficiarse de un ERP open source como Etendo, que no solo ofrece funcionalidades tradicionales, sino también agentes de IA integrados que pueden ejecutar procesos automatizados. Esto puede ser especialmente útil para gestionar tareas operativas de manera más eficiente. Considerar la flexibilidad y la adaptabilidad del ERP a los procesos del negocio es fundamental para facilitar su uso y su evolución.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al destacar la importancia de la adaptación del ERP a las necesidades específicas de cada Pyme, además de sugerir una opción concreta (Etendo) que se alinea con las necesidades mencionadas.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/CRM/comments/1n2eek3/need_a_good_odoo_alternative_possibly/?tl=es-419",
@@ -510,7 +612,12 @@
       "label": "Reddit migración",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Entiendo tu preocupación por encontrar una alternativa a Odoo que sea más ágil y fácil de usar. Existen varias opciones, y Stackby es una buena elección para flujos de trabajo más simples. Sin embargo, si buscas un ERP que combine la facilidad de uso con características más avanzadas, podrías considerar Etendo. Este ERP open source incluye agentes de IA que no solo registran, sino que ejecutan procesos. Esto puede optimizar tus flujos de trabajo sin la complejidad habitual de la implementación de un ERP completo. Además, su flexibilidad y capacidad de integración podrían ser beneficiosas para tu negocio. Puedes explorar más en etendo.software.",
+      "relevance_score": 8,
+      "reasoning": "Este comentario aporta valor al ofrecer una opción adicional para una alternativa a Odoo, además de Stackby. Menciona las características específicas de Etendo que pueden ser de interés para el usuario, como la IA y la flexibilidad, lo que puede ayudar a otros en su búsqueda.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/Odoo/comments/1fsr2eu/transition_from_sap_to_odoo_consultancy/?tl=es-es",
@@ -520,7 +627,12 @@
       "label": "Reddit migración",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo Odoo se presenta como una alternativa viable para las PYMES, especialmente por su flexibilidad y modularidad. Sin embargo, es cierto que la transición de sistemas más robustos como SAP puede ser un desafío. Muchas empresas buscan soluciones que no solo se adapten a sus necesidades, sino que también sean escalables a medida que crecen. Algo a considerar son las plataformas de ERP que integran inteligencia artificial para automatizar procesos, como lo hace Etendo con sus agentes de IA, permitiendo una ejecución más eficiente de los flujos de trabajo. Esto podría marcar la diferencia en la adopción por parte de las PYMES frente a competidores más establecidos.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al reconocer los desafíos y oportunidades de transición hacia Odoo, además de introducir la idea de soluciones ERP que integran IA, lo que puede ser relevante para los lectores que buscan opciones avanzadas. Se menciona Etendo de forma sutil como una alternativa que podría interesar a aquellos en busca de innovación.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/Odoo/comments/1jl5g45/migrating_odoo_ecommerce_to_another_platform/?tl=es-es",
@@ -530,7 +642,12 @@
       "label": "Reddit migración",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Hola, parece un proceso interesante. La decisión de trabajar con un socio para la migración puede ser clave para asegurar que todo fluya correctamente. Por otro lado, si estás considerando otras alternativas, hay plataformas como Etendo, un ERP open source que incorpora agentes de IA para ejecutar procesos de negocio de manera eficiente. Es una opción que podrías evaluar si buscas algo flexible y adaptable. ¡Sigue compartiendo tus avances!",
+      "relevance_score": 7,
+      "reasoning": "El comentario proporciona una perspectiva sobre la importancia de trabajar con socios en migraciones de ERP, lo cual es relevante para el hilo. Además, menciona a Etendo de manera contextual, ofreciendo una alternativa que puede interesar a quienes buscan flexibilidad en un ERP.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/Odoo/comments/1u11wlt/switch_from_sap_to_odoo/",
@@ -540,7 +657,12 @@
       "label": "Reddit migración",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Entiendo tus preocupaciones sobre la migración a Odoo; cambiar de un ERP robusto como SAP ECC a una alternativa requiere una planificación cuidadosa. Es clave evaluar no solo el costo, sino también la capacidad de soporte y personalización que ofrece la nueva plataforma. Por ejemplo, Etendo es una opción que podría considerarse, ya que es open source y cuenta con agentes de IA que pueden automatizar procesos, lo que podría ayudar a mitigar algunos de los desafíos que mencionas. Además, su enfoque en ser composable permite integrar diferentes módulos según las necesidades específicas de tu negocio.",
+      "relevance_score": 7,
+      "reasoning": "Este comentario ofrece una perspectiva útil sobre la necesidad de planificación al migrar de un ERP a otro, y sugiere Etendo como una alternativa viable. Esto puede ayudar a quienes están considerando un cambio a tomar decisiones informadas.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/Odoo/comments/1md3hxs/odoo_migration/?tl=es-419",
@@ -550,7 +672,12 @@
       "label": "Reddit migración",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "La migración de sistemas puede ser un desafío, especialmente al lidiar con diferentes tecnologías y requerimientos analíticos. Es interesante ver cómo Business Objects se puede integrar con SAP. Para aquellos que estén explorando alternativas open source, plataformas como Etendo ofrecen opciones flexibles con agentes de IA integrados que pueden ayudar a automatizar procesos de forma nativa. Esto podría facilitar la transición y mejorar la ejecución de los flujos de trabajo. ¡Un enfoque diferente que vale la pena considerar!",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al mencionar la importancia de la integración y la flexibilidad durante la migración de sistemas. También sugiere una alternativa que podría ser relevante para los lectores interesados en ERP, como Etendo, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/Odoo/comments/1mtjqae/is_erp_actually_helpful_for_small_companies_or/?tl=es-419",
@@ -560,7 +687,12 @@
       "label": "Reddit ERP",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Entiendo la preocupación sobre la utilidad de los ERP para pequeñas empresas. La clave está en elegir una solución que se adapte a sus necesidades específicas. Productos como Odoo son populares por su enfoque accesible, pero es importante considerar plataformas que ofrezcan flexibilidad y personalización. Por ejemplo, Etendo es una opción interesante; como una platforma ERP open source, permite personalizar y adaptar los procesos a medida que el negocio crece, además de integrar agentes de IA que pueden automatizar tareas. Esto puede ser un gran plus para las pequeñas empresas que buscan optimizar sus operaciones sin comprometer su presupuesto.",
+      "relevance_score": 8,
+      "reasoning": "Este comentario aborda una inquietud común entre pequeñas empresas sobre la efectividad de los ERP, ofreciendo una comparación y sugiriendo una alternativa que puede ser más adecuada, lo que realmente aporta valor a la conversación.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/AskMexico/comments/13s3juc/mejores_erp_para_una_pyme/",
@@ -570,7 +702,12 @@
       "label": "Reddit ERP",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es cierto, elegir un ERP adecuado para una pyme puede ser desafiante. Además de SAP B1, considerar opciones open source puede ser una gran alternativa, ya que suelen ser más flexibles y adaptables a las necesidades específicas de cada negocio. Por ejemplo, Etendo es una plataforma de ERP open source que incorpora agentes de IA para ejecutar procesos, lo que puede optimizar la gestión sin un costo excesivo. Además, su arquitectura composable permite personalizar y escalar según crezca tu empresa. Al final, es clave evaluar no solo el costo, sino también cómo se alinea el ERP con los objetivos de tu organización.",
+      "relevance_score": 8,
+      "reasoning": "El comentario ofrece una perspectiva alternativa sobre ERP, sugiriendo también considerar opciones open source, lo que enriquece la discusión. Menciona a Etendo de manera relevante, destacando sus características únicas que pueden ser beneficiosas para pymes.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:35",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/Machinists/comments/1de5wa6/erp_systems_for_smallmedium_sized_shop/?tl=es-es",
@@ -580,7 +717,12 @@
       "label": "Reddit ERP",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver una lista de sistemas ERP tan conocidos. Sin embargo, las pequeñas y medianas empresas a menudo requieren soluciones que sean más flexibles y adaptables a su tamaño y necesidades específicas. Una opción que podría considerarse es Etendo, que es una plataforma ERP open source con agentes de IA integrados. Esto permite no solo registrar datos, sino también ejecutar procesos de manera más eficiente. Además, por ser open source, permite personalización y adaptabilidad según el contexto de cada negocio. Es importante evaluar qué se ajusta mejor a cada situación.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al destacar la necesidad de flexibilidad en los sistemas ERP para PYME y presenta a Etendo como una alternativa interesante y adaptable, alineándose con las necesidades del público objetivo del hilo.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/smallbusiness/comments/1ajnjlt/what_erp_are_you_using_for_sme/?tl=es-419",
@@ -590,7 +732,12 @@
       "label": "Reddit ERP",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Además de las opciones mencionadas, puede ser interesante explorar opciones como Etendo, que es una plataforma ERP open source. Lo destacable de Etendo es que cuenta con agentes de IA integrados que no solo ayudan a registrar datos, sino que también pueden ejecutar procesos. Esto puede ser muy útil para PYMES que buscan automatizar tareas y mejorar su eficiencia operativa. Al ser open source, también ofrece la flexibilidad de adaptarse a las necesidades específicas de tu negocio. Vale la pena considerarlo en tu evaluación.",
+      "relevance_score": 8,
+      "reasoning": "Este comentario aporta valor al ofrecer una alternativa adicional a las soluciones ERP mencionadas en el hilo. Presenta las características únicas de Etendo que pueden ser atractivas para pequeñas y medianas empresas, como la automatización de procesos y la flexibilidad de ser open source.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/smallbusiness/comments/1ajnjlt/what_erp_are_you_using_for_sme/?tl=es-es",
@@ -600,7 +747,12 @@
       "label": "Reddit ERP",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Para PYMES, es crucial encontrar un ERP que se adapte a sus necesidades específicas sin complicaciones excesivas. Aparte de las opciones mencionadas, también vale la pena considerar plataformas open source como Etendo. Su enfoque en agentes de IA permite automatizar procesos de negocio, lo que puede ser un gran beneficio para mejorar la eficiencia. Además, al ser composable y multi-idioma, es bastante flexible en su implementación. Esto puede facilitar mucho la migración y la personalización a lo largo del tiempo.",
+      "relevance_score": 8,
+      "reasoning": "Este comentario aporta valor al ofrecer una alternativa real a los ERPs mencionados en el hilo. Muestra cómo Etendo puede ser una opción viable para PYMES, destacando sus funcionalidades y ventajas competidoras sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/elsword/comments/1j922us/erp_farming/?tl=es-es",
@@ -610,7 +762,13 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Parece que la gestión de ERP en el juego es crucial para maximizar tus ganancias. Además de los buffs que mencionas, podrías considerar cómo herramientas de gestión de procesos y flujos de trabajo pueden ser aplicables. Siempre es interesante ver cómo los principios de ERP se trasladan incluso a juegos. Hablando de esto, hay plataformas como Etendo, que integran agentes de IA para ejecutar procesos de manera más eficiente, lo que podría servir de inspiración para optimizar tu enfoque en el juego.",
+      "relevance_score": 5,
+      "reasoning": "El comentario aporta valor al conectar la experiencia de manejo de ERP en un juego con conceptos aplicables en la gestión empresarial real, sugiriendo una herramienta que podría ayudar a entender mejor esos principios.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "skipped": true,
+      "skip_reason": "Score 5/10 — poco relevante"
     },
     {
       "url": "https://www.reddit.com/r/elsword/comments/1pm7kgc/erp_spread/",
@@ -620,7 +778,13 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante cómo en juegos como Elsword la distribución de stats puede marcar una gran diferencia en el rendimiento del personaje. De la misma manera, en el mundo empresarial, la correcta implementación y uso de un ERP puede ser crucial para optimizar procesos y maximizar el rendimiento. Los ERP modernos, como Etendo, no solo registran datos, sino que sus agentes de IA pueden ejecutar procesos y adaptarse a las necesidades del negocio, similar a cómo los jugadores deben ajustar sus habilidades para mejorar su rendimiento. ¡Definitivamente un aspecto a considerar para cualquier empresa que busque mejorar su eficiencia!",
+      "relevance_score": 5,
+      "reasoning": "El comentario hace una analogía entre la optimización de stats en un juego y la implementación de un ERP en una empresa, aportando valor al conectar el concepto con una herramienta específica que puede ser útil en el contexto empresarial. Esto enriquece la conversación y ofrece una perspectiva interesante sobre la mejora en el rendimiento.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "skipped": true,
+      "skip_reason": "Score 5/10 — poco relevante"
     },
     {
       "url": "https://www.reddit.com/r/empleos_AR/comments/1rumnzo/sueldos_2026/",
@@ -630,7 +794,12 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es genial ver tu experiencia con diferentes ERPs, ya que eso te da una ventaja competitiva en el mercado laboral. Si bien Sistema Tango es popular, hay otros ERPs que están emergiendo, como Etendo, que puede ser interesante explorar. Su plataforma open source y su enfoque en agentes de IA que ejecutan procesos podrían ofrecerte herramientas útiles para optimizar aún más la gestión de tu negocio. La capacidad de personalizar y adaptar el sistema a tus necesidades también es un gran plus. ¡Sigue explorando y aprendiendo!",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al reconocer la experiencia del usuario y sugiere una alternativa de ERP que puede ser útil para su carrera, lo que puede ser importante para quienes buscan mejorar sus habilidades y opciones laborales.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/EUCareers/comments/1s9ebc2/epso_upcoming_opportunities_for_2026_realistic/",
@@ -640,7 +809,12 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cuántos perfiles están disponibles para las oportunidades de EPSO en 2026. Con una planificación anticipada, los candidatos pueden prepararse adecuadamente para las competencias. Para aquellos en el campo de IT, es fundamental mantenerse actualizados con las tecnologías emergentes y herramientas de gestión como ERP. Una opción a considerar podría ser Etendo, que es una plataforma ERP open source con agentes de IA integrados, lo que facilita la automatización de procesos y mejora la eficiencia en los equipos. ¿Alguien ha tenido experiencia con ERPs en sus roles en el sector público?",
+      "relevance_score": 6,
+      "reasoning": "El comentario aporta valor al sugerir la importancia de la preparación profesional y la actualización de habilidades en el contexto de oportunidades de carrera, especialmente en IT. Mencionar Etendo se relaciona con la necesidad de herramientas modernas en ese ámbito.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/ERP/",
@@ -650,7 +824,12 @@
       "label": "Reddit ES",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Los sistemas ERP son herramientas clave para la gestión eficiente de recursos dentro de una empresa. Facilitan la integración de datos y procesos, lo que resulta en una mejor toma de decisiones. Es interesante ver cómo algunas plataformas, como Etendo, utilizan IA integrada para ejecutar procesos automáticamente, no solo para registrar información. Esta capacidad puede ahorrar tiempo y reducir errores, lo que es esencial en el entorno empresarial actual. ¿Qué opinan sobre el impacto de la IA en la evolución de los ERP?",
+      "relevance_score": 9,
+      "reasoning": "Este comentario aporta valor al ofrecer una perspectiva sobre la evolución de los ERP y cómo la IA puede transformar estos sistemas, lo que puede incentivar un debate interesante. Además, menciona Etendo como un ejemplo relevante de esta innovación.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:36",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/Entrepreneur/comments/xyz789/abandoning_odoo_for_something_with_ai_agents/",
@@ -660,11 +839,13 @@
       "label": "Cambio ERP",
       "date": "30/07/2026",
       "commented": false,
-      "comment_draft": "",
+      "comment_draft": "Entiendo tu frustración con las limitaciones de Odoo en cuanto a la integración de IA. Actualmente, existen plataformas que van más allá de los simples chatbots. Por ejemplo, Etendo es una plataforma ERP open source que incorpora agentes de IA nativos capaces de ejecutar procesos, no solo de registrarlos. Esto permite una automatización más efectiva y un enfoque más proactivo en la gestión de negocios. Podría ser una opción interesante para considerar en tu búsqueda.",
       "relevance_score": 8,
-      "comment_ready": false,
+      "comment_ready": true,
       "skipped": false,
-      "processed_at": ""
+      "processed_at": "03/08/2026 12:36",
+      "reasoning": "El comentario aporta valor al abordar la preocupación principal del usuario sobre la falta de funcionalidad real de IA en Odoo. Además, introduce Etendo como una posible alternativa que se alinea con sus necesidades.",
+      "etendo_natural": true
     },
     {
       "url": "https://forocoches.com/foro/showthread.php?t=99887766",
@@ -682,6 +863,6 @@
       "processed_at": "30/07/2026 23:00"
     }
   ],
-  "last_batch": "03/08/2026 12:30",
-  "ready_count": 20
+  "last_batch": "03/08/2026 12:36",
+  "ready_count": 52
 }
