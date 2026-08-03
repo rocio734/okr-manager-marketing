@@ -782,30 +782,39 @@ def search_all_leads(data):
     print("  [2/4] Apollo.io...")
     # Palabras clave que indican compañías fuera del ICP — se descartan
     _BAD_NAME_KWORDS = [
+        # Educación y formación
         "school","escuela","instituto","college","universidad","university",
-        "academy","académia","posgrado","master","mba","postgrado",
-        "jobs","empleo","bolsa","carrera","fashion","moda","diseño gráfico",
-        "grafica","gràffica","agencia creativa","marketing digital","seo agency",
-        # Fuera de ICP: consultoras RRHH, psicología, fundaciones, medios
+        "academy","académia","posgrado","master","mba","postgrado","open academy",
+        # Empleo y RRHH
+        "jobs","empleo","bolsa","carrera","selección","headhunt","rrhh","talent",
+        "etalentum","adqualis","melt group","meltgroup","randstad","adecco","manpower",
+        # Moda y diseño
+        "fashion","moda","diseño gráfico","grafica","gràffica",
+        # Agencias de marketing/digital (ya los conseguimos por partner_scraping)
+        "agencia creativa","marketing digital","seo agency",
+        # Fuera de ICP: consultoras RRHH, psicología, fundaciones, medios, legal
         "consulting","consultor","consultora","psicotec","psico","aprender",
         "talento y liderazgo","hosteltur","hostelco","nunegal","adqualis",
         "fundación","fundacion","fundació","asociación","asociacion",
+        # Medios y noticias (no son prospectos)
+        "noticias","juridicas","forbes","expansion","diario","periódico",
+        "revista","media","press","editorial","publicación",
     ]
     for org in apollo_companies():
         d=domain_from_url(org.get("primary_domain","") or org.get("website_url","") or "")
         if not d or d in seen or should_skip(d): continue
+        # Apollo free tier no rellena industries/empleados — solo aceptar dominios .es
+        # (empresas españolas con web propia; descarta internacionales y sin dominio claro)
+        if not d.endswith(".es"):
+            continue
         name=org.get("name","") or d
         emp=org.get("num_employees",0) or 0
         industry=org.get("industry","") or ""
-        # Descartar registros sin enriquecer — Apollo devuelve 0 empleados sin industria
-        # cuando el record no tiene datos validados; son falsos positivos
-        if emp == 0 and not industry:
-            continue
         # Descartar empresas claramente fuera del ICP por nombre
         if any(kw in name.lower() for kw in _BAD_NAME_KWORDS):
             print(f"    SKIP ICP: {name}")
             continue
-        sector=detect_sector((industry)+" "+name)
+        sector=detect_sector(industry+" "+name)
         lead=make_lead(name,d,sector,"erp","Empresa España (Apollo)","s-erp",f"https://{d}",f"Apollo.io · {emp} empleados · {org.get('industry','—')}",2,"apollo")
         lead["linkedin_org"]=org.get("linkedin_url","—") or "—"
         new.append(lead); seen.add(d)
