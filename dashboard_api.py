@@ -4,7 +4,7 @@ GET /api/metrics?period=30  →  JSON con datos de Windsor.ai + Etendo CRM
 Caché en memoria por período, TTL 55 minutos.
 Startup warmup en background para period=30.
 """
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
@@ -16,6 +16,7 @@ import threading
 import time
 from datetime import datetime, timedelta
 from collections import Counter
+from typing import Optional
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 WINDSOR_API_KEY = os.environ.get("WINDSOR_API_KEY", "")
@@ -25,6 +26,34 @@ _CRM_PASS = os.environ.get("ETENDO_PASSWORD", "")
 _CRM_ROLE = "8351131DFF384725AB08E06773FE6144"
 WINDSOR_BASE = "https://connectors.windsor.ai"
 CACHE_TTL = 55 * 60  # 55 minutos
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
+_SB_HEADERS = lambda: {
+    "apikey": SUPABASE_KEY,
+    "Authorization": f"Bearer {SUPABASE_KEY}",
+    "Content-Type": "application/json",
+    "Prefer": "return=representation",
+}
+OUTREACH_CAMPAIGN = "outreach-ago2026"
+OUTREACH_SOURCE   = "intel_dashboard"
+PIPELINE_ID       = "11d2089f-a64e-4001-b8af-9210787f3fce"
+STAGE_MAP = {
+    "Nuevo Lead":        "2f7828bf-51eb-4a5e-a645-026a7e06834b",
+    "Contactado":        "5f230c21-de90-4b4d-9c05-c6dcdb2a1e7a",
+    "Reunión Agendada":  "943efba8-d11e-42ce-8753-88b8aabf02b9",
+    "Propuesta Enviada": "7c113042-33a6-4a6d-b851-1cdfe9e5ccea",
+    "Negociación":       "21df17b6-e0cf-4ff0-b605-47cb61a6b9f6",
+    "Cerrado Ganado":    "50217db0-7f61-4dba-a78c-4eb0803ebf89",
+    "Cerrado Perdido":   "18ac2275-7d73-4b33-baf8-fa78b8c5a1cf",
+}
+
+# 1x1 transparent GIF
+_GIF = (
+    b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff"
+    b"\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00"
+    b"\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b"
+)
 
 GA4_FIELDS = [
     "sessions", "active_users", "screen_page_views",
@@ -36,7 +65,7 @@ app = FastAPI(title="Etendo Dashboard API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET", "OPTIONS"],
+    allow_methods=["GET", "PUT", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -558,6 +587,145 @@ def metrics(period: int = Query(default=30, ge=7, le=180)):
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ── Outreach Pixel Tracking ────────────────────────────────────────────────────
+@app.get("/pixel/{email}.gif")
+def pixel(email: str):
+    """1x1 GIF — registra apertura en email_opens y avanza deal a Contactado."""
+    if not SUPABASE_URL:
+        return Response(content=_GIF, media_type="image/gif")
+    try:
+        # Insert open event (idempotent: multiple opens allowed)
+        requests.post(
+            f"{SUPABASE_URL}/rest/v1/email_opens",
+            headers=_SB_HEADERS(),
+            json={"contact_id": email, "campaign": OUTREACH_CAMPAIGN},
+            timeout=5,
+        )
+        # Advance deal stage to Contactado if still at Nuevo Lead
+        c_r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/contacts?email=eq.{urllib.parse.quote(email)}&select=id",
+            headers=_SB_HEADERS(), timeout=5)
+        contacts_found = c_r.json() if c_r.status_code == 200 else []
+        if contacts_found:
+            cid = contacts_found[0]["id"]
+            deals_r = requests.get(
+                f"{SUPABASE_URL}/rest/v1/deals?contact_id=eq.{cid}&stage_id=eq.{STAGE_MAP['Nuevo Lead']}",
+                headers=_SB_HEADERS(), timeout=5)
+            deals = deals_r.json() if deals_r.status_code == 200 else []
+            for d in deals:
+                requests.patch(
+                    f"{SUPABASE_URL}/rest/v1/deals?id=eq.{d['id']}",
+                    headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+                    json={"stage_id": STAGE_MAP["Contactado"]},
+                    timeout=5,
+                )
+    except Exception as e:
+        print(f"⚠️  pixel tracking error for {email}: {e}")
+    return Response(content=_GIF, media_type="image/gif",
+                    headers={"Cache-Control": "no-store, no-cache, must-revalidate",
+                             "Pragma": "no-cache"})
+
+
+# ── Outreach Leads API ──────────────────────────────────────────────────────────
+@app.get("/api/outreach")
+def outreach_list():
+    """Devuelve contacts + deals + open counts para el tab de Outreach."""
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+    try:
+        # Contacts tagged as intel leads
+        c_r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/contacts?fuente=eq.{OUTREACH_SOURCE}"
+            f"&select=id,nombre,email,empresa,custom_fields",
+            headers=_SB_HEADERS(), timeout=10)
+        contacts = c_r.json() if c_r.status_code == 200 else []
+
+        if not contacts:
+            return {"leads": []}
+
+        contact_ids = [c["id"] for c in contacts]
+        id_filter = ",".join(contact_ids)
+
+        # Deals for those contacts
+        d_r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/deals?contact_id=in.({id_filter})"
+            f"&select=id,contact_id,stage_id,prioridad,updated,notas_internas",
+            headers=_SB_HEADERS(), timeout=10)
+        deals = d_r.json() if d_r.status_code == 200 else []
+        deal_by_contact = {d["contact_id"]: d for d in deals}
+
+        # Email opens per contact email
+        emails = [c["email"] for c in contacts if c.get("email")]
+        open_counts: dict = {}
+        open_last: dict = {}
+        if emails:
+            email_filter = ",".join(emails)
+            o_r = requests.get(
+                f"{SUPABASE_URL}/rest/v1/email_opens"
+                f"?campaign=eq.{OUTREACH_CAMPAIGN}&contact_id=in.({email_filter})"
+                f"&select=contact_id,opened_at&order=opened_at.desc",
+                headers=_SB_HEADERS(), timeout=10)
+            opens = o_r.json() if o_r.status_code == 200 else []
+            for o in opens:
+                eid = o["contact_id"]
+                open_counts[eid] = open_counts.get(eid, 0) + 1
+                if eid not in open_last:
+                    open_last[eid] = o["opened_at"]
+
+        stage_name = {v: k for k, v in STAGE_MAP.items()}
+
+        result = []
+        for c in contacts:
+            deal = deal_by_contact.get(c["id"], {})
+            email = c.get("email", "")
+            cf = c.get("custom_fields") or {}
+            result.append({
+                "contact_id":   c["id"],
+                "deal_id":      deal.get("id", ""),
+                "empresa":      c.get("empresa", ""),
+                "email":        email,
+                "sector":       cf.get("sector", ""),
+                "score":        cf.get("score", 0),
+                "stage":        stage_name.get(deal.get("stage_id", ""), "Nuevo Lead"),
+                "stage_id":     deal.get("stage_id", STAGE_MAP["Nuevo Lead"]),
+                "prioridad":    deal.get("prioridad", "media"),
+                "opens":        open_counts.get(email, 0),
+                "last_open":    open_last.get(email, ""),
+                "updated":      deal.get("updated", ""),
+                "notas":        deal.get("notas_internas", ""),
+                "subject":      cf.get("outreach_subject", ""),
+                "pixel_url":    f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif",
+            })
+
+        result.sort(key=lambda x: (-x["opens"], -x["score"]))
+        return {"leads": result, "total": len(result)}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.put("/api/outreach/{deal_id}")
+def outreach_update(deal_id: str, stage: Optional[str] = None,
+                    notas: Optional[str] = None):
+    """Actualiza stage y/o notas de un deal de outreach."""
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+    payload: dict = {}
+    if stage and stage in STAGE_MAP:
+        payload["stage_id"] = STAGE_MAP[stage]
+    if notas is not None:
+        payload["notas_internas"] = notas
+    if not payload:
+        raise HTTPException(status_code=400, detail="Nada que actualizar")
+    r = requests.patch(
+        f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}",
+        headers={**_SB_HEADERS(), "Prefer": "return=representation"},
+        json=payload, timeout=10)
+    if r.status_code in (200, 201):
+        return {"ok": True, "updated": r.json()}
+    raise HTTPException(status_code=r.status_code, detail=r.text)
+
 
 # ── Startup warmup ─────────────────────────────────────────────────────────────
 @app.on_event("startup")
