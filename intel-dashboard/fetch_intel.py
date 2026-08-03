@@ -40,6 +40,15 @@ REPO_DIR  = Path(__file__).parent
 HTML_FILE = REPO_DIR / "index.html"
 DATA_FILE = REPO_DIR / "intel_data.json"
 
+# Cargar .env desde el directorio raíz del repo (dos niveles arriba de intel-dashboard/)
+_ENV_FILE = REPO_DIR.parent.parent / ".env"
+if _ENV_FILE.exists():
+    for _line in _ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if "=" in _line and not _line.startswith("#"):
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+
 BRAVE_API_KEY   = os.environ.get("BRAVE_API_KEY","")
 GOOGLE_MAPS_KEY = os.environ.get("GOOGLE_MAPS_API_KEY","")
 GOOGLE_SHEET_ID = os.environ.get("GOOGLE_SHEET_ID","")
@@ -68,12 +77,13 @@ _CITY   = _CITIES[_DOW % len(_CITIES)]
 _SECTOR = _SECTORS[_DOW % len(_SECTORS)]
 
 LEAD_SEARCHES = [
-    {"query":f'"implementar ERP" OR "implantar ERP" {_CITY} empresa {_YEAR}',"signal":"erp","signal_label":"Busca ERP","signal_class":"s-erp"},
-    {"query":f'"migrar de Odoo" OR "migrar de Sage" OR "migrar de SAP" {_CITY} empresa',"signal":"migrate","signal_label":"Migración ERP","signal_class":"s-mig"},
-    {"query":f'"selección ERP" OR "evaluar ERP" OR "comparar ERP" España sector {_SECTOR}',"signal":"selection","signal_label":"Selección ERP","signal_class":"s-sel"},
-    {"query":f'"partner ERP" OR "consultor ERP" {_CITY} pyme selección',"signal":"partner","signal_label":"Busca partner","signal_class":"s-par"},
-    {"query":f'"licitación ERP" OR "concurso ERP" OR "pliego ERP" España {_YEAR}',"signal":"erp","signal_label":"Licitación ERP","signal_class":"s-erp"},
-    {"query":f'"software ERP" {_CITY} {_SECTOR} empresa presupuesto',"signal":"erp","signal_label":"Busca ERP","signal_class":"s-erp"},
+    # Busca empresas reales por sector+ciudad — sin "ERP" (atrae vendedores, no compradores)
+    {"query":f'empresa {_SECTOR} {_CITY} fabricacion produccion "software de gestión"',"signal":"erp","signal_label":"Empresa ICP","signal_class":"s-erp"},
+    {"query":f'empresa logistica distribucion {_CITY} España almacen gestion',"signal":"erp","signal_label":"Empresa logística","signal_class":"s-erp"},
+    {"query":f'empresa {_SECTOR} {_CITY} España exportacion certificacion ISO',"signal":"erp","signal_label":"Empresa exportadora","signal_class":"s-erp"},
+    {"query":f'fabricante {_SECTOR} España {_CITY} web corporativa produccion',"signal":"erp","signal_label":"Fabricante España","signal_class":"s-erp"},
+    {"query":f'empresa construccion ingenieria {_CITY} proyectos obras gestion',"signal":"erp","signal_label":"Empresa construcción","signal_class":"s-erp"},
+    {"query":f'empresa alimentaria {_CITY} produccion distribucion gestion empresarial',"signal":"erp","signal_label":"Empresa alimentación","signal_class":"s-erp"},
 ]
 
 # Búsquedas de oportunidades de engagement (foros, posts, hilos con comentarios abiertos)
@@ -125,6 +135,7 @@ SKIP_DOMAINS = {
     # Medios de comunicación (no son prospectos)
     "elpais","expansion","cincodias","elconfidencial","xataka","eleconomista",
     "cinco","rankia","ihlservices","hpcwire","forbes","gartner","mckinsey",
+    "hosteltur","hostelco","tourinews","retailactual","logisticaytransporte",
     # Portales de empleo (falsos positivos de búsquedas "consultor ERP")
     "indeed","monster","glassdoor","milanuncios","wallapop","jobtoday",
     "tecnoempleo","computrabajo","jobatus","empleo","trabajo","turijobs",
@@ -133,6 +144,13 @@ SKIP_DOMAINS = {
     "comparasoftware","selecthub","softwarereviews","gartner","forrester",
     "trustpilot","clutch","puntoerp","revistaerp","erpfocus","panorama",
     "erpsoftware360","pcmag","techradar","zdnet","computerworld",
+    # Directorios B2B y agregadores (no son prospectos)
+    "kompass","proveedores.com","metalindustria","madrid.plus","planreforma",
+    "empresite","infocif","axesor","einforma","ranking-empresas","empresasdeespana",
+    "paginasamarillas","europages","directoriodeempresas",
+    # Entidades gubernamentales y fundaciones (no son clientes ERP PYME)
+    "comunidad.madrid","junta","gencat","xunta","gva.es","larioja.org",
+    "inmujeres","fundacion","fundació",
 }
 
 # Caché de URLs ya vistas para saber si usar auto_save o adaptive
@@ -291,6 +309,10 @@ _ARTICLE_TITLE_PATTERNS = [
     "cómo elegir", "qué es", "comparativa", "se necesita",
     "empleos en", "trabaja como", "oferta de trabajo", "se busca",
     "convocatoria", "licitación pública",
+    # Directorios y agregadores
+    "directorio de", "mejores empresas", "empresas de ", "listado de",
+    "empresas del sector", "registro de empresas", "top empresas",
+    "registros de", "seleccionamos empresas",
 ]
 
 def should_skip(domain):
@@ -319,11 +341,12 @@ def brave_search(query, num=5):
 
 def apollo_companies():
     if not APOLLO_KEY: return []
+    import random
     try:
         r=requests.post("https://api.apollo.io/v1/mixed_companies/search",
             headers={"Content-Type":"application/json","X-Api-Key":APOLLO_KEY},
             json={
-                "page": 1,
+                "page": random.randint(1, 8),  # rota páginas para no ver siempre las mismas
                 "per_page": 15,
                 "organization_locations": ["Spain"],
                 # 50-300 empleados: tamaño mínimo para necesitar un ERP real
@@ -723,10 +746,21 @@ def scrape_competitors(data):
 def search_all_leads(data):
     print("→ Buscando leads...")
     new=[]
-    # Dedup contra TODO el historial para evitar que el mismo consultor/partner
-    # reaparezca cada mes. Dominios Apollo/Maps se re-evalúan si su score era 1.
-    seen = {l.get("domain","") for l in data["leads_history"] if l.get("domain","")}
-    print(f"  Dominios en dedup (historial completo): {len(seen)}")
+    # Dedup por fuente:
+    #   - brave_search / partner_scraping / partner_spider: historial completo
+    #     (son artículos y consultores — no queremos verlos nunca más)
+    #   - apollo / google_maps: últimos 90 días
+    #     (son empresas reales — pueden ser contactadas en el próximo trimestre)
+    from datetime import datetime, timedelta
+    cutoff_90 = (datetime.today() - timedelta(days=90)).strftime("%d/%m/%Y")
+    seen_all = {l.get("domain","") for l in data["leads_history"]
+                if l.get("domain","") and l.get("source_type","") in
+                ("brave_search","partner_scraping","partner_spider")}
+    seen_90  = {l.get("domain","") for l in data["leads_history"]
+                if l.get("domain","") and l.get("date","") >= cutoff_90
+                and l.get("source_type","") in ("apollo","google_maps")}
+    seen = seen_all | seen_90
+    print(f"  Dominios en dedup — artículos/partners (total): {len(seen_all)} | Apollo/Maps (90d): {len(seen_90)}")
 
     # 1. Google Custom Search
     print(f"  [1/4] Brave Search... (ciudad hoy: {_CITY}, sector: {_SECTOR})")
@@ -746,13 +780,33 @@ def search_all_leads(data):
 
     # 2. Apollo empresas
     print("  [2/4] Apollo.io...")
+    # Palabras clave que indican compañías fuera del ICP — se descartan
+    _BAD_NAME_KWORDS = [
+        "school","escuela","instituto","college","universidad","university",
+        "academy","académia","posgrado","master","mba","postgrado",
+        "jobs","empleo","bolsa","carrera","fashion","moda","diseño gráfico",
+        "grafica","gràffica","agencia creativa","marketing digital","seo agency",
+        # Fuera de ICP: consultoras RRHH, psicología, fundaciones, medios
+        "consulting","consultor","consultora","psicotec","psico","aprender",
+        "talento y liderazgo","hosteltur","hostelco","nunegal","adqualis",
+        "fundación","fundacion","fundació","asociación","asociacion",
+    ]
     for org in apollo_companies():
         d=domain_from_url(org.get("primary_domain","") or org.get("website_url","") or "")
         if not d or d in seen or should_skip(d): continue
         name=org.get("name","") or d
         emp=org.get("num_employees",0) or 0
-        sector=detect_sector((org.get("industry","") or "")+" "+name)
-        lead=make_lead(name,d,sector,"erp","Busca ERP (Apollo)","s-erp",f"https://{d}",f"Apollo.io · {emp} empleados · {org.get('industry','—')}",2 if 15<=emp<=150 else 1,"apollo")
+        industry=org.get("industry","") or ""
+        # Descartar registros sin enriquecer — Apollo devuelve 0 empleados sin industria
+        # cuando el record no tiene datos validados; son falsos positivos
+        if emp == 0 and not industry:
+            continue
+        # Descartar empresas claramente fuera del ICP por nombre
+        if any(kw in name.lower() for kw in _BAD_NAME_KWORDS):
+            print(f"    SKIP ICP: {name}")
+            continue
+        sector=detect_sector((industry)+" "+name)
+        lead=make_lead(name,d,sector,"erp","Empresa España (Apollo)","s-erp",f"https://{d}",f"Apollo.io · {emp} empleados · {org.get('industry','—')}",2,"apollo")
         lead["linkedin_org"]=org.get("linkedin_url","—") or "—"
         new.append(lead); seen.add(d)
 
