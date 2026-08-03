@@ -69,22 +69,46 @@ COMPETITORS = [
     {"name":"Sage","id":"sage","url":"https://www.sage.com/es-es/erp/","pricing_url":"https://www.sage.com/es-es/erp/","blog_url":"https://www.sage.com/es-es/blog/","partners_url":"https://www.sage.com/es-es/partners/find-a-partner/"},
 ]
 
-_DOW   = datetime.date.today().weekday()   # 0=Lun … 4=Vie
+_DOW   = datetime.date.today().weekday()   # 0=Lun … 6=Dom
 _YEAR  = datetime.date.today().year
-_CITIES = ["Madrid","Barcelona","Valencia","Bilbao","Sevilla","Zaragoza","Málaga"]
-_SECTORS = ["industrial","logística","construcción","alimentación","tecnología"]
-_CITY   = _CITIES[_DOW % len(_CITIES)]
-_SECTOR = _SECTORS[_DOW % len(_SECTORS)]
+_CITIES  = ["Madrid","Barcelona","Valencia","Bilbao","Sevilla","Zaragoza","Málaga",
+             "Alicante","Murcia","Valladolid","Pamplona","San Sebastián","Vigo","La Coruña"]
+_SECTORS = ["industrial","logística","construcción","alimentación","tecnología",
+             "química","textil","automoción","distribución","energía"]
+_ACTIVITIES = ["fabricacion","distribucion","produccion","exportacion","almacenamiento",
+                "suministro","obras","instalacion","mantenimiento industrial","servicios industriales"]
+# Selección diaria con más variedad — 3 ciudades + 2 sectores + 2 actividades por día
+import hashlib as _h
+_DAY_SEED = int(_h.md5(str(datetime.date.today()).encode()).hexdigest(), 16)
+_CITY    = _CITIES[_DAY_SEED % len(_CITIES)]
+_CITY2   = _CITIES[(_DAY_SEED // 13) % len(_CITIES)]
+_SECTOR  = _SECTORS[_DAY_SEED % len(_SECTORS)]
+_SECTOR2 = _SECTORS[(_DAY_SEED // 7) % len(_SECTORS)]
+_ACT     = _ACTIVITIES[_DAY_SEED % len(_ACTIVITIES)]
+_ACT2    = _ACTIVITIES[(_DAY_SEED // 11) % len(_ACTIVITIES)]
 
-LEAD_SEARCHES = [
-    # Busca empresas reales por sector+ciudad — sin "ERP" (atrae vendedores, no compradores)
-    {"query":f'empresa {_SECTOR} {_CITY} fabricacion produccion "software de gestión"',"signal":"erp","signal_label":"Empresa ICP","signal_class":"s-erp"},
-    {"query":f'empresa logistica distribucion {_CITY} España almacen gestion',"signal":"erp","signal_label":"Empresa logística","signal_class":"s-erp"},
-    {"query":f'empresa {_SECTOR} {_CITY} España exportacion certificacion ISO',"signal":"erp","signal_label":"Empresa exportadora","signal_class":"s-erp"},
-    {"query":f'fabricante {_SECTOR} España {_CITY} web corporativa produccion',"signal":"erp","signal_label":"Fabricante España","signal_class":"s-erp"},
-    {"query":f'empresa construccion ingenieria {_CITY} proyectos obras gestion',"signal":"erp","signal_label":"Empresa construcción","signal_class":"s-erp"},
-    {"query":f'empresa alimentaria {_CITY} produccion distribucion gestion empresarial',"signal":"erp","signal_label":"Empresa alimentación","signal_class":"s-erp"},
+# Pool ampliado — se elige un subconjunto aleatorio cada día para evitar
+# que las mismas queries devuelvan los mismos dominios semana tras semana
+_LEAD_SEARCH_POOL = [
+    {"query":f'empresa {_SECTOR} {_CITY} {_ACT} web corporativa',"signal":"erp","signal_label":"Empresa ICP","signal_class":"s-erp"},
+    {"query":f'empresa {_SECTOR2} {_CITY2} {_ACT2} España',"signal":"erp","signal_label":"Empresa ICP","signal_class":"s-erp"},
+    {"query":f'empresa logistica distribucion {_CITY} almacen gestion',"signal":"erp","signal_label":"Empresa logística","signal_class":"s-erp"},
+    {"query":f'empresa logistica {_CITY2} transporte España operador',"signal":"erp","signal_label":"Empresa logística","signal_class":"s-erp"},
+    {"query":f'fabricante {_SECTOR} España {_CITY} exportacion',"signal":"erp","signal_label":"Fabricante España","signal_class":"s-erp"},
+    {"query":f'empresa {_SECTOR} {_CITY} exportacion mercado europeo',"signal":"erp","signal_label":"Empresa exportadora","signal_class":"s-erp"},
+    {"query":f'empresa construccion ingenieria {_CITY} proyectos obras',"signal":"erp","signal_label":"Empresa construcción","signal_class":"s-erp"},
+    {"query":f'constructora {_CITY2} España proyectos residenciales industriales',"signal":"erp","signal_label":"Empresa construcción","signal_class":"s-erp"},
+    {"query":f'empresa alimentaria {_CITY} produccion distribucion',"signal":"erp","signal_label":"Empresa alimentación","signal_class":"s-erp"},
+    {"query":f'empresa quimica farmaceutica {_CITY} fabricacion España',"signal":"erp","signal_label":"Empresa química","signal_class":"s-erp"},
+    {"query":f'empresa textil confeccion {_CITY} produccion España',"signal":"erp","signal_label":"Empresa textil","signal_class":"s-erp"},
+    {"query":f'empresa automocion componentes {_CITY} proveedor tier',"signal":"erp","signal_label":"Empresa automoción","signal_class":"s-erp"},
+    {"query":f'empresa distribucion mayorista {_CITY} catalogo productos',"signal":"erp","signal_label":"Distribuidor","signal_class":"s-erp"},
+    {"query":f'empresa {_SECTOR} {_CITY2} contratacion publica licitacion obra',"signal":"migrate","signal_label":"Licitación","signal_class":"s-mig"},
 ]
+# Elegir 8 queries distintas cada día usando el seed del día
+import random as _rnd
+_rnd.seed(_DAY_SEED)
+LEAD_SEARCHES = _rnd.sample(_LEAD_SEARCH_POOL, min(8, len(_LEAD_SEARCH_POOL)))
 
 # Búsquedas de oportunidades de engagement (foros, posts, hilos con comentarios abiertos)
 ENGAGEMENT_SEARCHES = [
@@ -148,9 +172,15 @@ SKIP_DOMAINS = {
     "kompass","proveedores.com","metalindustria","madrid.plus","planreforma",
     "empresite","infocif","axesor","einforma","ranking-empresas","empresasdeespana",
     "paginasamarillas","europages","directoriodeempresas",
-    # Entidades gubernamentales y fundaciones (no son clientes ERP PYME)
+    "datoscif","iberinform","informa.es","sabi.bvdinfo","einforma",
+    # Entidades gubernamentales, portales de ciudad y fundaciones
     "comunidad.madrid","junta","gencat","xunta","gva.es","larioja.org",
-    "inmujeres","fundacion","fundació",
+    "inmujeres","fundacion","fundació","pamplona.com","ayuntamiento",
+    # Medios de comunicación generalistas
+    "elmundo","elpais","elconfidencial","abc.es","lavanguardia","eldiario",
+    "20minutos","marca.com","sport.es","as.com",
+    # Gimnasios, clubes deportivos (falsos positivos por búsquedas geográficas)
+    "gym","crossfit","fitness","deporte","futbol","baloncesto",
 }
 
 # Caché de URLs ya vistas para saber si usar auto_save o adaptive
@@ -747,20 +777,20 @@ def search_all_leads(data):
     print("→ Buscando leads...")
     new=[]
     # Dedup por fuente:
-    #   - brave_search / partner_scraping / partner_spider: historial completo
-    #     (son artículos y consultores — no queremos verlos nunca más)
-    #   - apollo / google_maps: últimos 90 días
-    #     (son empresas reales — pueden ser contactadas en el próximo trimestre)
+    #   - partner_scraping / partner_spider: historial completo
+    #     (son consultoras Odoo/Holded — no son prospectos)
+    #   - brave_search / apollo / google_maps: últimos 90 días
+    #     (empresas reales — pueden reentrar en el próximo trimestre)
     from datetime import datetime, timedelta
     cutoff_90 = (datetime.today() - timedelta(days=90)).strftime("%d/%m/%Y")
-    seen_all = {l.get("domain","") for l in data["leads_history"]
-                if l.get("domain","") and l.get("source_type","") in
-                ("brave_search","partner_scraping","partner_spider")}
-    seen_90  = {l.get("domain","") for l in data["leads_history"]
-                if l.get("domain","") and l.get("date","") >= cutoff_90
-                and l.get("source_type","") in ("apollo","google_maps")}
-    seen = seen_all | seen_90
-    print(f"  Dominios en dedup — artículos/partners (total): {len(seen_all)} | Apollo/Maps (90d): {len(seen_90)}")
+    seen_partners = {l.get("domain","") for l in data["leads_history"]
+                     if l.get("domain","") and l.get("source_type","") in
+                     ("partner_scraping","partner_spider")}
+    seen_90 = {l.get("domain","") for l in data["leads_history"]
+               if l.get("domain","") and l.get("date","") >= cutoff_90
+               and l.get("source_type","") in ("brave_search","apollo","google_maps")}
+    seen = seen_partners | seen_90
+    print(f"  Dominios en dedup — partners (total): {len(seen_partners)} | Brave/Apollo/Maps (90d): {len(seen_90)}")
 
     # 1. Google Custom Search
     print(f"  [1/4] Brave Search... (ciudad hoy: {_CITY}, sector: {_SECTOR})")
@@ -799,6 +829,13 @@ def search_all_leads(data):
         # Medios y noticias (no son prospectos)
         "noticias","juridicas","forbes","expansion","diario","periódico",
         "revista","media","press","editorial","publicación",
+        # Consultoras ISO/calidad (certifican a otras empresas, no son compradores ERP)
+        "certificacion iso","calidad iso","iso 9001","consultor iso","auditoria iso",
+        # Agencias web y marketing digital
+        "agencia web","diseño web","marketing web","seo málaga","seo madrid",
+        "mantenimiento web","páginas web","desarrollo web",
+            # Gimnasios, ocio, fitness (falsos positivos geográficos)
+        "fitness","deporte","crossfit","pilates",
     ]
     for org in apollo_companies():
         d=domain_from_url(org.get("primary_domain","") or org.get("website_url","") or "")
