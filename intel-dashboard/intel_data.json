@@ -394,24 +394,6 @@
   ],
   "leads_history": [
     {
-      "company": "miempresa.online",
-      "domain": "miempresa.online",
-      "sector": "General",
-      "signal": "migrate",
-      "signal_label": "Migración ERP",
-      "signal_class": "s-mig",
-      "source_url": "https://www.miempresa.online/migrar-de-sap-a-odoo-flexibilidad-empresarial/",
-      "snippet": "Hemos acompañado a decenas de organizaciones en su viaje para migrar de SAP a Odoo, garantizando: Auditoría de procesos: Identificamos qué procesos de",
-      "score": 3,
-      "date": "31/07/2026",
-      "source_type": "brave_search",
-      "email": "marketing@miempresa.online",
-      "contact_name": "None None",
-      "contact_pos": null,
-      "phone": "—",
-      "linkedin_org": null
-    },
-    {
       "company": "Informes en tiempo real",
       "domain": "cronomia.com",
       "sector": "Consultoría ERP",
@@ -618,24 +600,6 @@
       "signal_class": "s-mig",
       "source_url": "https://www.dasolo.ai/es/blog/integraciones-de-odoo-3/odoo-vs-sap-migracion-integracion-22",
       "snippet": "Este artículo compara Odoo ERP y SAP Business One en profundidad: casos de uso típicos, escenarios de integración con otras aplicaciones, rutas de mig",
-      "score": 3,
-      "date": "30/07/2026",
-      "source_type": "brave_search",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—"
-    },
-    {
-      "company": "consultor erp empleos en Bilbao",
-      "domain": "es.jobsavior.com",
-      "sector": "Servicios",
-      "signal": "partner",
-      "signal_label": "Busca partner",
-      "signal_class": "s-par",
-      "source_url": "https://es.jobsavior.com/ofertas-de-trabajo/bilbao/query-consultor-erp",
-      "snippet": "Necesitamos incorporar a nuestros equipos de ERP un Consultor (a) con la misión de impulsar el negocio tanto en el sector privado como en el sector pú",
       "score": 3,
       "date": "30/07/2026",
       "source_type": "brave_search",
@@ -1330,24 +1294,6 @@
       "linkedin_org": "—"
     },
     {
-      "company": "Partner Odoo España: Guía Completa para Implementar y Optimi",
-      "domain": "es.statista.com",
-      "sector": "General",
-      "signal": "partner",
-      "signal_label": "Partner Odoo (deep)",
-      "signal_class": "s-par",
-      "source_url": "https://es.statista.com/estadisticas/648171/porcentaje-de-pymes-que-vendieron-online-espana/",
-      "snippet": "Partner Odoo — clientes: N/A",
-      "score": 3,
-      "date": "30/07/2026",
-      "source_type": "partner_spider",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—"
-    },
-    {
       "company": "¿Cuál es el mejor partner SAP Business One en México?",
       "domain": "corponet.com",
       "sector": "General",
@@ -1464,24 +1410,6 @@
       "signal_class": "s-mig",
       "source_url": "https://www.dasolo.ai/es/blog/integraciones-de-odoo-3/odoo-vs-sap-migracion-integracion-22",
       "snippet": "Este artículo compara Odoo ERP y SAP Business One en profundidad: casos de uso típicos, escenarios de integración con otras aplicaciones, rutas de mig",
-      "score": 3,
-      "date": "29/07/2026",
-      "source_type": "brave_search",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—"
-    },
-    {
-      "company": "consultor erp empleos en Valencia",
-      "domain": "es.jobsavior.com",
-      "sector": "Industrial",
-      "signal": "partner",
-      "signal_label": "Busca partner",
-      "signal_class": "s-par",
-      "source_url": "https://es.jobsavior.com/ofertas-de-trabajo/valencia/query-consultor-erp",
-      "snippet": "Tu nuevo puesto Como Consultor/a ERP, participarás en proyectos de implantación, mejora y soporte de soluciones ERP. Trabajarás... ... Para uno de nue",
       "score": 3,
       "date": "29/07/2026",
       "source_type": "brave_search",
@@ -2151,24 +2079,6 @@
       "score": 2,
       "date": "29/07/2026",
       "source_type": "partner_scraping",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—"
-    },
-    {
-      "company": "Partner Odoo España: Guía Completa para Implementar y Optimi",
-      "domain": "es.statista.com",
-      "sector": "General",
-      "signal": "partner",
-      "signal_label": "Partner Odoo (deep)",
-      "signal_class": "s-par",
-      "source_url": "https://es.statista.com/estadisticas/648171/porcentaje-de-pymes-que-vendieron-online-espana/",
-      "snippet": "Partner Odoo — clientes: N/A",
-      "score": 3,
-      "date": "29/07/2026",
-      "source_type": "partner_spider",
       "email": "—",
       "contact_name": "—",
       "contact_pos": "—",
@@ -2948,24 +2858,6 @@
       "contact_pos": "Director of Data and AI Innovation",
       "phone": "—",
       "linkedin_org": "https://www.linkedin.com/in/atharky"
-    },
-    {
-      "company": "Partner Odoo España: Guía Completa para Implementar y Optimi",
-      "domain": "es.statista.com",
-      "sector": "General",
-      "signal": "partner",
-      "signal_label": "Partner Odoo (deep)",
-      "signal_class": "s-par",
-      "source_url": "https://es.statista.com/estadisticas/648171/porcentaje-de-pymes-que-vendieron-online-espana/",
-      "snippet": "Partner Odoo — clientes: N/A",
-      "score": 3,
-      "date": "28/07/2026",
-      "source_type": "partner_spider",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—"
     },
     {
       "company": "¿Cuál es el mejor partner SAP Business One en México?",
@@ -3778,24 +3670,6 @@
       "linkedin_org": "https://www.linkedin.com/in/atharky"
     },
     {
-      "company": "Partner Odoo España: Guía Completa para Implementar y Optimi",
-      "domain": "es.statista.com",
-      "sector": "General",
-      "signal": "partner",
-      "signal_label": "Partner Odoo (deep)",
-      "signal_class": "s-par",
-      "source_url": "https://es.statista.com/estadisticas/648171/porcentaje-de-pymes-que-vendieron-online-espana/",
-      "snippet": "Partner Odoo — clientes: N/A",
-      "score": 3,
-      "date": "27/07/2026",
-      "source_type": "partner_spider",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—"
-    },
-    {
       "company": "¿Cuál es el mejor partner SAP Business One en México?",
       "domain": "corponet.com",
       "sector": "General",
@@ -4082,24 +3956,6 @@
       "contact_pos": "Odoo Manager",
       "phone": "—",
       "linkedin_org": "https://www.linkedin.com/in/sergio-marti-terrer-5b877678"
-    },
-    {
-      "company": "Partner Odoo España: Guía Completa para Implementar y Optimi",
-      "domain": "es.statista.com",
-      "sector": "General",
-      "signal": "partner",
-      "signal_label": "Partner Odoo (deep)",
-      "signal_class": "s-par",
-      "source_url": "https://es.statista.com/estadisticas/648171/porcentaje-de-pymes-que-vendieron-online-espana/",
-      "snippet": "Partner Odoo — clientes: N/A",
-      "score": 3,
-      "date": "24/07/2026",
-      "source_type": "partner_spider",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—"
     },
     {
       "company": "Implementar ERP en Sevilla, Andalucía",
@@ -5182,32 +5038,26 @@
     }
   },
   "features": {
-    "odoo": [
-      "Notas de lanzamiento de Odoo | Odoo",
-      "Precios de Odoo en 2026 en España: planes y costes",
-      "¿Cuál es el plan de precios de Odoo en 2026? | Process Control",
-      "Odoo CE y la Inteligencia Artificial: La Revolución que tu Empresa Necesita"
-    ],
+    "odoo": [],
     "sap": [
-      "SAP Business One: precios, funciones y opiniones | GetApp España 2026",
-      "SAP Business One - Opiniones, precios y características - Capterra España 2026",
-      "Licencias y Precios de SAP Business One (para empresas españolas) - Itop",
-      "Nuevas funcionalidades de SAP Business One en 2026 - Tecnologías de la información y comunicación",
-      "Obtenga mayor control sobre su pequeÃ±a empresa con la aplicaciÃ³n SAP Business One. Optimice los procesos usando un sof"
+      "Obtenga mayor control sobre su pequeÃ±a empresa con la aplicaciÃ³n SAP Business One. Optimice los procesos usando un sof",
+      "Obtenga un mayor control sobre su negocio o subsidiaria",
+      "Navegar por las olas de la industria marÃ­tima",
+      "Â¿CuÃ¡l es la diferencia entre SAP ERP y SAP Business One?"
     ],
     "holded": [
-      "Precios de Holded en 2026: planes, tarifas y cuál elegir",
-      "Holded: precios, funciones y opiniones | GetApp España 2026",
-      "Precios a tu medida | Holded",
-      "Holded: ERP para autónomos y pymes en España 2026 | AutomatizayEscala.com",
-      "Consejos, guías y artículos sobre facturación, contabilidad, impuestos y gestión empresarial para pymes y autónomos."
+      "Consejos, guías y artículos sobre facturación, contabilidad, impuestos y gestión empresarial para pymes y autónomos.",
+      "Factura electrónica obligatoria: ¿quién deberá hacerla?",
+      "Ley de IA: ¿qué debe cumplir tu empresa?",
+      "El 96% de los autónomos ya se ha digitalizado, pero solo 1 de cada 3 usa IA en su negocio",
+      "¿Cómo hacer una conciliación bancaria?"
     ],
     "sage": [
-      "Sage Contabilidad 2026: precios y opiniones reales",
-      "Nueva versión Sage 200C | 2026.28.000 - Anuncios - Sage 200 España - Community Hub",
-      "Sage 50: Nueva versión 2026.1.0 - Aelis",
-      "Sage 200: el ERP modular que crece con tu pyme",
-      "Descubre los artículos y consejos empresariales de nuestros expertos en temática legal, contabilidad, facturación, recur"
+      "Descubre los artículos y consejos empresariales de nuestros expertos en temática legal, contabilidad, facturación, recur",
+      "Sage Advice España | Consejos útiles sobre gestión empresarial y actualidad legal",
+      "¿Está tu software de facturación certificado y adaptado a la Ley Antifraude? Claves para comprobarlo",
+      "Estrategia y Gestión",
+      "Biblioteca Empresarial"
     ]
   },
   "engagement_history": [
@@ -5787,21 +5637,6 @@
       "comment_draft": ""
     },
     {
-      "url": "https://www.reddit.com/r/spain/comments/abc123/que_erp_recomendais_para_pyme_50_personas/",
-      "domain": "reddit.com",
-      "title": "¿Qué ERP recomendáis para PYME de 50 personas en España?",
-      "snippet": "Llevamos 3 años con un sistema legacy y queremos migrar. Necesitamos algo que soporte automatización y sea open source si es posible.",
-      "label": "Pregunta ERP",
-      "date": "30/07/2026",
-      "commented": false,
-      "comment_draft": "Buena pregunta. En nuestro caso con empresas similares hemos encontrado que Etendo funciona muy bien: es open source, composable y permite integrar agentes de IA directamente en el ERP a través de MCP. Lo llaman \"Agentic ERP\" porque los agentes como Claude pueden ejecutar procesos reales (crear pedidos, gestionar almacén). Web: etendo.software",
-      "relevance_score": 9,
-      "comment_ready": true,
-      "reasoning": "Pregunta directa sobre ERP para PYME española — coincide exactamente con el target de Etendo",
-      "etendo_natural": true,
-      "processed_at": "30/07/2026 23:00"
-    },
-    {
       "url": "https://www.reddit.com/r/Entrepreneur/comments/xyz789/abandoning_odoo_for_something_with_ai_agents/",
       "domain": "reddit.com",
       "title": "Abandoning Odoo — looking for ERP with real AI agent integration",
@@ -5814,21 +5649,6 @@
       "comment_ready": false,
       "skipped": false,
       "processed_at": ""
-    },
-    {
-      "url": "https://news.ycombinator.com/item?id=12345678",
-      "domain": "news.ycombinator.com",
-      "title": "Ask HN: What ERPs support MCP / agentic workflows in 2026?",
-      "snippet": "Looking for ERP systems that natively support Model Context Protocol or similar agentic frameworks.",
-      "label": "HackerNews",
-      "date": "30/07/2026",
-      "commented": false,
-      "comment_draft": "Etendo Go is built around this exact use case. They expose ERP operations (orders, inventory, purchasing) as MCP tools so any AI agent (Claude, GPT-4, etc.) can execute real business processes. Open source too. See etendo.software",
-      "relevance_score": 10,
-      "comment_ready": true,
-      "reasoning": "Thread specifically about ERP + MCP — Etendo is the exact answer",
-      "etendo_natural": true,
-      "processed_at": "30/07/2026 23:00"
     },
     {
       "url": "https://forocoches.com/foro/showthread.php?t=99887766",

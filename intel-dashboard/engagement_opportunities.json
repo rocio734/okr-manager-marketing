@@ -1,5 +1,5 @@
 {
-  "generated_at": "31/07/2026 22:07 UTC",
+  "generated_at": "31/07/2026 23:00 UTC",
   "pending_count": 59,
   "posts": [
     {
@@ -578,21 +578,6 @@
       "comment_draft": ""
     },
     {
-      "url": "https://www.reddit.com/r/spain/comments/abc123/que_erp_recomendais_para_pyme_50_personas/",
-      "domain": "reddit.com",
-      "title": "¿Qué ERP recomendáis para PYME de 50 personas en España?",
-      "snippet": "Llevamos 3 años con un sistema legacy y queremos migrar. Necesitamos algo que soporte automatización y sea open source si es posible.",
-      "label": "Pregunta ERP",
-      "date": "30/07/2026",
-      "commented": false,
-      "comment_draft": "Buena pregunta. En nuestro caso con empresas similares hemos encontrado que Etendo funciona muy bien: es open source, composable y permite integrar agentes de IA directamente en el ERP a través de MCP. Lo llaman \"Agentic ERP\" porque los agentes como Claude pueden ejecutar procesos reales (crear pedidos, gestionar almacén). Web: etendo.software",
-      "relevance_score": 9,
-      "comment_ready": true,
-      "reasoning": "Pregunta directa sobre ERP para PYME española — coincide exactamente con el target de Etendo",
-      "etendo_natural": true,
-      "processed_at": "30/07/2026 23:00"
-    },
-    {
       "url": "https://www.reddit.com/r/Entrepreneur/comments/xyz789/abandoning_odoo_for_something_with_ai_agents/",
       "domain": "reddit.com",
       "title": "Abandoning Odoo — looking for ERP with real AI agent integration",
@@ -605,21 +590,6 @@
       "comment_ready": false,
       "skipped": false,
       "processed_at": ""
-    },
-    {
-      "url": "https://news.ycombinator.com/item?id=12345678",
-      "domain": "news.ycombinator.com",
-      "title": "Ask HN: What ERPs support MCP / agentic workflows in 2026?",
-      "snippet": "Looking for ERP systems that natively support Model Context Protocol or similar agentic frameworks.",
-      "label": "HackerNews",
-      "date": "30/07/2026",
-      "commented": false,
-      "comment_draft": "Etendo Go is built around this exact use case. They expose ERP operations (orders, inventory, purchasing) as MCP tools so any AI agent (Claude, GPT-4, etc.) can execute real business processes. Open source too. See etendo.software",
-      "relevance_score": 10,
-      "comment_ready": true,
-      "reasoning": "Thread specifically about ERP + MCP — Etendo is the exact answer",
-      "etendo_natural": true,
-      "processed_at": "30/07/2026 23:00"
     },
     {
       "url": "https://forocoches.com/foro/showthread.php?t=99887766",
