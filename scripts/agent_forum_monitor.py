@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 from openai import OpenAI
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
-INTEL_DIR  = Path(__file__).parent.parent / "okr_manager_site" / "intel-dashboard"
+INTEL_DIR  = Path(__file__).parent.parent / "intel-dashboard"
 OPPS_FILE  = INTEL_DIR / "engagement_opportunities.json"
 INTEL_DATA = INTEL_DIR / "intel_data.json"
 

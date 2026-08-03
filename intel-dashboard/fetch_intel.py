@@ -125,6 +125,14 @@ SKIP_DOMAINS = {
     # Medios de comunicación (no son prospectos)
     "elpais","expansion","cincodias","elconfidencial","xataka","eleconomista",
     "cinco","rankia","ihlservices","hpcwire","forbes","gartner","mckinsey",
+    # Portales de empleo (falsos positivos de búsquedas "consultor ERP")
+    "indeed","monster","glassdoor","milanuncios","wallapop","jobtoday",
+    "tecnoempleo","computrabajo","jobatus","empleo","trabajo","turijobs",
+    "infoempleo","laboris","jooble","adzuna","simplyhired","talentcom",
+    # Directorios, comparadores y medios tech (no son empresas prospect)
+    "comparasoftware","selecthub","softwarereviews","gartner","forrester",
+    "trustpilot","clutch","puntoerp","revistaerp","erpfocus","panorama",
+    "erpsoftware360","pcmag","techradar","zdnet","computerworld",
 }
 
 # Caché de URLs ya vistas para saber si usar auto_save o adaptive
@@ -253,13 +261,16 @@ def detect_sector(text):
     if any(w in t for w in ["construcc","ingeniería","obra","arquitect","inmobil"]): return "Construcción"
     return "General"
 
-def score_lead(text, signal):
-    s=1
-    if any(w in text for w in ["busca","necesita","implantación","migrar","proyecto erp","selección","licitación"]): s+=1
-    if any(w in text for w in ["empresa","pyme","s.l.","s.a.","grupo","industrial","factory","ltd"]): s+=1
-    if any(w in text for w in ["blog","artículo","guía","cómo elegir","qué es","comparativa"]): s-=1
-    if signal in ["migrate","partner"]: s+=1
-    return max(1,min(3,s))
+def score_lead(text, signal, url="", title=""):
+    # Artículos/guías/job posts se quedan en score 1 sin importar el signal
+    if is_article(url, title):
+        return 1
+    s = 1
+    if any(w in text for w in ["busca","necesita","implantación","migrar","proyecto erp","selección","licitación"]): s += 1
+    if any(w in text for w in ["empresa","pyme","s.l.","s.a.","grupo","industrial","factory","ltd"]): s += 1
+    if any(w in text for w in ["blog","artículo","guía","cómo elegir","qué es","comparativa"]): s -= 1
+    if signal in ["migrate","partner"]: s += 1
+    return max(1, min(3, s))
 
 def domain_from_url(url):
     return re.sub(r'^https?://(www\.)?','',url).split('/')[0].split('?')[0].strip().lower()
@@ -267,8 +278,31 @@ def domain_from_url(url):
 def make_lead(company,domain,sector,signal,label,cls,src_url,snippet,score,source_type="search"):
     return {"company":company,"domain":domain,"sector":sector,"signal":signal,"signal_label":label,"signal_class":cls,"source_url":src_url,"snippet":snippet[:150],"score":score,"date":TODAY,"source_type":source_type,"email":"—","contact_name":"—","contact_pos":"—","phone":"—","linkedin_org":"—"}
 
+# Patrones en la URL que indican artículo/guía/oferta, no una empresa
+_ARTICLE_URL_PATTERNS = [
+    "/blog/", "/articulo", "/guia", "/noticias/", "/news/",
+    "/comparativa", "/que-es-", "/como-elegir", "/mejores-erp",
+    "/empleo/", "/oferta", "/trabajo/", "/vacante", "/empleo-en",
+    "/opinion/", "/post/", "/entry/",
+]
+# Patrones en el título que indican contenido editorial, no una empresa
+_ARTICLE_TITLE_PATTERNS = [
+    "¿por qué", "por qué las empresas", "guía de", "los mejores",
+    "cómo elegir", "qué es", "comparativa", "se necesita",
+    "empleos en", "trabaja como", "oferta de trabajo", "se busca",
+    "convocatoria", "licitación pública",
+]
+
 def should_skip(domain):
     return not domain or any(s in domain for s in SKIP_DOMAINS)
+
+def is_article(url, title=""):
+    url_l   = url.lower()
+    title_l = title.lower()
+    return (
+        any(p in url_l for p in _ARTICLE_URL_PATTERNS) or
+        any(p in title_l for p in _ARTICLE_TITLE_PATTERNS)
+    )
 
 # ── APIs ────────────────────────────────────────────────────────────────────
 def brave_search(query, num=5):
@@ -288,9 +322,24 @@ def apollo_companies():
     try:
         r=requests.post("https://api.apollo.io/v1/mixed_companies/search",
             headers={"Content-Type":"application/json","X-Api-Key":APOLLO_KEY},
-            json={"page":1,"per_page":15,"organization_locations":["Spain"],
-                  "organization_num_employees_ranges":["11,200"],
-                  "industries":["Manufacturing","Logistics and Supply Chain","Wholesale","Construction","Food & Beverages","Textiles"]},timeout=20)
+            json={
+                "page": 1,
+                "per_page": 15,
+                "organization_locations": ["Spain"],
+                # 50-300 empleados: tamaño mínimo para necesitar un ERP real
+                "organization_num_employees_ranges": ["50,300"],
+                # Sectores con alta penetración ERP y potencial de migración
+                "industries": [
+                    "Manufacturing", "Logistics and Supply Chain", "Wholesale",
+                    "Construction", "Food & Beverages", "Textiles",
+                    "Retail", "Automotive", "Chemicals", "Paper & Forest Products",
+                ],
+                # Excluir IT/consultoras — ya los tenemos por partner_scraping
+                "not_industries": [
+                    "Information Technology and Services",
+                    "Computer Software", "Internet",
+                ],
+            }, timeout=20)
         r.raise_for_status()
         return r.json().get("organizations",[])
     except Exception as e:
@@ -674,13 +723,10 @@ def scrape_competitors(data):
 def search_all_leads(data):
     print("→ Buscando leads...")
     new=[]
-    # Dedup solo contra leads de los últimos 30 días — no contra todo el historial
-    # Esto permite que un lead vuelva a aparecer si hay señal nueva después de un mes
-    from datetime import datetime, timedelta
-    cutoff = (datetime.today() - timedelta(days=30)).strftime("%d/%m/%Y")
-    recent = [l for l in data["leads_history"] if l.get("date","") >= cutoff]
-    seen = {l.get("domain","") for l in recent}
-    print(f"  Dominios en dedup (últimos 30d): {len(seen)}")
+    # Dedup contra TODO el historial para evitar que el mismo consultor/partner
+    # reaparezca cada mes. Dominios Apollo/Maps se re-evalúan si su score era 1.
+    seen = {l.get("domain","") for l in data["leads_history"] if l.get("domain","")}
+    print(f"  Dominios en dedup (historial completo): {len(seen)}")
 
     # 1. Google Custom Search
     print(f"  [1/4] Brave Search... (ciudad hoy: {_CITY}, sector: {_SECTOR})")
@@ -688,10 +734,14 @@ def search_all_leads(data):
         for r in brave_search(s["query"],num=5):
             d=domain_from_url(r["url"])
             if d in seen or should_skip(d): continue
+            # Descartar artículos/guías/portales de empleo desde la URL y el título
+            if is_article(r["url"], r.get("title","")):
+                continue
             co=r["title"].split("|")[0].split("-")[0].strip()
             if len(co)>60: co=d
             txt=r["title"]+r["snippet"]
-            lead=make_lead(co,d,detect_sector(txt),s["signal"],s["signal_label"],s["signal_class"],r["url"],r["snippet"],score_lead(txt.lower(),s["signal"]),"brave_search")
+            lead=make_lead(co,d,detect_sector(txt),s["signal"],s["signal_label"],s["signal_class"],r["url"],r["snippet"],
+                           score_lead(txt.lower(),s["signal"],r["url"],r.get("title","")),"brave_search")
             new.append(lead); seen.add(d)
 
     # 2. Apollo empresas

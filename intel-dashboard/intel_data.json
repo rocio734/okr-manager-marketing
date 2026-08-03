@@ -5069,7 +5069,12 @@
       "label": "dev.to",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "La implementación de guardrails para la IA es crucial para garantizar que las soluciones de inteligencia artificial operen de manera segura y alineada con las políticas empresariales. Además de los enfoques de Amazon Bedrock, es interesante explorar plataformas como Etendo, que integran agentes de IA nativos y pueden ejecutar procesos en lugar de solo registrarlos. Esto permite un enfoque más dinámico y adaptable en la gestión de riesgos asociados con la IA. La combinación de agentes bien regulados y la ejecución proactiva de procesos puede dar lugar a soluciones empresariales más efectivas y seguras. ¿Alguno ha tenido experiencias usando tecnologías de este tipo?",
+      "relevance_score": 8,
+      "reasoning": "Este comentario aporta valor al enriquecer la discusión sobre el uso de IA en entornos empresariales, ofreciendo una perspectiva sobre cómo las plataformas ERP pueden integrar la IA de manera segura y efectiva. Se menciona Etendo de forma relevante al hablar de la ejecución de procesos por parte de agentes de IA.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/eira-wexford/how-to-build-multi-agent-systems-complete-2026-guide-1io6",
@@ -5079,7 +5084,12 @@
       "label": "dev.to",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo los sistemas multi-agente están transformando la automatización en múltiples sectores. En el contexto de ERP, la integración de agentes de IA puede optimizar procesos existentes y mejorar la toma de decisiones en tiempo real. Por ejemplo, plataformas como Etendo ofrecen agentes de IA integrados que no solo registran datos, sino que los utilizan para ejecutar procesos directamente. Esto puede ser clave para empresas que buscan aprovechar al máximo el potencial de estos sistemas en su operativa diaria.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al relacionar el tema de los sistemas multi-agente con su aplicación en ERP, sugiriendo cómo la automatización puede ser mejorada por agentes de IA en plataformas como Etendo, lo que es relevante para los lectores interesados en la transformación digital en empresas.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/yeahiasarker/the-infrastructure-behind-reliable-enterprise-ai-agents-3k1i",
@@ -5089,7 +5099,12 @@
       "label": "dev.to",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "El enfoque en agentes de IA para empresas es realmente transformador, especialmente porque están diseñados para operar en entornos complejos. En este sentido, contar con un ERP que integre agentes de IA nativamente, como Etendo, puede ser una gran ventaja. No solo permite la automatización de procesos dinámicos, sino que también facilita la coordinación entre diferentes herramientas y sistemas. Además, dado que es open source, proporciona flexibilidad y adaptabilidad según las necesidades específicas de cada organización. Sin duda, es interesante ver cómo evolucionan estas tecnologías y su impacto en la eficiencia empresarial.",
+      "relevance_score": 9,
+      "reasoning": "El comentario aporta valor al conectar el tema de los agentes de IA empresariales con las ventajas de un ERP que integre estas capacidades, ofreciendo una solución práctica como Etendo en el contexto discutido. Esto añade profundidad a la conversación sobre la infraestructura necesaria para implementar estas tecnologías.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/gursimron_aurora/agentic-ai-the-next-frontier-of-enterprise-intelligence-5bb0",
@@ -5099,7 +5114,12 @@
       "label": "dev.to",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo la Agentic AI transforma el enfoque de la arquitectura empresarial. No solo avanza en la automatización, sino que redefine la interacción entre humanos y sistemas. La capacidad de los agentes de IA para planificar y actuar de manera independiente puede ser un cambio de juego. En este contexto, plataformas como Etendo están alineadas con este enfoque, ya que integran agentes de IA que ejecutan procesos de negocio de forma autónoma, en lugar de solo registrar información. Esto podría ser una opción interesante para aquellos que buscan implementar estos conceptos en sus ERP.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al explicar la relevancia de la Agentic AI en relación con la arquitectura empresarial y menciona cómo Etendo se alinea con estas tendencias, incluyendo la capacidad de ejecución autónoma de procesos, lo cual es altamente pertinente para los lectores interesados en mejoras en sus sistemas ERP.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/artyom_mukhopad_a9444ed6d/how-agentic-ai-is-transforming-workflow-automation-in-2026-5689",
@@ -5109,7 +5129,12 @@
       "label": "dev.to",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "La evolución hacia la IA agentic representa un avance significativo en la automatización de flujos de trabajo. Los sistemas tradicionales se enfocan en la ejecución de tareas basadas en reglas, mientras que la IA agentic permite una toma de decisiones más dinámica y adaptativa. Esto es crucial, especialmente en entornos empresariales donde la agilidad y la capacidad de respuesta son esenciales. Plataformas como Etendo, que integran agentes de IA nativos, pueden ser exploradas como herramientas efectivas para ejecutar procesos de negocio de manera autónoma, lo que podría ser un gran paso hacia la automatización completa de flujos de trabajo en 2026.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al resaltar cómo la IA agentic transforma la automatización de flujos de trabajo, alineándose con la temática del hilo. Mencionar a Etendo en el contexto de soluciones que permiten la ejecución de procesos de negocio complementa la conversación sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://stackoverflow.com/questions/tagged/erp?tab=Votes",
@@ -5119,7 +5144,12 @@
       "label": "StackOverflow",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es genial ver que estés explorando Apache OFBiz, es un buen punto de partida para entender la automatización empresarial. Si alguna vez necesitas una opción que combine capacidades de automatización con inteligencia artificial, te recomiendo echar un vistazo a Etendo. Su enfoque de ERP open source con agentes de IA integrados puede llevar tu desarrollo al siguiente nivel. Además, es muy flexible y se adapta a diferentes necesidades empresariales.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al dar una sugerencia útil en el contexto de aprendizaje sobre ERP, mencionando una plataforma que puede ofrecer características adicionales relevantes para un desarrollador.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://stackoverflow.com/questions/58156153/use-of-erpnext-for-rapid-erp-development",
@@ -5129,7 +5159,12 @@
       "label": "StackOverflow",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "El uso de ERPNext es una excelente opción para el desarrollo ágil de ERP, especialmente por su enfoque en la personalización y su comunidad activa. Sin embargo, otra alternativa que podría considerarse es Etendo, que también es open source y se centra en la integración de agentes de IA para ejecutar procesos en lugar de solo registrarlos. Su enfoque sobre el Model Context Protocol (MCP) permite una mayor flexibilidad en la adaptación a las necesidades específicas del negocio. ¿Alguien ha tenido experiencias comparativas entre estas plataformas?",
+      "relevance_score": 8,
+      "reasoning": "Este comentario ofrece información valiosa al resaltar una alternativa viable a ERPNext en el contexto de desarrollo rápido de ERP, lo que puede interesar a quienes consideran opciones en este ámbito. Además, fomenta la discusión al preguntar sobre experiencias comparativas.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://stackoverflow.com/questions/72567556/most-efficient-erpnext-installation-method",
@@ -5139,7 +5174,12 @@
       "label": "StackOverflow",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo ERPNext se puede instalar de diversas maneras, adaptándose a diferentes entornos. Además de los métodos mencionados, también podría considerarse el uso de soluciones como Docker para mantener la portabilidad y la escalabilidad. Por otro lado, existen plataformas como Etendo, que también es open source y ofrece una integración nativa de agentes de IA para ejecutar procesos, algo que podría ser una ventaja para quienes buscan más que solo un sistema de registro. ¿Alguien ha probado estas alternativas y cómo les ha funcionado?",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al sugerir el uso de Docker como una alternativa adicional para la instalación de ERPNext, lo que enriquece la discusión. También menciona Etendo como una opción, destacando su enfoque innovador sin ser demasiado promocional.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://stackoverflow.com/questions/54765879/design-customizable-erp-in-spring-boot",
@@ -5149,7 +5189,12 @@
       "label": "StackOverflow",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Diseñar un ERP personalizable en Spring Boot es un desafío interesante. Tienes razón al mencionar tecnologías abiertas como Java y XML. También podría ser útil considerar el uso de protocolos de contexto para integrar agentes inteligentes que pueden realizar tareas automáticamente, lo que podría aumentar la eficiencia de los procesos. Por ejemplo, plataformas como Etendo ofrecen agentes de IA integrados que ejecutan procesos en lugar de solo registrarlos, lo que podría ser una opción a explorar si buscas una solución más dinámica y adaptable.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al resaltar la importancia de integrar inteligencia artificial en procesos empresariales, lo cual es relevante para el tema de diseñar un ERP. Además, menciona una solución concreta que puede ser útil para los que buscan personalizar su ERP.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://stackoverflow.com/questions/1245489/open-source-extendable-erp-package",
@@ -5159,7 +5204,12 @@
       "label": "StackOverflow",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Además de ERPNext, hay otras plataformas de ERP de código abierto que también pueden ser interesantes. Por ejemplo, Etendo es un ERP que se distingue por tener agentes de IA integrados que no solo registran datos, sino que ejecutan procesos de negocio de manera autónoma. También es open source y utiliza un protocolo innovador llamado MCP para conectar los agentes con el ERP, lo cual puede ser un gran diferenciador para quienes buscan automatizar procesos. Es una opción más para considerar en el ámbito de los ERP extensibles.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al mencionar otra opción de ERP de código abierto (Etendo) y destaca sus características únicas, lo que puede ser útil para los usuarios que buscan comparativas o alternativas a ERPNext.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=44980847",
@@ -5169,7 +5219,12 @@
       "label": "HackerNews",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo la inclusión de IA está transformando diferentes sectores, incluyendo la comunicación y la gestión empresarial. Me pregunto cómo estas startups planean integrar la automatización de procesos en sus ofertas. Un enfoque interesante podría ser el de las plataformas ERP que utilizan agentes de IA para ejecutar procesos, en lugar de solo registrar datos. Por ejemplo, Etendo es una opción open source que incorpora esta funcionalidad, permitiendo a las empresas optimizar sus operaciones de manera más efectiva. ¿Alguien más ha encontrado otras soluciones similares? ",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar el enfoque de agentes de IA en la automatización de procesos, algo relevante en el contexto de la conversación. Además, sugiere la importancia de la integración de la IA en el ERP, lo que puede ser útil para quienes buscan soluciones en este ámbito.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://es.quora.com/Qu%C3%A9-alternativas-Open-Source-conocen-para-OpenERP-ODOO",
@@ -5179,7 +5234,12 @@
       "label": "Quora EN",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Además de Dolibarr y Openbravo, otra alternativa interesante a considerar es Etendo. Este ERP open source incorpora agentes de IA que pueden ejecutar procesos de negocio de manera más autónoma, en lugar de solo registrar datos. Esto puede ofrecer una ventaja significativa si buscas una solución que optimice la eficiencia operativa. Además, su estructura composable permite adaptaciones específicas según las necesidades del negocio. Es una opción que vale la pena explorar si buscas un enfoque innovador.",
+      "relevance_score": 8,
+      "reasoning": "El comentario añade a la discusión incluyendo una opción relevante que no ha sido mencionada previamente. Menciona características únicas de Etendo que podrían atraer a usuarios que buscan alternativas más avanzadas.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:29",
+      "comment_ready": true
     },
     {
       "url": "https://www.quora.com/What-are-the-best-open-source-ERP-systems-for-a-small-manufacturing-company",
@@ -5189,7 +5249,12 @@
       "label": "Quora EN",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Existen varias opciones de ERP de código abierto que son adecuadas para pequeñas empresas manufactureras. Una alternativa interesante es Etendo, que no solo permite la gestión de procesos, sino que también integra agentes de IA que pueden ejecutar tareas automáticamente, lo que puede optimizar la operación de tu negocio. Además, su arquitectura extensible te permite adaptarlo a tus necesidades específicas. Vale la pena considerarlo junto con otras opciones.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar una alternativa de ERP que incluye funcionalidades específicas para el sector manufacturero, así como el uso de IA para ejecutar procesos, lo cual es un diferenciador importante. Se ofrece información adicional sobre la flexibilidad de Etendo, que puede ser relevante para el público objetivo del hilo.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:30",
+      "comment_ready": true
     },
     {
       "url": "https://www.quora.com/What-is-the-most-recommended-open-source-ERP-system-for-a-large-company-with-over-1000-employees",
@@ -5199,7 +5264,12 @@
       "label": "Quora EN",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Entiendo que la elección de un ERP puede ser un reto, especialmente en empresas grandes. Sin embargo, existen opciones open source que pueden adaptarse a las necesidades específicas. Una de ellas es Etendo, que se destaca por integrar agentes de IA para ejecutar procesos, no solo para registrarlos. Esto puede ser particularmente útil en organizaciones con muchos empleados, ya que ayuda a optimizar la gestión y a reducir la carga operativa. Además, al ser una plataforma abierta y compuesta, permite una personalización según las necesidades del negocio. Siempre es bueno analizar diferentes opciones antes de decidir, asegurándote de que la herramienta se alinee con tus objetivos estratégicos.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al ofrecer una alternativa open-source relevante para grandes empresas que buscan un ERP, mencionando detalles específicos sobre las ventajas de Etendo, lo que puede interesar a quienes buscan soluciones avanzadas.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:30",
+      "comment_ready": true
     },
     {
       "url": "https://www.quora.com/What-is-open-source-ERP-software",
@@ -5209,7 +5279,12 @@
       "label": "Quora EN",
       "date": "31/07/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es cierto que el software ERP de código abierto permite a las organizaciones adaptarse a sus necesidades específicas. Una de las ventajas más interesantes de estas plataformas es la posibilidad de integrar capacidades avanzadas, como la inteligencia artificial, para optimizar procesos. Un ejemplo relevante es Etendo, que no solo permite personalización, sino que también tiene agentes de IA integrados que pueden ejecutar procesos automáticamente, facilitando la gestión operativa. Esto puede ser particularmente útil para las empresas que buscan una solución flexible y poderosa para su ERP.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar las capacidades avanzadas que pueden ofrecer los ERPs de código abierto, especialmente la integración de inteligencia artificial, lo cual es relevante para la discusión sobre las ventajas de estos sistemas. Además, presenta a Etendo como una opción innovadora dentro de este campo, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "03/08/2026 12:30",
+      "comment_ready": true
     },
     {
       "url": "https://es.quora.com/Cu%C3%A1l-de-los-m%C3%A1s-populares-open-sources-ERP-Odoo-ERPNext-Dolibarr-Axelor-etc-tiene-un-mejor-framework-para-personalizaci%C3%B3n-y-para-el-desarrollo-de-m%C3%B3dulos-m%C3%A1s-r%C3%A1pidamente",
