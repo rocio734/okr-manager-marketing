@@ -10,12 +10,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 import os
 import json
+import smtplib
 import urllib.request
 import urllib.parse
 import threading
 import time
 from datetime import datetime, timedelta
 from collections import Counter
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from typing import Optional
 
 # ── Config ─────────────────────────────────────────────────────────────────────
@@ -65,7 +68,7 @@ app = FastAPI(title="Etendo Dashboard API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET", "PUT", "OPTIONS"],
+    allow_methods=["GET", "PUT", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -748,6 +751,80 @@ def outreach_update(deal_id: str, stage: Optional[str] = None,
             json=contact_payload, timeout=10)
 
     return {"ok": True}
+
+
+# ── Send Outreach Email ────────────────────────────────────────────────────────
+@app.post("/api/send-outreach")
+def send_outreach(deal_id: str, from_email: str, from_password: str,
+                  sender_name: Optional[str] = "Vico"):
+    """Envía el email de outreach con pixel embebido desde la cuenta de Vico."""
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+
+    # Fetch deal → contact
+    dr = requests.get(f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}&select=contact_id",
+                      headers=_SB_HEADERS(), timeout=10)
+    deal_rows = dr.json() if dr.status_code == 200 else []
+    if not deal_rows:
+        raise HTTPException(status_code=404, detail="Deal no encontrado")
+    contact_id = deal_rows[0]["contact_id"]
+
+    cr = requests.get(
+        f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}"
+        f"&select=email,custom_fields",
+        headers=_SB_HEADERS(), timeout=10)
+    contact = (cr.json() or [{}])[0]
+    to_email = contact.get("email", "")
+    cf       = contact.get("custom_fields") or {}
+    subject  = cf.get("outreach_subject", "Etendo ERP — Demo gratuita")
+    body_txt = cf.get("outreach_body", "")
+
+    if not to_email:
+        raise HTTPException(status_code=400, detail="Lead sin email")
+    if not body_txt:
+        raise HTTPException(status_code=400, detail="Email sin cuerpo — contactá a Rocío")
+
+    # Build HTML with pixel
+    pixel_url = f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(to_email)}.gif"
+    body_html = (
+        "<div style='font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#222'>"
+        + body_txt.replace("\n\n", "</p><p>").replace("\n", "<br>")
+        + f"</p></div>"
+        f'<img src="{pixel_url}" width="1" height="1" style="display:none">'
+    )
+
+    # Send via Gmail SMTP
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"]    = f"{sender_name} <{from_email}>"
+        msg["To"]      = to_email
+        msg.attach(MIMEText(body_txt, "plain", "utf-8"))
+        msg.attach(MIMEText(body_html, "html",  "utf-8"))
+
+        with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.login(from_email, from_password)
+            smtp.sendmail(from_email, to_email, msg.as_string())
+    except smtplib.SMTPAuthenticationError:
+        raise HTTPException(status_code=401,
+            detail="Credenciales incorrectas. Usá una contraseña de aplicación de Gmail.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error SMTP: {e}")
+
+    # Mark as sent in Supabase
+    now_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    cf["attempts"]     = cf.get("attempts", 0) + 1
+    cf["last_sent_at"] = now_iso
+    if not cf.get("sent_at"):
+        cf["sent_at"] = now_iso
+    requests.patch(
+        f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}",
+        headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+        json={"custom_fields": cf}, timeout=10)
+
+    return {"ok": True, "to": to_email, "subject": subject, "attempts": cf["attempts"]}
 
 
 # ── Startup warmup ─────────────────────────────────────────────────────────────

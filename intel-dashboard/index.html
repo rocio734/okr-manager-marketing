@@ -856,6 +856,26 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
   </div>
 </div>
 
+<!-- OUTREACH LOGIN MODAL -->
+<div id="or-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border-radius:10px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.2)">
+    <h3 style="margin-bottom:6px;font-size:16px">Ingresá con tu Gmail</h3>
+    <p style="font-size:12px;color:var(--gm);margin-bottom:18px">Las credenciales se guardan solo en tu sesión y nunca se almacenan en el servidor.</p>
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Tu nombre</label>
+    <input id="or-login-name" type="text" placeholder="Vico" value="Vico"
+      style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:12px;background:var(--bg);color:var(--bk)">
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Tu Gmail</label>
+    <input id="or-login-email" type="email" placeholder="vico@gmail.com"
+      style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:12px;background:var(--bg);color:var(--bk)">
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Contraseña de aplicación Gmail</label>
+    <input id="or-login-pass" type="password" placeholder="xxxx xxxx xxxx xxxx"
+      style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:6px;background:var(--bg);color:var(--bk)">
+    <p style="font-size:11px;color:var(--gm);margin-bottom:18px">No es tu contraseña de Gmail normal. <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--bl)">Generá una aquí →</a></p>
+    <div id="or-login-err" style="display:none;font-size:12px;color:#c0392b;margin-bottom:10px;background:#fdecea;padding:8px;border-radius:5px"></div>
+    <button onclick="orLoginSave()" style="width:100%;padding:10px;background:var(--y);border:none;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer">Continuar →</button>
+  </div>
+</div>
+
 <!-- OUTREACH -->
 <div id="outreach-sec" class="pnl">
   <div class="krow" id="or-kpis" style="margin-bottom:16px">
@@ -871,6 +891,9 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <button class="fbtn" onclick="orFilter('Reunión Agendada',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Reunión Agendada</button>
     <button class="fbtn" onclick="orFilter('Propuesta Enviada',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Propuesta Enviada</button>
     <span style="margin-left:auto;font-size:11px;color:var(--gm)" id="or-updated">—</span>
+    <span id="or-user-chip" style="font-size:11px;color:var(--gm);display:none">
+      Enviando como <b id="or-user-label"></b> · <a href="#" onclick="orLogout();return false" style="color:var(--bl);text-decoration:none">Cambiar</a>
+    </span>
     <button onclick="loadOutreach()" style="font-size:11px;padding:3px 10px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">↻ Actualizar</button>
   </div>
 
@@ -1012,6 +1035,13 @@ function orScoreDot(s){
 }
 
 async function loadOutreach(silent=false){
+  // Show/hide user chip
+  const creds = orGetCreds();
+  const chip  = document.getElementById('or-user-chip');
+  if(creds){ chip.style.display='inline'; document.getElementById('or-user-label').textContent=creds.email; }
+  else { chip.style.display='none'; }
+  // If no creds on first open, show login
+  if(!creds && !silent){ orShowLogin(); return; }
   if(!silent) document.getElementById('or-tbody').innerHTML='<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--gm)">Cargando…</td></tr>';
   try {
     const r = await fetch(`${OR_API}/api/outreach`);
@@ -1080,7 +1110,7 @@ function renderOutreach(){
           ${STAGES.map(s=>`<option value="${s}"${s===l.stage?' selected':''}>${s}</option>`).join('')}
         </select><br>
         <button onclick="orSave('${l.deal_id}')" style="font-size:10px;padding:3px 7px;border:none;border-radius:4px;background:var(--y);cursor:pointer;margin-top:4px">✓ Guardar</button>
-        <button onclick="orMarkSent('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #43A047;border-radius:4px;background:transparent;color:#43A047;cursor:pointer;margin-top:4px;margin-left:2px">📤 Enviado</button>
+        <button onclick="orSendEmail('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #1565C0;border-radius:4px;background:#1565C0;color:#fff;cursor:pointer;margin-top:4px;margin-left:2px">📨 Enviar</button>
       </td>
     </tr>`;
   }).join('');
@@ -1104,21 +1134,61 @@ async function orSave(dealId){
   }
 }
 
-async function orMarkSent(dealId, btn){
-  btn.disabled = true;
-  btn.textContent = '…';
+// ── Outreach login (sessionStorage) ──────────────────────────────────────────
+function orGetCreds(){
+  try { return JSON.parse(sessionStorage.getItem('or_creds')||'null'); } catch{ return null; }
+}
+function orLoginSave(){
+  const name  = document.getElementById('or-login-name').value.trim();
+  const email = document.getElementById('or-login-email').value.trim();
+  const pass  = document.getElementById('or-login-pass').value.trim();
+  const err   = document.getElementById('or-login-err');
+  if(!email || !pass){ err.style.display='block'; err.textContent='Completá todos los campos.'; return; }
+  if(!email.includes('@')){ err.style.display='block'; err.textContent='Email inválido.'; return; }
+  sessionStorage.setItem('or_creds', JSON.stringify({name, email, pass}));
+  document.getElementById('or-modal').style.display='none';
+  loadOutreach();
+}
+function orShowLogin(){
+  document.getElementById('or-modal').style.display='flex';
+}
+function orLogout(){
+  sessionStorage.removeItem('or_creds');
+  document.getElementById('or-login-email').value='';
+  document.getElementById('or-login-pass').value='';
+  document.getElementById('or-login-err').style.display='none';
+  orShowLogin();
+}
+
+async function orSendEmail(dealId, btn){
+  const creds = orGetCreds();
+  if(!creds){ orShowLogin(); return; }
+  const orig = btn.textContent;
+  btn.disabled=true; btn.textContent='Enviando…';
   try {
-    const r = await fetch(`${OR_API}/api/outreach/${dealId}?sent=true`,{method:'PUT'});
+    const params = new URLSearchParams({
+      deal_id: dealId, from_email: creds.email,
+      from_password: creds.pass, sender_name: creds.name
+    });
+    const r = await fetch(`${OR_API}/api/send-outreach?${params}`, {method:'POST'});
     const d = await r.json();
     if(d.ok){
+      btn.style.background='#43A047';
+      btn.textContent='✓ Enviado';
+      setTimeout(()=>{ btn.disabled=false; btn.style.background='#1565C0'; btn.textContent='📨 Enviar'; }, 3000);
       await loadOutreach(true);
+    } else if(r.status===401){
+      btn.disabled=false; btn.textContent=orig;
+      document.getElementById('or-login-err').style.display='block';
+      document.getElementById('or-login-err').textContent = d.detail||'Credenciales incorrectas';
+      orShowLogin();
     } else {
-      alert('Error: '+JSON.stringify(d));
-      btn.disabled=false; btn.textContent='📤 Enviado';
+      btn.disabled=false; btn.textContent=orig;
+      alert('Error al enviar: '+(d.detail||JSON.stringify(d)));
     }
   } catch(e){
+    btn.disabled=false; btn.textContent=orig;
     alert('Error: '+e.message);
-    btn.disabled=false; btn.textContent='📤 Enviado';
   }
 }
 
