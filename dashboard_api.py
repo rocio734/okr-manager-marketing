@@ -802,7 +802,7 @@ def send_outreach(deal_id: str, from_email: str, from_password: str,
         msg.attach(MIMEText(body_txt, "plain", "utf-8"))
         msg.attach(MIMEText(body_html, "html",  "utf-8"))
 
-        with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as smtp:
             smtp.ehlo()
             smtp.starttls()
             smtp.login(from_email, from_password)
