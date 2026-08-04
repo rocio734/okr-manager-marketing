@@ -694,6 +694,7 @@ def outreach_list():
                 "sent_at":      cf.get("sent_at", ""),
                 "attempts":     cf.get("attempts", 0),
                 "subject":      cf.get("outreach_subject", ""),
+                "body_html":    cf.get("outreach_body", ""),
                 "pixel_url":    f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif",
             })
 
@@ -702,6 +703,30 @@ def outreach_list():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.put("/api/outreach/{deal_id}/email-content")
+def outreach_email_content(deal_id: str, payload: dict):
+    """Guarda subject y body_html editados en Supabase."""
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+    dr = requests.get(f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}&select=contact_id",
+                      headers=_SB_HEADERS(), timeout=10)
+    rows = dr.json() if dr.status_code == 200 else []
+    if not rows:
+        raise HTTPException(status_code=404, detail="Deal no encontrado")
+    contact_id = rows[0]["contact_id"]
+    cr = requests.get(f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}&select=custom_fields",
+                      headers=_SB_HEADERS(), timeout=10)
+    cf = ((cr.json() or [{}])[0]).get("custom_fields") or {}
+    if payload.get("subject"):
+        cf["outreach_subject"] = payload["subject"]
+    if payload.get("body_html") is not None:
+        cf["outreach_body"] = payload["body_html"]
+    requests.patch(f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}",
+                   headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+                   json={"custom_fields": cf}, timeout=10)
+    return {"ok": True}
 
 
 @app.put("/api/outreach/{deal_id}")

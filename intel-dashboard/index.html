@@ -856,6 +856,31 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
   </div>
 </div>
 
+<!-- OUTREACH EMAIL PREVIEW MODAL -->
+<div id="or-email-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
+  <div style="background:var(--bg);border-radius:12px;padding:28px 32px;max-width:720px;width:95%;box-shadow:0 8px 40px rgba(0,0,0,.3);margin-bottom:40px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="font-size:16px;margin:0">✉️ Vista previa del email</h3>
+      <button onclick="document.getElementById('or-email-modal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gm)">✕</button>
+    </div>
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Asunto</label>
+    <input id="or-preview-subject" type="text"
+      style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:14px;background:var(--bg);color:var(--bk);box-sizing:border-box">
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+      <label style="font-size:12px;font-weight:600">Cuerpo</label>
+      <button onclick="orTogglePreview()" id="or-toggle-btn" style="font-size:11px;padding:2px 8px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">👁 Preview</button>
+    </div>
+    <textarea id="or-preview-body" rows="12"
+      style="width:100%;padding:10px;border:1px solid var(--gb);border-radius:6px;font-size:12px;font-family:monospace;background:var(--bg);color:var(--bk);box-sizing:border-box;resize:vertical"></textarea>
+    <div id="or-preview-render" style="display:none;border:1px solid var(--gb);border-radius:6px;padding:16px;min-height:120px;font-size:13px;margin-bottom:0"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button onclick="orSaveEmailPreview()" style="padding:9px 18px;background:var(--y);border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer">💾 Guardar cambios</button>
+      <button onclick="orSendFromPreview(this)" style="padding:9px 18px;background:#1565C0;color:#fff;border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer">📨 Guardar y enviar</button>
+      <button onclick="document.getElementById('or-email-modal').style.display='none'" style="padding:9px 18px;background:none;border:1px solid var(--gb);border-radius:6px;font-size:13px;cursor:pointer;color:var(--bk)">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- OUTREACH LOGIN MODAL -->
 <div id="or-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center">
   <div style="background:var(--bg);border-radius:10px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.2)">
@@ -1108,9 +1133,95 @@ function renderOutreach(){
         <button onclick="orSave('${l.deal_id}')" style="font-size:10px;padding:3px 7px;border:none;border-radius:4px;background:var(--y);cursor:pointer;margin-top:4px">✓ Guardar</button>
         <button onclick="orSendEmail('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #1565C0;border-radius:4px;background:#1565C0;color:#fff;cursor:pointer;margin-top:4px;margin-left:2px">📨 Enviar</button>
         <button onclick="orGenerate('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #6a1b9a;border-radius:4px;background:#6a1b9a;color:#fff;cursor:pointer;margin-top:4px;margin-left:2px">✨ Generar</button>
+        <button onclick="orShowEmailPreview('${l.deal_id}','${(l.subject||'').replaceAll("'","\\'")}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #2e7d32;border-radius:4px;background:#2e7d32;color:#fff;cursor:pointer;margin-top:4px;margin-left:2px">✏️ Ver</button>
       </td>
     </tr>`;
   }).join('');
+}
+
+// ── Email preview modal ───────────────────────────────────────────────────────
+let _orPreviewDealId = null;
+let _orPreviewShowing = false;
+
+async function orShowEmailPreview(dealId, subject, btnEl){
+  _orPreviewDealId = dealId;
+  _orPreviewShowing = false;
+  // Fetch fresh data from API
+  const lead = _orData.find(l=>l.deal_id===dealId);
+  document.getElementById('or-preview-subject').value = lead?.subject || subject || '';
+  // Fetch body from Supabase via outreach endpoint (already loaded in _orData)
+  // We need the raw body_html — fetch it fresh from the API
+  let body = '';
+  try {
+    const r = await fetch(`${OR_API}/api/outreach`);
+    const d = await r.json();
+    const found = (d.leads||[]).find(l=>l.deal_id===dealId);
+    body = found?.body_html || found?.body || '';
+  } catch(e){ body = ''; }
+  document.getElementById('or-preview-body').value = body;
+  document.getElementById('or-preview-body').style.display='block';
+  document.getElementById('or-preview-render').style.display='none';
+  document.getElementById('or-toggle-btn').textContent='👁 Preview';
+  document.getElementById('or-email-modal').style.display='flex';
+}
+
+function orTogglePreview(){
+  const ta = document.getElementById('or-preview-body');
+  const rv = document.getElementById('or-preview-render');
+  const btn = document.getElementById('or-toggle-btn');
+  if(!_orPreviewShowing){
+    rv.innerHTML = ta.value;
+    ta.style.display='none'; rv.style.display='block';
+    btn.textContent='✏️ Editar'; _orPreviewShowing=true;
+  } else {
+    ta.style.display='block'; rv.style.display='none';
+    btn.textContent='👁 Preview'; _orPreviewShowing=false;
+  }
+}
+
+async function orSaveEmailPreview(){
+  if(!_orPreviewDealId) return;
+  const subject = document.getElementById('or-preview-subject').value;
+  const body    = document.getElementById('or-preview-body').value ||
+                  document.getElementById('or-preview-render').innerHTML;
+  try {
+    const r = await fetch(`${OR_API}/api/outreach/${_orPreviewDealId}/email-content`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({subject, body_html: body})
+    });
+    const d = await r.json();
+    if(d.ok){
+      alert('✓ Cambios guardados');
+      await loadOutreach(true);
+    } else { alert('Error: '+JSON.stringify(d)); }
+  } catch(e){ alert('Error: '+e.message); }
+}
+
+async function orSendFromPreview(btn){
+  await orSaveEmailPreview();
+  document.getElementById('or-email-modal').style.display='none';
+  const creds = orGetCreds();
+  if(!creds){ orShowLogin(); return; }
+  // Find the send button for this deal and click it
+  const orig = btn.textContent;
+  btn.disabled=true; btn.textContent='Enviando…';
+  try {
+    const params = new URLSearchParams({
+      deal_id: _orPreviewDealId, from_email: creds.email,
+      sender_name: creds.name || 'Vico'
+    });
+    const r = await fetch(`${OR_API}/api/send-outreach?${params}`, {method:'POST'});
+    const d = await r.json();
+    if(d.ok){
+      btn.textContent='✓ Enviado';
+      setTimeout(()=>{ btn.disabled=false; btn.textContent=orig; }, 3000);
+      await loadOutreach(true);
+    } else {
+      btn.disabled=false; btn.textContent=orig;
+      alert('Error al enviar: '+(d.detail||JSON.stringify(d)));
+    }
+  } catch(e){ btn.disabled=false; btn.textContent=orig; alert('Error: '+e.message); }
 }
 
 async function orGenerate(dealId, btn){
@@ -1123,9 +1234,17 @@ async function orGenerate(dealId, btn){
       btn.style.background='#43A047'; btn.style.borderColor='#43A047';
       btn.textContent='✓ Listo';
       const lead=_orData.find(l=>l.deal_id===dealId);
-      if(lead){ lead.subject=d.subject; lead.body=d.body_html; }
-      setTimeout(()=>{ btn.disabled=false; btn.style.background='#6a1b9a'; btn.style.borderColor='#6a1b9a'; btn.textContent='✨ Generar'; }, 3000);
-      await loadOutreach(true);
+      if(lead){ lead.subject=d.subject; lead.body_html=d.body_html; }
+      setTimeout(()=>{ btn.disabled=false; btn.style.background='#6a1b9a'; btn.style.borderColor='#6a1b9a'; btn.textContent='✨ Generar'; }, 2000);
+      // Auto-open preview modal
+      _orPreviewDealId = dealId;
+      _orPreviewShowing = false;
+      document.getElementById('or-preview-subject').value = d.subject || '';
+      document.getElementById('or-preview-body').value = d.body_html || '';
+      document.getElementById('or-preview-body').style.display='block';
+      document.getElementById('or-preview-render').style.display='none';
+      document.getElementById('or-toggle-btn').textContent='👁 Preview';
+      document.getElementById('or-email-modal').style.display='flex';
     } else {
       btn.disabled=false; btn.textContent=orig;
       alert('Error: '+(d.detail||JSON.stringify(d)));
