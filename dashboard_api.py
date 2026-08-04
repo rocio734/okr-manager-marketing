@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from collections import Counter
 from typing import Optional
 
-N8N_OUTREACH_WEBHOOK = "https://n8n.labs.etendo.cloud/webhook/intel-send-outreach"
+N8N_OUTREACH_WEBHOOK = "https://n8n.labs.etendo.cloud/webhook/a3f7c821-5d04-4b9e-8c31-0e72b49d6f15"
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 WINDSOR_API_KEY = os.environ.get("WINDSOR_API_KEY", "")
