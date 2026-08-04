@@ -859,18 +859,14 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
 <!-- OUTREACH LOGIN MODAL -->
 <div id="or-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center">
   <div style="background:var(--bg);border-radius:10px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.2)">
-    <h3 style="margin-bottom:6px;font-size:16px">Ingresá con tu Gmail</h3>
-    <p style="font-size:12px;color:var(--gm);margin-bottom:18px">Las credenciales se guardan solo en tu sesión y nunca se almacenan en el servidor.</p>
+    <h3 style="margin-bottom:6px;font-size:16px">¿Quién está enviando?</h3>
+    <p style="font-size:12px;color:var(--gm);margin-bottom:18px">Los emails salen desde <b>outreach@etendo.software</b>. Las respuestas llegarán a tu email.</p>
     <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Tu nombre</label>
     <input id="or-login-name" type="text" placeholder="Vico" value="Vico"
       style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:12px;background:var(--bg);color:var(--bk)">
-    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Tu Gmail</label>
-    <input id="or-login-email" type="email" placeholder="vico@gmail.com"
-      style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:12px;background:var(--bg);color:var(--bk)">
-    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Contraseña de aplicación Gmail</label>
-    <input id="or-login-pass" type="password" placeholder="xxxx xxxx xxxx xxxx"
-      style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:6px;background:var(--bg);color:var(--bk)">
-    <p style="font-size:11px;color:var(--gm);margin-bottom:18px">No es tu contraseña de Gmail normal. <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--bl)">Generá una aquí →</a></p>
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Tu email (Reply-To)</label>
+    <input id="or-login-email" type="email" placeholder="vico@etendo.software"
+      style="width:100%;padding:8px 10px;border:1px solid var(--gb);border-radius:6px;font-size:13px;margin-bottom:18px;background:var(--bg);color:var(--bk)">
     <div id="or-login-err" style="display:none;font-size:12px;color:#c0392b;margin-bottom:10px;background:#fdecea;padding:8px;border-radius:5px"></div>
     <button onclick="orLoginSave()" style="width:100%;padding:10px;background:var(--y);border:none;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer">Continuar →</button>
   </div>
@@ -1141,11 +1137,10 @@ function orGetCreds(){
 function orLoginSave(){
   const name  = document.getElementById('or-login-name').value.trim();
   const email = document.getElementById('or-login-email').value.trim();
-  const pass  = document.getElementById('or-login-pass').value.trim();
   const err   = document.getElementById('or-login-err');
-  if(!email || !pass){ err.style.display='block'; err.textContent='Completá todos los campos.'; return; }
+  if(!email){ err.style.display='block'; err.textContent='Ingresá tu email.'; return; }
   if(!email.includes('@')){ err.style.display='block'; err.textContent='Email inválido.'; return; }
-  sessionStorage.setItem('or_creds', JSON.stringify({name, email, pass}));
+  sessionStorage.setItem('or_creds', JSON.stringify({name, email}));
   document.getElementById('or-modal').style.display='none';
   loadOutreach();
 }
@@ -1155,7 +1150,6 @@ function orShowLogin(){
 function orLogout(){
   sessionStorage.removeItem('or_creds');
   document.getElementById('or-login-email').value='';
-  document.getElementById('or-login-pass').value='';
   document.getElementById('or-login-err').style.display='none';
   orShowLogin();
 }
@@ -1168,7 +1162,7 @@ async function orSendEmail(dealId, btn){
   try {
     const params = new URLSearchParams({
       deal_id: dealId, from_email: creds.email,
-      from_password: creds.pass, sender_name: creds.name
+      sender_name: creds.name || 'Vico'
     });
     const r = await fetch(`${OR_API}/api/send-outreach?${params}`, {method:'POST'});
     const d = await r.json();

@@ -10,16 +10,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 import os
 import json
-import smtplib
 import urllib.request
 import urllib.parse
 import threading
 import time
 from datetime import datetime, timedelta
 from collections import Counter
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from typing import Optional
+
+N8N_OUTREACH_WEBHOOK = "https://n8n.labs.etendo.cloud/webhook/intel-send-outreach"
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 WINDSOR_API_KEY = os.environ.get("WINDSOR_API_KEY", "")
@@ -755,9 +754,8 @@ def outreach_update(deal_id: str, stage: Optional[str] = None,
 
 # ── Send Outreach Email ────────────────────────────────────────────────────────
 @app.post("/api/send-outreach")
-def send_outreach(deal_id: str, from_email: str, from_password: str,
-                  sender_name: Optional[str] = "Vico"):
-    """Envía el email de outreach con pixel embebido desde la cuenta de Vico."""
+def send_outreach(deal_id: str, from_email: str, sender_name: Optional[str] = "Vico"):
+    """Envía el email de outreach via n8n (Gmail de Vico)."""
     if not SUPABASE_URL:
         raise HTTPException(status_code=503, detail="Supabase not configured")
 
@@ -789,29 +787,24 @@ def send_outreach(deal_id: str, from_email: str, from_password: str,
     body_html = (
         "<div style='font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#222'>"
         + body_txt.replace("\n\n", "</p><p>").replace("\n", "<br>")
-        + f"</p></div>"
+        + "</div>"
         f'<img src="{pixel_url}" width="1" height="1" style="display:none">'
     )
 
-    # Send via Gmail SMTP
+    # Send via n8n webhook (Gmail de Vico)
     try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"]    = f"{sender_name} <{from_email}>"
-        msg["To"]      = to_email
-        msg.attach(MIMEText(body_txt, "plain", "utf-8"))
-        msg.attach(MIMEText(body_html, "html",  "utf-8"))
-
-        with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as smtp:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.login(from_email, from_password)
-            smtp.sendmail(from_email, to_email, msg.as_string())
-    except smtplib.SMTPAuthenticationError:
-        raise HTTPException(status_code=401,
-            detail="Credenciales incorrectas. Usá una contraseña de aplicación de Gmail.")
+        resp = requests.post(
+            N8N_OUTREACH_WEBHOOK,
+            json={"to": to_email, "subject": subject, "html": body_html},
+            timeout=20,
+        )
+        if resp.status_code not in (200, 201):
+            raise HTTPException(status_code=502,
+                detail=f"n8n error {resp.status_code}: {resp.text[:200]}")
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error SMTP: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al enviar: {e}")
 
     # Mark as sent in Supabase
     now_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
