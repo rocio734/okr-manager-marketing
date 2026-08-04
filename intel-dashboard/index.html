@@ -1171,9 +1171,19 @@ async function orShowEmailPreview(dealId, subject, btnEl){
     body = found?.body_html || found?.body || '';
   } catch(e){ body = ''; }
   document.getElementById('or-preview-body').value = body;
-  document.getElementById('or-preview-body').style.display='block';
-  document.getElementById('or-preview-render').style.display='none';
-  document.getElementById('or-toggle-btn').textContent='👁 Preview';
+  // Si el body tiene HTML, abrir directamente en modo preview renderizado
+  const isHtml = body.trim().startsWith('<');
+  const ta = document.getElementById('or-preview-body');
+  const rv = document.getElementById('or-preview-render');
+  const togBtn = document.getElementById('or-toggle-btn');
+  if(isHtml){
+    rv.innerHTML = body;
+    ta.style.display='none'; rv.style.display='block';
+    togBtn.textContent='✏️ Editar'; _orPreviewShowing=true;
+  } else {
+    ta.style.display='block'; rv.style.display='none';
+    togBtn.textContent='👁 Preview'; _orPreviewShowing=false;
+  }
   document.getElementById('or-email-modal').style.display='flex';
 }
 
@@ -1248,14 +1258,16 @@ async function orGenerate(dealId, btn){
       const lead=_orData.find(l=>l.deal_id===dealId);
       if(lead){ lead.subject=d.subject; lead.body_html=d.body_html; }
       setTimeout(()=>{ btn.disabled=false; btn.style.background='#6a1b9a'; btn.style.borderColor='#6a1b9a'; btn.textContent='✨ Generar'; }, 2000);
-      // Auto-open preview modal
+      // Auto-open preview modal en modo renderizado (el body viene como HTML)
       _orPreviewDealId = dealId;
-      _orPreviewShowing = false;
+      _orPreviewShowing = true;
       document.getElementById('or-preview-subject').value = d.subject || '';
-      document.getElementById('or-preview-body').value = d.body_html || '';
-      document.getElementById('or-preview-body').style.display='block';
-      document.getElementById('or-preview-render').style.display='none';
-      document.getElementById('or-toggle-btn').textContent='👁 Preview';
+      const genBody = d.body_html || '';
+      document.getElementById('or-preview-body').value = genBody;
+      document.getElementById('or-preview-render').innerHTML = genBody;
+      document.getElementById('or-preview-body').style.display='none';
+      document.getElementById('or-preview-render').style.display='block';
+      document.getElementById('or-toggle-btn').textContent='✏️ Editar';
       document.getElementById('or-email-modal').style.display='flex';
     } else {
       btn.disabled=false; btn.textContent=orig;
