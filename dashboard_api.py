@@ -782,13 +782,35 @@ def send_outreach(deal_id: str, from_email: str, sender_name: Optional[str] = "V
     if not body_txt:
         raise HTTPException(status_code=400, detail="Email sin cuerpo — contactá a Rocío")
 
-    # Build HTML with pixel
+    # Build HTML with signature and pixel
     pixel_url = f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(to_email)}.gif"
+    signature = """
+<div style="margin-top:24px;border-top:1px solid #e6e6e6;padding-top:14px;font-family:Arial,sans-serif;font-size:13px;line-height:1.4;color:#333">
+  <div style="font-size:16px;color:#1a2b6d;font-weight:700">Victoria Miguez</div>
+  <div style="font-size:12px;color:#7a7a7a;text-transform:uppercase;letter-spacing:.4px">
+    Asistente Administrativa<br>Soporte de Operaciones
+  </div>
+  <div style="margin-top:10px">
+    📞 <a href="tel:+5493584199352" style="text-decoration:none;color:#1a2b6d">+54 9 358 4199352</a><br>
+    🌐 <a href="https://www.etendo.software" style="text-decoration:none;color:#1a2b6d">www.etendo.software</a><br>
+    ✉️ <a href="mailto:victoria.miguez@etendo.software" style="text-decoration:none;color:#1a2b6d">victoria.miguez@etendo.software</a>
+  </div>
+  <div style="margin-top:10px">
+    <a href="https://calendar.app.google/HyVddorYyUecHuJz9" style="color:#1a2b6d;text-decoration:underline">Reservá 30 min</a>
+  </div>
+  <div style="margin-top:12px">
+    <a href="https://www.etendo.software" target="_blank">
+      <img src="https://drive.google.com/uc?export=view&id=1CPhb8NKIUTbklRvX0fsP4XAVoWe9xGRP"
+           alt="Etendo" style="width:260px;border-radius:8px;border:none">
+    </a>
+  </div>
+</div>"""
     body_html = (
         "<div style='font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#222'>"
         + body_txt.replace("\n\n", "</p><p>").replace("\n", "<br>")
         + "</div>"
-        f'<img src="{pixel_url}" width="1" height="1" style="display:none">'
+        + signature
+        + f'<img src="{pixel_url}" width="1" height="1" style="display:none">'
     )
 
     # Send via n8n webhook (Gmail de Vico)
