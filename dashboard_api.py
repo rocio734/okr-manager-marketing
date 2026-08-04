@@ -695,6 +695,8 @@ def outreach_list():
                 "attempts":     cf.get("attempts", 0),
                 "subject":      cf.get("outreach_subject", ""),
                 "body_html":    cf.get("outreach_body", ""),
+                "has_message":  bool(cf.get("outreach_body", "")),
+                "replied_at":   cf.get("replied_at", ""),
                 "pixel_url":    f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif",
             })
 
@@ -727,6 +729,28 @@ def outreach_email_content(deal_id: str, payload: dict):
                    headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
                    json={"custom_fields": cf}, timeout=10)
     return {"ok": True}
+
+
+@app.post("/api/outreach/{deal_id}/mark-replied")
+def outreach_mark_replied(deal_id: str):
+    """Marca el lead como que respondió (guarda replied_at en custom_fields)."""
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+    dr = requests.get(f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}&select=contact_id",
+                      headers=_SB_HEADERS(), timeout=10)
+    rows = dr.json() if dr.status_code == 200 else []
+    if not rows:
+        raise HTTPException(status_code=404, detail="Deal no encontrado")
+    contact_id = rows[0]["contact_id"]
+    cr = requests.get(f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}&select=custom_fields",
+                      headers=_SB_HEADERS(), timeout=10)
+    cf = ((cr.json() or [{}])[0]).get("custom_fields") or {}
+    cf["replied_at"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    requests.patch(
+        f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}",
+        headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+        json={"custom_fields": cf}, timeout=10)
+    return {"ok": True, "replied_at": cf["replied_at"]}
 
 
 @app.put("/api/outreach/{deal_id}")
