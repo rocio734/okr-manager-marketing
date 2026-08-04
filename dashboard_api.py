@@ -28,7 +28,7 @@ _CRM_PASS = os.environ.get("ETENDO_PASSWORD", "")
 _CRM_ROLE = "8351131DFF384725AB08E06773FE6144"
 WINDSOR_BASE = "https://connectors.windsor.ai"
 CACHE_TTL = 55 * 60  # 55 minutos
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -759,8 +759,8 @@ def generate_outreach(deal_id: str):
     """Genera cuerpo y asunto de outreach personalizado con IA para un lead."""
     if not SUPABASE_URL:
         raise HTTPException(status_code=503, detail="Supabase not configured")
-    if not ANTHROPIC_API_KEY:
-        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY no configurada")
+    if not OPENAI_API_KEY:
+        raise HTTPException(status_code=503, detail="OPENAI_API_KEY no configurada")
 
     dr = requests.get(f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}&select=contact_id",
                       headers=_SB_HEADERS(), timeout=10)
@@ -802,23 +802,23 @@ Respondé SOLO con JSON válido, sin texto extra:
 El body_html debe usar párrafos <p> con estilos inline básicos. El enlace del video usá href="#VIDEO_URL" como placeholder."""
 
     resp = requests.post(
-        "https://api.anthropic.com/v1/messages",
+        "https://api.openai.com/v1/chat/completions",
         headers={
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
+            "Authorization": f"Bearer {OPENAI_API_KEY}",
+            "Content-Type": "application/json",
         },
         json={
-            "model": "claude-haiku-4-5-20251001",
+            "model": "gpt-4o",
             "max_tokens": 1024,
             "messages": [{"role": "user", "content": prompt}],
+            "response_format": {"type": "json_object"},
         },
         timeout=30,
     )
     if resp.status_code != 200:
-        raise HTTPException(status_code=502, detail=f"Anthropic error: {resp.text[:200]}")
+        raise HTTPException(status_code=502, detail=f"OpenAI error: {resp.text[:200]}")
 
-    raw = resp.json()["content"][0]["text"].strip()
+    raw = resp.json()["choices"][0]["message"]["content"].strip()
     # Strip markdown code fences if present
     if raw.startswith("```"):
         raw = raw.split("```")[1]
