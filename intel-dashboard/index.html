@@ -1103,17 +1103,17 @@ function renderOutreach(){
   document.getElementById('or-tbody').innerHTML = rows.map(l=>{
     // Columna "Mensaje" — indica si el borrador fue generado
     const msgBadge = l.has_message
-      ? `<span style="background:#EDE7F6;color:#4527A0;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap">✉ Borrador</span>`
+      ? `<span style="background:#6A1B9A;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap">✉ Borrador</span>`
       : `<span style="color:var(--gm);font-size:10px">—</span>`;
 
     // Columna "Estado email" — respondió > abierto > enviado > sin enviar
     let estadoBadge;
     if(l.replied_at){
       const d = new Date(l.replied_at).toLocaleDateString('es-ES');
-      estadoBadge = `<span style="background:#E8F5E9;color:#1B5E20;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;display:block;white-space:nowrap">💬 Respondió ${d}</span>`;
+      estadoBadge = `<span style="background:#2E7D32;color:#fff;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;display:block;white-space:nowrap">💬 Respondió ${d}</span>`;
     } else if(l.opens>0){
       const d = l.last_open ? new Date(l.last_open).toLocaleDateString('es-ES') : '';
-      estadoBadge = `<span style="background:#E3F2FD;color:#0D47A1;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;display:block;white-space:nowrap">👁 Abierto ${l.opens}× · ${d}</span>`;
+      estadoBadge = `<span style="background:#1565C0;color:#fff;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;display:block;white-space:nowrap">👁 Abierto ${l.opens}× · ${d}</span>`;
     } else if(l.sent_at){
       const d = new Date(l.sent_at).toLocaleDateString('es-ES');
       estadoBadge = `<span style="font-size:10px;color:var(--gm);white-space:nowrap">📨 Enviado ${d}<br>${l.attempts}× enviado</span>`;
