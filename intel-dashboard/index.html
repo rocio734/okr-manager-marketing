@@ -1107,9 +1107,33 @@ function renderOutreach(){
         </select><br>
         <button onclick="orSave('${l.deal_id}')" style="font-size:10px;padding:3px 7px;border:none;border-radius:4px;background:var(--y);cursor:pointer;margin-top:4px">✓ Guardar</button>
         <button onclick="orSendEmail('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #1565C0;border-radius:4px;background:#1565C0;color:#fff;cursor:pointer;margin-top:4px;margin-left:2px">📨 Enviar</button>
+        <button onclick="orGenerate('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #6a1b9a;border-radius:4px;background:#6a1b9a;color:#fff;cursor:pointer;margin-top:4px;margin-left:2px">✨ Generar</button>
       </td>
     </tr>`;
   }).join('');
+}
+
+async function orGenerate(dealId, btn){
+  const orig = btn.textContent;
+  btn.disabled=true; btn.textContent='Generando…';
+  try {
+    const r = await fetch(`${OR_API}/api/generate-outreach?deal_id=${dealId}`, {method:'POST'});
+    const d = await r.json();
+    if(d.ok){
+      btn.style.background='#43A047'; btn.style.borderColor='#43A047';
+      btn.textContent='✓ Listo';
+      const lead=_orData.find(l=>l.deal_id===dealId);
+      if(lead){ lead.subject=d.subject; lead.body=d.body_html; }
+      setTimeout(()=>{ btn.disabled=false; btn.style.background='#6a1b9a'; btn.style.borderColor='#6a1b9a'; btn.textContent='✨ Generar'; }, 3000);
+      await loadOutreach(true);
+    } else {
+      btn.disabled=false; btn.textContent=orig;
+      alert('Error: '+(d.detail||JSON.stringify(d)));
+    }
+  } catch(e){
+    btn.disabled=false; btn.textContent=orig;
+    alert('Error: '+e.message);
+  }
 }
 
 async function orSave(dealId){

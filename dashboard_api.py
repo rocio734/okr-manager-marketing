@@ -28,6 +28,7 @@ _CRM_PASS = os.environ.get("ETENDO_PASSWORD", "")
 _CRM_ROLE = "8351131DFF384725AB08E06773FE6144"
 WINDSOR_BASE = "https://connectors.windsor.ai"
 CACHE_TTL = 55 * 60  # 55 minutos
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -750,6 +751,96 @@ def outreach_update(deal_id: str, stage: Optional[str] = None,
             json=contact_payload, timeout=10)
 
     return {"ok": True}
+
+
+# ── Generate Outreach Email ────────────────────────────────────────────────────
+@app.post("/api/generate-outreach")
+def generate_outreach(deal_id: str):
+    """Genera cuerpo y asunto de outreach personalizado con IA para un lead."""
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+    if not ANTHROPIC_API_KEY:
+        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY no configurada")
+
+    dr = requests.get(f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}&select=contact_id",
+                      headers=_SB_HEADERS(), timeout=10)
+    deal_rows = dr.json() if dr.status_code == 200 else []
+    if not deal_rows:
+        raise HTTPException(status_code=404, detail="Deal no encontrado")
+    contact_id = deal_rows[0]["contact_id"]
+
+    cr = requests.get(
+        f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}"
+        f"&select=nombre,empresa,cargo,custom_fields",
+        headers=_SB_HEADERS(), timeout=10)
+    c = (cr.json() or [{}])[0]
+    empresa = c.get("empresa", "")
+    cargo   = c.get("cargo", "")
+    cf      = c.get("custom_fields") or {}
+    sector  = cf.get("sector", "")
+    score   = cf.get("score", "")
+
+    prompt = f"""Eres Vico, asistente de ventas de Etendo (ERP agentico para empresas).
+Generá un email de outreach en español (España/Argentina) para este lead:
+- Empresa: {empresa}
+- Sector: {sector}
+- Cargo del contacto: {cargo}
+- Score de interés: {score}/100
+
+Reglas ESTRICTAS:
+1. El email debe crear OBLIGACIÓN de responder — usá una pregunta directa al final que sea difícil de ignorar
+2. Tono: cercano, directo, sin corporativismo. Nada de "espero que este email te encuentre bien"
+3. Mencioná un dolor específico del sector {sector} que Etendo resuelve
+4. Máximo 4 párrafos cortos
+5. Incluí este CTA visual al final del cuerpo (antes de la firma): un enlace al video demo con texto "▶ Ver cómo funciona en 90 segundos"
+6. NO incluyas la firma (la ponemos aparte)
+7. Generá también un asunto potente, corto y con curiosidad gap
+
+Respondé SOLO con JSON válido, sin texto extra:
+{{"subject": "...", "body_html": "..."}}
+
+El body_html debe usar párrafos <p> con estilos inline básicos. El enlace del video usá href="#VIDEO_URL" como placeholder."""
+
+    resp = requests.post(
+        "https://api.anthropic.com/v1/messages",
+        headers={
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+        json={
+            "model": "claude-haiku-4-5-20251001",
+            "max_tokens": 1024,
+            "messages": [{"role": "user", "content": prompt}],
+        },
+        timeout=30,
+    )
+    if resp.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Anthropic error: {resp.text[:200]}")
+
+    raw = resp.json()["content"][0]["text"].strip()
+    # Strip markdown code fences if present
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    try:
+        generated = json.loads(raw)
+    except Exception:
+        raise HTTPException(status_code=502, detail=f"JSON inválido del modelo: {raw[:200]}")
+
+    subject   = generated.get("subject", "")
+    body_html = generated.get("body_html", "")
+
+    # Save to Supabase
+    cf["outreach_subject"] = subject
+    cf["outreach_body"]    = body_html
+    requests.patch(
+        f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}",
+        headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+        json={"custom_fields": cf}, timeout=10)
+
+    return {"ok": True, "subject": subject, "body_html": body_html}
 
 
 # ── Send Outreach Email ────────────────────────────────────────────────────────
