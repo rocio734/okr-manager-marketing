@@ -832,6 +832,22 @@ El body_html debe usar párrafos <p> con estilos inline básicos. El enlace del 
     subject   = generated.get("subject", "")
     body_html = generated.get("body_html", "")
 
+    # Replace video placeholder with real thumbnail block
+    video_url = "https://drive.google.com/file/d/1EnB--MreDyPmOmoFtgd1CTBphPW4vKei/view"
+    video_block = (
+        f'<a href="{video_url}" target="_blank" style="display:block;margin:20px 0;text-decoration:none">'
+        '<div style="background:linear-gradient(135deg,#1a2b6d,#f5c400);border-radius:10px;padding:20px 24px;'
+        'color:#fff;font-family:Arial,sans-serif;display:flex;align-items:center;gap:16px;max-width:480px">'
+        '<div style="width:48px;height:48px;background:rgba(255,255,255,0.25);border-radius:50%;'
+        'display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">▶</div>'
+        '<div><div style="font-weight:700;font-size:15px">Ver cómo funciona Etendo en 90 segundos</div>'
+        '<div style="font-size:12px;opacity:.85;margin-top:3px">Demo real · Sin instalación · Sin registro</div></div>'
+        '</div></a>'
+    )
+    body_html = body_html.replace('href="#VIDEO_URL"', f'href="{video_url}"')
+    if "#VIDEO_URL" not in generated.get("body_html", ""):
+        body_html = body_html + video_block
+
     # Save to Supabase
     cf["outreach_subject"] = subject
     cf["outreach_body"]    = body_html
