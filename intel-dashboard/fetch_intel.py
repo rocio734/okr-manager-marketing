@@ -1266,11 +1266,16 @@ def save_to_supabase(new_leads):
                 continue
 
             deal_payload = {
+                "nombre":      f"{company} · Intel Dashboard",
                 "contact_id":  contact_id,
+                "empresa":     company,
                 "pipeline_id": PIPELINE_ID,
                 "stage_id":    STAGE_NUEVO_LEAD,
                 "prioridad":   "alta" if score == 3 else ("media" if score == 2 else "baja"),
-                "fuente":      OUTREACH_SOURCE,
+                "valor":       0,
+                "moneda":      "EUR",
+                "prob_cierre": 0,
+                "estado":      "open",
             }
             dr = requests.post(
                 f"{base}/deals",

@@ -1,51 +1,46 @@
 {
-  "generated_at": "05/08/2026 14:24 UTC",
-  "pending_count": 65,
+  "generated_at": "03/08/2026 13:48 UTC",
+  "pending_count": 87,
   "posts": [
     {
-      "url": "https://dev.to/anmolbaranwal/open-source-toolkit-for-building-ai-agents-in-2026-55h1",
+      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
       "domain": "dev.to",
-      "title": "Open Source Toolkit for Building AI Agents in 2026 - DEV Community",
-      "snippet": "Microsoft Agent Framework - The enterprise successor to AutoGen. Stable APIs, long-term support, A2A and MCP built in. Pick when you need long-term support guarantees. OWL - Multi-agent automation framework built on CAMEL. Uses a planning agent + execution agent model for long-horizon real-world tas",
+      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
+      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
       "label": "dev.to",
-      "date": "05/08/2026",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Es interesante ver cómo el desarrollo de agentes de IA está tomando forma y la importancia de usar herramientas open source para construir sobre bases sólidas. En ese sentido, el enfoque en la comunidad y la mantenibilidad es clave. Proyectos como Etendo, que integran agentes de IA en su núcleo, permiten automatizar procesos de negocio de manera más avanzada, lo que podría ser útil para quienes buscan implementar soluciones efectivas en sus organizaciones. La combinación de un ERP open source con capacidades de IA puede transformar cómo manejamos las operaciones comerciales. ¡Gracias por compartir esta lista útil!",
-      "relevance_score": 8,
-      "reasoning": "El comentario añade valor al resaltar la importancia de las buenas prácticas en open source y cómo la integración de IA en herramientas como un ERP puede ser beneficiosa para los desarrolladores e implementadores de tecnología. Esto enriquece la conversación sin ser promocional.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
     },
     {
-      "url": "https://news.ycombinator.com/item?id=49141847",
-      "domain": "news.ycombinator.com",
-      "title": "CRM: An open-source, agentic-first CRM | Hacker News",
-      "snippet": "Worst CRM product name of all time, &amp;: · Contributing We&#x27;d rather have a paragraph you wrote than a pull request an agent wrote. Ironic after scrolling through the readme just wishing you’d wrote it yourself",
-      "label": "HackerNews",
-      "date": "05/08/2026",
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Entiendo la frustración con los CRMs que dependen demasiado de la automatización y falta de personalización. Es esencial que el software refleje nuestra voz y nuestros procesos únicos. En el ámbito del software de gestión, plataformas como Etendo, que integran agentes de IA de manera nativa, permiten que los procesos sean más fluidos y personalizados, ejecutando tareas que normalmente requerirían intervención humana. Si bien hay que tener cuidado con la superficialidad, la combinación de agentes con un enfoque open source ofrece la flexibilidad necesaria para adaptar el CRM a nuestras necesidades específicas.",
-      "relevance_score": 8,
-      "reasoning": "Este comentario aporta valor al abordar la preocupación sobre la falta de personalización en los CRMs y destaca la importancia de tener un software que refleje las necesidades únicas de cada organización. Además, al mencionar Etendo, se introduce una alternativa que responde a la inquietud planteada en el hilo.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
     },
     {
-      "url": "https://news.ycombinator.com/item?id=46924426",
+      "url": "https://news.ycombinator.com/item?id=48736833",
       "domain": "news.ycombinator.com",
-      "title": "Software factories and the agentic moment | Hacker News",
-      "snippet": "The only github I could find is: https://github.com/strongdm/attractor · Building Attractor Supply the following prompt to a modern coding agent (Claude Code, Codex, OpenCode, Amp, Cursor, etc): codeagent&gt; Implement Attractor as described by https://factory.strongdm.ai/ Canadian girlfriend ...",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
       "label": "HackerNews",
-      "date": "05/08/2026",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Es interesante ver cómo las fábricas de software están evolucionando y cómo la integración de agentes inteligentes puede cambiar la forma en que desarrollamos productos. Los procesos automatizados no solo mejoran la eficiencia, sino que permiten una personalización más rápida y adaptativa de las soluciones. Un enfoque que vale la pena considerar es el de plataformas como Etendo, que combina la capacidad de un ERP con agentes de IA nativos que pueden ejecutar procesos completos. Esto podría ser una forma efectiva de implementar las ideas discutidas aquí, llevando un paso más allá la automatización en el desarrollo de software.",
-      "relevance_score": 8,
-      "reasoning": "Este comentario aporta valor al destacar la relevancia de los agentes inteligentes en el desarrollo de software y cómo un ERP como Etendo puede integrar estas tecnologías. Además, ofrece una alternativa tangible a los conceptos discutidos en el hilo, enriqueciendo la conversación sobre la automatización y la eficiencia en este contexto.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
     },
     {
       "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
@@ -53,59 +48,49 @@
       "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
       "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
       "label": "Reddit ES",
-      "date": "05/08/2026",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Es interesante ver cómo la evolución de los salarios en España puede estar ligada a la adopción de tecnologías que optimicen la gestión empresarial. Las empresas que implementan sistemas ERP avanzados pueden optimizar sus procesos y, potencialmente, mejorar su rentabilidad, lo que podría reflejarse en mayores salarios. Plataformas como Etendo, que incorporan agentes de IA y son open source, permiten a las empresas adaptarse rápidamente a las necesidades del mercado y gestionar de manera más eficiente sus recursos, lo que podría tener un impacto positivo en la distribución salarial.",
-      "relevance_score": 8,
-      "reasoning": "Este comentario aporta valor al conectar la discusión sobre salarios con la importancia de la tecnología ERP en la optimización de procesos empresariales. Además, menciona a Etendo de forma relevante, aludiendo a su capacidad para ayudar a las empresas a mejorar su rentabilidad y, en consecuencia, sus salarios.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
     },
     {
-      "url": "https://dev.to/anmolbaranwal/open-source-toolkit-for-building-ai-agents-in-2026-55h1",
+      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
       "domain": "dev.to",
-      "title": "Open Source Toolkit for Building AI Agents in 2026 - DEV Community",
-      "snippet": "Microsoft Agent Framework - The enterprise successor to AutoGen. Stable APIs, long-term support, A2A and MCP built in. Pick when you need long-term support guarantees. OWL - Multi-agent automation framework built on CAMEL. Uses a planning agent + execution agent model for long-horizon real-world tas",
+      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
+      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
       "label": "dev.to",
-      "date": "05/08/2026",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Es interesante ver cómo el desarrollo de agentes de IA está tomando forma y la importancia de usar herramientas open source para construir sobre bases sólidas. En ese sentido, el enfoque en la comunidad y la mantenibilidad es clave. Proyectos como Etendo, que integran agentes de IA en su núcleo, permiten automatizar procesos de negocio de manera más avanzada, lo que podría ser útil para quienes buscan implementar soluciones efectivas en sus organizaciones. La combinación de un ERP open source con capacidades de IA puede transformar cómo manejamos las operaciones comerciales. ¡Gracias por compartir esta lista útil!",
-      "relevance_score": 8,
-      "reasoning": "El comentario añade valor al resaltar la importancia de las buenas prácticas en open source y cómo la integración de IA en herramientas como un ERP puede ser beneficiosa para los desarrolladores e implementadores de tecnología. Esto enriquece la conversación sin ser promocional.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
     },
     {
-      "url": "https://news.ycombinator.com/item?id=49141847",
-      "domain": "news.ycombinator.com",
-      "title": "CRM: An open-source, agentic-first CRM | Hacker News",
-      "snippet": "Worst CRM product name of all time, &amp;: · Contributing We&#x27;d rather have a paragraph you wrote than a pull request an agent wrote. Ironic after scrolling through the readme just wishing you’d wrote it yourself",
-      "label": "HackerNews",
-      "date": "05/08/2026",
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Entiendo la frustración con los CRMs que dependen demasiado de la automatización y falta de personalización. Es esencial que el software refleje nuestra voz y nuestros procesos únicos. En el ámbito del software de gestión, plataformas como Etendo, que integran agentes de IA de manera nativa, permiten que los procesos sean más fluidos y personalizados, ejecutando tareas que normalmente requerirían intervención humana. Si bien hay que tener cuidado con la superficialidad, la combinación de agentes con un enfoque open source ofrece la flexibilidad necesaria para adaptar el CRM a nuestras necesidades específicas.",
-      "relevance_score": 8,
-      "reasoning": "Este comentario aporta valor al abordar la preocupación sobre la falta de personalización en los CRMs y destaca la importancia de tener un software que refleje las necesidades únicas de cada organización. Además, al mencionar Etendo, se introduce una alternativa que responde a la inquietud planteada en el hilo.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
     },
     {
-      "url": "https://news.ycombinator.com/item?id=46924426",
+      "url": "https://news.ycombinator.com/item?id=48736833",
       "domain": "news.ycombinator.com",
-      "title": "Software factories and the agentic moment | Hacker News",
-      "snippet": "The only github I could find is: https://github.com/strongdm/attractor · Building Attractor Supply the following prompt to a modern coding agent (Claude Code, Codex, OpenCode, Amp, Cursor, etc): codeagent&gt; Implement Attractor as described by https://factory.strongdm.ai/ Canadian girlfriend ...",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
       "label": "HackerNews",
-      "date": "05/08/2026",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Es interesante ver cómo las fábricas de software están evolucionando y cómo la integración de agentes inteligentes puede cambiar la forma en que desarrollamos productos. Los procesos automatizados no solo mejoran la eficiencia, sino que permiten una personalización más rápida y adaptativa de las soluciones. Un enfoque que vale la pena considerar es el de plataformas como Etendo, que combina la capacidad de un ERP con agentes de IA nativos que pueden ejecutar procesos completos. Esto podría ser una forma efectiva de implementar las ideas discutidas aquí, llevando un paso más allá la automatización en el desarrollo de software.",
-      "relevance_score": 8,
-      "reasoning": "Este comentario aporta valor al destacar la relevancia de los agentes inteligentes en el desarrollo de software y cómo un ERP como Etendo puede integrar estas tecnologías. Además, ofrece una alternativa tangible a los conceptos discutidos en el hilo, enriqueciendo la conversación sobre la automatización y la eficiencia en este contexto.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
     },
     {
       "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
@@ -113,14 +98,209 @@
       "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
       "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
       "label": "Reddit ES",
-      "date": "05/08/2026",
+      "date": "03/08/2026",
       "commented": false,
-      "comment_draft": "Es interesante ver cómo la evolución de los salarios en España puede estar ligada a la adopción de tecnologías que optimicen la gestión empresarial. Las empresas que implementan sistemas ERP avanzados pueden optimizar sus procesos y, potencialmente, mejorar su rentabilidad, lo que podría reflejarse en mayores salarios. Plataformas como Etendo, que incorporan agentes de IA y son open source, permiten a las empresas adaptarse rápidamente a las necesidades del mercado y gestionar de manera más eficiente sus recursos, lo que podría tener un impacto positivo en la distribución salarial.",
-      "relevance_score": 8,
-      "reasoning": "Este comentario aporta valor al conectar la discusión sobre salarios con la importancia de la tecnología ERP en la optimización de procesos empresariales. Además, menciona a Etendo de forma relevante, aludiendo a su capacidad para ayudar a las empresas a mejorar su rentabilidad y, en consecuencia, sus salarios.",
-      "etendo_natural": true,
-      "processed_at": "05/08/2026 14:25",
-      "comment_ready": true
+      "comment_draft": ""
+    },
+    {
+      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
+      "domain": "dev.to",
+      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
+      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=48736833",
+      "domain": "news.ycombinator.com",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
+      "domain": "reddit.com",
+      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
+      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
+      "label": "Reddit ES",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
+      "domain": "dev.to",
+      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
+      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=48736833",
+      "domain": "news.ycombinator.com",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
+      "domain": "reddit.com",
+      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
+      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
+      "label": "Reddit ES",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=48736833",
+      "domain": "news.ycombinator.com",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/devsarg/comments/1j90q8u/b%C3%BAsqueda_de_erp_para_empresa_en_argentina/",
+      "domain": "reddit.com",
+      "title": "r/devsarg on Reddit: Búsqueda de ERP para empresa en Argentina",
+      "snippet": "Hi OP, I&#x27;m in the same situation as you do, I was looking for Odoo references and the ln10n_ar_edi module for local invoices, I saw the enterprise edition is only $13.40 + the server monthly cost. That&#x27;s all we need I think, right ? ... Hola! ¿Cómo estás? ¿Pudiste dar con la solución que b",
+      "label": "Reddit ERP",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
+      "domain": "reddit.com",
+      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
+      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
+      "label": "Reddit ES",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=48736833",
+      "domain": "news.ycombinator.com",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/devsarg/comments/1j90q8u/b%C3%BAsqueda_de_erp_para_empresa_en_argentina/",
+      "domain": "reddit.com",
+      "title": "r/devsarg on Reddit: Búsqueda de ERP para empresa en Argentina",
+      "snippet": "Hi OP, I&#x27;m in the same situation as you do, I was looking for Odoo references and the ln10n_ar_edi module for local invoices, I saw the enterprise edition is only $13.40 + the server monthly cost. That&#x27;s all we need I think, right ? ... Hola! ¿Cómo estás? ¿Pudiste dar con la solución que b",
+      "label": "Reddit ERP",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
+    },
+    {
+      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
+      "domain": "reddit.com",
+      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
+      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
+      "label": "Reddit ES",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": ""
     },
     {
       "url": "https://dev.to/ido_vapner/amazon-bedrock-guardrails-building-safe-reliable-agentic-ai-at-scale-in-2026-32lf",
@@ -982,7 +1162,5 @@
       "skip_reason": "Score 4/10 — poco relevante",
       "processed_at": "30/07/2026 23:00"
     }
-  ],
-  "last_batch": "05/08/2026 14:25",
-  "ready_count": 60
+  ]
 }
