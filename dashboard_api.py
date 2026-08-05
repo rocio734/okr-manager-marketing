@@ -829,22 +829,55 @@ def generate_outreach(deal_id: str):
 
     cr = requests.get(
         f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}"
-        f"&select=nombre,empresa,cargo,custom_fields",
+        f"&select=nombre,email,empresa,cargo,custom_fields",
         headers=_SB_HEADERS(), timeout=10)
     c = (cr.json() or [{}])[0]
     empresa = c.get("empresa", "")
     cargo   = c.get("cargo", "")
+    email   = (c.get("email") or "").lower()
     cf           = c.get("custom_fields") or {}
     sector       = cf.get("sector", "")
     score        = cf.get("score", "")
     signal_label = cf.get("signal_label", "")
+
+    GENERIC_PREFIXES = {
+        "info", "contacto", "contact", "hola", "hello", "admin", "administracion",
+        "administración", "logistica", "logística", "comercial", "ventas", "sales",
+        "marketing", "direccion", "dirección", "recepcion", "recepción", "general",
+        "empresa", "mail", "correo", "soporte", "support", "web",
+    }
+    local_part = email.split("@")[0] if "@" in email else email
+    is_generic = local_part in GENERIC_PREFIXES
+
     PARTNER_SIGNALS = {
         "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
         "Partner SAP (deep)", "Busca partner",
     }
     lead_type = "partner" if signal_label in PARTNER_SIGNALS else "lead"
 
-    if lead_type == "partner":
+    if is_generic:
+        prompt = f"""Eres Vico, de Etendo (ERP para empresas medianas).
+Estás escribiendo a la bandeja genérica de una empresa ({email}), así que NO sabes quién lo va a leer.
+Tu único objetivo es que te respondan con el nombre de la persona correcta a quien contactar.
+
+- Empresa: {empresa}
+- Sector: {sector}
+
+Reglas ESTRICTAS:
+1. Email MUY corto: máximo 3 líneas de texto + pregunta final
+2. NO hagas pitch de producto. Ni una sola feature de Etendo
+3. Menciona el sector en una frase para mostrar que es relevante, no genérico
+4. La pregunta final: "¿Podrías decirme quién se encarga de la gestión de software en {empresa}?"
+5. Tono: natural, humano, como si fuera un email personal — no corporativo
+6. Asunto: corto, que parezca interno, no publicitario
+7. NO incluyas firma
+
+Respondé SOLO con JSON válido:
+{{"subject": "...", "body_html": "..."}}
+
+El body_html debe usar párrafos <p> con estilos inline básicos."""
+
+    elif lead_type == "partner":
         prompt = f"""Eres Vico, partner manager de Etendo (ERP agéntico y composable para empresas medianas).
 Generá un email de outreach en español (España) para una consultora/implementadora que actualmente trabaja con {signal_label.replace('Partner ', '') if signal_label.startswith('Partner') else 'otro ERP'}.
 
