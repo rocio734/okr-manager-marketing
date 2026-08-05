@@ -905,28 +905,33 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <div class="kcard"><p class="klbl">En Reunión / Propuesta</p><p class="kval" style="color:var(--am)" id="or-advanced">—</p><p class="ksub">Etapas avanzadas</p></div>
   </div>
 
-  <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-    <button class="fbtn on" onclick="orFilter('all',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--y);font-weight:600">Todos</button>
-    <button class="fbtn" onclick="orFilter('Nuevo Lead',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Nuevo Lead</button>
-    <button class="fbtn" onclick="orFilter('Contactado',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Contactado</button>
-    <button class="fbtn" onclick="orFilter('Reunión Agendada',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Reunión Agendada</button>
-    <button class="fbtn" onclick="orFilter('Propuesta Enviada',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Propuesta Enviada</button>
+  <div style="margin-bottom:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="fbtn or-stage-btn on" onclick="orFilter('all',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--y);font-weight:600">Todos</button>
+    <button class="fbtn or-stage-btn" onclick="orFilter('Nuevo Lead',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Nuevo Lead</button>
+    <button class="fbtn or-stage-btn" onclick="orFilter('Contactado',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Contactado</button>
+    <button class="fbtn or-stage-btn" onclick="orFilter('Reunión Agendada',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Reunión Agendada</button>
+    <button class="fbtn or-stage-btn" onclick="orFilter('Propuesta Enviada',this)" style="font-size:12px;padding:4px 12px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">Propuesta Enviada</button>
     <span style="margin-left:auto;font-size:11px;color:var(--gm)" id="or-updated">—</span>
     <span id="or-user-chip" style="font-size:11px;color:var(--gm);display:none">
       Enviando como <b id="or-user-label"></b> · <a href="#" onclick="orLogout();return false" style="color:var(--bl);text-decoration:none">Cambiar</a>
     </span>
     <button onclick="loadOutreach()" style="font-size:11px;padding:3px 10px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">↻ Actualizar</button>
   </div>
+  <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="fbtn or-type-btn on" onclick="orTypeFilter('all',this)" style="font-size:11px;padding:3px 10px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--y);font-weight:600">Todos tipos</button>
+    <button class="fbtn or-type-btn" onclick="orTypeFilter('lead',this)" style="font-size:11px;padding:3px 10px;border:1px solid #1B5E20;border-radius:4px;cursor:pointer;background:var(--bg);color:#1B5E20;font-weight:600">🏢 Solo Leads</button>
+    <button class="fbtn or-type-btn" onclick="orTypeFilter('partner',this)" style="font-size:11px;padding:3px 10px;border:1px solid #0D47A1;border-radius:4px;cursor:pointer;background:var(--bg);color:#0D47A1;font-weight:600">🤝 Solo Partners</button>
+  </div>
 
   <div style="overflow-x:auto">
     <table class="tbl" id="or-table">
       <thead><tr>
-        <th>Empresa</th><th>Email</th><th>Sector</th><th>Score</th>
+        <th>Empresa</th><th>Tipo</th><th>Email</th><th>Sector</th><th>Score</th>
         <th>Etapa</th><th>Mensaje</th><th>Estado email</th>
         <th>Notas</th><th>Acción</th>
       </tr></thead>
       <tbody id="or-tbody">
-        <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--gm)">Cargando leads…</td></tr>
+        <tr><td colspan="10" style="text-align:center;padding:24px;color:var(--gm)">Cargando leads…</td></tr>
       </tbody>
     </table>
   </div>
@@ -1032,6 +1037,7 @@ document.addEventListener('DOMContentLoaded',renderEngagementStatus);
 const OR_API = 'https://etendo-dashboard-api.onrender.com';
 let _orData = [];
 let _orFilter = 'all';
+let _typeFilter = 'all';
 let _orRefreshTimer = null;
 
 const OR_STAGE_COLORS = {
@@ -1080,13 +1086,20 @@ async function loadOutreach(silent=false){
 
 function orFilter(val, el){
   _orFilter = val;
-  document.querySelectorAll('#outreach-sec .fbtn').forEach(b=>b.style.background='var(--bg)');
+  document.querySelectorAll('#outreach-sec .or-stage-btn').forEach(b=>{b.style.background='var(--bg)';b.style.color='';});
+  if(el){ el.style.background='var(--y)'; el.style.color=''; }
+  renderOutreach();
+}
+function orTypeFilter(val, el){
+  _typeFilter = val;
+  document.querySelectorAll('#outreach-sec .or-type-btn').forEach(b=>{b.style.background='var(--bg)';b.style.fontWeight='600';});
   if(el) el.style.background='var(--y)';
   renderOutreach();
 }
 
 function renderOutreach(){
-  const rows = _orFilter==='all' ? _orData : _orData.filter(l=>l.stage===_orFilter);
+  let rows = _orFilter==='all' ? _orData : _orData.filter(l=>l.stage===_orFilter);
+  if(_typeFilter!=='all') rows = rows.filter(l=>l.lead_type===_typeFilter);
   const openCount = _orData.filter(l=>l.opens>0).length;
   const advCount  = _orData.filter(l=>['Reunión Agendada','Propuesta Enviada','Negociación','Cerrado Ganado'].includes(l.stage)).length;
   document.getElementById('or-total').textContent = _orData.length;
@@ -1094,7 +1107,7 @@ function renderOutreach(){
   document.getElementById('or-advanced').textContent = advCount;
 
   if(!rows.length){
-    document.getElementById('or-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--gm)">Sin resultados</td></tr>';
+    document.getElementById('or-tbody').innerHTML='<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--gm)">Sin resultados</td></tr>';
     return;
   }
 
@@ -1125,8 +1138,13 @@ function renderOutreach(){
       ? `<span style="font-size:10px;color:#2E7D32;font-weight:600">💬 Respondió</span>`
       : `<button onclick="orMarkReplied('${l.deal_id}',this)" style="font-size:10px;padding:3px 7px;border:1px solid #2E7D32;border-radius:4px;background:#fff;color:#2E7D32;cursor:pointer;margin-top:4px;margin-left:2px">💬 Respondió</button>`;
 
+    const tipoBadge = l.lead_type==='partner'
+      ? `<span style="background:#0D47A1;color:#fff;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap">🤝 Partner</span>`
+      : `<span style="background:#1B5E20;color:#fff;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap">🏢 Lead</span>`;
+
     return `<tr>
       <td style="padding:8px 10px;font-weight:500">${l.empresa}</td>
+      <td style="padding:8px 6px;text-align:center">${tipoBadge}</td>
       <td style="padding:8px 10px;font-size:11px">${l.email||'—'}</td>
       <td style="padding:8px 10px;font-size:11px">${l.sector||'—'}</td>
       <td style="padding:8px 10px">${orScoreDot(l.score)}</td>
