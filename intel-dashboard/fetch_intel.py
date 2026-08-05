@@ -197,6 +197,17 @@ SKIP_DOMAINS = {
     "staminamarketing","seomalagaweb",
     # Portales de empleo adicionales
     "infoempleo","talentsearch","jobandtalent","cornerjob","infojobs",
+    "jooble","jobijoba","jobeka","opcionempleo","expertone",
+    # Implementadores Dynamics/BC/NAV (venden ERP, no lo buscan)
+    "advancesoluciones","sevillaerp","aerya","aelis","databay","dasolo",
+    # Comparadores y directorios de software
+    "comparasoft","comparaindustria","sortlist","blog.saleslayer","saleslayer",
+    # WhatsApp y chats (falsos positivos)
+    "wa.me",
+    # Blogs de competidores (no son la empresa, son su blog)
+    "blog.corponet","blog.saleslayer",
+    # Agregadores de agencias
+    "ekamat","corposuite",
 }
 
 # Caché de URLs ya vistas para saber si usar auto_save o adaptive
