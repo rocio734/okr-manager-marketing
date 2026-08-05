@@ -57,6 +57,12 @@ HUNTER_KEY      = os.environ.get("HUNTER_API_KEY","")
 GMAIL_USER      = os.environ.get("GMAIL_USER","")
 GMAIL_PASS      = os.environ.get("GMAIL_PASSWORD_ROCIO","")
 APOLLO_KEY      = os.environ.get("APOLLO_API_KEY","")
+SUPABASE_URL    = os.environ.get("SUPABASE_URL","")
+SUPABASE_KEY    = os.environ.get("SUPABASE_SERVICE_KEY","")
+
+OUTREACH_SOURCE  = "intel_dashboard"
+STAGE_NUEVO_LEAD = "2f7828bf-51eb-4a5e-a645-026a7e06834b"
+PIPELINE_ID      = "11d2089f-a64e-4001-b8af-9210787f3fce"
 
 TODAY = datetime.date.today().strftime("%d/%m/%Y")
 NOW   = datetime.datetime.now().strftime("%d/%m/%Y %H:%M UTC")
@@ -1177,6 +1183,115 @@ def render_alerts(changes,new_leads):
     if pt: html+=f'<div class="acard" style="border-left-color:#EDA100"><b>🤝 {len(pt)} partners de competidores</b></div>'
     return html or '<div style="padding:10px;color:var(--text-muted);font-size:12px">Sin alertas nuevas</div>'
 
+# ── Supabase sync ───────────────────────────────────────────────────────────
+def save_to_supabase(new_leads):
+    """
+    Escribe los leads nuevos en Supabase (contacts + deals) para que aparezcan
+    en el tab Outreach del dashboard. Solo leads con email verificado o score >= 2.
+    Usa upsert por email (contacts) para evitar duplicados.
+    """
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("  ⚠️  SUPABASE_URL / SUPABASE_SERVICE_KEY no configurados — skip")
+        return
+
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation,resolution=merge-duplicates",
+    }
+    base = SUPABASE_URL.rstrip("/") + "/rest/v1"
+
+    # Solo leads con email real o score alto (sin email no podemos hacer outreach)
+    candidates = [l for l in new_leads if l.get("email", "—") != "—"]
+    if not candidates:
+        print(f"  → Supabase: 0 leads con email — nada que sincronizar")
+        return
+
+    created = 0
+    skipped = 0
+    for lead in candidates:
+        email   = lead.get("email", "").strip().lower()
+        company = lead.get("company", "—")
+        domain  = lead.get("domain", "")
+        sector  = lead.get("sector", "") or lead.get("signal_label", "")
+        score   = lead.get("score", 1)
+
+        contact_payload = {
+            "nombre":          lead.get("contact_name") or company,
+            "email":           email,
+            "empresa":         company,
+            "fuente":          OUTREACH_SOURCE,
+            "pipeline_id":     PIPELINE_ID,
+            "notas_internas":  (
+                f"Detectado por Intel Dashboard · {lead.get('date','')} · "
+                f"{lead.get('signal_label','')} · Fuente: {lead.get('source_url','')}"
+            ),
+            "custom_fields": {
+                "sector":    sector,
+                "score":     score,
+                "domain":    domain,
+                "source_type": lead.get("source_type", ""),
+                "linkedin":  lead.get("linkedin", "—"),
+                "phone":     lead.get("phone", "—"),
+                "position":  lead.get("contact_pos", "—"),
+                "detected_at": datetime.datetime.now().isoformat(),
+            },
+        }
+
+        try:
+            r = requests.post(
+                f"{base}/contacts",
+                headers=headers,
+                json=contact_payload,
+                timeout=10,
+            )
+            if r.status_code not in (200, 201):
+                print(f"    ⚠️  contact upsert {email}: {r.status_code} {r.text[:120]}")
+                skipped += 1
+                continue
+
+            contact_id = r.json()[0]["id"] if r.json() else None
+            if not contact_id:
+                skipped += 1
+                continue
+
+            # Crear deal en stage "Nuevo Lead" solo si no existe uno ya
+            check = requests.get(
+                f"{base}/deals?contact_id=eq.{contact_id}&select=id",
+                headers={**headers, "Prefer": ""},
+                timeout=10,
+            )
+            if check.status_code == 200 and check.json():
+                skipped += 1
+                continue
+
+            deal_payload = {
+                "contact_id":  contact_id,
+                "pipeline_id": PIPELINE_ID,
+                "stage_id":    STAGE_NUEVO_LEAD,
+                "prioridad":   "alta" if score == 3 else ("media" if score == 2 else "baja"),
+                "fuente":      OUTREACH_SOURCE,
+            }
+            dr = requests.post(
+                f"{base}/deals",
+                headers={**headers, "Prefer": "return=representation"},
+                json=deal_payload,
+                timeout=10,
+            )
+            if dr.status_code in (200, 201):
+                created += 1
+            else:
+                print(f"    ⚠️  deal {email}: {dr.status_code} {dr.text[:120]}")
+                skipped += 1
+
+        except Exception as e:
+            print(f"    ⚠️  Supabase error {email}: {e}")
+            skipped += 1
+
+    print(f"  → Supabase: {created} leads nuevos · {skipped} ignorados/errores")
+
+
 # ── Main ────────────────────────────────────────────────────────────────────
 def main():
     print(f"\n{'='*55}\nEtendo Intelligence — {NOW}\n{'='*55}")
@@ -1192,6 +1307,8 @@ def main():
         tok=sheets_token()
         if tok: save_to_sheets(new_leads,new_changes,GOOGLE_SHEET_ID,tok)
         else: print("  ⚠️ Configura GOOGLE_SERVICE_ACCOUNT_JSON")
+    print("→ Supabase Outreach...")
+    save_to_supabase(new_leads)
     print("→ HTML...")
     html=open(HTML_FILE,encoding="utf-8").read()
     by_src={}

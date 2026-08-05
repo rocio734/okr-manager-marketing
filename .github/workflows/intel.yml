@@ -40,6 +40,8 @@ jobs:
           OPENAI_API_KEY:              ${{ secrets.OPENAI_API_KEY }}
           GMAIL_USER:                  ${{ secrets.GMAIL_USER }}
           GMAIL_PASSWORD_ROCIO:        ${{ secrets.GMAIL_PASSWORD_ROCIO }}
+          SUPABASE_URL:                ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY:        ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: cd intel-dashboard && python fetch_intel.py
 
       - name: Generar borradores de engagement
