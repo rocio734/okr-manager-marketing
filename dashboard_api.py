@@ -679,6 +679,13 @@ def outreach_list():
             deal = deal_by_contact.get(c["id"], {})
             email = c.get("email", "")
             cf = c.get("custom_fields") or {}
+            signal_label = cf.get("signal_label", "")
+            PARTNER_SIGNALS = {
+                "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
+                "Partner SAP (deep)", "Busca partner",
+            }
+            lead_type = "partner" if signal_label in PARTNER_SIGNALS else "lead"
+
             result.append({
                 "contact_id":   c["id"],
                 "deal_id":      deal.get("id", ""),
@@ -686,6 +693,8 @@ def outreach_list():
                 "email":        email,
                 "sector":       cf.get("sector", ""),
                 "score":        cf.get("score", 0),
+                "signal_label": signal_label,
+                "lead_type":    lead_type,
                 "stage":        stage_name.get(deal.get("stage_id", ""), "Nuevo Lead"),
                 "stage_id":     deal.get("stage_id", STAGE_MAP["Nuevo Lead"]),
                 "opens":        open_counts.get(email, 0),
@@ -825,12 +834,42 @@ def generate_outreach(deal_id: str):
     c = (cr.json() or [{}])[0]
     empresa = c.get("empresa", "")
     cargo   = c.get("cargo", "")
-    cf      = c.get("custom_fields") or {}
-    sector  = cf.get("sector", "")
-    score   = cf.get("score", "")
+    cf           = c.get("custom_fields") or {}
+    sector       = cf.get("sector", "")
+    score        = cf.get("score", "")
+    signal_label = cf.get("signal_label", "")
+    PARTNER_SIGNALS = {
+        "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
+        "Partner SAP (deep)", "Busca partner",
+    }
+    lead_type = "partner" if signal_label in PARTNER_SIGNALS else "lead"
 
-    prompt = f"""Eres Vico, asistente de ventas de Etendo (ERP agentico para empresas).
-Generá un email de outreach en español (España/Argentina) para este lead:
+    if lead_type == "partner":
+        prompt = f"""Eres Vico, partner manager de Etendo (ERP agéntico y composable para empresas medianas).
+Generá un email de outreach en español (España) para una consultora/implementadora que actualmente trabaja con {signal_label.replace('Partner ', '') if signal_label.startswith('Partner') else 'otro ERP'}.
+
+- Empresa: {empresa}
+- Señal detectada: {signal_label}
+- Cargo del contacto: {cargo}
+
+Contexto: Etendo es un ERP open-source, composable y agéntico. Su red de partners obtiene margen en licencias, soporte y servicios de implementación. Es complementario o alternativo a Odoo/SAP/Sage para clientes que necesitan más flexibilidad o integración con IA.
+
+Reglas ESTRICTAS:
+1. El email es de partner-to-partner, no de vendedor a comprador. Tono: profesional entre colegas
+2. NO digas que Etendo es mejor que su ERP actual — plantea una oportunidad de ampliar su portfolio
+3. El eje principal: "Tus clientes te van a pedir IA en su ERP. ¿Qué les vas a ofrecer?"
+4. Una pregunta concreta al final que invite a una llamada de 20 minutos
+5. Máximo 4 párrafos cortos. Sin frases de relleno
+6. Incluí CTA: enlace con texto "▶ Ver Etendo en 90 segundos" usando href="#VIDEO_URL"
+7. NO incluyas firma
+
+Respondé SOLO con JSON válido:
+{{"subject": "...", "body_html": "..."}}
+
+El body_html debe usar párrafos <p> con estilos inline básicos."""
+    else:
+        prompt = f"""Eres Vico, asistente de ventas de Etendo (ERP agéntico para empresas).
+Generá un email de outreach en español (España) para este prospecto:
 - Empresa: {empresa}
 - Sector: {sector}
 - Cargo del contacto: {cargo}
