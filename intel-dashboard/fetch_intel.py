@@ -187,6 +187,16 @@ SKIP_DOMAINS = {
     "20minutos","marca.com","sport.es","as.com",
     # Gimnasios, clubes deportivos (falsos positivos por búsquedas geográficas)
     "gym","crossfit","fitness","deporte","futbol","baloncesto",
+    # Software RR.HH. y reclutamiento (no son ICP — usan HR software, no ERP)
+    "bizneo","factorial","kenjo","sesame","workday","bamboohr","personio",
+    "catenon","norconrec","gnorcon","talentsearchpeople","clairejoster",
+    "adqualis","krell-consulting","psicotec","marketingdirecto",
+    # Fintech/nóminas especializadas (no son ICP de ERP)
+    "checkitbancario","freematica","nominasol",
+    # Agencias de marketing/SEO (no son ICP)
+    "staminamarketing","seomalagaweb",
+    # Portales de empleo adicionales
+    "infoempleo","talentsearch","jobandtalent","cornerjob","infojobs",
 }
 
 # Caché de URLs ya vistas para saber si usar auto_save o adaptive
@@ -1202,8 +1212,25 @@ def save_to_supabase(new_leads):
     }
     base = SUPABASE_URL.rstrip("/") + "/rest/v1"
 
-    # Solo leads con email real o score alto (sin email no podemos hacer outreach)
-    candidates = [l for l in new_leads if l.get("email", "—") != "—"]
+    def _domain_ok(domain):
+        d = domain.replace("www.", "").lower()
+        return not any(skip in d for skip in SKIP_DOMAINS)
+
+    # Solo leads con email real, dominio limpio y señal ICP/partner válida
+    VALID_SIGNALS = {
+        "Busca ERP (Apollo)", "Busca ERP", "Selección ERP", "Migración ERP",
+        "Empresa logística", "Empresa construcción", "Empresa textil", "Empresa exportadora",
+        "Empresa ICP", "Empresa España (Apollo)", "Empresa alimentación", "Fabricante España",
+        "Empresa química", "Empresa automoción", "Distribuidor", "Licitación",
+        "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
+        "Partner SAP (deep)", "Busca partner",
+    }
+    candidates = [
+        l for l in new_leads
+        if l.get("email", "—") != "—"
+        and _domain_ok(l.get("domain", ""))
+        and l.get("signal_label", "") in VALID_SIGNALS
+    ]
     if not candidates:
         print(f"  → Supabase: 0 leads con email — nada que sincronizar")
         return
@@ -1227,14 +1254,15 @@ def save_to_supabase(new_leads):
                 f"{lead.get('signal_label','')} · Fuente: {lead.get('source_url','')}"
             ),
             "custom_fields": {
-                "sector":    sector,
-                "score":     score,
-                "domain":    domain,
-                "source_type": lead.get("source_type", ""),
-                "linkedin":  lead.get("linkedin", "—"),
-                "phone":     lead.get("phone", "—"),
-                "position":  lead.get("contact_pos", "—"),
-                "detected_at": datetime.datetime.now().isoformat(),
+                "sector":       sector,
+                "score":        score,
+                "domain":       domain,
+                "signal_label": lead.get("signal_label", ""),
+                "source_type":  lead.get("source_type", ""),
+                "linkedin":     lead.get("linkedin", "—"),
+                "phone":        lead.get("phone", "—"),
+                "position":     lead.get("contact_pos", "—"),
+                "detected_at":  datetime.datetime.now().isoformat(),
             },
         }
 
