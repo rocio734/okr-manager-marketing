@@ -1267,21 +1267,40 @@ def save_to_supabase(new_leads):
         }
 
         try:
-            r = requests.post(
+            # Verificar si ya existe un contacto con ese email
+            existing = requests.get(
                 f"{base}/contacts",
-                headers=headers,
-                json=contact_payload,
+                headers={**headers, "Prefer": ""},
+                params={"email": f"eq.{email}", "fuente": f"eq.{OUTREACH_SOURCE}", "select": "id"},
                 timeout=10,
             )
-            if r.status_code not in (200, 201):
-                print(f"    ⚠️  contact upsert {email}: {r.status_code} {r.text[:120]}")
+            if existing.status_code == 200 and existing.json():
+                # Ya existe — actualizar signal_label en custom_fields y saltar
+                contact_id = existing.json()[0]["id"]
+                requests.patch(
+                    f"{base}/contacts?id=eq.{contact_id}",
+                    headers={**headers, "Prefer": "return=minimal"},
+                    json={"custom_fields": contact_payload["custom_fields"]},
+                    timeout=10,
+                )
                 skipped += 1
-                continue
-
-            contact_id = r.json()[0]["id"] if r.json() else None
-            if not contact_id:
-                skipped += 1
-                continue
+                # Igual verificar si tiene deal
+            else:
+                # Nuevo contacto
+                r = requests.post(
+                    f"{base}/contacts",
+                    headers=headers,
+                    json=contact_payload,
+                    timeout=10,
+                )
+                if r.status_code not in (200, 201):
+                    print(f"    ⚠️  contact insert {email}: {r.status_code} {r.text[:120]}")
+                    skipped += 1
+                    continue
+                contact_id = r.json()[0]["id"] if r.json() else None
+                if not contact_id:
+                    skipped += 1
+                    continue
 
             # Crear deal en stage "Nuevo Lead" solo si no existe uno ya
             check = requests.get(
