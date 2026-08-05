@@ -1222,7 +1222,6 @@ def save_to_supabase(new_leads):
             "email":           email,
             "empresa":         company,
             "fuente":          OUTREACH_SOURCE,
-            "pipeline_id":     PIPELINE_ID,
             "notas_internas":  (
                 f"Detectado por Intel Dashboard · {lead.get('date','')} · "
                 f"{lead.get('signal_label','')} · Fuente: {lead.get('source_url','')}"
