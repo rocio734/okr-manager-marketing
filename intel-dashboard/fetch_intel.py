@@ -198,8 +198,10 @@ SKIP_DOMAINS = {
     # Portales de empleo adicionales
     "infoempleo","talentsearch","jobandtalent","cornerjob","infojobs",
     "jooble","jobijoba","jobeka","opcionempleo","expertone",
-    # Implementadores Dynamics/BC/NAV (venden ERP, no lo buscan)
+    # Implementadores y vendedores de ERP (venden ERP, no lo buscan)
     "advancesoluciones","sevillaerp","aerya","aelis","databay","dasolo",
+    "melit","microtech","inforges","miga.es","tecnologiaestrategica",
+    "gruptelematic","softwariza3","practicsbs","alanait","corponet",
     # Comparadores y directorios de software
     "comparasoft","comparaindustria","sortlist","blog.saleslayer","saleslayer",
     # WhatsApp y chats (falsos positivos)
