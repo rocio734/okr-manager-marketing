@@ -1248,11 +1248,25 @@ def save_to_supabase(new_leads):
         print(f"  → Supabase: 0 leads con email — nada que sincronizar")
         return
 
+    _BAD_COMPANY = re.compile(
+        r"(odoo|erp|sap|sage|partner|consultor|logístic|inicio|home|"
+        r"implementar|software|gestión|programa|guía|consejos|qué es|cuál es|"
+        r"silver|gold|platinum|📈|〖|página)", re.IGNORECASE
+    )
+
+    def _clean_company(name, domain):
+        """Devuelve nombre de empresa limpio; si el scrapeado es un título de página, usa el dominio."""
+        if not name or name in ("—", "Inicio", "Home") or _BAD_COMPANY.search(name) or len(name) > 50:
+            base = domain.replace("www.", "").split(".")[0]
+            base = re.sub(r"([a-z])([A-Z])", r"\1 \2", base).replace("-", " ").replace("_", " ")
+            return base.title()
+        return name
+
     created = 0
     skipped = 0
     for lead in candidates:
         email   = lead.get("email", "").strip().lower()
-        company = lead.get("company", "—")
+        company = _clean_company(lead.get("company", ""), lead.get("domain", ""))
         domain  = lead.get("domain", "")
         sector  = lead.get("sector", "") or lead.get("signal_label", "")
         score   = lead.get("score", 1)
