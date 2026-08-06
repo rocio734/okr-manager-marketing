@@ -657,61 +657,114 @@ def linkedin_get_contact(company_name, domain):
 
 
 def scrape_partners():
-    all_p=[]
-    # Odoo partners España — la web carga partners por AJAX (SPA), imposible scraping fiable
-    # Usamos Brave Search para encontrar partners que se presentan públicamente
+    all_p = []
+    seen_domains = set()
+
+    def _add(name, competitor, url, domain):
+        name = name.strip()
+        if not domain or domain in seen_domains or should_skip(domain): return
+        if len(name) < 3 or len(name) > 80: return
+        seen_domains.add(domain)
+        all_p.append({"name": name, "competitor": competitor, "url": url, "domain": domain})
+
+    def _name_from_title(t):
+        return t.replace(" - Partners","").replace(" | Odoo","").split(" - ")[0].split(" | ")[0].strip()
+
+    # ── Odoo partners España — Brave Search (múltiples ángulos) ──────────────
     odoo_queries = [
         '"partner de Odoo" OR "partner Odoo" España empresa',
         '"implementador Odoo" OR "consultor Odoo" España pyme',
         '"Gold Partner Odoo" OR "Silver Partner Odoo" España',
+        '"Ready Partner Odoo" España',
+        '"Odoo partner" Madrid implementación ERP',
+        '"Odoo partner" Barcelona consultoría ERP',
+        '"Odoo partner" Valencia OR Bilbao OR Sevilla España',
+        '"partner oficial Odoo" España autorizado',
+        'implementador Odoo España pyme certificado 2024',
+        '"Odoo Gold" OR "Odoo Silver" OR "Odoo Ready" España empresa',
     ]
     for q in odoo_queries:
-        for r in brave_search(q, num=8):
+        for r in brave_search(q, num=10):
             d = domain_from_url(r["url"])
-            if not d or should_skip(d) or "odoo.com" in d: continue
-            t = r["title"].split(" - ")[0].split(" | ")[0].strip()
-            if 3 < len(t) < 70 and not any(p["domain"]==d for p in all_p):
-                all_p.append({"name":t,"competitor":"Odoo","url":r["url"],"domain":d})
-    print(f"    Odoo partners (Brave): {len(all_p)}")
+            if d and "odoo.com" not in d:
+                _add(_name_from_title(r["title"]), "Odoo", r["url"], d)
+    print(f"    Odoo (Brave): {sum(1 for p in all_p if p['competitor']=='Odoo')}")
 
-    # Holded partners
-    page=fetch("https://www.holded.com/es/partners", dynamic=True)  # JS rendering via Scrapling
+    # Scraping directo del directorio público de Odoo España (con JS rendering)
+    odoo_direct_before = len(all_p)
+    for page_n in range(1, 9):  # hasta 8 páginas × ~12 partners
+        url = f"https://www.odoo.com/partners/country-10/grade-none/page-{page_n}/"
+        html = fetch_html(url, dynamic=True, timeout=25)
+        if not html or "No results" in html:
+            break
+        soup = BeautifulSoup(html, "html.parser")
+        found_this_page = 0
+        # Buscar links externos dentro de tarjetas de partner
+        for a in soup.find_all("a", href=re.compile(r"^https?://(?!.*(odoo\.com))")):
+            t = a.get_text(strip=True)
+            d = domain_from_url(a.get("href",""))
+            if d and 3 < len(t) < 80:
+                _add(t, "Odoo", a.get("href",""), d)
+                found_this_page += 1
+        # Fallback: h1/h2/h3 dentro de tarjetas
+        if found_this_page == 0:
+            for el in soup.select("h2,h3,.o_partner_name,[class*='partner_name']"):
+                t = el.get_text(strip=True)
+                if 3 < len(t) < 80:
+                    _add(t, "Odoo", url, "")
+        time.sleep(1.5)
+    print(f"    Odoo (scraping directo): {len(all_p) - odoo_direct_before}")
+
+    # ── SAP partners España ───────────────────────────────────────────────────
+    sap_queries = [
+        '"partner SAP Business One" España consultor implementador',
+        '"SAP Business One" partner reseller España pyme',
+        '"partner SAP B1" España',
+        '"implementador SAP Business One" España',
+        '"SAP Business One" Madrid OR Barcelona OR Valencia partner',
+    ]
+    for q in sap_queries:
+        for r in brave_search(q, num=10):
+            d = domain_from_url(r["url"])
+            if d and "sap.com" not in d:
+                _add(_name_from_title(r["title"]), "SAP", r["url"], d)
+    print(f"    SAP partners: {sum(1 for p in all_p if p['competitor']=='SAP')}")
+
+    # ── Sage partners España ──────────────────────────────────────────────────
+    sage_queries = [
+        '"partner Sage" España consultor ERP autorizado',
+        '"distribuidor Sage" España pyme ERP',
+        '"partner oficial Sage" España',
+        '"Sage 200" OR "Sage X3" OR "Sage 50" partner España',
+        'consultor "Sage ERP" España implementación autorizado',
+    ]
+    for q in sage_queries:
+        for r in brave_search(q, num=10):
+            d = domain_from_url(r["url"])
+            if d and "sage.com" not in d:
+                _add(_name_from_title(r["title"]), "Sage", r["url"], d)
+    print(f"    Sage partners: {sum(1 for p in all_p if p['competitor']=='Sage')}")
+
+    # ── Holded partners (scraping con JS) ─────────────────────────────────────
+    holded_before = len(all_p)
+    page = fetch("https://www.holded.com/es/partners", dynamic=True)
     html = page.html_content if page and not isinstance(page, str) else (page or "")
-    holded_count=0
     if html:
-        soup=BeautifulSoup(html,"html.parser")
-        # Buscar links externos (webs de partners)
-        for a in soup.find_all("a",href=re.compile(r"^https?://(?!.*holded.com)")):
-            t=a.get_text(strip=True)
-            h=a.get("href","")
-            d=domain_from_url(h)
-            if 5<len(t)<70 and d and not should_skip(d):
-                all_p.append({"name":t,"competitor":"Holded","url":h,"domain":d})
-                holded_count+=1
-        # Fallback: elementos con clase partner
-        if holded_count==0:
-            for el in soup.select("h2,h3,[class*='partner'],[class*='agency']")[:20]:
-                t=el.get_text(strip=True)
-                if 5<len(t)<70:
-                    all_p.append({"name":t,"competitor":"Holded","url":"https://www.holded.com/es/partners","domain":""})
-    print(f"    Holded partners: {holded_count}")
+        soup = BeautifulSoup(html, "html.parser")
+        for a in soup.find_all("a", href=re.compile(r"^https?://(?!.*holded\.com)")):
+            t = a.get_text(strip=True)
+            d = domain_from_url(a.get("href",""))
+            if 3 < len(t) < 80 and d:
+                _add(t, "Holded", a.get("href",""), d)
+        if len(all_p) == holded_before:
+            for el in soup.select("h2,h3,[class*='partner'],[class*='agency']")[:30]:
+                t = el.get_text(strip=True)
+                if 3 < len(t) < 80:
+                    _add(t, "Holded", "https://www.holded.com/es/partners", "")
+    print(f"    Holded partners: {len(all_p) - holded_before}")
 
-    # SAP partners via Google
-    sap_results=brave_search('"partner SAP Business One" España consultor implementador', num=5)
-    for r in sap_results:
-        d=domain_from_url(r["url"])
-        if d and not should_skip(d) and "sap.com" not in d:
-            all_p.append({"name":r["title"].split("|")[0].strip(),"competitor":"SAP","url":r["url"],"domain":d})
-
-    # Sage partners via Google
-    sage_results=brave_search('"partner Sage" España consultor ERP autorizado', num=5)
-    for r in sage_results:
-        d=domain_from_url(r["url"])
-        if d and not should_skip(d) and "sage.com" not in d:
-            all_p.append({"name":r["title"].split("|")[0].strip(),"competitor":"Sage","url":r["url"],"domain":d})
-
-    print(f"    Total partners antes de filtrar: {len(all_p)}")
-    return all_p[:40]
+    print(f"    Total partners encontrados: {len(all_p)}")
+    return all_p  # sin límite artificial
 
 # ── Datos históricos ────────────────────────────────────────────────────────
 def load_data():

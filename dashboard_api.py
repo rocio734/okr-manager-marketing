@@ -856,7 +856,7 @@ def generate_outreach(deal_id: str):
     lead_type = "partner" if signal_label in PARTNER_SIGNALS else "lead"
 
     if is_generic:
-        prompt = f"""Eres Vico, de Etendo (ERP para empresas medianas).
+        prompt = f"""Eres Victoria, de Etendo (ERP para empresas medianas).
 Estás escribiendo a la bandeja genérica de una empresa ({email}), así que NO sabes quién lo va a leer.
 Tu único objetivo es que te respondan con el nombre de la persona correcta a quien contactar.
 
@@ -869,7 +869,7 @@ Reglas ESTRICTAS:
 3. Menciona el sector en una frase para mostrar que es relevante, no genérico
 4. La pregunta final: "¿Podrías decirme quién se encarga de la gestión de software en {empresa}?"
 5. Tono: natural, humano, como si fuera un email personal — no corporativo
-6. Asunto: corto, que parezca interno, no publicitario
+6. Asunto: corto, que parezca un email personal. PROHIBIDO usar "Consulta rápida" o frases genéricas — siempre incluir el nombre de la empresa o el sector
 7. NO incluyas firma
 
 Respondé SOLO con JSON válido:
@@ -878,19 +878,24 @@ Respondé SOLO con JSON válido:
 El body_html debe usar párrafos <p> con estilos inline básicos."""
 
     elif lead_type == "partner":
-        prompt = f"""Eres Vico, partner manager de Etendo (ERP agéntico y composable para empresas medianas).
+        prompt = f"""Eres Victoria, partner manager de Etendo (ERP agéntico y composable para empresas medianas).
 Generá un email de outreach en español (España) para una consultora/implementadora que actualmente trabaja con {signal_label.replace('Partner ', '') if signal_label.startswith('Partner') else 'otro ERP'}.
 
 - Empresa: {empresa}
 - Señal detectada: {signal_label}
 - Cargo del contacto: {cargo}
 
-Contexto: Etendo es un ERP open-source, composable y agéntico. Su red de partners obtiene margen en licencias, soporte y servicios de implementación. Es complementario o alternativo a Odoo/SAP/Sage para clientes que necesitan más flexibilidad o integración con IA.
+Contexto CRÍTICO sobre Etendo (léelo con atención antes de escribir):
+- Etendo NO "tiene IA incorporada" ni "integra IA". Eso es incorrecto.
+- Etendo tiene Copilot como capa de IA integrada para tareas internas del ERP.
+- MÁS IMPORTANTE: cualquier herramienta de IA externa (Claude, GPT, agentes propios del cliente) puede operar el ERP directamente vía MCP, sin que el usuario toque la interfaz. Esto es el diferenciador real.
+- El mensaje correcto: "tus clientes podrán conectar su propia IA —la que ya usen o elijan— para automatizar procesos en el ERP sin depender de la interfaz."
+- La red de partners obtiene margen en licencias, soporte y servicios de implementación.
 
 Reglas ESTRICTAS:
 1. El email es de partner-to-partner, no de vendedor a comprador. Tono: profesional entre colegas
 2. NO digas que Etendo es mejor que su ERP actual — plantea una oportunidad de ampliar su portfolio
-3. El eje principal: "Tus clientes te van a pedir IA en su ERP. ¿Qué les vas a ofrecer?"
+3. El eje central: "Tus clientes te van a pedir que su ERP se conecte con su IA. Con Etendo ya es posible."
 4. Una pregunta concreta al final que invite a una llamada de 20 minutos
 5. Máximo 4 párrafos cortos. Sin frases de relleno
 6. Incluí CTA: enlace con texto "▶ Ver Etendo en 90 segundos" usando href="#VIDEO_URL"
@@ -901,12 +906,18 @@ Respondé SOLO con JSON válido:
 
 El body_html debe usar párrafos <p> con estilos inline básicos."""
     else:
-        prompt = f"""Eres Vico, asistente de ventas de Etendo (ERP agéntico para empresas).
+        prompt = f"""Eres Victoria, de Etendo (ERP agéntico para empresas).
 Generá un email de outreach en español (España) para este prospecto:
 - Empresa: {empresa}
 - Sector: {sector}
 - Cargo del contacto: {cargo}
 - Score de interés: {score}/100
+
+Contexto CRÍTICO sobre Etendo (léelo con atención antes de escribir):
+- Etendo NO "tiene IA incorporada" ni "integra IA" como feature propia. Eso es incorrecto.
+- Etendo tiene Copilot como capa de IA integrada para tareas internas.
+- El diferenciador real: cualquier herramienta de IA externa (Claude, GPT, agentes propios) puede operar el ERP directamente vía MCP, sin que el usuario toque la interfaz.
+- Si mencionas IA, el mensaje correcto es: "conectá tu propia IA con el ERP" o "automatizá procesos sin depender de la interfaz".
 
 Reglas ESTRICTAS:
 1. El email debe crear OBLIGACIÓN de responder — usá una pregunta directa al final que sea difícil de ignorar
@@ -982,7 +993,7 @@ El body_html debe usar párrafos <p> con estilos inline básicos. El enlace del 
 
 # ── Send Outreach Email ────────────────────────────────────────────────────────
 @app.post("/api/send-outreach")
-def send_outreach(deal_id: str, from_email: str, sender_name: Optional[str] = "Vico"):
+def send_outreach(deal_id: str, from_email: str, sender_name: Optional[str] = "Victoria"):
     """Envía el email de outreach via n8n (Gmail de Vico)."""
     if not SUPABASE_URL:
         raise HTTPException(status_code=503, detail="Supabase not configured")
