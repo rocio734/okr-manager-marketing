@@ -922,6 +922,11 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <button class="fbtn or-type-btn" onclick="orTypeFilter('lead',this)" style="font-size:11px;padding:3px 10px;border:1px solid #1B5E20;border-radius:4px;cursor:pointer;background:var(--bg);color:#1B5E20;font-weight:600">🏢 Solo Leads</button>
     <button class="fbtn or-type-btn" onclick="orTypeFilter('partner',this)" style="font-size:11px;padding:3px 10px;border:1px solid #0D47A1;border-radius:4px;cursor:pointer;background:var(--bg);color:#0D47A1;font-weight:600">🤝 Solo Partners</button>
   </div>
+  <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button onclick="orGenerateAll(this)" style="font-size:11px;padding:4px 12px;border:1px solid #6a1b9a;border-radius:4px;cursor:pointer;background:#6a1b9a;color:#fff;font-weight:600">✨ Generar todos</button>
+    <button onclick="orSendAll(this)" style="font-size:11px;padding:4px 12px;border:1px solid #1565C0;border-radius:4px;cursor:pointer;background:#1565C0;color:#fff;font-weight:600">📨 Enviar todos</button>
+    <button onclick="orExportExcel()" style="font-size:11px;padding:4px 12px;border:1px solid #2E7D32;border-radius:4px;cursor:pointer;background:#2E7D32;color:#fff;font-weight:600">📥 Exportar Excel</button>
+  </div>
 
   <div style="overflow-x:auto">
     <table class="tbl" id="or-table">
@@ -1295,6 +1300,80 @@ async function orGenerate(dealId, btn){
     btn.disabled=false; btn.textContent=orig;
     alert('Error: '+e.message);
   }
+}
+
+async function orGenerateAll(btn){
+  let rows = _orFilter==='all' ? _orData : _orData.filter(l=>l.stage===_orFilter);
+  if(_typeFilter!=='all') rows = rows.filter(l=>l.lead_type===_typeFilter);
+  if(!rows.length){ alert('No hay leads visibles.'); return; }
+  const orig = btn.textContent;
+  btn.disabled=true; btn.textContent=`Generando 0/${rows.length}…`;
+  let done=0;
+  for(const lead of rows){
+    try{
+      const r = await fetch(`${OR_API}/api/generate-outreach?deal_id=${lead.deal_id}`,{method:'POST'});
+      const d = await r.json();
+      if(d.ok){ lead.subject=d.subject; lead.body_html=d.body_html; lead.has_message=true; done++; }
+    }catch(e){}
+    btn.textContent=`Generando ${done}/${rows.length}…`;
+  }
+  btn.disabled=false; btn.textContent=`✓ Listo (${done}/${rows.length})`;
+  setTimeout(()=>{ btn.textContent=orig; },3000);
+  renderOutreach();
+}
+
+async function orSendAll(btn){
+  const creds = orGetCreds();
+  if(!creds){ orShowLogin(); return; }
+  let rows = _orFilter==='all' ? _orData : _orData.filter(l=>l.stage===_orFilter);
+  if(_typeFilter!=='all') rows = rows.filter(l=>l.lead_type===_typeFilter);
+  const toSend = rows.filter(l=>l.has_message && !l.sent_at);
+  if(!toSend.length){ alert('No hay emails generados pendientes de envío.'); return; }
+  if(!confirm(`¿Enviás ${toSend.length} email(s) ahora?`)) return;
+  const orig = btn.textContent;
+  btn.disabled=true; btn.textContent=`Enviando 0/${toSend.length}…`;
+  let sent=0;
+  for(const lead of toSend){
+    try{
+      const params = new URLSearchParams({deal_id:lead.deal_id,from_email:creds.email,sender_name:creds.name||'Vico'});
+      const r = await fetch(`${OR_API}/api/send-outreach?${params}`,{method:'POST'});
+      const d = await r.json();
+      if(d.ok) sent++;
+    }catch(e){}
+    btn.textContent=`Enviando ${sent}/${toSend.length}…`;
+  }
+  btn.disabled=false; btn.textContent=`✓ Enviado (${sent}/${toSend.length})`;
+  setTimeout(()=>{ btn.textContent=orig; },4000);
+  await loadOutreach(true);
+}
+
+function orExportExcel(){
+  let rows = _orFilter==='all' ? _orData : _orData.filter(l=>l.stage===_orFilter);
+  if(_typeFilter!=='all') rows = rows.filter(l=>l.lead_type===_typeFilter);
+  if(!rows.length){ alert('No hay datos para exportar.'); return; }
+  const headers = ['Empresa','Tipo','Email','Sector','Score','Etapa','Mensaje','Estado Email','Notas'];
+  const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
+  const csvRows = [
+    headers.join(','),
+    ...rows.map(l=>[
+      esc(l.empresa),
+      esc(l.lead_type==='partner'?'Partner':'Lead'),
+      esc(l.email),
+      esc(l.sector),
+      l.score||0,
+      esc(l.stage),
+      l.has_message?'Borrador':'Sin generar',
+      l.replied_at?`Respondió ${new Date(l.replied_at).toLocaleDateString('es-ES')}`:l.opens>0?`Abierto ${l.opens}×`:l.sent_at?`Enviado ${new Date(l.sent_at).toLocaleDateString('es-ES')}`:'Sin enviar',
+      esc(l.notas)
+    ].join(','))
+  ];
+  const csv = csvRows.join('\r\n');
+  const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`leads_intel_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 async function orSave(dealId){
