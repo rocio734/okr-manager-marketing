@@ -1306,18 +1306,20 @@ async function orGenerateAll(btn){
   let rows = _orFilter==='all' ? _orData : _orData.filter(l=>l.stage===_orFilter);
   if(_typeFilter!=='all') rows = rows.filter(l=>l.lead_type===_typeFilter);
   if(!rows.length){ alert('No hay leads visibles.'); return; }
+  const toGenerate = rows.filter(l=>!l.has_message);
+  if(!toGenerate.length){ btn.textContent='✓ Ya están todos los borradores'; setTimeout(()=>{ btn.textContent='✨ Generar todos'; },3000); return; }
   const orig = btn.textContent;
-  btn.disabled=true; btn.textContent=`Generando 0/${rows.length}…`;
+  btn.disabled=true; btn.textContent=`Generando 0/${toGenerate.length}…`;
   let done=0;
-  for(const lead of rows){
+  for(const lead of toGenerate){
     try{
       const r = await fetch(`${OR_API}/api/generate-outreach?deal_id=${lead.deal_id}`,{method:'POST'});
       const d = await r.json();
       if(d.ok){ lead.subject=d.subject; lead.body_html=d.body_html; lead.has_message=true; done++; }
     }catch(e){}
-    btn.textContent=`Generando ${done}/${rows.length}…`;
+    btn.textContent=`Generando ${done}/${toGenerate.length}…`;
   }
-  btn.disabled=false; btn.textContent=`✓ Listo (${done}/${rows.length})`;
+  btn.disabled=false; btn.textContent=`✓ Listo (${done}/${toGenerate.length})`;
   setTimeout(()=>{ btn.textContent=orig; },3000);
   renderOutreach();
 }
