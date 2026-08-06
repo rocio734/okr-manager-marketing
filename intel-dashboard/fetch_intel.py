@@ -510,7 +510,7 @@ class PartnerSpider:
     """
 
     def __init__(self, partner_urls, competitor_name):
-        self.partner_urls = partner_urls[:10]  # Limitar a 10 por competidor
+        self.partner_urls = partner_urls[:30]  # máximo 30 por competidor
         self.competitor_name = competitor_name
         self.results = []
 
@@ -670,6 +670,12 @@ def scrape_partners():
     def _name_from_title(t):
         return t.replace(" - Partners","").replace(" | Odoo","").split(" - ")[0].split(" | ")[0].strip()
 
+    def _name_from_odoo_slug(url):
+        """Extrae nombre de empresa del slug de perfil de Odoo: /es/partners/studio73-s-l-1506080 → Studio73 S L"""
+        slug = url.rstrip('/').split('/es/partners/')[-1]
+        slug = re.sub(r'-\d+$', '', slug)  # quita el ID numérico final
+        return ' '.join(w.capitalize() for w in slug.split('-') if w and not w.isdigit())
+
     # ── Odoo partners España — Brave Search (múltiples ángulos) ──────────────
     odoo_queries = [
         '"partner de Odoo" OR "partner Odoo" España empresa',
@@ -680,7 +686,7 @@ def scrape_partners():
         '"Odoo partner" Barcelona consultoría ERP',
         '"Odoo partner" Valencia OR Bilbao OR Sevilla España',
         '"partner oficial Odoo" España autorizado',
-        'implementador Odoo España pyme certificado 2024',
+        'implementador Odoo España pyme certificado',
         '"Odoo Gold" OR "Odoo Silver" OR "Odoo Ready" España empresa',
     ]
     for q in odoo_queries:
@@ -688,32 +694,37 @@ def scrape_partners():
             d = domain_from_url(r["url"])
             if d and "odoo.com" not in d:
                 _add(_name_from_title(r["title"]), "Odoo", r["url"], d)
-    print(f"    Odoo (Brave): {sum(1 for p in all_p if p['competitor']=='Odoo')}")
+    print(f"    Odoo (Brave directo): {sum(1 for p in all_p if p['competitor']=='Odoo')}")
 
-    # Scraping directo del directorio público de Odoo España (con JS rendering)
-    odoo_direct_before = len(all_p)
-    for page_n in range(1, 9):  # hasta 8 páginas × ~12 partners
-        url = f"https://www.odoo.com/partners/country-10/grade-none/page-{page_n}/"
-        html = fetch_html(url, dynamic=True, timeout=25)
-        if not html or "No results" in html:
-            break
-        soup = BeautifulSoup(html, "html.parser")
-        found_this_page = 0
-        # Buscar links externos dentro de tarjetas de partner
-        for a in soup.find_all("a", href=re.compile(r"^https?://(?!.*(odoo\.com))")):
-            t = a.get_text(strip=True)
-            d = domain_from_url(a.get("href",""))
-            if d and 3 < len(t) < 80:
-                _add(t, "Odoo", a.get("href",""), d)
-                found_this_page += 1
-        # Fallback: h1/h2/h3 dentro de tarjetas
-        if found_this_page == 0:
-            for el in soup.select("h2,h3,.o_partner_name,[class*='partner_name']"):
-                t = el.get_text(strip=True)
-                if 3 < len(t) < 80:
-                    _add(t, "Odoo", url, "")
-        time.sleep(1.5)
-    print(f"    Odoo (scraping directo): {len(all_p) - odoo_direct_before}")
+    # Odoo — perfiles del directorio via site: queries en Brave
+    # El directorio de Odoo es JS-only, pero Brave lo tiene indexado.
+    # Extraemos nombres del slug y los añadimos sin dominio; el flujo principal
+    # (línea ~971) hará una búsqueda Brave para encontrar el dominio real.
+    odoo_site_queries = [
+        'site:odoo.com/es/partners Madrid',
+        'site:odoo.com/es/partners Barcelona',
+        'site:odoo.com/es/partners Valencia',
+        'site:odoo.com/es/partners Bilbao',
+        'site:odoo.com/es/partners Sevilla',
+        'site:odoo.com/es/partners Zaragoza',
+        'site:odoo.com/es/partners Málaga',
+        'site:odoo.com/es/partners Murcia',
+        'site:odoo.com/es/partners Alicante',
+        'site:odoo.com/es/partners Valladolid',
+        'site:odoo.com/es/partners Granada',
+        'site:odoo.com/es/partners España Gold',
+    ]
+    odoo_site_before = len(all_p)
+    for q in odoo_site_queries:
+        for r in brave_search(q, num=10):
+            url = r["url"]
+            # Solo perfiles individuales: /es/partners/slug-con-id-numerico
+            if re.match(r'https://www\.odoo\.com/es/partners/[a-z0-9][a-z0-9\-]+-\d+/?$', url):
+                slug_name = _name_from_odoo_slug(url)
+                if slug_name and slug_name not in [p["name"] for p in all_p]:
+                    # Sin dominio — el flujo principal lo buscará con Brave
+                    all_p.append({"name": slug_name, "competitor": "Odoo", "url": url, "domain": ""})
+    print(f"    Odoo (perfiles directorio): {len(all_p) - odoo_site_before}")
 
     # ── SAP partners España ───────────────────────────────────────────────────
     sap_queries = [
