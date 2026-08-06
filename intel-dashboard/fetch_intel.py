@@ -1255,12 +1255,25 @@ def save_to_supabase(new_leads):
     )
 
     def _clean_company(name, domain):
-        """Devuelve nombre de empresa limpio; si el scrapeado es un título de página, usa el dominio."""
         if not name or name in ("—", "Inicio", "Home") or _BAD_COMPANY.search(name) or len(name) > 50:
             base = domain.replace("www.", "").split(".")[0]
             base = re.sub(r"([a-z])([A-Z])", r"\1 \2", base).replace("-", " ").replace("_", " ")
             return base.title()
         return name
+
+    NON_DECISOR = {
+        "conductor", "operario", "técnico", "técnica", "analista", "desarrollador",
+        "programador", "administrativo", "becario", "intern", "junior", "assistant",
+        "asistente", "auxiliar", "agente", "recepcionista", "contable", "controller",
+        "talent acquisition", "recruiter", "reclutador", "soporte", "support",
+        "helpdesk", "customer success", "account executive", "ejecutivo de cuentas",
+    }
+
+    def _is_decisor(pos):
+        if not pos or pos in ("—", ""):
+            return True  # sin dato → no filtrar, puede ser decisor
+        pos_low = pos.lower()
+        return not any(k in pos_low for k in NON_DECISOR)
 
     created = 0
     skipped = 0
@@ -1270,6 +1283,11 @@ def save_to_supabase(new_leads):
         domain  = lead.get("domain", "")
         sector  = lead.get("sector", "") or lead.get("signal_label", "")
         score   = lead.get("score", 1)
+        pos     = lead.get("contact_pos", "")
+
+        if not _is_decisor(pos):
+            skipped += 1
+            continue
 
         contact_payload = {
             "nombre":          lead.get("contact_name") or company,
