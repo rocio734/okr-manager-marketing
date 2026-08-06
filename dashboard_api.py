@@ -5,6 +5,8 @@ Caché en memoria por período, TTL 55 minutos.
 Startup warmup en background para period=30.
 """
 from fastapi import FastAPI, Query, HTTPException, Response
+from fastapi.responses import RedirectResponse
+import secrets
 from fastapi.middleware.cors import CORSMiddleware
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
@@ -594,18 +596,31 @@ def metrics(period: int = Query(default=30, ge=7, le=180)):
 # ── Outreach Pixel Tracking ────────────────────────────────────────────────────
 @app.get("/pixel/{email}.gif")
 def pixel(email: str):
-    """1x1 GIF — registra apertura en email_opens y avanza deal a Contactado."""
+    """Redirige a URL única por apertura — evita que los clientes de email cacheen el pixel.
+    Gmail y Outlook cachean imágenes en sesión; el redirect con nonce aleatorio fuerza
+    una nueva petición en cada apertura, permitiendo contar re-aperturas."""
+    nonce = secrets.token_hex(10)
+    return RedirectResponse(
+        url=f"/pixel/{email}/open?_={nonce}",
+        status_code=302,
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate",
+                 "Pragma": "no-cache", "Vary": "*"},
+    )
+
+
+@app.get("/pixel/{email}/open")
+def pixel_open(email: str):
+    """Registra la apertura en Supabase y sirve el GIF. Llamado tras el redirect."""
     if not SUPABASE_URL:
         return Response(content=_GIF, media_type="image/gif")
     try:
-        # Insert open event (idempotent: multiple opens allowed)
         requests.post(
             f"{SUPABASE_URL}/rest/v1/email_opens",
             headers=_SB_HEADERS(),
             json={"contact_id": email, "campaign": OUTREACH_CAMPAIGN},
             timeout=5,
         )
-        # Advance deal stage to Contactado if still at Nuevo Lead
+        # Avanzar deal a Contactado si sigue en Nuevo Lead
         c_r = requests.get(
             f"{SUPABASE_URL}/rest/v1/contacts?email=eq.{urllib.parse.quote(email)}&select=id",
             headers=_SB_HEADERS(), timeout=5)
@@ -626,8 +641,9 @@ def pixel(email: str):
     except Exception as e:
         print(f"⚠️  pixel tracking error for {email}: {e}")
     return Response(content=_GIF, media_type="image/gif",
-                    headers={"Cache-Control": "no-store, no-cache, must-revalidate",
-                             "Pragma": "no-cache"})
+                    headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                             "Pragma": "no-cache", "Expires": "Thu, 01 Jan 1970 00:00:00 GMT",
+                             "Vary": "*"})
 
 
 # ── Outreach Leads API ──────────────────────────────────────────────────────────
