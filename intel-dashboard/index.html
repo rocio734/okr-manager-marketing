@@ -932,7 +932,7 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <table class="tbl" id="or-table">
       <thead><tr>
         <th>Empresa</th><th>Tipo</th><th>Email</th><th>Sector</th><th>Score</th>
-        <th>Etapa</th><th>Mensaje</th><th>Estado email</th>
+        <th>Etapa</th><th>Mensaje</th><th>Estado email</th><th style="text-align:center;min-width:44px">👁</th>
         <th>Notas</th><th>Acción</th>
       </tr></thead>
       <tbody id="or-tbody">
@@ -1156,9 +1156,14 @@ function renderOutreach(){
       <td style="padding:8px 10px">${orStageBadge(l.stage)}</td>
       <td style="padding:8px 10px;text-align:center">${msgBadge}</td>
       <td style="padding:8px 10px">${estadoBadge}</td>
+      <td style="padding:8px 6px;text-align:center">
+        ${l.opens>0
+          ? `<span style="display:inline-block;background:#1565C0;color:#fff;font-weight:700;font-size:13px;border-radius:50%;min-width:24px;height:24px;line-height:24px;text-align:center;padding:0 4px">${l.opens}</span>`
+          : `<span style="color:var(--gm);font-size:12px">—</span>`}
+      </td>
       <td style="padding:8px 6px">
-        <input id="note-${l.deal_id}" value="${(l.notas||'').replaceAll('"','&quot;')}" placeholder="Notas…"
-          style="width:110px;font-size:11px;padding:3px 6px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk)">
+        <textarea id="note-${l.deal_id}" placeholder="Notas…"
+          style="width:150px;min-height:54px;font-size:11px;padding:3px 6px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk);resize:vertical;font-family:inherit">${(l.notas||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}</textarea>
       </td>
       <td style="padding:8px 6px;white-space:nowrap">
         <select id="stage-${l.deal_id}" style="font-size:11px;padding:3px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk)">
@@ -1353,8 +1358,9 @@ function orExportExcel(){
   let rows = _orFilter==='all' ? _orData : _orData.filter(l=>l.stage===_orFilter);
   if(_typeFilter!=='all') rows = rows.filter(l=>l.lead_type===_typeFilter);
   if(!rows.length){ alert('No hay datos para exportar.'); return; }
-  const headers = ['Empresa','Tipo','Email','Sector','Score','Etapa','Mensaje','Estado Email','Notas'];
+  const headers = ['Empresa','Tipo','Email','Sector','Score','Etapa','Aperturas','Mensaje','Estado Email','Notas','Asunto','Cuerpo Email'];
   const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
+  const stripHtml = h => (h||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
   const csvRows = [
     headers.join(','),
     ...rows.map(l=>[
@@ -1364,9 +1370,12 @@ function orExportExcel(){
       esc(l.sector),
       l.score||0,
       esc(l.stage),
+      l.opens||0,
       l.has_message?'Borrador':'Sin generar',
       l.replied_at?`Respondió ${new Date(l.replied_at).toLocaleDateString('es-ES')}`:l.opens>0?`Abierto ${l.opens}×`:l.sent_at?`Enviado ${new Date(l.sent_at).toLocaleDateString('es-ES')}`:'Sin enviar',
-      esc(l.notas)
+      esc(l.notas),
+      esc(l.subject),
+      esc(stripHtml(l.body_html))
     ].join(','))
   ];
   const csv = csvRows.join('\r\n');
