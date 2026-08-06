@@ -1,16 +1,21 @@
 {
-  "generated_at": "03/08/2026 13:48 UTC",
-  "pending_count": 87,
+  "generated_at": "06/08/2026 09:23 UTC",
+  "pending_count": 92,
   "posts": [
     {
-      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
+      "url": "https://dev.to/inapp_marketing_02d7c6755/agentic-ai-in-enterprise-software-the-next-leap-in-intelligent-automation-4h1b",
       "domain": "dev.to",
-      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
-      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
+      "title": "Agentic AI in Enterprise Software: The Next Leap in Intelligent Automation - DEV Community",
+      "snippet": "Solution with Agentic AI: By integrating Agentic AI into their ERP system, the company enabled autonomous price optimization. Agentic AI analyzed real-time market data, competitor pricing, and consumer behavior to adjust prices dynamically.",
       "label": "dev.to",
-      "date": "03/08/2026",
+      "date": "06/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Este tema sobre la AI Agentic es fascinante y resalta cómo estamos avanzando hacia sistemas que no solo automatizan tareas, sino que comprenden el contexto y pueden tomar decisiones. Este enfoque es crucial para enfrentar los desafíos de un entorno empresarial en constante cambio. Un ejemplo interesante de esta tendencia es Etendo, una plataforma ERP open source que incorpora agentes de IA nativos. Estos agentes no solo registran, sino que también ejecutan procesos, lo que potencia la eficiencia operativa y la adaptabilidad. Es una opción a considerar para empresas que buscan aprovechar al máximo la inteligencia autónoma en sus operaciones.",
+      "relevance_score": 9,
+      "reasoning": "El comentario agrega valor al conectar la conversación sobre AI Agentic con un ejemplo concreto (Etendo) que ilustra cómo esta tendencia está siendo implementada en sistemas ERP. Ofrece una perspectiva práctica sobre cómo la tecnología puede responder a las necesidades actuales de las empresas, lo que enriquecerá el debate.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:24",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
@@ -20,17 +25,12 @@
       "label": "dev.to",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
-    },
-    {
-      "url": "https://news.ycombinator.com/item?id=48736833",
-      "domain": "news.ycombinator.com",
-      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
-      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
-      "label": "HackerNews",
-      "date": "03/08/2026",
-      "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo estos frameworks de agentes de IA están evolucionando y especializándose. La capacidad de LangGraph para gestionar flujos de trabajo complejos es particularmente atractiva para ingenieros. Sin embargo, es importante considerar también cómo estos agentes se integran en un ecosistema más amplio, como en el caso de plataformas ERP. Herramientas como Etendo, con su enfoque en agentes de IA integrados, pueden complementar estos frameworks al llevar la ejecución de procesos comerciales a un nuevo nivel, permitiendo que las empresas no solo registren datos, sino que también ejecuten acciones de manera automatizada. Explorar combinaciones de tecnologías puede abrir nuevas oportunidades en la automatización de procesos.",
+      "relevance_score": 7,
+      "reasoning": "El comentario agrega valor a la discusión al conectar los frameworks de agentes de IA mencionados con su aplicación en escenarios reales, específicamente en la automatización de procesos empresariales. También invita a los lectores a considerar cómo diferentes tecnologías pueden trabajar juntas.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=44558046",
@@ -40,67 +40,42 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo muchas startups están emergiendo para desafiar las soluciones ERP tradicionales que a menudo pueden ser costosas y complejas. La integración de IA para agilizar procesos es clave. En este sentido, me preguntaba si han considerado la flexibilidad que ofrece una plataforma open source, como Etendo, que permite personalizaciones y cuenta con agentes de IA nativos que ejecutan procesos. Cada vez más empresas buscan alternativas que sean tanto eficientes como adaptables a sus necesidades específicas.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar la tendencia hacia soluciones ERP más flexibles y la importancia de la IA en la ejecución de procesos. Además, presenta a Etendo como una opción relevante que puede resonar con el público que busca alternativas a sistemas tradicionales, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
-      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
-      "domain": "reddit.com",
-      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
-      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
-      "label": "Reddit ES",
-      "date": "03/08/2026",
-      "commented": false,
-      "comment_draft": ""
-    },
-    {
-      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
-      "domain": "dev.to",
-      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
-      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
-      "label": "dev.to",
-      "date": "03/08/2026",
-      "commented": false,
-      "comment_draft": ""
-    },
-    {
-      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
-      "domain": "dev.to",
-      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
-      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
-      "label": "dev.to",
-      "date": "03/08/2026",
-      "commented": false,
-      "comment_draft": ""
-    },
-    {
-      "url": "https://news.ycombinator.com/item?id=48736833",
+      "url": "https://news.ycombinator.com/item?id=45577080",
       "domain": "news.ycombinator.com",
-      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
-      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
+      "title": "Why the push for Agentic when models can barely follow a simple instruction? | Hacker News",
+      "snippet": "i understand the author might be a little frustrated and employing hyperbole here, but are most folks genuinely having similar problems · at this point I have found LLMs to more often than not follow my instructions. It requires diligent pruning of instructions, effective prompting and planning. ...",
       "label": "HackerNews",
-      "date": "03/08/2026",
+      "date": "06/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es cierto que trabajar con modelos de IA requiere un enfoque más detallado y una buena comunicación. Sin embargo, la integración de agentes de IA en plataformas ERP, como la que ofrece Etendo, puede optimizar muchos de estos procesos. Etendo permite no solo el registro de datos, sino que sus agentes pueden ejecutar procesos de manera proactiva. Esto podría cambiar la forma en que interactuamos con la tecnología, facilitando la automatización y la efectividad en la planificación y ejecución de tareas. La clave está en encontrar herramientas que se ajusten a nuestras necesidades y que trabajen de manera colaborativa con los usuarios.",
+      "relevance_score": 8,
+      "reasoning": "El comentario responde a las preocupaciones sobre la efectividad de los modelos de IA en tareas complejas, destacando cómo un ERP con agentes de IA integrados puede mejorar el rendimiento y la colaboración. Ofrece una perspectiva positiva sobre la automatización y el trabajo en conjunto entre humanos y tecnología, que es el foco de la discusión.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:24",
+      "comment_ready": true
     },
     {
-      "url": "https://news.ycombinator.com/item?id=44558046",
-      "domain": "news.ycombinator.com",
-      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
-      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
-      "label": "HackerNews",
-      "date": "03/08/2026",
-      "commented": false,
-      "comment_draft": ""
-    },
-    {
-      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
+      "url": "https://www.reddit.com/r/selfhosted/comments/1i84tq8/anyone_built_a_good_erpnext_based_system_at_a/?tl=es-es",
       "domain": "reddit.com",
-      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
-      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
+      "title": "r/selfhosted on Reddit: ¿Alguien ha montado un buen sistema basado en ERPNext en una empresa pequeña?",
+      "snippet": "Ahora me encuentro buscando herramientas en Internet - ¡madre mía, hay tantas ahora! - que puedan ayudarnos. Actualmente, el mejor candidato parece ser Odoo. Pero también probé a alojar ERPNext. Tiene buena pinta, pero parece complicado de configurar y personalizar para nuestras necesidades.",
       "label": "Reddit ES",
-      "date": "03/08/2026",
+      "date": "06/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Entiendo el desafío de encontrar un ERP que se ajuste a las necesidades de una pequeña empresa. ERPNext y Odoo son opciones populares, pero pueden requerir un esfuerzo considerable de personalización. Si aún no lo has considerado, te podría interesar explorar Etendo. Es una plataforma ERP open source que integra agentes de IA para automatizar procesos, lo que podría facilitar la configuración y personalización. Además, su enfoque en ser composable y multi-idioma puede adaptarse mejor a tus requerimientos específicos. ¡Suerte en tu búsqueda! ",
+      "relevance_score": 8,
+      "reasoning": "El comentario se enfoca en compartir una alternativa relevante a ERPNext y Odoo, proporcionando información valiosa sobre las características de Etendo que podrían simplificar el proceso para el usuario.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:24",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
@@ -110,7 +85,12 @@
       "label": "dev.to",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es fascinante observar cómo los agentes de IA están redefiniendo la automatización en las empresas. Al integrar estas tecnologías con sistemas como ERP y CRM, las organizaciones pueden mejorar drásticamente la eficiencia operativa. Por ejemplo, plataformas como Etendo ofrecen un enfoque relevante al incorporar agentes de IA que no solo registran datos, sino que ejecutan procesos de negocio directamente. Esto permite un flujo de trabajo más automatizado y dinámico, usando protocolos como el MCP para una mejor conectividad con otras aplicaciones. Esto podría ser una opción valiosa para quienes buscan optimizar su transformación digital.",
+      "relevance_score": 9,
+      "reasoning": "Este comentario aporta valor al proporcionar un ejemplo práctico de cómo los agentes de IA pueden mejorar los procesos empresariales y menciona a Etendo como una opción que tiene características relevantes en este contexto, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
@@ -120,7 +100,12 @@
       "label": "dev.to",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo estos frameworks de agentes de IA están evolucionando y especializándose. La capacidad de LangGraph para gestionar flujos de trabajo complejos es particularmente atractiva para ingenieros. Sin embargo, es importante considerar también cómo estos agentes se integran en un ecosistema más amplio, como en el caso de plataformas ERP. Herramientas como Etendo, con su enfoque en agentes de IA integrados, pueden complementar estos frameworks al llevar la ejecución de procesos comerciales a un nuevo nivel, permitiendo que las empresas no solo registren datos, sino que también ejecuten acciones de manera automatizada. Explorar combinaciones de tecnologías puede abrir nuevas oportunidades en la automatización de procesos.",
+      "relevance_score": 7,
+      "reasoning": "El comentario agrega valor a la discusión al conectar los frameworks de agentes de IA mencionados con su aplicación en escenarios reales, específicamente en la automatización de procesos empresariales. También invita a los lectores a considerar cómo diferentes tecnologías pueden trabajar juntas.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=48736833",
@@ -130,7 +115,12 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo la evolución de los modelos como Claude Sonnet 5 se orienta hacia un desarrollo más autónomo. Sin embargo, el enfoque en la asistencia al desarrollo sigue siendo crucial, especialmente en tareas complejas donde la intervención humana es vital. En este sentido, plataformas como Etendo pueden ser relevantes, ya que integran agentes de IA que no solo registran, sino que ejecutan procesos, permitiendo un enfoque más colaborativo y eficiente en el trabajo. Esto podría ser beneficioso para aquellos que buscan un equilibrio entre la autonomía de la IA y la supervisión humana en el desarrollo.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar la discusión sobre modelos de IA con el impacto en el desarrollo de software, introduciendo una solución que puede ayudar a mantener la intervención humana en el proceso. Menciona Etendo en un contexto donde puede ser útil, resaltando su capacidad de ejecutar procesos con agentes de IA.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=44558046",
@@ -140,7 +130,12 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo muchas startups están emergiendo para desafiar las soluciones ERP tradicionales que a menudo pueden ser costosas y complejas. La integración de IA para agilizar procesos es clave. En este sentido, me preguntaba si han considerado la flexibilidad que ofrece una plataforma open source, como Etendo, que permite personalizaciones y cuenta con agentes de IA nativos que ejecutan procesos. Cada vez más empresas buscan alternativas que sean tanto eficientes como adaptables a sus necesidades específicas.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar la tendencia hacia soluciones ERP más flexibles y la importancia de la IA en la ejecución de procesos. Además, presenta a Etendo como una opción relevante que puede resonar con el público que busca alternativas a sistemas tradicionales, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
@@ -150,7 +145,12 @@
       "label": "Reddit ES",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante cómo la distribución de salarios impacta en la economía de un país. En España, un enfoque en la eficiencia operativa podría permitir a las empresas ofrecer salarios más competitivos. La digitalización de procesos y la adopción de tecnologías como ERPs pueden ser clave. Por ejemplo, soluciones como Etendo, que integra agentes de IA para ejecutar procesos, pueden optimizar gastos y mejorar la rentabilidad, lo que a su vez podría permitir un mejor nivel salarial para los empleados. ¿Alguien ha tenido experiencia en implementar soluciones de este tipo para mejorar el rendimiento salarial en sus empresas?",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar el tema de la distribución de salarios con la optimización empresarial a través de la tecnología, sugiriendo una solución que podría ser útil en el contexto del hilo.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
@@ -160,7 +160,12 @@
       "label": "dev.to",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es fascinante observar cómo los agentes de IA están redefiniendo la automatización en las empresas. Al integrar estas tecnologías con sistemas como ERP y CRM, las organizaciones pueden mejorar drásticamente la eficiencia operativa. Por ejemplo, plataformas como Etendo ofrecen un enfoque relevante al incorporar agentes de IA que no solo registran datos, sino que ejecutan procesos de negocio directamente. Esto permite un flujo de trabajo más automatizado y dinámico, usando protocolos como el MCP para una mejor conectividad con otras aplicaciones. Esto podría ser una opción valiosa para quienes buscan optimizar su transformación digital.",
+      "relevance_score": 9,
+      "reasoning": "Este comentario aporta valor al proporcionar un ejemplo práctico de cómo los agentes de IA pueden mejorar los procesos empresariales y menciona a Etendo como una opción que tiene características relevantes en este contexto, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
@@ -170,7 +175,12 @@
       "label": "dev.to",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo estos frameworks de agentes de IA están evolucionando y especializándose. La capacidad de LangGraph para gestionar flujos de trabajo complejos es particularmente atractiva para ingenieros. Sin embargo, es importante considerar también cómo estos agentes se integran en un ecosistema más amplio, como en el caso de plataformas ERP. Herramientas como Etendo, con su enfoque en agentes de IA integrados, pueden complementar estos frameworks al llevar la ejecución de procesos comerciales a un nuevo nivel, permitiendo que las empresas no solo registren datos, sino que también ejecuten acciones de manera automatizada. Explorar combinaciones de tecnologías puede abrir nuevas oportunidades en la automatización de procesos.",
+      "relevance_score": 7,
+      "reasoning": "El comentario agrega valor a la discusión al conectar los frameworks de agentes de IA mencionados con su aplicación en escenarios reales, específicamente en la automatización de procesos empresariales. También invita a los lectores a considerar cómo diferentes tecnologías pueden trabajar juntas.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=48736833",
@@ -180,7 +190,12 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo la evolución de los modelos como Claude Sonnet 5 se orienta hacia un desarrollo más autónomo. Sin embargo, el enfoque en la asistencia al desarrollo sigue siendo crucial, especialmente en tareas complejas donde la intervención humana es vital. En este sentido, plataformas como Etendo pueden ser relevantes, ya que integran agentes de IA que no solo registran, sino que ejecutan procesos, permitiendo un enfoque más colaborativo y eficiente en el trabajo. Esto podría ser beneficioso para aquellos que buscan un equilibrio entre la autonomía de la IA y la supervisión humana en el desarrollo.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar la discusión sobre modelos de IA con el impacto en el desarrollo de software, introduciendo una solución que puede ayudar a mantener la intervención humana en el proceso. Menciona Etendo en un contexto donde puede ser útil, resaltando su capacidad de ejecutar procesos con agentes de IA.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=44558046",
@@ -190,7 +205,12 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo muchas startups están emergiendo para desafiar las soluciones ERP tradicionales que a menudo pueden ser costosas y complejas. La integración de IA para agilizar procesos es clave. En este sentido, me preguntaba si han considerado la flexibilidad que ofrece una plataforma open source, como Etendo, que permite personalizaciones y cuenta con agentes de IA nativos que ejecutan procesos. Cada vez más empresas buscan alternativas que sean tanto eficientes como adaptables a sus necesidades específicas.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar la tendencia hacia soluciones ERP más flexibles y la importancia de la IA en la ejecución de procesos. Además, presenta a Etendo como una opción relevante que puede resonar con el público que busca alternativas a sistemas tradicionales, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
@@ -200,7 +220,27 @@
       "label": "Reddit ES",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante cómo la distribución de salarios impacta en la economía de un país. En España, un enfoque en la eficiencia operativa podría permitir a las empresas ofrecer salarios más competitivos. La digitalización de procesos y la adopción de tecnologías como ERPs pueden ser clave. Por ejemplo, soluciones como Etendo, que integra agentes de IA para ejecutar procesos, pueden optimizar gastos y mejorar la rentabilidad, lo que a su vez podría permitir un mejor nivel salarial para los empleados. ¿Alguien ha tenido experiencia en implementar soluciones de este tipo para mejorar el rendimiento salarial en sus empresas?",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar el tema de la distribución de salarios con la optimización empresarial a través de la tecnología, sugiriendo una solución que podría ser útil en el contexto del hilo.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
+      "domain": "dev.to",
+      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
+      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es fascinante observar cómo los agentes de IA están redefiniendo la automatización en las empresas. Al integrar estas tecnologías con sistemas como ERP y CRM, las organizaciones pueden mejorar drásticamente la eficiencia operativa. Por ejemplo, plataformas como Etendo ofrecen un enfoque relevante al incorporar agentes de IA que no solo registran datos, sino que ejecutan procesos de negocio directamente. Esto permite un flujo de trabajo más automatizado y dinámico, usando protocolos como el MCP para una mejor conectividad con otras aplicaciones. Esto podría ser una opción valiosa para quienes buscan optimizar su transformación digital.",
+      "relevance_score": 9,
+      "reasoning": "Este comentario aporta valor al proporcionar un ejemplo práctico de cómo los agentes de IA pueden mejorar los procesos empresariales y menciona a Etendo como una opción que tiene características relevantes en este contexto, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
@@ -210,7 +250,12 @@
       "label": "dev.to",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo estos frameworks de agentes de IA están evolucionando y especializándose. La capacidad de LangGraph para gestionar flujos de trabajo complejos es particularmente atractiva para ingenieros. Sin embargo, es importante considerar también cómo estos agentes se integran en un ecosistema más amplio, como en el caso de plataformas ERP. Herramientas como Etendo, con su enfoque en agentes de IA integrados, pueden complementar estos frameworks al llevar la ejecución de procesos comerciales a un nuevo nivel, permitiendo que las empresas no solo registren datos, sino que también ejecuten acciones de manera automatizada. Explorar combinaciones de tecnologías puede abrir nuevas oportunidades en la automatización de procesos.",
+      "relevance_score": 7,
+      "reasoning": "El comentario agrega valor a la discusión al conectar los frameworks de agentes de IA mencionados con su aplicación en escenarios reales, específicamente en la automatización de procesos empresariales. También invita a los lectores a considerar cómo diferentes tecnologías pueden trabajar juntas.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=48736833",
@@ -220,7 +265,12 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo la evolución de los modelos como Claude Sonnet 5 se orienta hacia un desarrollo más autónomo. Sin embargo, el enfoque en la asistencia al desarrollo sigue siendo crucial, especialmente en tareas complejas donde la intervención humana es vital. En este sentido, plataformas como Etendo pueden ser relevantes, ya que integran agentes de IA que no solo registran, sino que ejecutan procesos, permitiendo un enfoque más colaborativo y eficiente en el trabajo. Esto podría ser beneficioso para aquellos que buscan un equilibrio entre la autonomía de la IA y la supervisión humana en el desarrollo.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar la discusión sobre modelos de IA con el impacto en el desarrollo de software, introduciendo una solución que puede ayudar a mantener la intervención humana en el proceso. Menciona Etendo en un contexto donde puede ser útil, resaltando su capacidad de ejecutar procesos con agentes de IA.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=44558046",
@@ -230,7 +280,147 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo muchas startups están emergiendo para desafiar las soluciones ERP tradicionales que a menudo pueden ser costosas y complejas. La integración de IA para agilizar procesos es clave. En este sentido, me preguntaba si han considerado la flexibilidad que ofrece una plataforma open source, como Etendo, que permite personalizaciones y cuenta con agentes de IA nativos que ejecutan procesos. Cada vez más empresas buscan alternativas que sean tanto eficientes como adaptables a sus necesidades específicas.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar la tendencia hacia soluciones ERP más flexibles y la importancia de la IA en la ejecución de procesos. Además, presenta a Etendo como una opción relevante que puede resonar con el público que busca alternativas a sistemas tradicionales, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
+      "domain": "reddit.com",
+      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
+      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
+      "label": "Reddit ES",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante cómo la distribución de salarios impacta en la economía de un país. En España, un enfoque en la eficiencia operativa podría permitir a las empresas ofrecer salarios más competitivos. La digitalización de procesos y la adopción de tecnologías como ERPs pueden ser clave. Por ejemplo, soluciones como Etendo, que integra agentes de IA para ejecutar procesos, pueden optimizar gastos y mejorar la rentabilidad, lo que a su vez podría permitir un mejor nivel salarial para los empleados. ¿Alguien ha tenido experiencia en implementar soluciones de este tipo para mejorar el rendimiento salarial en sus empresas?",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar el tema de la distribución de salarios con la optimización empresarial a través de la tecnología, sugiriendo una solución que podría ser útil en el contexto del hilo.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://dev.to/alex_sebastian/how-ai-agents-integrate-with-enterprise-systems-and-apis-to-perform-actions-2boi",
+      "domain": "dev.to",
+      "title": "How AI Agents Integrate with Enterprise Systems and APIs to Perform Actions - DEV Community",
+      "snippet": "For example, an AI agent in a customer support system can retrieve order details from an ERP, update a CRM ticket, and notify a logistics platform—all through API interactions. This orchestration allows agents to act as intelligent intermediaries between systems. The real value of AI agents emerges ",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es fascinante observar cómo los agentes de IA están redefiniendo la automatización en las empresas. Al integrar estas tecnologías con sistemas como ERP y CRM, las organizaciones pueden mejorar drásticamente la eficiencia operativa. Por ejemplo, plataformas como Etendo ofrecen un enfoque relevante al incorporar agentes de IA que no solo registran datos, sino que ejecutan procesos de negocio directamente. Esto permite un flujo de trabajo más automatizado y dinámico, usando protocolos como el MCP para una mejor conectividad con otras aplicaciones. Esto podría ser una opción valiosa para quienes buscan optimizar su transformación digital.",
+      "relevance_score": 9,
+      "reasoning": "Este comentario aporta valor al proporcionar un ejemplo práctico de cómo los agentes de IA pueden mejorar los procesos empresariales y menciona a Etendo como una opción que tiene características relevantes en este contexto, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante ver cómo estos frameworks de agentes de IA están evolucionando y especializándose. La capacidad de LangGraph para gestionar flujos de trabajo complejos es particularmente atractiva para ingenieros. Sin embargo, es importante considerar también cómo estos agentes se integran en un ecosistema más amplio, como en el caso de plataformas ERP. Herramientas como Etendo, con su enfoque en agentes de IA integrados, pueden complementar estos frameworks al llevar la ejecución de procesos comerciales a un nuevo nivel, permitiendo que las empresas no solo registren datos, sino que también ejecuten acciones de manera automatizada. Explorar combinaciones de tecnologías puede abrir nuevas oportunidades en la automatización de procesos.",
+      "relevance_score": 7,
+      "reasoning": "El comentario agrega valor a la discusión al conectar los frameworks de agentes de IA mencionados con su aplicación en escenarios reales, específicamente en la automatización de procesos empresariales. También invita a los lectores a considerar cómo diferentes tecnologías pueden trabajar juntas.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=48736833",
+      "domain": "news.ycombinator.com",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante ver cómo la evolución de los modelos como Claude Sonnet 5 se orienta hacia un desarrollo más autónomo. Sin embargo, el enfoque en la asistencia al desarrollo sigue siendo crucial, especialmente en tareas complejas donde la intervención humana es vital. En este sentido, plataformas como Etendo pueden ser relevantes, ya que integran agentes de IA que no solo registran, sino que ejecutan procesos, permitiendo un enfoque más colaborativo y eficiente en el trabajo. Esto podría ser beneficioso para aquellos que buscan un equilibrio entre la autonomía de la IA y la supervisión humana en el desarrollo.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar la discusión sobre modelos de IA con el impacto en el desarrollo de software, introduciendo una solución que puede ayudar a mantener la intervención humana en el proceso. Menciona Etendo en un contexto donde puede ser útil, resaltando su capacidad de ejecutar procesos con agentes de IA.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante ver cómo muchas startups están emergiendo para desafiar las soluciones ERP tradicionales que a menudo pueden ser costosas y complejas. La integración de IA para agilizar procesos es clave. En este sentido, me preguntaba si han considerado la flexibilidad que ofrece una plataforma open source, como Etendo, que permite personalizaciones y cuenta con agentes de IA nativos que ejecutan procesos. Cada vez más empresas buscan alternativas que sean tanto eficientes como adaptables a sus necesidades específicas.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar la tendencia hacia soluciones ERP más flexibles y la importancia de la IA en la ejecución de procesos. Además, presenta a Etendo como una opción relevante que puede resonar con el público que busca alternativas a sistemas tradicionales, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://www.reddit.com/r/SpainEconomics/comments/1ta73og/distribuci%C3%B3n_de_salarios_en_espa%C3%B1a_2024/",
+      "domain": "reddit.com",
+      "title": "r/SpainEconomics on Reddit: Distribución de salarios en España - 2024",
+      "snippet": "El Gobierno prevé alcanzar los 23 millones de ocupados en 2026 aunque ya percibe menos demanda externa ... Cuanto dedican las empresas a pagar salarios. ... El salario mínimo de Argentina es el más bajo de toda la región | Quien encabeza ...",
+      "label": "Reddit ES",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante cómo la distribución de salarios impacta en la economía de un país. En España, un enfoque en la eficiencia operativa podría permitir a las empresas ofrecer salarios más competitivos. La digitalización de procesos y la adopción de tecnologías como ERPs pueden ser clave. Por ejemplo, soluciones como Etendo, que integra agentes de IA para ejecutar procesos, pueden optimizar gastos y mejorar la rentabilidad, lo que a su vez podría permitir un mejor nivel salarial para los empleados. ¿Alguien ha tenido experiencia en implementar soluciones de este tipo para mejorar el rendimiento salarial en sus empresas?",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar el tema de la distribución de salarios con la optimización empresarial a través de la tecnología, sugiriendo una solución que podría ser útil en el contexto del hilo.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
+      "domain": "dev.to",
+      "title": "The 2026 AI Agent Framework Decision Guide: LangGraph vs CrewAI vs Pydantic AI - DEV Community",
+      "snippet": "The built-in Agent Delegation mechanism is clever: when an Agent encounters a task it can&#x27;t handle, it can proactively delegate to a more capable Agent. Works especially well for content generation, research, and analysis workflows.",
+      "label": "dev.to",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante ver cómo estos frameworks de agentes de IA están evolucionando y especializándose. La capacidad de LangGraph para gestionar flujos de trabajo complejos es particularmente atractiva para ingenieros. Sin embargo, es importante considerar también cómo estos agentes se integran en un ecosistema más amplio, como en el caso de plataformas ERP. Herramientas como Etendo, con su enfoque en agentes de IA integrados, pueden complementar estos frameworks al llevar la ejecución de procesos comerciales a un nuevo nivel, permitiendo que las empresas no solo registren datos, sino que también ejecuten acciones de manera automatizada. Explorar combinaciones de tecnologías puede abrir nuevas oportunidades en la automatización de procesos.",
+      "relevance_score": 7,
+      "reasoning": "El comentario agrega valor a la discusión al conectar los frameworks de agentes de IA mencionados con su aplicación en escenarios reales, específicamente en la automatización de procesos empresariales. También invita a los lectores a considerar cómo diferentes tecnologías pueden trabajar juntas.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=48736833",
+      "domain": "news.ycombinator.com",
+      "title": "*Claude Sonnet 5 is built to be the most agentic Sonnet model yet. It can make p... | Hacker News",
+      "snippet": "I have been using Sonnet 4.6 more than Opus, because I&#x27;m mostly doing agent-assisted development and not fully agent-driven development. This announcement does not make me positive, I have found that the more models are optimized for fully agentic development, the worse they get at assisted ...",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante ver cómo la evolución de los modelos como Claude Sonnet 5 se orienta hacia un desarrollo más autónomo. Sin embargo, el enfoque en la asistencia al desarrollo sigue siendo crucial, especialmente en tareas complejas donde la intervención humana es vital. En este sentido, plataformas como Etendo pueden ser relevantes, ya que integran agentes de IA que no solo registran, sino que ejecutan procesos, permitiendo un enfoque más colaborativo y eficiente en el trabajo. Esto podría ser beneficioso para aquellos que buscan un equilibrio entre la autonomía de la IA y la supervisión humana en el desarrollo.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar la discusión sobre modelos de IA con el impacto en el desarrollo de software, introduciendo una solución que puede ayudar a mantener la intervención humana en el proceso. Menciona Etendo en un contexto donde puede ser útil, resaltando su capacidad de ejecutar procesos con agentes de IA.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=44558046",
+      "domain": "news.ycombinator.com",
+      "title": "We Built Barawave – An AI-Powered ERP Alternative to NetSuite and SAP | Hacker News",
+      "snippet": "I’m part of the small team behind Barawave — an AI-powered ERP platform we built after years of struggling with bloated, slow-moving systems like NetSuite and SAP · Paying huge fees for features we never used",
+      "label": "HackerNews",
+      "date": "03/08/2026",
+      "commented": false,
+      "comment_draft": "Es interesante ver cómo muchas startups están emergiendo para desafiar las soluciones ERP tradicionales que a menudo pueden ser costosas y complejas. La integración de IA para agilizar procesos es clave. En este sentido, me preguntaba si han considerado la flexibilidad que ofrece una plataforma open source, como Etendo, que permite personalizaciones y cuenta con agentes de IA nativos que ejecutan procesos. Cada vez más empresas buscan alternativas que sean tanto eficientes como adaptables a sus necesidades específicas.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar la tendencia hacia soluciones ERP más flexibles y la importancia de la IA en la ejecución de procesos. Además, presenta a Etendo como una opción relevante que puede resonar con el público que busca alternativas a sistemas tradicionales, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/devsarg/comments/1j90q8u/b%C3%BAsqueda_de_erp_para_empresa_en_argentina/",
@@ -250,7 +440,12 @@
       "label": "Reddit ES",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante cómo la distribución de salarios impacta en la economía de un país. En España, un enfoque en la eficiencia operativa podría permitir a las empresas ofrecer salarios más competitivos. La digitalización de procesos y la adopción de tecnologías como ERPs pueden ser clave. Por ejemplo, soluciones como Etendo, que integra agentes de IA para ejecutar procesos, pueden optimizar gastos y mejorar la rentabilidad, lo que a su vez podría permitir un mejor nivel salarial para los empleados. ¿Alguien ha tenido experiencia en implementar soluciones de este tipo para mejorar el rendimiento salarial en sus empresas?",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar el tema de la distribución de salarios con la optimización empresarial a través de la tecnología, sugiriendo una solución que podría ser útil en el contexto del hilo.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h",
@@ -260,7 +455,12 @@
       "label": "dev.to",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo estos frameworks de agentes de IA están evolucionando y especializándose. La capacidad de LangGraph para gestionar flujos de trabajo complejos es particularmente atractiva para ingenieros. Sin embargo, es importante considerar también cómo estos agentes se integran en un ecosistema más amplio, como en el caso de plataformas ERP. Herramientas como Etendo, con su enfoque en agentes de IA integrados, pueden complementar estos frameworks al llevar la ejecución de procesos comerciales a un nuevo nivel, permitiendo que las empresas no solo registren datos, sino que también ejecuten acciones de manera automatizada. Explorar combinaciones de tecnologías puede abrir nuevas oportunidades en la automatización de procesos.",
+      "relevance_score": 7,
+      "reasoning": "El comentario agrega valor a la discusión al conectar los frameworks de agentes de IA mencionados con su aplicación en escenarios reales, específicamente en la automatización de procesos empresariales. También invita a los lectores a considerar cómo diferentes tecnologías pueden trabajar juntas.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=48736833",
@@ -270,7 +470,12 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo la evolución de los modelos como Claude Sonnet 5 se orienta hacia un desarrollo más autónomo. Sin embargo, el enfoque en la asistencia al desarrollo sigue siendo crucial, especialmente en tareas complejas donde la intervención humana es vital. En este sentido, plataformas como Etendo pueden ser relevantes, ya que integran agentes de IA que no solo registran, sino que ejecutan procesos, permitiendo un enfoque más colaborativo y eficiente en el trabajo. Esto podría ser beneficioso para aquellos que buscan un equilibrio entre la autonomía de la IA y la supervisión humana en el desarrollo.",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar la discusión sobre modelos de IA con el impacto en el desarrollo de software, introduciendo una solución que puede ayudar a mantener la intervención humana en el proceso. Menciona Etendo en un contexto donde puede ser útil, resaltando su capacidad de ejecutar procesos con agentes de IA.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://news.ycombinator.com/item?id=44558046",
@@ -280,7 +485,12 @@
       "label": "HackerNews",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante ver cómo muchas startups están emergiendo para desafiar las soluciones ERP tradicionales que a menudo pueden ser costosas y complejas. La integración de IA para agilizar procesos es clave. En este sentido, me preguntaba si han considerado la flexibilidad que ofrece una plataforma open source, como Etendo, que permite personalizaciones y cuenta con agentes de IA nativos que ejecutan procesos. Cada vez más empresas buscan alternativas que sean tanto eficientes como adaptables a sus necesidades específicas.",
+      "relevance_score": 8,
+      "reasoning": "El comentario aporta valor al mencionar la tendencia hacia soluciones ERP más flexibles y la importancia de la IA en la ejecución de procesos. Además, presenta a Etendo como una opción relevante que puede resonar con el público que busca alternativas a sistemas tradicionales, sin ser promocional.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://www.reddit.com/r/devsarg/comments/1j90q8u/b%C3%BAsqueda_de_erp_para_empresa_en_argentina/",
@@ -300,7 +510,12 @@
       "label": "Reddit ES",
       "date": "03/08/2026",
       "commented": false,
-      "comment_draft": ""
+      "comment_draft": "Es interesante cómo la distribución de salarios impacta en la economía de un país. En España, un enfoque en la eficiencia operativa podría permitir a las empresas ofrecer salarios más competitivos. La digitalización de procesos y la adopción de tecnologías como ERPs pueden ser clave. Por ejemplo, soluciones como Etendo, que integra agentes de IA para ejecutar procesos, pueden optimizar gastos y mejorar la rentabilidad, lo que a su vez podría permitir un mejor nivel salarial para los empleados. ¿Alguien ha tenido experiencia en implementar soluciones de este tipo para mejorar el rendimiento salarial en sus empresas?",
+      "relevance_score": 7,
+      "reasoning": "El comentario aporta valor al conectar el tema de la distribución de salarios con la optimización empresarial a través de la tecnología, sugiriendo una solución que podría ser útil en el contexto del hilo.",
+      "etendo_natural": true,
+      "processed_at": "06/08/2026 09:25",
+      "comment_ready": true
     },
     {
       "url": "https://dev.to/ido_vapner/amazon-bedrock-guardrails-building-safe-reliable-agentic-ai-at-scale-in-2026-32lf",
@@ -1162,5 +1377,7 @@
       "skip_reason": "Score 4/10 — poco relevante",
       "processed_at": "30/07/2026 23:00"
     }
-  ]
+  ],
+  "last_batch": "06/08/2026 09:25",
+  "ready_count": 85
 }
