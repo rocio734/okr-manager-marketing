@@ -722,6 +722,7 @@ def outreach_list():
                 "body_html":    cf.get("outreach_body", ""),
                 "has_message":  bool(cf.get("outreach_body", "")),
                 "replied_at":   cf.get("replied_at", ""),
+                "current_erp":  cf.get("current_erp", "—"),
                 "pixel_url":    f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif",
             })
 
@@ -855,6 +856,7 @@ def generate_outreach(deal_id: str):
     sector       = cf.get("sector", "")
     score        = cf.get("score", "")
     signal_label = cf.get("signal_label", "")
+    current_erp  = cf.get("current_erp", "")
 
     GENERIC_PREFIXES = {
         "info", "contacto", "contact", "hola", "hello", "admin", "administracion",
@@ -924,13 +926,14 @@ Respondé SOLO con JSON válido:
 
 El body_html debe usar párrafos <p> con estilos inline básicos."""
     else:
+        erp_line = f"\n- ERP actual detectado: {current_erp} (si es relevante, mencioná que la migración a Etendo es más sencilla de lo que parece)" if current_erp and current_erp not in ("—","") else ""
         prompt = f"""Eres Victoria, encargada del área comercial de Etendo (ERP agéntico para empresas).
 Si te presentás en el email, usá exactamente: "Soy Victoria, encargada del área comercial de Etendo" — nunca uses otro nombre ni cargo.
 Generá un email de outreach en español (España) para este prospecto:
 - Empresa: {empresa}
 - Sector: {sector}
 - Cargo del contacto: {cargo}
-- Score de interés: {score}/100
+- Score de interés: {score}/100{erp_line}
 
 Contexto CRÍTICO sobre Etendo (léelo con atención antes de escribir):
 - Etendo NO "tiene IA incorporada" ni "integra IA" como feature propia. Eso es incorrecto.
@@ -1098,6 +1101,154 @@ def send_outreach(deal_id: str, from_email: str, sender_name: Optional[str] = "V
         json={"custom_fields": cf}, timeout=10)
 
     return {"ok": True, "to": to_email, "subject": subject, "attempts": cf["attempts"]}
+
+
+# ── Follow-up automático ───────────────────────────────────────────────────────
+@app.get("/api/followup-pending")
+def followup_pending():
+    """
+    Lista contactos que necesitan follow-up:
+    - email enviado hace 3+ días (sent_at o last_sent_at)
+    - sin respuesta (replied_at nulo)
+    - menos de 3 intentos (no saturar)
+    """
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+
+    from datetime import timezone
+    cutoff = (datetime.utcnow() - timedelta(days=3)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    cr = requests.get(
+        f"{SUPABASE_URL}/rest/v1/contacts"
+        f"?fuente=eq.{OUTREACH_SOURCE}&select=id,email,empresa,custom_fields",
+        headers=_SB_HEADERS(), timeout=15)
+    contacts = cr.json() if cr.status_code == 200 else []
+
+    pending = []
+    for c in contacts:
+        cf = c.get("custom_fields") or {}
+        last_sent = cf.get("last_sent_at") or cf.get("sent_at","")
+        replied   = cf.get("replied_at","")
+        attempts  = cf.get("attempts", 0)
+        if not last_sent or replied or attempts >= 3:
+            continue
+        if last_sent < cutoff:
+            pending.append({
+                "contact_id": c["id"],
+                "email":      c.get("email",""),
+                "empresa":    c.get("empresa",""),
+                "attempts":   attempts,
+                "last_sent":  last_sent,
+                "days_ago":   round((datetime.utcnow() - datetime.strptime(
+                    last_sent[:19], "%Y-%m-%dT%H:%M:%S")).days),
+            })
+
+    pending.sort(key=lambda x: x["last_sent"])
+    return {"count": len(pending), "pending": pending}
+
+
+@app.post("/api/send-followup/{contact_id}")
+def send_followup(contact_id: str):
+    """
+    Envía un follow-up corto al contacto. Solo si tiene sent_at y sin replied_at.
+    Genera un mensaje breve con IA ("¿llegó mi mensaje anterior?") y lo envía vía n8n.
+    """
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+    if not OPENAI_API_KEY:
+        raise HTTPException(status_code=503, detail="OPENAI_API_KEY no configurada")
+
+    cr = requests.get(
+        f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}"
+        f"&select=email,empresa,cargo,custom_fields",
+        headers=_SB_HEADERS(), timeout=10)
+    c = (cr.json() or [{}])[0]
+    if not c:
+        raise HTTPException(status_code=404, detail="Contacto no encontrado")
+
+    email   = c.get("email","")
+    empresa = c.get("empresa","")
+    cf      = c.get("custom_fields") or {}
+
+    if not email:
+        raise HTTPException(status_code=400, detail="Sin email")
+    if cf.get("replied_at"):
+        raise HTTPException(status_code=400, detail="Ya respondió — no enviar follow-up")
+    if cf.get("attempts",0) >= 3:
+        raise HTTPException(status_code=400, detail="Máximo de intentos alcanzado (3)")
+
+    sector       = cf.get("sector","")
+    signal_label = cf.get("signal_label","")
+    current_erp  = cf.get("current_erp","")
+    orig_subject = cf.get("outreach_subject","")
+
+    erp_ctx = f" (detectamos que usan {current_erp})" if current_erp and current_erp != "—" else ""
+
+    prompt = f"""Eres Victoria, encargada del área comercial de Etendo.
+Ya enviaste un primer email a {empresa} ({sector}{erp_ctx}) hace varios días y no hubo respuesta.
+Escribí un follow-up MUY corto (2-3 líneas máximo) en español (España).
+
+Reglas:
+1. Referencia al email anterior sin copiarlo ("te escribí hace unos días sobre...")
+2. Una sola pregunta cerrada al final que sea fácil de responder con sí/no
+3. Tono humano, nada corporativo
+4. Asunto: diferente al original ("{orig_subject}"), más directo
+5. NO incluyas firma
+6. Si tiene señal "{signal_label}", mencioná ese contexto brevemente
+
+Respondé SOLO con JSON: {{"subject": "...", "body_html": "..."}}"""
+
+    try:
+        ai = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {OPENAI_API_KEY}",
+                     "Content-Type": "application/json"},
+            json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": prompt}],
+                  "max_tokens": 400, "temperature": 0.7},
+            timeout=30)
+        raw = ai.json()["choices"][0]["message"]["content"].strip()
+        parsed = json.loads(raw)
+        subject  = parsed.get("subject","Follow-up — Etendo ERP")
+        body_txt = parsed.get("body_html","")
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Error IA: {e}")
+
+    pixel_url = f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif"
+    signature = """<div style="margin-top:24px;border-top:1px solid #e6e6e6;padding-top:14px;font-family:Arial,sans-serif;font-size:13px;line-height:1.4;color:#333">
+  <div style="font-size:16px;color:#1a2b6d;font-weight:700">Victoria Miguez</div>
+  <div style="font-size:12px;color:#7a7a7a;text-transform:uppercase;letter-spacing:.4px">Encargada del Área Comercial<br>Etendo ERP</div>
+  <div style="margin-top:10px">
+    🌐 <a href="https://www.etendo.software" style="text-decoration:none;color:#1a2b6d">www.etendo.software</a><br>
+    ✉️ <a href="mailto:victoria.miguez@etendo.software" style="text-decoration:none;color:#1a2b6d">victoria.miguez@etendo.software</a>
+  </div>
+  <div style="margin-top:10px"><a href="https://calendar.app.google/HyVddorYyUecHuJz9" style="color:#1a2b6d;text-decoration:underline">Reservá 30 min</a></div>
+</div>"""
+    body_html = (
+        "<div style='font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#222'>"
+        + body_txt + "</div>" + signature
+        + f'<img src="{pixel_url}" width="1" height="1" style="display:none">'
+    )
+
+    try:
+        resp = requests.post(N8N_OUTREACH_WEBHOOK,
+            json={"to": email, "subject": subject, "html": body_html}, timeout=20)
+        if resp.status_code not in (200, 201):
+            raise HTTPException(status_code=502, detail=f"n8n error {resp.status_code}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al enviar: {e}")
+
+    now_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    cf["attempts"]     = cf.get("attempts", 0) + 1
+    cf["last_sent_at"] = now_iso
+    cf["followup_sent_at"] = now_iso
+    requests.patch(
+        f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}",
+        headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+        json={"custom_fields": cf}, timeout=10)
+
+    return {"ok": True, "to": email, "subject": subject, "attempts": cf["attempts"]}
 
 
 # ── Startup warmup ─────────────────────────────────────────────────────────────

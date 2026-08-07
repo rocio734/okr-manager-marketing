@@ -450,19 +450,35 @@ def apollo_companies():
 
 def apollo_contact(domain):
     if not APOLLO_KEY: return {}
-    try:
-        r=requests.post("https://api.apollo.io/v1/mixed_people/search",
-            headers={"Content-Type":"application/json","X-Api-Key":APOLLO_KEY},
-            json={"page":1,"per_page":1,"organization_domains":[domain],
-                  "person_titles":["CEO","Director General","Director Operaciones","CTO","Gerente","Owner","Founder"]},timeout=20)
-        r.raise_for_status()
-        pp=r.json().get("people",[])
-        if not pp: return {}
-        p=pp[0]
-        return {"email":p.get("email","—") or "—","name":f"{p.get('first_name','')} {p.get('last_name','')}".strip(),"position":p.get("title","—"),"linkedin":p.get("linkedin_url","—") or "—","phone":(p.get("phone_numbers") or [{}])[0].get("raw_number","—")}
-    except Exception as e:
-        print(f"    ⚠️ Apollo contact {domain}: {e}")
-        return {}
+    # Apollo cambió auth en 2024 — intentar endpoint nuevo (/api/v1) y legacy (/v1)
+    _TITLES = ["CEO","Director General","Director Operaciones","Director Financiero",
+               "CTO","Gerente General","Owner","Founder","Responsable","Socio"]
+    _ENDPOINTS = [
+        ("https://api.apollo.io/api/v1/people/search",
+         {"page":1,"per_page":1,"organization_domains":[domain],"person_titles":_TITLES}),
+        ("https://api.apollo.io/v1/mixed_people/search",
+         {"page":1,"per_page":1,"organization_domains":[domain],"person_titles":_TITLES}),
+    ]
+    for url, payload in _ENDPOINTS:
+        try:
+            r=requests.post(url,
+                headers={"Content-Type":"application/json","X-Api-Key":APOLLO_KEY,
+                         "Cache-Control":"no-cache"},
+                json=payload, timeout=20)
+            if r.status_code == 403:
+                continue  # endpoint no disponible en este plan — probar siguiente
+            r.raise_for_status()
+            pp=r.json().get("people",[])
+            if not pp: return {}
+            p=pp[0]
+            return {"email":p.get("email","—") or "—",
+                    "name":f"{p.get('first_name','')} {p.get('last_name','')}".strip(),
+                    "position":p.get("title","—"),
+                    "linkedin":p.get("linkedin_url","—") or "—",
+                    "phone":(p.get("phone_numbers") or [{}])[0].get("raw_number","—")}
+        except Exception as e:
+            print(f"    ⚠️ Apollo contact {domain} [{url[-30:]}]: {e}")
+    return {}
 
 def hunter_search(domain):
     if not HUNTER_KEY: return {}
@@ -492,38 +508,48 @@ _CONTACT_PATHS = [
 _SKIP_EMAIL_DOMAINS = {
     "sentry.io","wixpress.com","example.com","test.com","domain.com",
     "wordpress.com","squarespace.com","godaddy.com","hostinger.com",
-    "gmail.com","hotmail.com","outlook.com",  # personales — útiles solo si son el único
+    "gmail.com","hotmail.com","outlook.com",
 }
+# Patrones para detectar el ERP que ya usa la empresa
+_ERP_FINGERPRINTS = {
+    "Odoo":     ["odoo.com","/web#action=","openerp","res.partner","powered by odoo"],
+    "Holded":   ["holded.com","app.holded.com","holded erp"],
+    "Sage":     ["sage.com","sage 50","sage 200","sage x3","sage murano"],
+    "SAP":      ["sap.com","sap business one","sap b1","business one","mysap"],
+    "A3ERP":    ["a3software.com","a3erp","a3 erp","a3con "],
+    "Navision": ["dynamics nav","business central","nav 2018","bc 365"],
+}
+# Nombre completo en páginas de equipo: "Juan García" / "María José López"
+_FULLNAME_RE = re.compile(
+    r'\b([A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]{2,}(?:\s+(?:de\s+|del\s+|la\s+)?[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]{2,}){1,3})\b'
+)
 
 def _scrape_contact_page(base_url):
     """Visita /contacto y páginas de equipo con Scrapling y extrae emails + teléfonos."""
     found_emails, found_phones = [], []
+    _all_html = []
     tried = set()
     base = base_url.rstrip("/")
 
     def _harvest(html):
         if not html: return
-        # mailto: links primero (más fiables)
+        _all_html.append(html)
         for m in re.findall(r'mailto:([^"\'>\s]+)', html):
             e = m.split("?")[0].strip().lower()
             if _EMAIL_RE.match(e): found_emails.append(e)
-        # tel: links
         for t in re.findall(r'tel:([^"\'>\s]+)', html):
             p = t.strip()
             if _PHONE_RE.search(p): found_phones.append(p)
-        # Emails en texto plano (con ofuscaciones comunes: [at], (at), [dot])
         normalized = html.replace("[at]","@").replace("(at)","@").replace(" at ","@") \
                          .replace("[dot]",".").replace("(dot)",".")
         for e in _EMAIL_RE.findall(normalized):
             dom = e.split("@")[-1].lower()
             if dom not in _SKIP_EMAIL_DOMAINS:
                 found_emails.append(e.lower())
-        # Teléfonos en texto
         for p in _PHONE_RE.findall(html):
             found_phones.append(p.strip())
 
     def _get(url, timeout=10):
-        """Fetch con fallback SSL verify=False para certificados rotos."""
         try:
             r = requests.get(url, headers=HEADERS, timeout=timeout, verify=True)
             r.raise_for_status()
@@ -540,12 +566,12 @@ def _scrape_contact_page(base_url):
         except Exception:
             return None
 
-    # 1. Homepage — siempre tiene algo en el footer
+    # 1. Homepage
     hp = fetch_html(base, timeout=12) or _get(base, timeout=12)
     _harvest(hp)
     tried.add(base)
 
-    # 2. Páginas de contacto específicas
+    # 2. Páginas de contacto y equipo
     for path in _CONTACT_PATHS:
         if len(found_emails) >= 2: break
         url = base + path
@@ -555,17 +581,44 @@ def _scrape_contact_page(base_url):
         if html and len(html) > 500:
             _harvest(html)
 
+    # Detectar ERP actual en todo el HTML recopilado
+    all_html_lower = " ".join(h.lower() for h in _all_html if h)
+    detected_erp = "—"
+    for erp_name, patterns in _ERP_FINGERPRINTS.items():
+        if any(p in all_html_lower for p in patterns):
+            detected_erp = erp_name
+            break
+
     # Dedup y priorizar: dominio propio > genéricos conocidos
     own_domain = base.replace("https://","").replace("http://","").replace("www.","").split("/")[0].split(".")[0]
     emails_own = [e for e in dict.fromkeys(found_emails) if own_domain in e]
     emails_other = [e for e in dict.fromkeys(found_emails) if own_domain not in e
                     and e.split("@")[-1] not in _SKIP_EMAIL_DOMAINS]
-    # Preferir corporativos (no gmail/hotmail), luego otros
-    best_email = (emails_own + emails_other + found_emails)
-    best_email = next(iter(dict.fromkeys(best_email)), "—")
-
+    best_email = next(iter(dict.fromkeys(emails_own + emails_other + found_emails)), "—")
     best_phone = next(iter(dict.fromkeys(found_phones)), "—")
-    return {"email": best_email, "phone": best_phone, "source": "web_scrape"}
+
+    # Extraer nombre de contacto de páginas de equipo
+    contact_name = "—"
+    for html in _all_html:
+        if not html: continue
+        # Buscar nombres cerca de cargos directivos en headings
+        soup_txt = re.sub(r'<[^>]+>', ' ', html)
+        for m in _FULLNAME_RE.finditer(soup_txt):
+            candidate = m.group(1).strip()
+            # Descartar si es nombre de empresa (más de 4 palabras) o contiene números
+            words = candidate.split()
+            if 2 <= len(words) <= 3 and not any(c.isdigit() for c in candidate):
+                # Verificar que aparece cerca de palabras de cargo
+                ctx = soup_txt[max(0,m.start()-150):m.end()+150].lower()
+                if any(k in ctx for k in ["ceo","director","gerente","fundador","founder",
+                                           "socio","responsable","presidente","cto","coo"]):
+                    contact_name = candidate
+                    break
+        if contact_name != "—":
+            break
+
+    return {"email": best_email, "phone": best_phone, "name": contact_name,
+            "current_erp": detected_erp, "source": "web_scrape"}
 
 
 def enrich(domain):
@@ -1135,11 +1188,32 @@ def search_all_leads(data):
                 new.append(lead); seen.add(d)
         print(f"    → {len([l for l in new if l.get('source_type')=='partner_spider'])} perfiles completos extraídos")
 
-    # Enriquecimiento
-    print(f"  Enriqueciendo {len(new)} leads...")
-    for i,lead in enumerate(new):
+    # Filtrar por señal ICP ANTES de enriquecer — evitar gastar Apollo/Hunter en leads que caerán igual
+    VALID_SIGNALS_ENRICH = {
+        "Busca ERP (Apollo)", "Busca ERP", "Selección ERP", "Migración ERP",
+        "Empresa logística", "Empresa construcción", "Empresa textil", "Empresa exportadora",
+        "Empresa ICP", "Empresa España (Apollo)", "Empresa alimentación", "Fabricante España",
+        "Empresa química", "Empresa automoción", "Distribuidor", "Licitación",
+        "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
+        "Partner SAP (deep)", "Busca partner",
+        "Google Maps",  # Maps siempre tiene señal real
+    }
+    to_enrich = [l for l in new if l.get("signal_label","") in VALID_SIGNALS_ENRICH]
+    skip_enrich = len(new) - len(to_enrich)
+    if skip_enrich:
+        print(f"  Saltando enriquecimiento de {skip_enrich} leads sin señal ICP válida")
+
+    print(f"  Enriqueciendo {len(to_enrich)} leads (de {len(new)} totales)...")
+    for i,lead in enumerate(to_enrich):
         c=enrich(lead["domain"])
-        lead.update({"email":c.get("email","—"),"contact_name":c.get("name","—"),"contact_pos":c.get("position","—"),"phone":c.get("phone",lead.get("phone","—")),"linkedin_org":c.get("linkedin",lead.get("linkedin_org","—"))})
+        lead.update({
+            "email":        c.get("email","—"),
+            "contact_name": c.get("name","—"),
+            "contact_pos":  c.get("position","—"),
+            "phone":        c.get("phone", lead.get("phone","—")),
+            "linkedin_org": c.get("linkedin", lead.get("linkedin_org","—")),
+            "current_erp":  c.get("current_erp","—"),
+        })
         if i%5==0: time.sleep(0.3)
 
     # Acumular preservando histórico — límite 500 para tener más datos
@@ -1491,6 +1565,7 @@ def save_to_supabase(new_leads):
                 "linkedin":     lead.get("linkedin", "—"),
                 "phone":        lead.get("phone", "—"),
                 "position":     lead.get("contact_pos", "—"),
+                "current_erp":  lead.get("current_erp", "—"),
                 "detected_at":  datetime.datetime.now().isoformat(),
             },
         }
