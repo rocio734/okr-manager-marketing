@@ -210,6 +210,26 @@ SKIP_DOMAINS = {
     "blog.corponet","blog.saleslayer",
     # Agregadores de agencias
     "ekamat","corposuite",
+    # Administraciones públicas y portales gubernamentales (no son prospectos)
+    "hacienda.navarra","navarra.es","sedeelectronica","gobierto","contratacion.gob",
+    "contratosdelsector","contrataciondelestado","licitaciones","boe.es","bocm.es",
+    "juntaex.es","jcyl.es","aragon.es","iet.csic","csic.es","bdc.es","inap.es",
+    "sede.gob","administracion.gob","mites.gob","mitma.gob","mincotur.gob",
+    "mapama.gob","mefp.gob","mjusticia.gob","interior.gob","exteriores.gob",
+    "congreso.es","senado.es","boe.es","agenciatributaria","aeat.es",
+    "seguridad-social","sepe.es","servef.gva","inem.es","soib.es",
+    # Periódicos y portales de noticias locales (falsos positivos geográficos)
+    "laverdad.es","lasprovincias.es","levante-emv","elperiodico","europapress",
+    "cadenaser","ondacero","cope.es","rtve.es","elespanol.com","vozpopuli",
+    "lainformacion","huffingtonpost","publico.es","elplural","ctxt.es",
+    "diarioinformacion","diariomallorca","diariosur","diariodesevilla",
+    "diariodenavarra","noticias.nav","noticiasdenavarra","elcorreo","deia",
+    # Portales de licitaciones y contratos públicos
+    "perfiles.gob","perfil.contratante","perfil-contratante","plataformadecontratacion",
+    "pmcm.es","rcspain.es","pmbok","licitacion.es",
+    # Medios de prensa empresarial/económica (no son prospectos)
+    "eleconomista","bolsamania","estrategiasdeinversion","invertia","capitalbolsa",
+    "quienesquien","empresasinforma","sabi.bvd","axesor.es",
 }
 
 # Caché de URLs ya vistas para saber si usar auto_save o adaptive
@@ -502,8 +522,26 @@ def _scrape_contact_page(base_url):
         for p in _PHONE_RE.findall(html):
             found_phones.append(p.strip())
 
+    def _get(url, timeout=10):
+        """Fetch con fallback SSL verify=False para certificados rotos."""
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=timeout, verify=True)
+            r.raise_for_status()
+            return r.text
+        except requests.exceptions.SSLError:
+            try:
+                import urllib3
+                urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+                r = requests.get(url, headers=HEADERS, timeout=timeout, verify=False)
+                r.raise_for_status()
+                return r.text
+            except Exception:
+                return None
+        except Exception:
+            return None
+
     # 1. Homepage — siempre tiene algo en el footer
-    hp = fetch_html(base, timeout=12)
+    hp = fetch_html(base, timeout=12) or _get(base, timeout=12)
     _harvest(hp)
     tried.add(base)
 
@@ -513,7 +551,7 @@ def _scrape_contact_page(base_url):
         url = base + path
         if url in tried: continue
         tried.add(url)
-        html = fetch_html(url, timeout=10)
+        html = fetch_html(url, timeout=10) or _get(url, timeout=10)
         if html and len(html) > 500:
             _harvest(html)
 
