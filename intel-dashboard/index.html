@@ -156,11 +156,31 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
 <!-- RESUMEN -->
 <div id="ov" class="pnl on">
   <div class="krow">
-    <div class="kcard"><p class="klbl">Leads totales</p><p class="kval"><!-- WS:leads_total -->415<!-- /WS:leads_total --></p><p class="ksub">+<!-- WS:leads_new_today -->72<!-- /WS:leads_new_today --> hoy · España</p></div>
-    <div class="kcard"><p class="klbl">Alta calidad</p><p class="kval" style="color:var(--gn)"><!-- WS:leads_high -->44<!-- /WS:leads_high --></p><p class="ksub">Score alto · acumulado</p></div>
-    <div class="kcard"><p class="klbl">Con email verificado</p><p class="kval" style="color:var(--bl)"><!-- WS:leads_email -->150<!-- /WS:leads_email --></p><p class="ksub">Hunter · Apollo · acumulado</p></div>
-    <div class="kcard"><p class="klbl">Cambios competidores</p><p class="kval" style="color:var(--am)"><!-- WS:changes_total -->2<!-- /WS:changes_total --></p><p class="ksub">Odoo · SAP · Holded · Sage</p></div>
-    <div class="kcard"><p class="klbl">Posts engagement</p><p class="kval" style="color:var(--gn)"><!-- WS:engagement_ready -->85<!-- /WS:engagement_ready --></p><p class="ksub"><!-- WS:engagement_total -->98<!-- /WS:engagement_total --> detectados · borradores listos</p></div>
+    <div class="kcard" title="Total de empresas encontradas por el cron desde que arrancó (histórico acumulado, máx 500)">
+      <p class="klbl">Descubiertos <span style="font-size:10px;opacity:.55;font-weight:400">histórico</span></p>
+      <p class="kval"><!-- WS:leads_total -->415<!-- /WS:leads_total --></p>
+      <p class="ksub">+<!-- WS:leads_new_today -->72<!-- /WS:leads_new_today --> esta ejecución · España</p>
+    </div>
+    <div class="kcard" title="De los descubiertos, cuántos tienen email real (Apollo, Hunter o web scraping)">
+      <p class="klbl">Con email <span style="font-size:10px;opacity:.55;font-weight:400">histórico</span></p>
+      <p class="kval" style="color:var(--bl)"><!-- WS:leads_email -->150<!-- /WS:leads_email --></p>
+      <p class="ksub">Apollo · Hunter · Web scrape</p>
+    </div>
+    <div class="kcard" title="Leads actualmente en la tabla Outreach de Supabase — los que podés contactar ahora">
+      <p class="klbl">En Outreach <span style="font-size:10px;opacity:.55;font-weight:400">Supabase</span></p>
+      <p class="kval" style="color:var(--gn)"><!-- WS:outreach_total -->26<!-- /WS:outreach_total --></p>
+      <p class="ksub"><!-- WS:leads_high -->44<!-- /WS:leads_high --> score alto · contactables ahora</p>
+    </div>
+    <div class="kcard" title="Cambios detectados en webs de competidores en esta ejecución">
+      <p class="klbl">Cambios competidores</p>
+      <p class="kval" style="color:var(--am)"><!-- WS:changes_total -->2<!-- /WS:changes_total --></p>
+      <p class="ksub">Odoo · SAP · Holded · Sage</p>
+    </div>
+    <div class="kcard" title="Posts de foros/LinkedIn donde tiene sentido comentar mencionando Etendo">
+      <p class="klbl">Posts engagement</p>
+      <p class="kval" style="color:var(--gn)"><!-- WS:engagement_ready -->85<!-- /WS:engagement_ready --></p>
+      <p class="ksub"><!-- WS:engagement_total -->98<!-- /WS:engagement_total --> detectados · borradores listos</p>
+    </div>
   </div>
 
   <div class="sec">Alertas del día</div>

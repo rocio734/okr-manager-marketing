@@ -460,6 +460,76 @@ def hunter_search(domain):
         print(f"    ⚠️ Hunter {domain}: {e}")
         return {}
 
+_EMAIL_RE = re.compile(
+    r'\b[A-Za-z0-9._%+\-]+@(?!(?:example|test|sentry|domain|yourcompany|empresa)\b)[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b'
+)
+_PHONE_RE = re.compile(r'(?:\+34\s?)?(?:6\d{2}|7\d{2}|8\d{2}|9\d{2})[\s.\-]?\d{3}[\s.\-]?\d{3}')
+_CONTACT_PATHS = [
+    "/contacto", "/contactar", "/contact", "/contact-us",
+    "/sobre-nosotros", "/sobre-nosotras", "/equipo", "/team",
+    "/quienes-somos", "/who-we-are",
+]
+_SKIP_EMAIL_DOMAINS = {
+    "sentry.io","wixpress.com","example.com","test.com","domain.com",
+    "wordpress.com","squarespace.com","godaddy.com","hostinger.com",
+    "gmail.com","hotmail.com","outlook.com",  # personales — útiles solo si son el único
+}
+
+def _scrape_contact_page(base_url):
+    """Visita /contacto y páginas de equipo con Scrapling y extrae emails + teléfonos."""
+    found_emails, found_phones = [], []
+    tried = set()
+    base = base_url.rstrip("/")
+
+    def _harvest(html):
+        if not html: return
+        # mailto: links primero (más fiables)
+        for m in re.findall(r'mailto:([^"\'>\s]+)', html):
+            e = m.split("?")[0].strip().lower()
+            if _EMAIL_RE.match(e): found_emails.append(e)
+        # tel: links
+        for t in re.findall(r'tel:([^"\'>\s]+)', html):
+            p = t.strip()
+            if _PHONE_RE.search(p): found_phones.append(p)
+        # Emails en texto plano (con ofuscaciones comunes: [at], (at), [dot])
+        normalized = html.replace("[at]","@").replace("(at)","@").replace(" at ","@") \
+                         .replace("[dot]",".").replace("(dot)",".")
+        for e in _EMAIL_RE.findall(normalized):
+            dom = e.split("@")[-1].lower()
+            if dom not in _SKIP_EMAIL_DOMAINS:
+                found_emails.append(e.lower())
+        # Teléfonos en texto
+        for p in _PHONE_RE.findall(html):
+            found_phones.append(p.strip())
+
+    # 1. Homepage — siempre tiene algo en el footer
+    hp = fetch_html(base, timeout=12)
+    _harvest(hp)
+    tried.add(base)
+
+    # 2. Páginas de contacto específicas
+    for path in _CONTACT_PATHS:
+        if len(found_emails) >= 2: break
+        url = base + path
+        if url in tried: continue
+        tried.add(url)
+        html = fetch_html(url, timeout=10)
+        if html and len(html) > 500:
+            _harvest(html)
+
+    # Dedup y priorizar: dominio propio > genéricos conocidos
+    own_domain = base.replace("https://","").replace("http://","").replace("www.","").split("/")[0].split(".")[0]
+    emails_own = [e for e in dict.fromkeys(found_emails) if own_domain in e]
+    emails_other = [e for e in dict.fromkeys(found_emails) if own_domain not in e
+                    and e.split("@")[-1] not in _SKIP_EMAIL_DOMAINS]
+    # Preferir corporativos (no gmail/hotmail), luego otros
+    best_email = (emails_own + emails_other + found_emails)
+    best_email = next(iter(dict.fromkeys(best_email)), "—")
+
+    best_phone = next(iter(dict.fromkeys(found_phones)), "—")
+    return {"email": best_email, "phone": best_phone, "source": "web_scrape"}
+
+
 def enrich(domain):
     c={"email":"—","name":"—","position":"—","linkedin":"—","phone":"—"}
     if APOLLO_KEY:
@@ -468,6 +538,18 @@ def enrich(domain):
     if HUNTER_KEY:
         h=hunter_search(domain)
         if h.get("email","—")!="—": c.update(h); return c
+    # Fallback: scraping directo de la web de la empresa
+    try:
+        base_url = f"https://{domain}"
+        s = _scrape_contact_page(base_url)
+        if s.get("email","—") != "—":
+            c.update(s)
+            print(f"    ✓ Web scrape {domain}: {s['email']}")
+            return c
+        elif s.get("phone","—") != "—":
+            c["phone"] = s["phone"]  # guardamos teléfono aunque no haya email
+    except Exception as e:
+        print(f"    ⚠️ Web scrape {domain}: {e}")
     if HUNTER_KEY:
         h=hunter_search(domain)
         c.update(h)
@@ -1452,6 +1534,29 @@ def save_to_supabase(new_leads):
     print(f"  → Supabase: {created} leads nuevos · {skipped} ignorados/errores")
 
 
+def count_supabase_outreach():
+    """Devuelve el total de contactos en Supabase con fuente=intel_dashboard."""
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return 0
+    try:
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "Prefer": "count=exact",
+            "Range": "0-0",
+        }
+        r = requests.get(
+            f"{SUPABASE_URL.rstrip('/')}/rest/v1/contacts?fuente=eq.intel_dashboard&select=id",
+            headers=headers, timeout=10,
+        )
+        cr = r.headers.get("Content-Range", "")  # "0-0/26"
+        total = int(cr.split("/")[-1]) if "/" in cr else 0
+        return total
+    except Exception as e:
+        print(f"  ⚠️ count_supabase_outreach: {e}")
+        return 0
+
+
 # ── Main ────────────────────────────────────────────────────────────────────
 def main():
     print(f"\n{'='*55}\nEtendo Intelligence — {NOW}\n{'='*55}")
@@ -1469,6 +1574,8 @@ def main():
         else: print("  ⚠️ Configura GOOGLE_SERVICE_ACCOUNT_JSON")
     print("→ Supabase Outreach...")
     save_to_supabase(new_leads)
+    outreach_total = count_supabase_outreach()
+    print(f"  → Total en Outreach Supabase: {outreach_total}")
     print("→ HTML...")
     html=open(HTML_FILE,encoding="utf-8").read()
     by_src={}
@@ -1478,6 +1585,7 @@ def main():
     html=inject(html,"leads_new_today",str(len(new_leads)))
     html=inject(html,"leads_high",str(len([l for l in data["leads_history"] if l["score"]==3])))
     html=inject(html,"leads_email",str(len([l for l in data["leads_history"] if l.get("email","—")!="—"])))
+    html=inject(html,"outreach_total",str(outreach_total))
     html=inject(html,"changes_total",str(len(new_changes)))
     html=inject(html,"ALERTS",render_alerts(new_changes,new_leads))
     today_leads=[l for l in data["leads_history"] if l.get("date","")==TODAY]
