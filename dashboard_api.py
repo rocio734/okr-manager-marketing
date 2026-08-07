@@ -872,7 +872,8 @@ def generate_outreach(deal_id: str):
     lead_type = "partner" if signal_label in PARTNER_SIGNALS else "lead"
 
     if is_generic:
-        prompt = f"""Eres Victoria, de Etendo (ERP para empresas medianas).
+        prompt = f"""Eres Victoria, encargada del área comercial de Etendo (ERP para empresas medianas).
+Si te presentás en el email, usá exactamente: "Soy Victoria, encargada del área comercial de Etendo" — nunca uses otro nombre ni cargo.
 Estás escribiendo a la bandeja genérica de una empresa ({email}), así que NO sabes quién lo va a leer.
 Tu único objetivo es que te respondan con el nombre de la persona correcta a quien contactar.
 
@@ -894,7 +895,8 @@ Respondé SOLO con JSON válido:
 El body_html debe usar párrafos <p> con estilos inline básicos."""
 
     elif lead_type == "partner":
-        prompt = f"""Eres Victoria, partner manager de Etendo (ERP agéntico y composable para empresas medianas).
+        prompt = f"""Eres Victoria, encargada del área comercial de Etendo (ERP agéntico y composable para empresas medianas).
+Si te presentás en el email, usá exactamente: "Soy Victoria, encargada del área comercial de Etendo" — nunca uses otro nombre ni cargo.
 Generá un email de outreach en español (España) para una consultora/implementadora que actualmente trabaja con {signal_label.replace('Partner ', '') if signal_label.startswith('Partner') else 'otro ERP'}.
 
 - Empresa: {empresa}
@@ -922,7 +924,8 @@ Respondé SOLO con JSON válido:
 
 El body_html debe usar párrafos <p> con estilos inline básicos."""
     else:
-        prompt = f"""Eres Victoria, de Etendo (ERP agéntico para empresas).
+        prompt = f"""Eres Victoria, encargada del área comercial de Etendo (ERP agéntico para empresas).
+Si te presentás en el email, usá exactamente: "Soy Victoria, encargada del área comercial de Etendo" — nunca uses otro nombre ni cargo.
 Generá un email de outreach en español (España) para este prospecto:
 - Empresa: {empresa}
 - Sector: {sector}
