@@ -1487,7 +1487,8 @@ def save_to_supabase(new_leads):
         d = domain.replace("www.", "").lower()
         return not any(skip in d for skip in SKIP_DOMAINS)
 
-    # Solo leads con email real, dominio limpio y señal ICP/partner válida
+    # Solo leads con email O teléfono, dominio limpio y señal ICP/partner válida
+    # Google Maps da teléfono directo del negocio — igual de contactable que email
     VALID_SIGNALS = {
         "Busca ERP (Apollo)", "Busca ERP", "Selección ERP", "Migración ERP",
         "Empresa logística", "Empresa construcción", "Empresa textil", "Empresa exportadora",
@@ -1495,15 +1496,16 @@ def save_to_supabase(new_leads):
         "Empresa química", "Empresa automoción", "Distribuidor", "Licitación",
         "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
         "Partner SAP (deep)", "Busca partner",
+        "Google Maps",
     }
     candidates = [
         l for l in new_leads
-        if l.get("email", "—") != "—"
+        if (l.get("email", "—") != "—" or l.get("phone", "—") != "—")
         and _domain_ok(l.get("domain", ""))
         and l.get("signal_label", "") in VALID_SIGNALS
     ]
     if not candidates:
-        print(f"  → Supabase: 0 leads con email — nada que sincronizar")
+        print(f"  → Supabase: 0 leads con contacto — nada que sincronizar")
         return
 
     _BAD_COMPANY = re.compile(
