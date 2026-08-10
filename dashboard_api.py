@@ -999,8 +999,7 @@ El body_html debe usar párrafos <p> con estilos inline básicos. El enlace del 
         '</div></a>'
     )
     body_html = body_html.replace('href="#VIDEO_URL"', f'href="{video_url}"')
-    # Genéricos: no añadir banner — el objetivo es solo conseguir el nombre del contacto
-    if "#VIDEO_URL" not in generated.get("body_html", "") and not is_generic:
+    if "#VIDEO_URL" not in generated.get("body_html", ""):
         body_html = body_html + video_block
 
     # Save to Supabase
