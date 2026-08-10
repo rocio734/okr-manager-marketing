@@ -1115,9 +1115,9 @@ async function loadOutreach(silent=false){
   } catch(e) {
     if(!silent) document.getElementById('or-tbody').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--rd)">Error al cargar: ${e.message}</td></tr>`;
   }
-  // Auto-refresh cada 5 min
+  // Auto-refresh cada 30 seg
   clearTimeout(_orRefreshTimer);
-  _orRefreshTimer = setTimeout(()=>loadOutreach(true), 5*60*1000);
+  _orRefreshTimer = setTimeout(()=>loadOutreach(true), 30*1000);
 }
 
 function orFilter(val, el){
