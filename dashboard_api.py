@@ -874,30 +874,30 @@ def generate_outreach(deal_id: str):
     lead_type = "partner" if signal_label in PARTNER_SIGNALS else "lead"
 
     if is_generic:
-        prompt = f"""Eres Victoria, encargada del área comercial de Etendo.
-Si te presentás en el email, usá exactamente: "Soy Victoria de Etendo" — breve, sin cargo largo.
-Estás escribiendo a la bandeja genérica de una empresa ({email}). No sabés quién lo lee.
-Tu objetivo: que quien lo lea quiera reenviarlo al responsable de software/tecnología.
+        prompt = f"""Completá esta plantilla de email con UNA sola línea de gancho adaptada al sector. Nada más.
 
-- Empresa: {empresa}
-- Sector: {sector}
+PLANTILLA (no cambies nada excepto la línea marcada):
+---
+Hola,
 
-Estructura EXACTA (3 elementos, nada más):
-1. Una línea de gancho concreto que mencione el sector Y el diferenciador de Etendo: que las empresas del sector pueden operar su ERP hablándole a Claude (u otra IA) en lenguaje natural, sin tocar pantallas. Sé específico al sector, no genérico.
-2. Una sola pregunta directa: "¿A quién le puedo contar esto en {empresa}?"
-3. Firma: solo "Victoria"
+Soy Victoria de Etendo. [GANCHO: una oración que diga qué hacemos por empresas de {sector} — el diferenciador es que operan el ERP hablándole a Claude en lenguaje natural, sin tocar pantallas. Máx 20 palabras, tono directo, sin adjetivos vacíos.]
 
-Reglas ESTRICTAS:
-- PROHIBIDO: "sinergia", "explorar oportunidades", "espero que", "me encantaría", frases corporativas
-- PROHIBIDO: más de 3 elementos. Sin párrafos extra, sin contexto de empresa, sin historia
-- El gancho debe ser tan concreto que quien lo lea piense "esto le interesa al de sistemas"
-- Asunto: muy corto, menciona el sector o la empresa. NUNCA "Consulta rápida"
-- NO incluyas firma larga ni bloque de contacto
+¿A quién le puedo contar esto en {empresa}?
+
+Victoria
+---
+
+Ejemplos de GANCHO bien hecho (tomá el tono, no copies):
+- Construcción: "Estamos ayudando a empresas de construcción a operar su ERP desde Claude — le hablás en lenguaje natural y el sistema ejecuta solo, sin pantallas."
+- Logística: "Estamos ayudando a operadores logísticos a gestionar pedidos y stock desde Claude — sin abrir el ERP, solo hablando."
+- Alimentación: "Ayudamos a empresas de alimentación a automatizar su ERP con lenguaje natural — el equipo le habla a Claude y el sistema actúa solo."
+
+Asunto: corto, menciona el sector. Sin "Consulta rápida". Sin signos de exclamación.
 
 Respondé SOLO con JSON válido:
 {{"subject": "...", "body_html": "..."}}
 
-El body_html debe usar párrafos <p> con estilos inline básicos. Sin bloques de firma."""
+El body_html debe usar <p> con estilos inline. Respetá los saltos de párrafo de la plantilla."""
 
     elif lead_type == "partner":
         prompt = f"""Eres Victoria, encargada del área comercial de Etendo (ERP agéntico y composable para empresas medianas).
