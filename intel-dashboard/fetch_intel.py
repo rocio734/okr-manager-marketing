@@ -1193,6 +1193,37 @@ def scrape_cases_of_success():
     except Exception as e:
         print(f"    ⚠️ Aitana: {e}")
 
+    # ── CrossPoint365 (~27 casos — Dynamics 365 customers, root-level slugs) ─
+    try:
+        r = requests.get("https://www.crosspoint365.com/casos-de-exito/", headers=HEADERS, timeout=15)
+        if r.status_code == 200:
+            _SKIP_CP = {
+                'soluciones', 'formacion', 'bootcamp', 'sobre-nosotros', 'expertos',
+                'producto', 'soporte', 'reimplantacion', 'cambio-de-partner', 'trabaja',
+                'equipo', 'my.crosspoint365', 'casos-de-exito', 'contacto', 'empresa',
+                'aviso-legal', 'politica', 'blog',
+            }
+            links = re.findall(
+                r'href="https://www\.crosspoint365\.com/([a-z0-9\-]{10,80})/"', r.text
+            )
+            before = len(all_cases)
+            for slug in dict.fromkeys(links):
+                if any(s in slug for s in _SKIP_CP):
+                    continue
+                if len(slug.split('-')) < 4:   # must be a descriptive case slug
+                    continue
+                company_slug = _strip_erp(slug)
+                if len(company_slug) < 3 or company_slug in _SKIP_SLUGS:
+                    continue
+                name = ' '.join(w.capitalize() for w in company_slug.split('-'))
+                all_cases.append({
+                    'slug': company_slug, 'name': name,
+                    'sector': 'General', 'erp': 'MS Dynamics',
+                })
+            print(f"    CrossPoint365: {len(all_cases) - before} casos")
+    except Exception as e:
+        print(f"    ⚠️ CrossPoint365: {e}")
+
     # ── Domain discovery: 10 companies/run rotated daily ──────────────────
     import random as _rc
     _rc.seed(_DAY_SEED + 777)
