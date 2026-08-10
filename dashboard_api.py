@@ -1049,7 +1049,7 @@ def send_outreach(deal_id: str, from_email: str, sender_name: Optional[str] = "V
 <div style="margin-top:24px;border-top:1px solid #e6e6e6;padding-top:14px;font-family:Arial,sans-serif;font-size:13px;line-height:1.4;color:#333">
   <div style="font-size:16px;color:#1a2b6d;font-weight:700">Victoria Miguez</div>
   <div style="font-size:12px;color:#7a7a7a;text-transform:uppercase;letter-spacing:.4px">
-    Asistente Administrativa<br>Soporte de Operaciones
+    Encargada del Área Comercial
   </div>
   <div style="margin-top:10px">
     📞 <a href="tel:+5493584199352" style="text-decoration:none;color:#1a2b6d">+54 9 358 4199352</a><br>

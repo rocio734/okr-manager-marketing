@@ -141,15 +141,40 @@ ENGAGEMENT_DOMAINS = {
     "g2.com", "capterra.es", "softwareadvice.es", "getapp.es",
 }
 
-MAPS_SEARCHES = [
-    {"query":"empresa industrial manufacturing Spain","sector":"Industrial"},
-    {"query":"empresa logistica distribucion Spain","sector":"Logística"},
-    {"query":"empresa servicios profesionales Spain","sector":"Servicios"},
-    {"query":"empresa construccion ingenieria Spain","sector":"Construcción"},
-    {"query":"empresa alimentacion retail Spain","sector":"Retail"},
+_MAPS_POOL = [
+    {"query":"empresa industrial manufacturing","sector":"Industrial"},
+    {"query":"empresa logistica distribucion almacen","sector":"Logística"},
+    {"query":"empresa servicios profesionales B2B","sector":"Servicios"},
+    {"query":"empresa construccion ingenieria civil","sector":"Construcción"},
+    {"query":"empresa alimentacion bebidas fabricacion","sector":"Alimentación"},
+    {"query":"empresa quimica plasticos fabricacion","sector":"Química"},
+    {"query":"empresa textil confeccion moda","sector":"Textil"},
+    {"query":"empresa automocion componentes proveedor","sector":"Automoción"},
+    {"query":"empresa farmaceutica laboratorio","sector":"Farmacéutico"},
+    {"query":"empresa electronica tecnologia hardware","sector":"Tecnología"},
+    {"query":"empresa muebles madera fabricacion","sector":"Madera/Mueble"},
+    {"query":"empresa metalurgica acero fabricacion","sector":"Metalurgia"},
+    {"query":"empresa papel carton envases fabricacion","sector":"Envases"},
+    {"query":"empresa transporte maritime aereo carga","sector":"Transporte"},
+    {"query":"empresa mayorista distribuidor nacional","sector":"Distribución"},
+    {"query":"empresa energias renovables solar instalacion","sector":"Energía"},
+    {"query":"empresa agricultura agroindustria exportacion","sector":"Agro"},
+    {"query":"empresa mantenimiento industrial servicios","sector":"Mantenimiento"},
+    {"query":"empresa imprenta artes graficas packaging","sector":"Artes Gráficas"},
+    {"query":"empresa instalaciones climatizacion HVAC","sector":"Instalaciones"},
 ]
 
-SPAIN_CITIES = ["Madrid,Spain","Barcelona,Spain","Valencia,Spain","Bilbao,Spain","Zaragoza,Spain","Sevilla,Spain"]
+SPAIN_CITIES = [
+    "Madrid,Spain","Barcelona,Spain","Valencia,Spain","Bilbao,Spain",
+    "Zaragoza,Spain","Sevilla,Spain","Málaga,Spain","Alicante,Spain",
+    "Murcia,Spain","Valladolid,Spain","Pamplona,Spain","Vigo,Spain",
+    "La Coruña,Spain","San Sebastián,Spain","Tarragona,Spain","Girona,Spain",
+]
+
+# Rotar 8 queries y 5 ciudades distintas cada día para maximizar cobertura
+_rnd.seed(_DAY_SEED + 1)
+MAPS_SEARCHES = _rnd.sample(_MAPS_POOL, min(8, len(_MAPS_POOL)))
+_MAPS_CITIES  = _rnd.sample(SPAIN_CITIES, min(5, len(SPAIN_CITIES)))
 
 SKIP_DOMAINS = {
     # Competidores ERP
@@ -1127,8 +1152,8 @@ def search_all_leads(data):
     maps_count=0
     if GOOGLE_MAPS_KEY:
         print(f"    Usando Maps key: {GOOGLE_MAPS_KEY[:8]}...")
-        for ms in MAPS_SEARCHES[:3]:
-            for city in SPAIN_CITIES[:3]:
+        for ms in MAPS_SEARCHES:
+            for city in _MAPS_CITIES:
                 for place in maps_places(ms["query"],city):
                     det=maps_details(place.get("place_id",""))
                     web=det.get("website","")
