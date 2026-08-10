@@ -906,16 +906,16 @@ Generá un email de outreach en español (España) para una consultora/implement
 - Cargo del contacto: {cargo}
 
 Contexto CRÍTICO sobre Etendo (léelo con atención antes de escribir):
-- Etendo NO "tiene IA incorporada" ni "integra IA". Eso es incorrecto.
-- Etendo tiene Copilot como capa de IA integrada para tareas internas del ERP.
-- MÁS IMPORTANTE: cualquier herramienta de IA externa (Claude, GPT, agentes propios del cliente) puede operar el ERP directamente vía MCP, sin que el usuario toque la interfaz. Esto es el diferenciador real.
-- El mensaje correcto: "tus clientes podrán conectar su propia IA —la que ya usen o elijan— para automatizar procesos en el ERP sin depender de la interfaz."
+- Etendo es el PRIMER ERP agéntico del mercado. Eso no es marketing — es una diferencia técnica real.
+- Cualquier IA externa (Claude, GPT, agentes propios del cliente) puede operar el ERP directamente vía MCP, en lenguaje natural, sin que el usuario toque la interfaz. El usuario le dice a Claude "creá una orden de compra para el proveedor X" y el ERP lo ejecuta solo.
+- Etendo tiene además Copilot como capa de IA interna para tareas del ERP.
+- NO digas "integra IA" ni "tiene IA incorporada" — eso lo tienen todos. El diferenciador es MCP: la IA opera el ERP como si fuera una persona, solo con lenguaje natural.
 - La red de partners obtiene margen en licencias, soporte y servicios de implementación.
 
 Reglas ESTRICTAS:
 1. El email es de partner-to-partner, no de vendedor a comprador. Tono: profesional entre colegas
 2. NO digas que Etendo es mejor que su ERP actual — plantea una oportunidad de ampliar su portfolio
-3. El eje central: "Tus clientes te van a pedir que su ERP se conecte con su IA. Con Etendo ya es posible."
+3. El eje central: "Tus clientes te van a pedir que su ERP funcione con IA. Con Etendo ya es posible hoy: conectan Claude o GPT y operan el ERP solo con lenguaje natural."
 4. Una pregunta concreta al final que invite a una llamada de 20 minutos
 5. Máximo 4 párrafos cortos. Sin frases de relleno
 6. Incluí CTA: enlace con texto "▶ Ver Etendo en 90 segundos" usando href="#VIDEO_URL"
@@ -936,17 +936,17 @@ Generá un email de outreach en español (España) para este prospecto:
 - Score de interés: {score}/100{erp_line}
 
 Contexto CRÍTICO sobre Etendo (léelo con atención antes de escribir):
-- Etendo NO "tiene IA incorporada" ni "integra IA" como feature propia. Eso es incorrecto.
-- Etendo tiene Copilot como capa de IA integrada para tareas internas.
-- El diferenciador real: cualquier herramienta de IA externa (Claude, GPT, agentes propios) puede operar el ERP directamente vía MCP, sin que el usuario toque la interfaz.
-- Si mencionas IA, el mensaje correcto es: "conectá tu propia IA con el ERP" o "automatizá procesos sin depender de la interfaz".
+- Etendo es el PRIMER ERP agéntico del mercado. Diferencia técnica real, no marketing.
+- Cualquier IA externa (Claude, GPT, agentes propios) puede operar el ERP vía MCP usando solo lenguaje natural: el usuario le indica a Claude "procesá los pedidos pendientes" y el ERP lo ejecuta, sin tocar la interfaz.
+- Ejemplo concreto que podés usar: "Conectás Claude a Etendo vía MCP y desde una conversación podés crear órdenes de compra, consultar stock, cerrar facturas — todo en lenguaje natural."
+- NO digas "integra IA" ni "tiene IA" — eso lo tienen todos. El diferenciador es que la IA opera el ERP como una persona, con lenguaje natural, vía MCP.
 
 Reglas ESTRICTAS:
 1. El email debe crear OBLIGACIÓN de responder — usá una pregunta directa al final que sea difícil de ignorar
 2. Tono: cercano, directo, sin corporativismo. Nada de "espero que este email te encuentre bien"
-3. Mencioná un dolor específico del sector {sector} que Etendo resuelve
+3. Mencioná un dolor específico del sector {sector} que Etendo resuelve, y conectalo con el beneficio agéntico
 4. Máximo 4 párrafos cortos
-5. Incluí este CTA visual al final del cuerpo (antes de la firma): un enlace al video demo con texto "▶ Ver cómo funciona en 90 segundos"
+5. Incluí este CTA visual al final del cuerpo (antes de la firma): un enlace al video demo con texto "▶ Ver cómo funciona en 90 segundos" usando href="#VIDEO_URL"
 6. NO incluyas la firma (la ponemos aparte)
 7. Generá también un asunto potente, corto y con curiosidad gap
 
@@ -999,7 +999,8 @@ El body_html debe usar párrafos <p> con estilos inline básicos. El enlace del 
         '</div></a>'
     )
     body_html = body_html.replace('href="#VIDEO_URL"', f'href="{video_url}"')
-    if "#VIDEO_URL" not in generated.get("body_html", ""):
+    # Genéricos: no añadir banner — el objetivo es solo conseguir el nombre del contacto
+    if "#VIDEO_URL" not in generated.get("body_html", "") and not is_generic:
         body_html = body_html + video_block
 
     # Save to Supabase

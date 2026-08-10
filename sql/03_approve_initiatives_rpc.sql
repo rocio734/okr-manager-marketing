@@ -17,6 +17,7 @@ returns json
 language plpgsql
 security definer
 set search_path = public
+
 as $$
 declare
   v_email  text := lower(coalesce(auth.email(), ''));
