@@ -907,6 +907,63 @@ def linkedin_get_contact(company_name, domain):
         return {}
 
 
+def scrape_erp_users():
+    """Scrapes páginas de 'casos de éxito' de competidores ERP para encontrar empresas
+    que YA USAN un ERP — son prospectos de migración de alta calidad (score 3).
+    Returns list of {name, domain, web, erp_current, sector, source_url}"""
+    ERP_USERS_PAGES = [
+        # Distrito K (TeamSystem) — 159 empresas reales con links a sus webs
+        {"url": "https://www.distritok.com/aplicaciones/casos-exito/", "erp": "TeamSystem/DistritoK"},
+        # Solmicro/Zucchetti — red de distribución
+        {"url": "https://www.solmicro.com/red-de-distribucion-erp/red-de-distribucion-erp", "erp": "Solmicro/Zucchetti"},
+    ]
+    SKIP_COMPETITOR_DOMAINS = {
+        "distritok","teamsystem","solmicro","zucchetti","odoo","sap","sage","holded",
+        "google","facebook","twitter","linkedin","instagram","youtube","cloudflare",
+        "wp-content","cdn.","fonts.","analytics","jquery","bootstrap","microsoft",
+        "wp-json","cookie","amazon","apple","mozilla",
+    }
+    results = []
+    seen = set()
+
+    for source in ERP_USERS_PAGES:
+        try:
+            r = requests.get(source["url"], headers=HEADERS, timeout=15, verify=True)
+            if r.status_code != 200:
+                print(f"    ⚠️ ERP users {source['erp']}: HTTP {r.status_code}")
+                continue
+            html = r.text
+            erp = source["erp"]
+
+            # Extract external company website URLs
+            for url_match in re.findall(r'href="(https?://[^"]{5,80})"', html):
+                # Get domain
+                d = re.sub(r'^https?://(www\.)?', '', url_match).split('/')[0].lower().split('?')[0]
+                if not d or len(d) < 4 or d in seen or should_skip(d):
+                    continue
+                if any(s in d for s in SKIP_COMPETITOR_DOMAINS):
+                    continue
+                if not re.match(r'^[a-z0-9][a-z0-9\-\.]{2,50}\.[a-z]{2,}$', d):
+                    continue
+
+                seen.add(d)
+                results.append({
+                    "name": d.split('.')[0].replace('-', ' ').title(),
+                    "domain": d,
+                    "web": url_match,
+                    "erp_current": erp,
+                    "sector": "General",
+                    "source_url": source["url"],
+                })
+
+            print(f"    ERP users {erp}: {len([r for r in results if r.get('erp_current')==erp])} empresas")
+
+        except Exception as e:
+            print(f"    ⚠️ ERP users {source['erp']}: {e}")
+
+    return results
+
+
 def scrape_partners():
     all_p = []
     seen_domains = set()
@@ -1008,22 +1065,65 @@ def scrape_partners():
     print(f"    Sage partners: {sum(1 for p in all_p if p['competitor']=='Sage')}")
 
     # ── Holded partners (scraping con JS) ─────────────────────────────────────
+    # ── Holded solution partners (directorio estático con H2/H3) ─────────────
     holded_before = len(all_p)
-    page = fetch("https://www.holded.com/es/partners", dynamic=True)
-    html = page.html_content if page and not isinstance(page, str) else (page or "")
-    if html:
-        soup = BeautifulSoup(html, "html.parser")
-        for a in soup.find_all("a", href=re.compile(r"^https?://(?!.*holded\.com)")):
-            t = a.get_text(strip=True)
-            d = domain_from_url(a.get("href",""))
-            if 3 < len(t) < 80 and d:
-                _add(t, "Holded", a.get("href",""), d)
-        if len(all_p) == holded_before:
-            for el in soup.select("h2,h3,[class*='partner'],[class*='agency']")[:30]:
+    # Intentar primero el directorio de solution partners (tiene lista completa en HTML)
+    holded_dir_urls = [
+        "https://www.holded.com/es/directorio-solution-partners",
+        "https://www.holded.com/es/partners",
+    ]
+    for h_url in holded_dir_urls:
+        try:
+            rh = requests.get(h_url, headers=HEADERS, timeout=12)
+            if rh.status_code != 200:
+                continue
+            soup = BeautifulSoup(rh.text, "html.parser")
+            # Links to external partner sites
+            for a in soup.find_all("a", href=re.compile(r"^https?://(?!.*holded\.com)")):
+                t = a.get_text(strip=True)
+                d = domain_from_url(a.get("href",""))
+                if 3 < len(t) < 80 and d:
+                    _add(t, "Holded", a.get("href",""), d)
+            # H2/H3 headings as fallback (company names embedded in page)
+            for el in soup.select("h2,h3"):
+                t = el.get_text(strip=True)
+                if 3 < len(t) < 80 and not any(skip in t.lower() for skip in
+                    ["holded","plan","precio","partner","todos","sobre","ayuda","blog"]):
+                    _add(t, "Holded", h_url, "")
+            if len(all_p) > holded_before:
+                break  # got results, no need to try next URL
+        except Exception as e:
+            print(f"    ⚠️ Holded {h_url}: {e}")
+    # Fallback con Scrapling dinámico
+    if len(all_p) == holded_before:
+        page = fetch("https://www.holded.com/es/partners", dynamic=True)
+        html = page.html_content if page and not isinstance(page, str) else (page or "")
+        if html:
+            soup = BeautifulSoup(html, "html.parser")
+            for el in soup.select("h2,h3,[class*='partner'],[class*='agency']")[:40]:
                 t = el.get_text(strip=True)
                 if 3 < len(t) < 80:
                     _add(t, "Holded", "https://www.holded.com/es/partners", "")
     print(f"    Holded partners: {len(all_p) - holded_before}")
+
+    # ── Ahora ERP — integrantes/distribuidores ────────────────────────────────
+    ahora_before = len(all_p)
+    try:
+        ra = requests.get("https://www.ahora.es/integrantes/", headers=HEADERS, timeout=12)
+        if ra.status_code == 200:
+            soup = BeautifulSoup(ra.text, "html.parser")
+            for a in soup.find_all("a", href=re.compile(r"^https?://(?!.*ahora\.es)")):
+                t = a.get_text(strip=True)
+                d = domain_from_url(a.get("href",""))
+                if 3 < len(t) < 80 and d:
+                    _add(t, "Ahora ERP", a.get("href",""), d)
+            for el in soup.select("h2,h3,.partner-name,.company-name"):
+                t = el.get_text(strip=True)
+                if 3 < len(t) < 60:
+                    _add(t, "Ahora ERP", "https://www.ahora.es/integrantes/", "")
+    except Exception as e:
+        print(f"    ⚠️ Ahora ERP: {e}")
+    print(f"    Ahora ERP integrantes: {len(all_p) - ahora_before}")
 
     print(f"    Total partners encontrados: {len(all_p)}")
     return all_p  # sin límite artificial
@@ -1225,8 +1325,25 @@ def search_all_leads(data):
     else:
         print("    ⚠️ Sin GOOGLE_MAPS_API_KEY")
 
-    # 4. Partners competidores — con Spider de crawling profundo
-    print("  [4/4] Partners con Spider...")
+    # 4. Usuarios reales de ERPs competidores (casos de éxito = prospectos de migración)
+    print("  [4/5] Usuarios ERP competidores (casos de éxito)...")
+    for eu in scrape_erp_users():
+        d = eu.get("domain","")
+        if not d or d in seen or should_skip(d): continue
+        lead = make_lead(
+            eu["name"], d, eu.get("sector","General"),
+            "migrate", f"Usuario {eu['erp_current']}", "s-mig",
+            eu["web"],
+            f"Empresa usando {eu['erp_current']} — potencial migración a Etendo",
+            3, "erp_user"
+        )
+        lead["current_erp"] = eu["erp_current"]
+        new.append(lead); seen.add(d)
+    erp_user_count = len([l for l in new if l.get("source_type")=="erp_user"])
+    print(f"    → {erp_user_count} empresas usuarias de ERP competidor")
+
+    # 5. Partners competidores — con Spider de crawling profundo
+    print("  [5/5] Partners con Spider...")
     raw_partners=scrape_partners()
     partner_urls_by_comp = {}
     for p in raw_partners:
@@ -1276,7 +1393,8 @@ def search_all_leads(data):
         "Empresa química", "Empresa automoción", "Distribuidor", "Licitación",
         "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
         "Partner SAP (deep)", "Busca partner",
-        "Google Maps",  # Maps siempre tiene señal real
+        "Google Maps",           # Maps siempre tiene señal real
+        "Usuario TeamSystem/DistritoK", "Usuario Solmicro/Zucchetti",  # ERP users = migración
     }
     to_enrich = [l for l in new if l.get("signal_label","") in VALID_SIGNALS_ENRICH]
     skip_enrich = len(new) - len(to_enrich)
