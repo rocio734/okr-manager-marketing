@@ -1,0 +1,41 @@
+name: Outreach Follow-up
+
+on:
+  schedule:
+    # 9:00 AM UTC = 11:00 AM España = 6:00 AM Argentina (lunes a viernes)
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  send-followups:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get pending follow-ups
+        id: pending
+        run: |
+          RESPONSE=$(curl -s "https://etendo-dashboard-api.onrender.com/api/followup-pending")
+          COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('count',0))")
+          IDS=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(' '.join([p['contact_id'] for p in d.get('pending',[])]))")
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "ids=$IDS" >> $GITHUB_OUTPUT
+          echo "Pendientes de follow-up: $COUNT"
+
+      - name: Send follow-ups
+        if: steps.pending.outputs.count != '0'
+        run: |
+          IDS="${{ steps.pending.outputs.ids }}"
+          SENT=0
+          ERRORS=0
+          for ID in $IDS; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+              "https://etendo-dashboard-api.onrender.com/api/send-followup/$ID")
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "201" ]; then
+              echo "OK  $ID"
+              SENT=$((SENT+1))
+            else
+              echo "ERR $ID (HTTP $STATUS)"
+              ERRORS=$((ERRORS+1))
+            fi
+            sleep 3
+          done
+          echo "=== Follow-ups enviados: $SENT | Errores: $ERRORS ==="
