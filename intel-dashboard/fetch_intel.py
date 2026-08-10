@@ -1081,6 +1081,142 @@ def scrape_einforma():
     return results
 
 
+def scrape_cases_of_success():
+    """Scrapes 'casos de éxito' de partners Dynamics/SAP: Davisa (81), ARBENTIA (20), Aitana (62).
+    Empresas que YA USAN ERP competidor = prospectos migración score 3.
+    Domain discovery: slug → HTTP HEAD (slug.es / slugsinbarras.es / slug.com).
+    10 empresas/run rotadas diariamente del pool ~160."""
+
+    _ERP_SUFFIXES = sorted([
+        'business-central', 'dynamics-365', 'dynamics-nav', 'dynamics',
+        'navision', 'sage-x3', 'sage-50', 'sage', 'microsoft-365', 'microsoft',
+        'sharepoint', 'azure-ai', 'azure', 'qlik-cloud-saas', 'qlik-cloud', 'qlik',
+        'power-bi', 'cloud-saas', 'ciberseguridad', 'erp', 'ai',
+    ], key=len, reverse=True)
+
+    _SKIP_SLUGS = {'feed', 'page', '', 'casos-de-exito', 'caso-de-exito', 'recursos'}
+    _SECTOR_MAP = {
+        'fabricacion': 'Fabricación', 'logistica': 'Logística',
+        'alimentacion': 'Alimentación', 'distribucion': 'Distribución',
+        'promocion-construccion': 'Construcción', 'servicios': 'Servicios',
+        'retail': 'Retail', 'farmacia': 'Farmacéutico',
+    }
+
+    def _strip_erp(slug):
+        changed = True
+        while changed:
+            changed = False
+            for s in _ERP_SUFFIXES:
+                if slug.endswith('-' + s):
+                    slug = slug[:-len(s) - 1]
+                    changed = True
+                    break
+        return slug or slug
+
+    def _guess_domain(slug):
+        clean = slug.replace('-', '')
+        for candidate in [f"{slug}.es", f"{clean}.es", f"{slug}.com", f"{clean}.com"]:
+            for scheme in ["https://www.", "https://"]:
+                try:
+                    resp = requests.head(f"{scheme}{candidate}", timeout=3,
+                                        allow_redirects=True, verify=False)
+                    if resp.status_code < 400:
+                        final = re.sub(r'^https?://(www\.)?', '', resp.url).split('/')[0].lower()
+                        return final
+                except Exception:
+                    continue
+        return None
+
+    all_cases = []
+
+    # ── Davisa (81 casos, card data-sector + slug + h3 name) ──────────────
+    try:
+        r = requests.get("https://www.davisa.es/casos-de-exito/", headers=HEADERS, timeout=15)
+        if r.status_code == 200:
+            cards = re.findall(
+                r'data-sector="([^"]+)".*?href="/casos-de-exito/([^/]+)/".*?<h3[^>]*>([^<]+)</h3>',
+                r.text, re.DOTALL
+            )
+            for sector_raw, slug, name in cards:
+                if slug in _SKIP_SLUGS:
+                    continue
+                all_cases.append({
+                    'slug': slug, 'name': name.strip(),
+                    'sector': _SECTOR_MAP.get(sector_raw, 'General'),
+                    'erp': 'MS Dynamics',
+                })
+            print(f"    Davisa: {len(cards)} casos")
+    except Exception as e:
+        print(f"    ⚠️ Davisa: {e}")
+
+    # ── ARBENTIA (20 casos, slugs de URL) ──────────────────────────────────
+    try:
+        r = requests.get("https://www.arbentia.com/recursos/casos-de-exito/", headers=HEADERS, timeout=15)
+        if r.status_code == 200:
+            slugs = list(dict.fromkeys(
+                re.findall(r'recursos/casos-de-exito/([a-z0-9\-]+)/', r.text)
+            ))
+            before = len(all_cases)
+            for slug in slugs:
+                if slug in _SKIP_SLUGS:
+                    continue
+                name = ' '.join(w.capitalize() for w in slug.split('-'))
+                all_cases.append({'slug': slug, 'name': name, 'sector': 'General', 'erp': 'MS Dynamics'})
+            print(f"    ARBENTIA: {len(all_cases) - before} casos")
+    except Exception as e:
+        print(f"    ⚠️ ARBENTIA: {e}")
+
+    # ── Aitana (62 casos en 5 páginas WordPress, strip sufijo ERP del slug) ─
+    try:
+        aitana_slugs = []
+        for page in range(1, 4):   # páginas 1-3 = ~90 casos, dedup → ~45 únicos
+            url = ("https://www.aitana.es/caso-de-exito/" if page == 1
+                   else f"https://www.aitana.es/caso-de-exito/page/{page}/")
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            if r.status_code != 200:
+                continue
+            raw = re.findall(
+                r'href="https://www\.aitana\.es/caso-de-exito/([a-z0-9\-]+)/"', r.text
+            )
+            aitana_slugs.extend(raw)
+            time.sleep(0.4)
+        before = len(all_cases)
+        for slug in list(dict.fromkeys(aitana_slugs)):
+            if slug in _SKIP_SLUGS:
+                continue
+            company_slug = _strip_erp(slug)
+            if len(company_slug) < 3:
+                continue
+            name = ' '.join(w.capitalize() for w in company_slug.split('-'))
+            all_cases.append({'slug': company_slug, 'name': name, 'sector': 'General', 'erp': 'MS Dynamics'})
+        print(f"    Aitana: {len(all_cases) - before} casos")
+    except Exception as e:
+        print(f"    ⚠️ Aitana: {e}")
+
+    # ── Domain discovery: 10 companies/run rotated daily ──────────────────
+    import random as _rc
+    _rc.seed(_DAY_SEED + 777)
+    _rc.shuffle(all_cases)
+    selected = all_cases[:10]
+
+    results = []
+    seen_slugs = set()
+    for case in selected:
+        if case['slug'] in seen_slugs:
+            continue
+        seen_slugs.add(case['slug'])
+        domain = _guess_domain(case['slug'])
+        if not domain or should_skip(domain):
+            continue
+        results.append({
+            'name': case['name'], 'domain': domain,
+            'erp_current': case['erp'], 'sector': case['sector'],
+        })
+
+    print(f"    → {len(results)}/10 dominios encontrados ({len(all_cases)} pool total)")
+    return results
+
+
 def scrape_erp_users():
     """Scrapes páginas de 'casos de éxito' de competidores ERP para encontrar empresas
     que YA USAN un ERP — son prospectos de migración de alta calidad (score 3).
@@ -1499,8 +1635,22 @@ def search_all_leads(data):
     else:
         print("    ⚠️ Sin GOOGLE_MAPS_API_KEY")
 
-    # 4. Usuarios reales de ERPs competidores (casos de éxito = prospectos de migración)
-    print("  [4/5] Usuarios ERP competidores (casos de éxito)...")
+    # 4. Usuarios reales de ERPs competidores — casos de éxito de partners Dynamics/SAP
+    print("  [4/5] ERP users: casos de éxito partners + Distrito K/Solmicro...")
+    for co in scrape_cases_of_success():
+        d = co.get("domain", "")
+        if not d or d in seen or should_skip(d):
+            continue
+        lead = make_lead(
+            co["name"], d, co.get("sector", "General"),
+            "migrate", f"Usuario {co['erp_current']}", "s-mig",
+            f"https://{d}",
+            f"Empresa usando {co['erp_current']} — potencial migración a Etendo",
+            3, "erp_user"
+        )
+        lead["current_erp"] = co["erp_current"]
+        new.append(lead); seen.add(d)
+
     for eu in scrape_erp_users():
         d = eu.get("domain","")
         if not d or d in seen or should_skip(d): continue
