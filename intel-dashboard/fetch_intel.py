@@ -1005,6 +1005,82 @@ def scrape_empresite():
     return results
 
 
+def scrape_einforma():
+    """eInforma CNAE directory (eleconomista.es group) — static HTML con microdata schema.org.
+    50 empresas/página con nombre, dominio, ciudad y provincia.
+    4 CNAE rotados × 2 páginas = ~400 empresas/run para enriquecer via Hunter/web-scraping.
+    Filtra extintas/disueltas automáticamente."""
+
+    _CNAE = [
+        ("Industria-Manufacturera", "CNAE-C028-Fabricacion-De-Maquinaria-Y-Equipo-N-C-O-P-",     "Industrial"),
+        ("Industria-Manufacturera", "CNAE-C013-Industria-Textil",                                 "Textil"),
+        ("Industria-Manufacturera", "CNAE-C020-Industria-Quimica",                                "Química"),
+        ("Industria-Manufacturera", "CNAE-C022-Fabricacion-De-Productos-De-Caucho-Y-Plasticos",   "Plásticos"),
+        ("Industria-Manufacturera", "CNAE-C023-Fabricacion-De-Otros-Productos-Minerales-No-Metalicos", "Industrial"),
+        ("Industria-Manufacturera", "CNAE-C011-Fabricacion-De-Bebidas",                           "Alimentación"),
+        ("Industria-Manufacturera", "CNAE-C032-Otras-Industrias-Manufactureras",                  "Industrial"),
+        ("Transporte-Y-Almacenamiento", "CNAE-494-Transporte-De-Mercancias-Por-Carretera-Y-Servicios-De-Mudanza", "Logística"),
+        ("Industria-Manufacturera", "CNAE-C025-Fabricacion-De-Productos-Metalicos-Excepto-Maquinaria-Y-Equipo",  "Metalúrgico"),
+        ("Construccion-Y-Sector-Inmobiliario", "CNAE-F041-Construccion-De-Edificios",             "Construcción"),
+    ]
+    _HEADERS = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36",
+        "Accept-Language": "es-ES,es;q=0.9",
+        "Referer": "https://www.einforma.com/",
+    }
+    _SKIP_KW = ['extinguida', 'extinguido', 'liquidaci', 'concurso', 'disuelto', 'disuelta', 'en baja']
+
+    import html as _html_mod
+    import random as _r3
+    _r3.seed(_DAY_SEED + 99)
+
+    # 4 CNAE rotados × 2 páginas = 8 requests → ~400 empresas/run
+    selected = _r3.sample(_CNAE, min(4, len(_CNAE)))
+
+    results = []
+    seen_domains = set()
+
+    for cat, slug, sector in selected:
+        start_page = _r3.randint(1, 10)   # rota qué página fetch para no repetir siempre las mismas
+        for page_off in range(2):
+            page = start_page + page_off
+            if page == 1:
+                url = f"https://www.einforma.com/empresas/{cat}/{slug}.html"
+            else:
+                url = f"https://www.einforma.com/empresas/{cat}/{slug}/Empresas-{page}.html"
+            try:
+                r = requests.get(url, headers=_HEADERS, timeout=15)
+                if r.status_code != 200:
+                    continue
+                entries = re.findall(
+                    r'itemtype="http://schema\.org/LocalBusiness".*?'
+                    r'itemprop="name">([^<]+)</span>.*?'
+                    r'itemprop="addressLocality">([^<]+)</span>.*?'
+                    r'itemprop="addressRegion">([^<]+)</span>.*?'
+                    r'<td>(www\.[a-z0-9][a-z0-9.\-]{2,40}\.[a-z]{2,6})</td>',
+                    r.text, re.DOTALL
+                )
+                for name_raw, city_raw, province_raw, domain_raw in entries:
+                    name = _html_mod.unescape(name_raw).strip()
+                    if any(kw in name.lower() for kw in _SKIP_KW):
+                        continue
+                    domain = domain_raw.replace('www.', '', 1).strip()
+                    if not domain or domain in seen_domains or should_skip(domain):
+                        continue
+                    seen_domains.add(domain)
+                    results.append({
+                        'name': name, 'domain': domain, 'sector': sector,
+                        'city': _html_mod.unescape(city_raw).strip(),
+                        'province': _html_mod.unescape(province_raw).strip(),
+                    })
+                time.sleep(0.7)
+            except Exception as e:
+                print(f"    ⚠️ eInforma {slug[:25]}/p{page}: {e}")
+
+    print(f"    eInforma total: {len(results)} empresas en {len(selected)} CNAE codes")
+    return results
+
+
 def scrape_erp_users():
     """Scrapes páginas de 'casos de éxito' de competidores ERP para encontrar empresas
     que YA USAN un ERP — son prospectos de migración de alta calidad (score 3).
@@ -1506,6 +1582,24 @@ def search_all_leads(data):
         seen.add(d)
         empresite_count += 1
     print(f"    → {empresite_count} empresas de Empresite (email+tel incluidos)")
+
+    # eInforma — CNAE directory (dominio confirmado, sin email/tel — enriquecimiento via web-scrape)
+    print("  eInforma CNAE directory...")
+    einforma_count = 0
+    for co in scrape_einforma():
+        d = co.get("domain", "")
+        if not d or d in seen or should_skip(d):
+            continue
+        lead = make_lead(
+            co["name"], d, co["sector"],
+            "erp", f"eInforma {co['sector']}", "s-erp",
+            f"https://www.{d}",
+            f"eInforma · {co.get('city','España')} · {co.get('province','')}",
+            2, "einforma"
+        )
+        lead["current_erp"] = "—"
+        new.append(lead); seen.add(d); einforma_count += 1
+    print(f"    → {einforma_count} empresas de eInforma (CNAE España)")
 
     # Filtrar por señal ICP ANTES de enriquecer — evitar gastar Apollo/Hunter en leads que caerán igual
     VALID_SIGNALS_ENRICH = {
