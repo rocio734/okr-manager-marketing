@@ -2061,12 +2061,21 @@ def save_to_supabase(new_leads):
         "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
         "Partner SAP (deep)", "Busca partner",
         "Google Maps",
+        # Fuentes nuevas con email/tel pre-enriquecido
+        "Empresite Industrial", "Empresite Logística", "Empresite Construcción",
+        "Empresite Alimentación", "Empresite Química", "Empresite Textil",
+        "Empresite Automoción", "Empresite Metalurgia", "Empresite Distribución",
+        "Empresite Farmacéutico", "Empresite Madera/Mueble",
+        # ERP users (Distrito K, Solmicro, Davisa, etc.) — prospectos de migración score 3
+        "Usuario TeamSystem/DistritoK", "Usuario Solmicro/Zucchetti",
+        "Usuario MS Dynamics", "Usuario SAP Business One",
     }
     candidates = [
         l for l in new_leads
         if (l.get("email", "—") != "—" or l.get("phone", "—") != "—")
         and _domain_ok(l.get("domain", ""))
-        and l.get("signal_label", "") in VALID_SIGNALS
+        and (l.get("signal_label", "") in VALID_SIGNALS
+             or l.get("signal_label", "").startswith("Empresite "))
     ]
     if not candidates:
         print(f"  → Supabase: 0 leads con contacto — nada que sincronizar")
