@@ -874,27 +874,30 @@ def generate_outreach(deal_id: str):
     lead_type = "partner" if signal_label in PARTNER_SIGNALS else "lead"
 
     if is_generic:
-        prompt = f"""Eres Victoria, encargada del área comercial de Etendo (ERP para empresas medianas).
-Si te presentás en el email, usá exactamente: "Soy Victoria, encargada del área comercial de Etendo" — nunca uses otro nombre ni cargo.
-Estás escribiendo a la bandeja genérica de una empresa ({email}), así que NO sabes quién lo va a leer.
-Tu único objetivo es que te respondan con el nombre de la persona correcta a quien contactar.
+        prompt = f"""Eres Victoria, encargada del área comercial de Etendo.
+Si te presentás en el email, usá exactamente: "Soy Victoria de Etendo" — breve, sin cargo largo.
+Estás escribiendo a la bandeja genérica de una empresa ({email}). No sabés quién lo lee.
+Tu objetivo: que quien lo lea quiera reenviarlo al responsable de software/tecnología.
 
 - Empresa: {empresa}
 - Sector: {sector}
 
+Estructura EXACTA (3 elementos, nada más):
+1. Una línea de gancho concreto que mencione el sector Y el diferenciador de Etendo: que las empresas del sector pueden operar su ERP hablándole a Claude (u otra IA) en lenguaje natural, sin tocar pantallas. Sé específico al sector, no genérico.
+2. Una sola pregunta directa: "¿A quién le puedo contar esto en {empresa}?"
+3. Firma: solo "Victoria"
+
 Reglas ESTRICTAS:
-1. Email MUY corto: máximo 3 líneas de texto + pregunta final
-2. NO hagas pitch de producto. Ni una sola feature de Etendo
-3. Menciona el sector en una frase para mostrar que es relevante, no genérico
-4. La pregunta final: "¿Podrías decirme quién se encarga de la gestión de software en {empresa}?"
-5. Tono: natural, humano, como si fuera un email personal — no corporativo
-6. Asunto: corto, que parezca un email personal. PROHIBIDO usar "Consulta rápida" o frases genéricas — siempre incluir el nombre de la empresa o el sector
-7. NO incluyas firma
+- PROHIBIDO: "sinergia", "explorar oportunidades", "espero que", "me encantaría", frases corporativas
+- PROHIBIDO: más de 3 elementos. Sin párrafos extra, sin contexto de empresa, sin historia
+- El gancho debe ser tan concreto que quien lo lea piense "esto le interesa al de sistemas"
+- Asunto: muy corto, menciona el sector o la empresa. NUNCA "Consulta rápida"
+- NO incluyas firma larga ni bloque de contacto
 
 Respondé SOLO con JSON válido:
 {{"subject": "...", "body_html": "..."}}
 
-El body_html debe usar párrafos <p> con estilos inline básicos."""
+El body_html debe usar párrafos <p> con estilos inline básicos. Sin bloques de firma."""
 
     elif lead_type == "partner":
         prompt = f"""Eres Victoria, encargada del área comercial de Etendo (ERP agéntico y composable para empresas medianas).
