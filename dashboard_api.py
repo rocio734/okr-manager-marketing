@@ -921,7 +921,7 @@ Reglas ESTRICTAS:
 3. El eje central: "Tus clientes te van a pedir que su ERP funcione con IA. Con Etendo ya es posible hoy: conectan Claude o GPT y operan el ERP solo con lenguaje natural."
 4. Una pregunta concreta al final que invite a una llamada de 20 minutos
 5. Máximo 4 párrafos cortos. Sin frases de relleno
-6. Incluí CTA: enlace con texto "▶ Ver Etendo en 90 segundos" usando href="#VIDEO_URL"
+6. NO incluyas links de video ni CTAs — se agrega automáticamente
 7. NO incluyas firma
 
 Respondé SOLO con JSON válido:
@@ -949,7 +949,7 @@ Reglas ESTRICTAS:
 2. Tono: cercano, directo, sin corporativismo. Nada de "espero que este email te encuentre bien"
 3. Mencioná un dolor específico del sector {sector} que Etendo resuelve, y conectalo con el beneficio agéntico
 4. Máximo 4 párrafos cortos
-5. Incluí este CTA visual al final del cuerpo (antes de la firma): un enlace al video demo con texto "▶ Ver cómo funciona en 90 segundos" usando href="#VIDEO_URL"
+5. NO incluyas links de video ni CTAs — se agrega automáticamente
 6. NO incluyas la firma (la ponemos aparte)
 7. Generá también un asunto potente, corto y con curiosidad gap
 
@@ -1001,9 +1001,11 @@ El body_html debe usar párrafos <p> con estilos inline básicos. El enlace del 
         '<div style="font-size:12px;opacity:.85;margin-top:3px">Demo real · Sin instalación · Sin registro</div></div>'
         '</div></a>'
     )
+    # Eliminar cualquier link de video inline que haya generado el modelo y siempre poner el banner visual
+    import re as _re
+    body_html = _re.sub(r'<a[^>]*drive\.google[^>]*>.*?</a>', '', body_html, flags=_re.DOTALL)
     body_html = body_html.replace('href="#VIDEO_URL"', f'href="{video_url}"')
-    if "#VIDEO_URL" not in generated.get("body_html", ""):
-        body_html = body_html + video_block
+    body_html = body_html + video_block
 
     # Save to Supabase
     cf["outreach_subject"] = subject
