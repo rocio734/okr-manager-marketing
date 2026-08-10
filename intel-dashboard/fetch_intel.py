@@ -171,10 +171,10 @@ SPAIN_CITIES = [
     "La Coruña,Spain","San Sebastián,Spain","Tarragona,Spain","Girona,Spain",
 ]
 
-# Rotar 8 queries y 5 ciudades distintas cada día para maximizar cobertura
+# Rotar 14 queries y 8 ciudades distintas cada día — más cobertura geográfica y sectorial
 _rnd.seed(_DAY_SEED + 1)
-MAPS_SEARCHES = _rnd.sample(_MAPS_POOL, min(8, len(_MAPS_POOL)))
-_MAPS_CITIES  = _rnd.sample(SPAIN_CITIES, min(5, len(SPAIN_CITIES)))
+MAPS_SEARCHES = _rnd.sample(_MAPS_POOL, min(14, len(_MAPS_POOL)))
+_MAPS_CITIES  = _rnd.sample(SPAIN_CITIES, min(8, len(SPAIN_CITIES)))
 
 SKIP_DOMAINS = {
     # Competidores ERP
@@ -431,47 +431,100 @@ def is_article(url, title=""):
     )
 
 # ── APIs ────────────────────────────────────────────────────────────────────
-def brave_search(query, num=5):
-    if not BRAVE_API_KEY: return []
-    try:
-        r=requests.get("https://api.search.brave.com/res/v1/web/search",
-            headers={"Accept":"application/json","Accept-Encoding":"gzip","X-Subscription-Token":BRAVE_API_KEY},
-            params={"q":query,"count":min(num,20),"country":"es","search_lang":"es","text_decorations":0},timeout=15)
-        r.raise_for_status()
-        return [{"title":i.get("title",""),"url":i.get("url",""),"snippet":i.get("description","")} for i in r.json().get("web",{}).get("results",[])]
-    except Exception as e:
-        print(f"    ⚠️ Brave Search: {e}")
+def duckduckgo_search(query, num=5):
+    """Fallback gratuito cuando Brave está sin créditos (402).
+    Usa StealthyFetcher (headless) cuando Scrapling está disponible para bypassear bot detection."""
+    from urllib.parse import unquote as _uq
+    html = ""
+    # Intento con StealthyFetcher (headless, bypassea bot checks de DDG)
+    if SCRAPLING_OK:
+        try:
+            search_url = "https://html.duckduckgo.com/html/?q=" + requests.utils.quote(query) + "&kl=es-es"
+            page = StealthyFetcher.fetch(search_url, headless=True, network_idle=True,
+                                         timeout=20000, disable_resources=True)
+            html = page.html_content if page and not isinstance(page, str) else ""
+        except Exception:
+            html = ""
+    # Fallback: requests simple (funciona en algunos entornos de ejecución)
+    if not html or "result__a" not in html:
+        try:
+            r = requests.get("https://html.duckduckgo.com/html/",
+                params={"q": query, "kl": "es-es"},
+                headers={**HEADERS, "Accept": "text/html,application/xhtml+xml"},
+                timeout=15)
+            if r.status_code == 200 and "result__a" in r.text:
+                html = r.text
+        except Exception:
+            pass
+    if not html:
         return []
+    results = []
+    for href, title in re.findall(r'class="result__a"[^>]*href="([^"]+)"[^>]*>([^<]+)', html):
+        m = re.search(r'uddg=([^&"]+)', href)
+        real_url = _uq(m.group(1)) if m else href
+        if not real_url.startswith("http") or "duckduckgo.com/y.js" in real_url:
+            continue
+        results.append({"title": title.strip(), "url": real_url, "snippet": ""})
+        if len(results) >= num:
+            break
+    return results
+
+def brave_search(query, num=5):
+    if BRAVE_API_KEY:
+        try:
+            r=requests.get("https://api.search.brave.com/res/v1/web/search",
+                headers={"Accept":"application/json","Accept-Encoding":"gzip","X-Subscription-Token":BRAVE_API_KEY},
+                params={"q":query,"count":min(num,20),"country":"es","search_lang":"es","text_decorations":0},timeout=15)
+            if r.status_code == 402:
+                print("    ⚠️ Brave sin créditos (402) — usando DuckDuckGo")
+            elif r.status_code == 200:
+                return [{"title":i.get("title",""),"url":i.get("url",""),"snippet":i.get("description","")} for i in r.json().get("web",{}).get("results",[])]
+            else:
+                r.raise_for_status()
+        except Exception as e:
+            if "402" not in str(e):
+                print(f"    ⚠️ Brave Search: {e}")
+    return duckduckgo_search(query, num)
 
 def apollo_companies():
+    """3 llamadas rotadas por grupo de sectores — hasta 75 empresas/run vs 15 antes."""
     if not APOLLO_KEY: return []
     import random
-    try:
-        r=requests.post("https://api.apollo.io/v1/mixed_companies/search",
-            headers={"Content-Type":"application/json","X-Api-Key":APOLLO_KEY},
-            json={
-                "page": random.randint(1, 8),  # rota páginas para no ver siempre las mismas
-                "per_page": 15,
-                "organization_locations": ["Spain"],
-                # 50-300 empleados: tamaño mínimo para necesitar un ERP real
-                "organization_num_employees_ranges": ["50,300"],
-                # Sectores con alta penetración ERP y potencial de migración
-                "industries": [
-                    "Manufacturing", "Logistics and Supply Chain", "Wholesale",
-                    "Construction", "Food & Beverages", "Textiles",
-                    "Retail", "Automotive", "Chemicals", "Paper & Forest Products",
-                ],
-                # Excluir IT/consultoras — ya los tenemos por partner_scraping
-                "not_industries": [
-                    "Information Technology and Services",
-                    "Computer Software", "Internet",
-                ],
-            }, timeout=20)
-        r.raise_for_status()
-        return r.json().get("organizations",[])
-    except Exception as e:
-        print(f"    ⚠️ Apollo companies: {e}")
-        return []
+    _NOT_IND = ["Information Technology and Services", "Computer Software", "Internet"]
+    # 3 grupos de sectores con alta demanda ERP — rotar para no repetir siempre el mismo
+    _SECTOR_GROUPS = [
+        ["Manufacturing", "Automotive", "Chemicals", "Paper & Forest Products"],
+        ["Logistics and Supply Chain", "Wholesale", "Retail", "Transportation/Trucking/Railroad"],
+        ["Construction", "Food & Beverages", "Textiles", "Plastics"],
+    ]
+    # El grupo del día rota según seed diario; los otros 2 también se incluyen (distintas páginas)
+    base_group = _DAY_SEED % 3
+    all_orgs = []
+    for i in range(3):
+        group_idx = (base_group + i) % 3
+        page = random.randint(1 + i * 3, 4 + i * 3)  # páginas separadas para no repetir
+        try:
+            r = requests.post(
+                "https://api.apollo.io/v1/mixed_companies/search",
+                headers={"Content-Type": "application/json", "X-Api-Key": APOLLO_KEY},
+                json={
+                    "page": page,
+                    "per_page": 25,
+                    "organization_locations": ["Spain"],
+                    "organization_num_employees_ranges": ["10,500"],
+                    "industries": _SECTOR_GROUPS[group_idx],
+                    "not_industries": _NOT_IND,
+                },
+                timeout=20
+            )
+            r.raise_for_status()
+            batch = r.json().get("organizations", [])
+            all_orgs.extend(batch)
+            print(f"    Apollo grupo {group_idx+1}: {len(batch)} empresas (pág {page})")
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"    ⚠️ Apollo grupo {group_idx+1}: {e}")
+    return all_orgs
 
 def apollo_contact(domain):
     if not APOLLO_KEY: return {}
@@ -1131,10 +1184,12 @@ def search_all_leads(data):
     for org in apollo_companies():
         d=domain_from_url(org.get("primary_domain","") or org.get("website_url","") or "")
         if not d or d in seen or should_skip(d): continue
-        # Apollo free tier no rellena industries/empleados — solo aceptar dominios .es
-        # (empresas españolas con web propia; descarta internacionales y sin dominio claro)
+        # Aceptar .es siempre; para otros TLDs solo si Apollo confirma Spain en primary_domain
+        # o la empresa tiene phone_number español. Descarta dominios sin señal española.
         if not d.endswith(".es"):
-            continue
+            phone = (org.get("primary_phone") or {}).get("raw_number","")
+            if not (phone.startswith("+34") or phone.startswith("34")):
+                continue
         name=org.get("name","") or d
         emp=org.get("num_employees",0) or 0
         industry=org.get("industry","") or ""
