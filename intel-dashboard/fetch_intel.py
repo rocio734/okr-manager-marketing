@@ -907,6 +907,104 @@ def linkedin_get_contact(company_name, domain):
         return {}
 
 
+def scrape_empresite():
+    """Scrapes Empresite (eleconomista.es) por sector + provincia.
+    Cada página da 30 empresas con nombre, web, teléfono y email en JSON-LD.
+    Sin necesidad de Hunter.io para estas — están pre-enriquecidas.
+    Rota sectores y provincias diariamente con el seed del día."""
+
+    _ACTIVITIES = [
+        ("FABRICACION-MAQUINARIA",          "Industrial"),
+        ("TRANSPORTE-LOGISTICA-ALMACENAJE",  "Logística"),
+        ("CONSTRUCCION-EDIFICACION",         "Construcción"),
+        ("CONSTRUCCION-OBRAS",               "Construcción"),
+        ("ALIMENTACION-BEBIDAS",             "Alimentación"),
+        ("QUIMICA-PLASTICOS",                "Química"),
+        ("MODA-TEXTIL",                      "Textil"),
+        ("AUTOMOCION",                       "Automoción"),
+        ("METALURGIA",                       "Metalurgia"),
+        ("INDUSTRIA-METALICA",               "Industrial"),
+        ("MADERA-MUEBLE",                    "Madera/Mueble"),
+        ("DISTRIBUCION",                     "Distribución"),
+        ("FARMACIA",                         "Farmacéutico"),
+        ("OBRA-CIVIL",                       "Construcción"),
+    ]
+    _PROVINCES = [
+        "MADRID","BARCELONA","VALENCIA","SEVILLA","MALAGA",
+        "ZARAGOZA","ALICANTE","MURCIA","VALLADOLID","VIZCAYA",
+        "GUIPUZCOA","PONTEVEDRA","CORUNA","CASTELLON","CORDOBA",
+        "GRANADA","TOLEDO","BURGOS","LEON","SALAMANCA",
+        "NAVARRA","TARRAGONA","GIRONA","LLEIDA","BALEARES",
+    ]
+    _HEADERS = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36",
+        "Accept-Language": "es-ES,es;q=0.9",
+        "Referer": "https://www.eleconomista.es/",
+    }
+
+    # Selección diaria rotada: 5 sectores × 4 provincias = 20 requests → ~600 empresas/día
+    # Seed distinto del resto para no solapar con Maps
+    import random as _r2
+    _r2.seed(_DAY_SEED + 42)
+    acts = _r2.sample(_ACTIVITIES, min(5, len(_ACTIVITIES)))
+    provs = _r2.sample(_PROVINCES, min(4, len(_PROVINCES)))
+
+    results = []
+    seen_domains = set()
+
+    for act_slug, sector in acts:
+        for prov in provs:
+            url = f"https://empresite.eleconomista.es/Actividad/{act_slug}/provincia/{prov}/"
+            try:
+                r = requests.get(url, headers=_HEADERS, timeout=15)
+                if r.status_code not in (200,):
+                    continue
+                jblocks = re.findall(
+                    r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>',
+                    r.text, re.DOTALL
+                )
+                for block in jblocks:
+                    try:
+                        d = json.loads(block)
+                        if d.get('@type') != 'ItemList':
+                            continue
+                        for entry in d.get('itemListElement', []):
+                            item = entry.get('item', {})
+                            raw_domain = item.get('@id', '')
+                            if not raw_domain:
+                                continue
+                            # @id is like "www.domain.es" — normalize
+                            d_clean = re.sub(r'^https?://(www\.)?', '', raw_domain).split('/')[0].lower()
+                            if not d_clean or len(d_clean) < 4 or d_clean in seen_domains:
+                                continue
+                            if should_skip(d_clean):
+                                continue
+                            seen_domains.add(d_clean)
+                            name = item.get('name', d_clean).strip()
+                            # Skip liquidated companies and those clearly out of ICP
+                            if any(kw in name.lower() for kw in
+                                   ['liquidacion','concurso acreedores','disuelto','extinguida']):
+                                continue
+                            phone = str(item.get('telephone', '') or '').strip()
+                            email = str(item.get('email', '') or '').strip()
+                            city = item.get('address', {}).get('addressLocality', prov).split()[0].title()
+                            results.append({
+                                'name': name, 'domain': d_clean,
+                                'phone': f"+34{phone}" if phone and not phone.startswith('+') else phone or '—',
+                                'email': email or '—',
+                                'sector': sector, 'city': city, 'province': prov,
+                            })
+                    except Exception:
+                        continue
+                time.sleep(0.8)   # respetuoso con el servidor
+            except Exception as e:
+                print(f"    ⚠️ Empresite {act_slug}/{prov}: {e}")
+                continue
+
+    print(f"    Empresite total: {len(results)} empresas en {len(acts)} sectores × {len(provs)} provincias")
+    return results
+
+
 def scrape_erp_users():
     """Scrapes páginas de 'casos de éxito' de competidores ERP para encontrar empresas
     que YA USAN un ERP — son prospectos de migración de alta calidad (score 3).
@@ -1384,6 +1482,30 @@ def search_all_leads(data):
                 lead["phone"] = profile.get("phone","—")
                 new.append(lead); seen.add(d)
         print(f"    → {len([l for l in new if l.get('source_type')=='partner_spider'])} perfiles completos extraídos")
+
+    # Empresite — directorio con email+teléfono ya incluidos (no necesitan Hunter)
+    print("  Empresite B2B directory...")
+    empresite_count = 0
+    for co in scrape_empresite():
+        d = co.get("domain", "")
+        if not d or d in seen or should_skip(d):
+            continue
+        lead = make_lead(
+            co["name"], d, co["sector"],
+            "erp", f"Empresite {co['sector']}", "s-erp",
+            f"https://{d}",
+            f"Empresite · {co.get('city','España')} · {co.get('province','')}",
+            2, "empresite"
+        )
+        # Pre-enriched: email y teléfono directamente del directorio
+        lead["phone"] = co.get("phone", "—")
+        lead["email"] = co.get("email", "—")
+        lead["contact_name"] = "—"
+        lead["current_erp"] = "—"
+        new.append(lead)
+        seen.add(d)
+        empresite_count += 1
+    print(f"    → {empresite_count} empresas de Empresite (email+tel incluidos)")
 
     # Filtrar por señal ICP ANTES de enriquecer — evitar gastar Apollo/Hunter en leads que caerán igual
     VALID_SIGNALS_ENRICH = {
