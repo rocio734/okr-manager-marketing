@@ -1220,6 +1220,17 @@ function renderOutreach(){
       <td style="padding:8px 6px">
         <textarea id="note-${l.deal_id}" placeholder="Notas…"
           style="width:150px;min-height:54px;font-size:11px;padding:3px 6px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk);resize:vertical;font-family:inherit">${(l.notas||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}</textarea>
+        <div style="margin-top:4px;display:flex;flex-direction:column;gap:3px">
+          <input id="erp-${l.deal_id}" value="${(l.erp_actual||'').replaceAll('"','&quot;')}" placeholder="ERP actual"
+            title="ERP que usa actualmente"
+            style="width:148px;font-size:10px;padding:2px 5px;border:1px solid var(--gb);border-radius:3px;background:var(--bg);color:var(--bk)">
+          <input id="comp-${l.deal_id}" value="${(l.competidores||'').replaceAll('"','&quot;')}" placeholder="Competidores evaluados"
+            title="ERPs que están comparando"
+            style="width:148px;font-size:10px;padding:2px 5px;border:1px solid var(--gb);border-radius:3px;background:var(--bg);color:var(--bk)">
+          <input id="pres-${l.deal_id}" value="${(l.presupuesto||'').replaceAll('"','&quot;')}" placeholder="Presupuesto est."
+            title="Presupuesto estimado del proyecto"
+            style="width:148px;font-size:10px;padding:2px 5px;border:1px solid var(--gb);border-radius:3px;background:var(--bg);color:var(--bk)">
+        </div>
       </td>
       <td style="padding:8px 6px;white-space:nowrap">
         <select id="stage-${l.deal_id}" style="font-size:11px;padding:3px;border:1px solid var(--gb);border-radius:4px;background:var(--bg);color:var(--bk)">
@@ -1446,12 +1457,16 @@ function orExportExcel(){
 async function orSave(dealId){
   const stage = document.getElementById(`stage-${dealId}`).value;
   const notas = document.getElementById(`note-${dealId}`).value;
+  const erp   = document.getElementById(`erp-${dealId}`)?.value  || '';
+  const comp  = document.getElementById(`comp-${dealId}`)?.value || '';
+  const pres  = document.getElementById(`pres-${dealId}`)?.value || '';
+  const params = new URLSearchParams({stage, notas, erp_actual: erp, competidores: comp, presupuesto: pres});
   try {
-    const r = await fetch(`${OR_API}/api/outreach/${dealId}?stage=${encodeURIComponent(stage)}&notas=${encodeURIComponent(notas)}`,{method:'PUT'});
+    const r = await fetch(`${OR_API}/api/outreach/${dealId}?${params}`,{method:'PUT'});
     const d = await r.json();
     if(d.ok){
       const lead = _orData.find(l=>l.deal_id===dealId);
-      if(lead){lead.stage=stage;lead.notas=notas;}
+      if(lead){lead.stage=stage;lead.notas=notas;lead.erp_actual=erp;lead.competidores=comp;lead.presupuesto=pres;}
       renderOutreach();
     } else {
       alert('Error al guardar: '+JSON.stringify(d));

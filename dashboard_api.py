@@ -723,6 +723,9 @@ def outreach_list():
                 "has_message":  bool(cf.get("outreach_body", "")),
                 "replied_at":   cf.get("replied_at", ""),
                 "current_erp":  cf.get("current_erp", "—"),
+                "erp_actual":   cf.get("erp_actual", cf.get("current_erp", "—")),
+                "competidores": cf.get("competidores", ""),
+                "presupuesto":  cf.get("presupuesto", ""),
                 "pixel_url":    f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif",
             })
 
@@ -781,7 +784,10 @@ def outreach_mark_replied(deal_id: str):
 
 @app.put("/api/outreach/{deal_id}")
 def outreach_update(deal_id: str, stage: Optional[str] = None,
-                    notas: Optional[str] = None, sent: Optional[bool] = None):
+                    notas: Optional[str] = None, sent: Optional[bool] = None,
+                    erp_actual: Optional[str] = None,
+                    competidores: Optional[str] = None,
+                    presupuesto: Optional[str] = None):
     """Actualiza stage, notas y/o registra un intento de envío."""
     if not SUPABASE_URL:
         raise HTTPException(status_code=503, detail="Supabase not configured")
@@ -806,17 +812,24 @@ def outreach_update(deal_id: str, stage: Optional[str] = None,
     if notas is not None:
         contact_payload["notas_internas"] = notas
 
-    if sent:
-        # Fetch current custom_fields to increment attempts
+    # Campos competitive intel — se guardan en custom_fields
+    _intel_updates = {k: v for k, v in {
+        "erp_actual": erp_actual, "competidores": competidores, "presupuesto": presupuesto,
+    }.items() if v is not None}
+
+    if sent or _intel_updates:
+        # Fetch current custom_fields
         cr = requests.get(
             f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact_id}&select=custom_fields",
             headers=_SB_HEADERS(), timeout=10)
         cf = (cr.json() or [{}])[0].get("custom_fields") or {}
-        now_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-        cf["attempts"] = cf.get("attempts", 0) + 1
-        if not cf.get("sent_at"):
-            cf["sent_at"] = now_iso
-        cf["last_sent_at"] = now_iso
+        if sent:
+            now_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            cf["attempts"] = cf.get("attempts", 0) + 1
+            if not cf.get("sent_at"):
+                cf["sent_at"] = now_iso
+            cf["last_sent_at"] = now_iso
+        cf.update(_intel_updates)
         contact_payload["custom_fields"] = cf
 
     if contact_payload:

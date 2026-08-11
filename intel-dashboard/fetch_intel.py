@@ -2188,6 +2188,9 @@ def save_to_supabase(new_leads):
                 "phone":        lead.get("phone", "—"),
                 "position":     lead.get("contact_pos", "—"),
                 "current_erp":  lead.get("current_erp", "—"),
+                "erp_actual":   lead.get("current_erp", "—"),   # alias editable por Victoria
+                "competidores": "",   # se rellena manualmente desde la call list
+                "presupuesto":  "",   # se rellena manualmente desde la call list
                 "detected_at":  datetime.datetime.now().isoformat(),
             },
         }
