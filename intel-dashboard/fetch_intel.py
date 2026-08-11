@@ -1811,7 +1811,7 @@ def search_all_leads(data):
 
     print(f"  Enriqueciendo {len(to_enrich)} leads (de {len(new)} totales)...")
     _enrich_start = time.time()
-    _ENRICH_BUDGET_S = 300  # 5 minutos máx para toda la fase
+    _ENRICH_BUDGET_S = 600  # 10 minutos máx para toda la fase
     for i,lead in enumerate(to_enrich):
         if time.time() - _enrich_start > _ENRICH_BUDGET_S:
             print(f"  ⏱️ Presupuesto de enriquecimiento agotado — saltando {len(to_enrich)-i} leads restantes")
