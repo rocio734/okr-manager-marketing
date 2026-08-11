@@ -649,17 +649,17 @@ def _scrape_contact_page(base_url):
             return None
 
     # 1. Homepage
-    hp = fetch_html(base, timeout=12) or _get(base, timeout=12)
+    hp = fetch_html(base, timeout=5) or _get(base, timeout=5)
     _harvest(hp)
     tried.add(base)
 
-    # 2. Páginas de contacto y equipo
-    for path in _CONTACT_PATHS:
+    # 2. Páginas de contacto y equipo — máx 5 paths, timeout reducido
+    for path in _CONTACT_PATHS[:5]:
         if len(found_emails) >= 2: break
         url = base + path
         if url in tried: continue
         tried.add(url)
-        html = fetch_html(url, timeout=10) or _get(url, timeout=10)
+        html = fetch_html(url, timeout=4) or _get(url, timeout=4)
         if html and len(html) > 500:
             _harvest(html)
 
@@ -1797,13 +1797,25 @@ def search_all_leads(data):
         "Google Maps",           # Maps siempre tiene señal real
         "Usuario TeamSystem/DistritoK", "Usuario Solmicro/Zucchetti",  # ERP users = migración
     }
-    to_enrich = [l for l in new if l.get("signal_label","") in VALID_SIGNALS_ENRICH]
+    to_enrich = [
+        l for l in new
+        if l.get("signal_label","") in VALID_SIGNALS_ENRICH
+        # Skip Maps leads que ya tienen phone — phone solo califica para Supabase
+        and not (l.get("signal_label","") == "Google Maps" and l.get("phone","—") != "—")
+        # Skip leads que ya tienen email — ya están enriquecidos
+        and l.get("email","—") == "—"
+    ]
     skip_enrich = len(new) - len(to_enrich)
     if skip_enrich:
-        print(f"  Saltando enriquecimiento de {skip_enrich} leads sin señal ICP válida")
+        print(f"  Saltando enriquecimiento de {skip_enrich} leads (sin señal ICP, o ya tienen contacto)")
 
     print(f"  Enriqueciendo {len(to_enrich)} leads (de {len(new)} totales)...")
+    _enrich_start = time.time()
+    _ENRICH_BUDGET_S = 300  # 5 minutos máx para toda la fase
     for i,lead in enumerate(to_enrich):
+        if time.time() - _enrich_start > _ENRICH_BUDGET_S:
+            print(f"  ⏱️ Presupuesto de enriquecimiento agotado — saltando {len(to_enrich)-i} leads restantes")
+            break
         c=enrich(lead["domain"])
         lead.update({
             "email":        c.get("email","—"),
