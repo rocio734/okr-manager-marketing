@@ -1795,22 +1795,23 @@ def search_all_leads(data):
         "Empresa química", "Empresa automoción", "Distribuidor", "Licitación",
         "Partner Odoo", "Partner SAP", "Partner Sage", "Partner Holded",
         "Partner SAP (deep)", "Busca partner",
-        "Google Maps",           # Maps siempre tiene señal real
-        "Usuario TeamSystem/DistritoK", "Usuario Solmicro/Zucchetti",  # ERP users = migración
+        "Google Maps",
+        "Usuario TeamSystem/DistritoK", "Usuario Solmicro/Zucchetti",
+        "Usuario MS Dynamics",  # casos de éxito Davisa/ARBENTIA/Aitana/CrossPoint
     }
     to_enrich = [
         l for l in new
         if l.get("signal_label","") in VALID_SIGNALS_ENRICH
-        # Skip Maps leads que ya tienen phone — phone solo califica para Supabase
         and not (l.get("signal_label","") == "Google Maps" and l.get("phone","—") != "—")
-        # Skip leads que ya tienen email — ya están enriquecidos
         and l.get("email","—") == "—"
     ]
+    # Priorizar por score desc — ERP users (score 3) primero, luego Maps/Apollo (score 2)
+    to_enrich.sort(key=lambda l: -l.get("score", 0))
     skip_enrich = len(new) - len(to_enrich)
     if skip_enrich:
         print(f"  Saltando enriquecimiento de {skip_enrich} leads (sin señal ICP, o ya tienen contacto)")
 
-    print(f"  Enriqueciendo {len(to_enrich)} leads (de {len(new)} totales)...")
+    print(f"  Enriqueciendo {len(to_enrich)} leads (de {len(new)} totales, ordenados por score)...")
     _enrich_start = time.time()
     _ENRICH_BUDGET_S = 600  # 10 minutos máx para toda la fase
     for i,lead in enumerate(to_enrich):
