@@ -946,11 +946,11 @@ def scrape_empresite():
         "Referer": "https://www.eleconomista.es/",
     }
 
-    # Selección diaria rotada: 5 sectores × 4 provincias = 20 requests → ~600 empresas/día
-    # Seed distinto del resto para no solapar con Maps
+    # Selección diaria rotada: 7 sectores × 4 provincias = 28 requests → ~840 empresas/día
+    # (ampliado de 5 a 7 al eliminar eInforma, que es bloqueado en CI)
     import random as _r2
     _r2.seed(_DAY_SEED + 42)
-    acts = _r2.sample(_ACTIVITIES, min(5, len(_ACTIVITIES)))
+    acts = _r2.sample(_ACTIVITIES, min(7, len(_ACTIVITIES)))
     provs = _r2.sample(_PROVINCES, min(4, len(_PROVINCES)))
 
     results = []
@@ -1010,10 +1010,11 @@ def scrape_empresite():
 
 
 def scrape_einforma():
-    """eInforma CNAE directory (eleconomista.es group) — static HTML con microdata schema.org.
-    50 empresas/página con nombre, dominio, ciudad y provincia.
-    4 CNAE rotados × 2 páginas = ~400 empresas/run para enriquecer via Hunter/web-scraping.
-    Filtra extintas/disueltas automáticamente."""
+    """eInforma CNAE directory — bloqueado por IP en CI (datacenter IPs silenciadas).
+    Solo funciona en ejecución local. En CI retorna lista vacía para evitar 120s de timeouts."""
+    if os.environ.get("CI"):
+        print("    eInforma omitido en CI (IP de datacenter bloqueada)")
+        return []
 
     _CNAE = [
         ("Industria-Manufacturera", "CNAE-C028-Fabricacion-De-Maquinaria-Y-Equipo-N-C-O-P-",     "Industrial"),
