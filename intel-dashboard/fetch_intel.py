@@ -30,8 +30,12 @@ try:
     # Activar modo adaptativo global — guarda huellas de elementos
     # para relocalizarlos automáticamente si el HTML cambia
     StealthyFetcher.adaptive = True
-    SCRAPLING_OK = True
-    print("✅ Scrapling disponible con modo adaptativo activado")
+    # Playwright/camoufox se cuelga en GitHub Actions CI sin display virtual
+    SCRAPLING_OK = not os.environ.get("CI")
+    if SCRAPLING_OK:
+        print("✅ Scrapling disponible con modo adaptativo activado")
+    else:
+        print("⚠️  Scrapling deshabilitado en CI (evita cuelgue de headless browser)")
 except ImportError:
     SCRAPLING_OK = False
     print("⚠️  Scrapling no disponible — usando requests como fallback")
