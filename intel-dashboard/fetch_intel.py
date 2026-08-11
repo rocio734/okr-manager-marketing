@@ -1819,6 +1819,7 @@ def search_all_leads(data):
             print(f"  ⏱️ Presupuesto de enriquecimiento agotado — saltando {len(to_enrich)-i} leads restantes")
             break
         c=enrich(lead["domain"])
+        lead["enrich_attempts"] = lead.get("enrich_attempts", 0) + 1
         lead.update({
             "email":        c.get("email","—"),
             "contact_name": c.get("name","—"),
@@ -1829,24 +1830,26 @@ def search_all_leads(data):
         })
         if i%5==0: time.sleep(0.3)
 
-    # Retry: leads ya en historial sin email — timer propio independiente
+    # Retry: leads ya en historial sin email, máx 3 intentos totales — timer propio
     _RETRY_BUDGET_S = 180  # 3 minutos adicionales, separados del loop principal
     _retry_start = time.time()
     retried = []
     retry_candidates = [
         l for l in data.get("leads_history", [])
         if l.get("email", "—") == "—"
+        and l.get("enrich_attempts", 0) < 3          # descarta los que ya fallaron 3+ veces
         and l.get("signal_label", "") in VALID_SIGNALS_ENRICH
         and not (l.get("signal_label", "") == "Google Maps" and l.get("phone", "—") != "—")
     ]
-    retry_candidates.sort(key=lambda l: -l.get("score", 0))
+    retry_candidates.sort(key=lambda l: (-l.get("score", 0), l.get("enrich_attempts", 0)))
     if retry_candidates:
-        print(f"  🔄 Retry: {len(retry_candidates)} leads históricos sin email (máx {_RETRY_BUDGET_S}s)")
+        print(f"  🔄 Retry: {len(retry_candidates)} leads sin email con <3 intentos (máx {_RETRY_BUDGET_S}s)")
         for lead in retry_candidates:
             if time.time() - _retry_start > _RETRY_BUDGET_S:
                 print(f"  ⏱️ Retry budget agotado")
                 break
             c = enrich(lead["domain"])
+            lead["enrich_attempts"] = lead.get("enrich_attempts", 0) + 1
             if c.get("email", "—") != "—":
                 lead.update({
                     "email":        c.get("email", "—"),
