@@ -1829,35 +1829,36 @@ def search_all_leads(data):
         })
         if i%5==0: time.sleep(0.3)
 
-    # Retry: leads ya en historial sin email — aprovechar presupuesto restante
-    tiempo_restante = _ENRICH_BUDGET_S - (time.time() - _enrich_start)
+    # Retry: leads ya en historial sin email — timer propio independiente
+    _RETRY_BUDGET_S = 180  # 3 minutos adicionales, separados del loop principal
+    _retry_start = time.time()
     retried = []
-    if tiempo_restante > 30:
-        retry_candidates = [
-            l for l in data.get("leads_history", [])
-            if l.get("email", "—") == "—"
-            and l.get("signal_label", "") in VALID_SIGNALS_ENRICH
-            and not (l.get("signal_label", "") == "Google Maps" and l.get("phone", "—") != "—")
-        ]
-        retry_candidates.sort(key=lambda l: -l.get("score", 0))
-        if retry_candidates:
-            print(f"  🔄 Retry: {len(retry_candidates)} leads históricos sin email ({tiempo_restante:.0f}s disponibles)")
-            for lead in retry_candidates:
-                if time.time() - _enrich_start > _ENRICH_BUDGET_S:
-                    break
-                c = enrich(lead["domain"])
-                if c.get("email", "—") != "—":
-                    lead.update({
-                        "email":        c.get("email", "—"),
-                        "contact_name": c.get("name", lead.get("contact_name", "—")),
-                        "contact_pos":  c.get("position", lead.get("contact_pos", "—")),
-                        "phone":        c.get("phone", lead.get("phone", "—")),
-                        "linkedin_org": c.get("linkedin", lead.get("linkedin_org", "—")),
-                        "current_erp":  c.get("current_erp", lead.get("current_erp", "—")),
-                    })
-                    retried.append(lead)
-            if retried:
-                print(f"  ✅ Retry: {len(retried)} leads enriquecidos con email nuevo")
+    retry_candidates = [
+        l for l in data.get("leads_history", [])
+        if l.get("email", "—") == "—"
+        and l.get("signal_label", "") in VALID_SIGNALS_ENRICH
+        and not (l.get("signal_label", "") == "Google Maps" and l.get("phone", "—") != "—")
+    ]
+    retry_candidates.sort(key=lambda l: -l.get("score", 0))
+    if retry_candidates:
+        print(f"  🔄 Retry: {len(retry_candidates)} leads históricos sin email (máx {_RETRY_BUDGET_S}s)")
+        for lead in retry_candidates:
+            if time.time() - _retry_start > _RETRY_BUDGET_S:
+                print(f"  ⏱️ Retry budget agotado")
+                break
+            c = enrich(lead["domain"])
+            if c.get("email", "—") != "—":
+                lead.update({
+                    "email":        c.get("email", "—"),
+                    "contact_name": c.get("name", lead.get("contact_name", "—")),
+                    "contact_pos":  c.get("position", lead.get("contact_pos", "—")),
+                    "phone":        c.get("phone", lead.get("phone", "—")),
+                    "linkedin_org": c.get("linkedin", lead.get("linkedin_org", "—")),
+                    "current_erp":  c.get("current_erp", lead.get("current_erp", "—")),
+                })
+                retried.append(lead)
+        if retried:
+            print(f"  ✅ Retry: {len(retried)} leads enriquecidos con email nuevo")
 
     # Acumular preservando histórico — límite 500 para tener más datos
     data["leads_history"]=(new+data["leads_history"])[:500]
