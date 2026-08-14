@@ -402,7 +402,7 @@ def domain_from_url(url):
     return re.sub(r'^https?://(www\.)?','',url).split('/')[0].split('?')[0].strip().lower()
 
 def make_lead(company,domain,sector,signal,label,cls,src_url,snippet,score,source_type="search"):
-    return {"company":company,"domain":domain,"sector":sector,"signal":signal,"signal_label":label,"signal_class":cls,"source_url":src_url,"snippet":snippet[:150],"score":score,"date":TODAY,"source_type":source_type,"email":"—","contact_name":"—","contact_pos":"—","phone":"—","linkedin_org":"—"}
+    return {"company":company,"domain":domain,"sector":sector,"signal":signal,"signal_label":label,"signal_class":cls,"source_url":src_url,"snippet":snippet[:150],"score":score,"date":TODAY,"source_type":source_type,"email":"—","contact_name":"—","contact_pos":"—","phone":"—","linkedin_org":"—","pais_detectado":"—"}
 
 # Patrones en la URL que indican artículo/guía/oferta, no una empresa
 _ARTICLE_URL_PATTERNS = [
@@ -605,6 +605,72 @@ _ERP_FINGERPRINTS = {
 _FULLNAME_RE = re.compile(
     r'\b([A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]{2,}(?:\s+(?:de\s+|del\s+|la\s+)?[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]{2,}){1,3})\b'
 )
+_NAME_BLOCKLIST = {
+    # sustantivos y verbos comunes en español que no son apellidos
+    "empresa","grupo","servicios","productos","soluciones","animales","ambientadores",
+    "lavavajillas","flotadores","repuestos","plantas","perros","gatos","beneficios",
+    "bolsa","trabajo","noticias","garantías","contacto","inicio","privacidad",
+    "cookies","política","aviso","legal","quienes","somos","nosotros","desde",
+    "tienda","galicia","marina","norte","sur","este","oeste","centro","nacional",
+    "ofrecemos","trato","trabajamos","realizamos","utilizamos","bienvenidos",
+    "estamos","hacemos","tenemos","nuestros","nuestras","overview","process",
+    "aditivos","elige","calidad","innovación","confianza","experiencia","gestión",
+    "distribución","fabricación","instalación","mantenimiento","reparación",
+    "sector","sectores","área","áreas","adm","dpto","depto","departamento",
+    # colores (aparecen en nombres de marca/producto)
+    "rojo","azul","verde","negro","blanco","amarillo","naranja","morado",
+    "rosa","gris","dorado","plateado","marrón","beige","turquesa",
+    # inglés que aparece en páginas españolas
+    "building","shop","pay","home","about","store","products","services",
+    "contact","team","staff","blog","media","news","academy","sales",
+    # tipografías y clases CSS que llegan como texto
+    "roboto","condensed","medium","regular","bold","light","italic","thin",
+    # palabras de navegación
+    "siguiente","anterior","inicio","volver","leer","más","ver","todo",
+    # ciudades y regiones españolas (aparecen en direcciones/footers)
+    "mallorca","menorca","ibiza","tenerife","madrid","barcelona","sevilla",
+    "valencia","bilbao","zaragoza","málaga","murcia","palma","alicante",
+    "córdoba","valladolid","vigo","gijón","vitoria","granada","elche",
+    "oviedo","badalona","terrassa","sabadell","hospitalet","cartagena",
+    "jerez","santa","cruz","las","palmas","pamplona","almería","fuenlabrada",
+    "alcalá","leganes","getafe","burgos","castellón","salamanca","albacete",
+}
+
+_SPANISH_FIRST_NAMES = {
+    # Masculinos
+    "jose","juan","pedro","carlos","luis","miguel","antonio","manuel","francisco",
+    "david","daniel","pablo","alejandro","alberto","fernando","javier","sergio",
+    "alvaro","andres","rafael","diego","victor","roberto","marcos","raul",
+    "ricardo","eduardo","gonzalo","ignacio","joaquin","ramon","enrique",
+    "santiago","tomas","adrian","jorge","mario","ruben","ivan","alex","felix",
+    "oscar","hector","gabriel","cesar","emilio","nacho","guillermo","borja",
+    "gerard","marc","pol","pau","arnau","oriol","miquel","pere","joan","Josep",
+    # Femeninos
+    "ana","maria","cristina","laura","elena","isabel","carmen","pilar","rosa",
+    "teresa","marta","sara","paula","lucia","silvia","patricia","beatriz",
+    "sandra","susana","noelia","alicia","esther","ines","natalia","nuria","eva",
+    "irene","rocio","raquel","amparo","dolores","lola","blanca","clara","adriana",
+    "sofia","valentina","claudia","andrea","martina","julia","alba","carla",
+    "monica","veronica","yolanda","lorena","vanesa","miriam","rebeca","leire",
+    "ane","amaia","nerea","itziar","maite","olga","piedad","montserrat","neus",
+}
+
+def _looks_like_person_name(candidate):
+    """El primer nombre debe ser un nombre de pila español conocido."""
+    import unicodedata
+    words = [w.lower() for w in candidate.split()]
+    # Rechazar si alguna palabra es un sustantivo/verbo común
+    if any(w in _NAME_BLOCKLIST for w in words):
+        return False
+    if any(len(w) > 15 for w in words):
+        return False
+    # El primer token debe ser un nombre de pila conocido (sin acentos para comparar)
+    first = words[0]
+    first_norm = "".join(
+        c for c in unicodedata.normalize("NFD", first)
+        if unicodedata.category(c) != "Mn"
+    )
+    return first_norm in _SPANISH_FIRST_NAMES or first in _SPANISH_FIRST_NAMES
 
 def _scrape_contact_page(base_url):
     """Visita /contacto y páginas de equipo con Scrapling y extrae emails + teléfonos."""
@@ -679,21 +745,45 @@ def _scrape_contact_page(base_url):
     best_email = next(iter(dict.fromkeys(emails_own + emails_other + found_emails)), "—")
     best_phone = next(iter(dict.fromkeys(found_phones)), "—")
 
-    # Extraer nombre de contacto de páginas de equipo
+    # Extraer nombre de contacto — solo páginas de contacto/equipo, nunca homepage
     contact_name = "—"
-    for html in _all_html:
+    _CARGO_KW = ["ceo","director","gerente","fundador","founder","socio",
+                 "responsable","presidente","cto","coo","propietario","owner"]
+    team_htmls = _all_html[1:]  # _all_html[0] es la homepage, demasiado ruidosa
+    for html in team_htmls:
         if not html: continue
-        # Buscar nombres cerca de cargos directivos en headings
+        # Paso 1: BeautifulSoup en headings específicos (h2/h3/h4 y elementos con clase nombre/name)
+        soup_team = BeautifulSoup(html, "html.parser")
+        for tag in soup_team.find_all(["h2","h3","h4","p","span"]):
+            tag_cls = " ".join(tag.get("class") or []).lower()
+            tag_id  = (tag.get("id") or "").lower()
+            # Solo considerar tags que parecen ser de perfil/persona
+            if not any(k in tag_cls + tag_id for k in ["name","nombre","person","perfil","team","equipo","staff"]):
+                continue
+            text = tag.get_text(" ", strip=True)
+            m = _FULLNAME_RE.match(text.strip())
+            if not m:
+                continue
+            candidate = m.group(1).strip()
+            words = candidate.split()
+            if 2 <= len(words) <= 3 and not any(c.isdigit() for c in candidate) and _looks_like_person_name(candidate):
+                # Verificar cargo en el contenedor inmediato
+                container_text = (tag.parent.get_text(" ", strip=True) if tag.parent else "").lower()
+                if any(k in container_text for k in _CARGO_KW):
+                    contact_name = candidate
+                    break
+        if contact_name != "—":
+            break
+
+        # Paso 2: fallback con regex en texto limpio, ventana estrecha (60 chars)
         soup_txt = re.sub(r'<[^>]+>', ' ', html)
+        soup_txt = re.sub(r'\s+', ' ', soup_txt)
         for m in _FULLNAME_RE.finditer(soup_txt):
             candidate = m.group(1).strip()
-            # Descartar si es nombre de empresa (más de 4 palabras) o contiene números
             words = candidate.split()
-            if 2 <= len(words) <= 3 and not any(c.isdigit() for c in candidate):
-                # Verificar que aparece cerca de palabras de cargo
-                ctx = soup_txt[max(0,m.start()-150):m.end()+150].lower()
-                if any(k in ctx for k in ["ceo","director","gerente","fundador","founder",
-                                           "socio","responsable","presidente","cto","coo"]):
+            if 2 <= len(words) <= 3 and not any(c.isdigit() for c in candidate) and _looks_like_person_name(candidate):
+                ctx = soup_txt[max(0, m.start()-60):m.end()+60].lower()
+                if any(k in ctx for k in _CARGO_KW):
                     contact_name = candidate
                     break
         if contact_name != "—":
@@ -727,6 +817,78 @@ def enrich(domain):
         h=hunter_search(domain)
         c.update(h)
     return c
+
+# ── Detección de país por TLD, teléfono y scraping de homepage ─────────────
+_TLD_PAIS = {
+    # Ordenar por longitud desc para que com.ar matchee antes que ar
+    "com.ar": "🇦🇷 Argentina", "com.mx": "🇲🇽 México", "com.co": "🇨🇴 Colombia",
+    "com.cl": "🇨🇱 Chile", "com.pe": "🇵🇪 Perú", "com.uy": "🇺🇾 Uruguay",
+    "com.do": "🇩🇴 Rep. Dominicana", "com.br": "🇧🇷 Brasil",
+    "co.uk": "🇬🇧 Reino Unido",
+    "es": "🇪🇸 España", "ar": "🇦🇷 Argentina", "mx": "🇲🇽 México",
+    "co": "🇨🇴 Colombia", "cr": "🇨🇷 Costa Rica", "cl": "🇨🇱 Chile",
+    "pe": "🇵🇪 Perú", "uy": "🇺🇾 Uruguay", "ec": "🇪🇨 Ecuador",
+    "ve": "🇻🇪 Venezuela", "bo": "🇧🇴 Bolivia", "py": "🇵🇾 Paraguay",
+    "pa": "🇵🇦 Panamá", "gt": "🇬🇹 Guatemala", "hn": "🇭🇳 Honduras",
+    "ni": "🇳🇮 Nicaragua", "sv": "🇸🇻 El Salvador", "do": "🇩🇴 Rep. Dominicana",
+    "pt": "🇵🇹 Portugal", "br": "🇧🇷 Brasil", "fr": "🇫🇷 Francia",
+    "de": "🇩🇪 Alemania", "it": "🇮🇹 Italia",
+}
+_PHONE_PAIS = {
+    "+34": "🇪🇸 España", "+54": "🇦🇷 Argentina", "+506": "🇨🇷 Costa Rica",
+    "+52": "🇲🇽 México", "+57": "🇨🇴 Colombia", "+56": "🇨🇱 Chile",
+    "+51": "🇵🇪 Perú", "+598": "🇺🇾 Uruguay", "+593": "🇪🇨 Ecuador",
+    "+58": "🇻🇪 Venezuela", "+591": "🇧🇴 Bolivia", "+595": "🇵🇾 Paraguay",
+    "+507": "🇵🇦 Panamá", "+502": "🇬🇹 Guatemala", "+55": "🇧🇷 Brasil",
+    "+351": "🇵🇹 Portugal",
+}
+_ES_WEB_SIGNALS = ["españa", "madrid", "barcelona", "valencia", "sevilla", "bilbao",
+                   "zaragoza", "málaga", "malaga", "granada", "alicante",
+                   "n.i.f.", "nif:", " s.l.", " s.a.", " sl ", " slne ",
+                   "código postal", "c.p.", "calle ", "avenida ", "avda."]
+_LATAM_WEB = [
+    ("costa rica", "🇨🇷 Costa Rica"), ("colombia", "🇨🇴 Colombia"),
+    ("argentina", "🇦🇷 Argentina"), ("méxico", "🇲🇽 México"), ("mexico", "🇲🇽 México"),
+    ("chile", "🇨🇱 Chile"), ("perú", "🇵🇪 Perú"), ("peru", "🇵🇪 Perú"),
+    ("uruguay", "🇺🇾 Uruguay"), ("ecuador", "🇪🇨 Ecuador"),
+    ("venezuela", "🇻🇪 Venezuela"), ("panamá", "🇵🇦 Panamá"), ("panama", "🇵🇦 Panamá"),
+    ("guatemala", "🇬🇹 Guatemala"), ("bolivia", "🇧🇴 Bolivia"), ("brasil", "🇧🇷 Brasil"),
+]
+_GENERIC_TLDS = {"com","net","org","io","app","biz","info","online","site","co","global","tech"}
+
+def detect_pais(domain, phone="—"):
+    """Detecta el país de la empresa por TLD, prefijo de teléfono y scraping ligero del homepage."""
+    domain = (domain or "").lower().strip().lstrip("www.").rstrip("/")
+
+    # 1. TLD (ordenado por longitud desc — com.ar antes que ar)
+    for tld, pais in sorted(_TLD_PAIS.items(), key=lambda x: -len(x[0])):
+        if domain.endswith("." + tld):
+            return pais
+
+    # 2. Prefijo de teléfono (ordenado desc para +506 antes que +57)
+    if phone and phone not in ("—", ""):
+        p = phone.replace(" ","").replace("-","")
+        for prefix, pais in sorted(_PHONE_PAIS.items(), key=lambda x: -len(x[0])):
+            if p.startswith(prefix):
+                return pais
+
+    # 3. Para TLDs genéricos: scrape rápido de la homepage
+    tld_part = domain.rsplit(".", 1)[-1] if "." in domain else ""
+    if tld_part in _GENERIC_TLDS:
+        try:
+            html = (fetch_html(f"https://{domain}", timeout=5) or "").lower()
+            if "+34" in html or re.search(r'\b9[0-9]{8}\b', html):
+                return "🇪🇸 España"
+            for sig in _ES_WEB_SIGNALS:
+                if sig in html:
+                    return "🇪🇸 España"
+            for kw, pais in _LATAM_WEB:
+                if kw in html:
+                    return f"⚠️ {pais}"
+        except Exception:
+            pass
+
+    return "—"
 
 def maps_places(query, city):
     if not GOOGLE_MAPS_KEY: return []
@@ -1828,6 +1990,7 @@ def search_all_leads(data):
             "linkedin_org": c.get("linkedin", lead.get("linkedin_org","—")),
             "current_erp":  c.get("current_erp","—"),
         })
+        lead["pais_detectado"] = detect_pais(lead["domain"], lead.get("phone","—"))
         if i%5==0: time.sleep(0.3)
 
     # Retry: leads ya en historial sin email, máx 3 intentos totales — timer propio
@@ -1862,6 +2025,11 @@ def search_all_leads(data):
                 retried.append(lead)
         if retried:
             print(f"  ✅ Retry: {len(retried)} leads enriquecidos con email nuevo")
+
+    # Detección de país para leads que no pasaron por enrich (solo TLD, sin HTTP)
+    for lead in new:
+        if lead.get("pais_detectado","—") in ("—",""):
+            lead["pais_detectado"] = detect_pais(lead["domain"], lead.get("phone","—"))
 
     # Acumular preservando histórico — límite 500 para tener más datos
     data["leads_history"]=(new+data["leads_history"])[:500]
@@ -2022,12 +2190,16 @@ PARTNER_SOURCES = {"partner_scraping","partner_spider"}
 
 def render_leads(leads):
     direct = [l for l in leads if l.get("source_type","") not in PARTNER_SOURCES]
-    if not direct: return '<tr><td colspan="10" style="padding:16px;text-align:center;color:var(--text-muted)">Sin leads directos</td></tr>'
+    if not direct: return '<tr><td colspan="11" style="padding:16px;text-align:center;color:var(--text-muted)">Sin leads directos</td></tr>'
     rows=""
     for l in direct[:100]:
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l"); sc_txt="⭐ Alto" if sc==3 else("▲ Medio" if sc==2 else"▼ Bajo")
         em=l.get("email","—"); em_h=f'<a href="mailto:{em}" class="lnk">{em[:22]}{"…" if len(em)>22 else ""}</a>' if em!="—" else '<span style="color:var(--text-muted)">—</span>'
         age=_age_badge(l.get("date",""))
+        pais=l.get("pais_detectado","—") or "—"
+        es_spain = "España" in pais
+        pais_style = "font-size:11px" if es_spain else "font-size:11px;font-weight:700;color:#c0392b"
+        pais_icon = "" if es_spain or pais=="—" else " ⚠️"
         rows+=f'<tr data-s="{l["signal"]}" data-q="{"h" if sc==3 else("m" if sc==2 else"l")}" data-src="{l.get("source_type","")}">'
         rows+=f'<td><b>{l["company"]}</b>{age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
         rows+=f'<td style="color:var(--text-secondary);font-size:11px">{l["sector"]}</td>'
@@ -2036,6 +2208,7 @@ def render_leads(leads):
         rows+=f'<td style="font-size:11px">{l.get("contact_name","—")}<div style="font-size:10px;color:var(--text-muted)">{l.get("contact_pos","—")}</div></td>'
         rows+=f'<td style="font-size:11px">{em_h}</td>'
         rows+=f'<td style="font-size:11px">{l.get("phone","—")}</td>'
+        rows+=f'<td style="{pais_style}">{pais}{pais_icon}</td>'
         rows+=f'<td><a href="https://{l["domain"]}" target="_blank" class="lnk">Web</a></td>'
         rows+=f'<td><a href="{l["source_url"]}" target="_blank" class="lnk">Fuente</a></td>'
         rows+=f'<td style="font-size:10px;color:var(--text-muted)">{l["date"]}</td></tr>'
