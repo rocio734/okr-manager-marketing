@@ -1,0 +1,24 @@
+[
+  {
+    "email": "info@sasmak.com",
+    "tipo": "bounce",
+    "raw_subject": "Mail delivery failed: returning message to sender",
+    "raw_body": "",
+    "raw_from": "mailer-daemon@sasmak.com",
+    "fecha_vuelta": "",
+    "detected_at": "2026-08-18T14:50:12Z",
+    "procesado": true,
+    "procesado_at": "2026-08-18T14:50:17Z"
+  },
+  {
+    "email": "comercial@verhal.com",
+    "tipo": "vacaciones",
+    "raw_subject": "Respuesta automática: Fuera de la oficina hasta el 25/08/2026",
+    "raw_body": "",
+    "raw_from": "comercial@verhal.com",
+    "fecha_vuelta": "25/08/2026",
+    "detected_at": "2026-08-18T14:50:12Z",
+    "procesado": true,
+    "procesado_at": "2026-08-18T14:50:17Z"
+  }
+]
