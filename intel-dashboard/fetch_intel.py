@@ -1641,8 +1641,9 @@ def load_data():
     if DATA_FILE.exists():
         d = json.load(open(DATA_FILE))
         if "engagement_history" not in d: d["engagement_history"] = []
+        if "seen_domains" not in d: d["seen_domains"] = {}   # {domain: date_first_seen}
         return d
-    return {"comp_hashes":{},"changes_history":[],"leads_history":[],"engagement_history":[],"prices":{},"features":{}}
+    return {"comp_hashes":{},"changes_history":[],"leads_history":[],"engagement_history":[],"prices":{},"features":{},"seen_domains":{}}
 
 def save_data(data):
     with open(DATA_FILE,"w") as f: json.dump(data,f,ensure_ascii=False,indent=2)
@@ -1741,15 +1742,25 @@ def search_all_leads(data):
             except: pass
         return datetime.min
     cutoff_dt = datetime.today() - timedelta(days=90)
-    seen_partners = {l.get("domain","") for l in data["leads_history"]
-                     if l.get("domain","") and l.get("source_type","") in
-                     ("partner_scraping","partner_spider")}
-    seen_90 = {l.get("domain","") for l in data["leads_history"]
-               if l.get("domain","")
-               and l.get("source_type","") not in ("partner_scraping","partner_spider")
-               and _parse_lead_date(l.get("date","")) >= cutoff_dt}
+
+    # seen_domains persiste en intel_data.json — no se trunca con el historial
+    # {domain: date_first_seen}  →  90d para no-partners, lifetime para partners
+    sd = data.setdefault("seen_domains", {})
+
+    # Rellenar seen_domains con leads del historial que aún no estén (migración)
+    for l in data["leads_history"]:
+        d = l.get("domain","")
+        if d and d not in sd:
+            sd[d] = l.get("date", TODAY)
+
+    seen_partners = {d for d, dt in sd.items()
+                     if any(l.get("domain")==d and l.get("source_type","") in
+                            ("partner_scraping","partner_spider")
+                            for l in data["leads_history"])}
+    seen_90 = {d for d, dt in sd.items()
+               if d not in seen_partners and _parse_lead_date(dt) >= cutoff_dt}
     seen = seen_partners | seen_90
-    print(f"  Dominios en dedup — partners (total): {len(seen_partners)} | Brave/Apollo/Maps (90d): {len(seen_90)}")
+    print(f"  Dominios en dedup — partners (lifetime): {len(seen_partners)} | resto (90d): {len(seen_90)} | total bloqueados: {len(seen)}")
 
     # 1. Google Custom Search
     print(f"  [1/4] Brave Search... (ciudad hoy: {_CITY}, sector: {_SECTOR})")
@@ -2038,9 +2049,16 @@ def search_all_leads(data):
         if lead.get("pais_detectado","—") in ("—",""):
             lead["pais_detectado"] = detect_pais(lead["domain"], lead.get("phone","—"))
 
-    # Acumular preservando histórico — límite 500 para tener más datos
+    # Registrar dominios nuevos en seen_domains (persiste aunque salgan del historial)
+    sd = data.setdefault("seen_domains", {})
+    for lead in new:
+        d = lead.get("domain","")
+        if d and d not in sd:
+            sd[d] = TODAY
+
+    # Acumular preservando histórico — límite 500 para display/dashboard
     data["leads_history"]=(new+data["leads_history"])[:500]
-    print(f"  Total acumulado en historial: {len(data['leads_history'])}")
+    print(f"  Total acumulado en historial: {len(data['leads_history'])} | dominios vistos: {len(sd)}")
     return new + retried
 
 # ── Google Sheets ───────────────────────────────────────────────────────────
