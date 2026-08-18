@@ -5,7 +5,7 @@
     "1": "whatsapp_enviado",
     "2": "email1_enviado",
     "3": "followup_email_enviado",
-    "4": "reunión_agendada",
+    "4": "reunion_agendada",
     "5": "oportunidad_abierta",
     "99": "descartado"
   },
@@ -57,9 +57,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:17Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "atencionalcliente@scotta1985.com": {
@@ -70,9 +80,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:22Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@navarropintores.es": {
@@ -83,9 +103,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:26Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "office@nautipaints.com": {
@@ -96,9 +126,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:31Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "bayon@bayon.es": {
@@ -109,9 +149,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:36Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "administracion@reforvengalicia.com": {
@@ -122,9 +172,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:40Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "web@safetop.net": {
@@ -135,9 +195,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:45Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@carpa10.com": {
@@ -148,9 +218,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:49Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "bigmatstores@bigmat.es": {
@@ -161,9 +241,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:54Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@costablancahomedesign.com": {
@@ -174,9 +264,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:59Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "disiclin@disiclinsa.com": {
@@ -187,9 +287,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:04Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@yowup.com": {
@@ -200,9 +310,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:09Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@pavidols.com": {
@@ -213,9 +333,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:14Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "comercial@verhal.com": {
@@ -226,9 +356,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:19Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@xardinova.es": {
@@ -239,9 +379,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:23Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "comercial@frigodiz.com": {
@@ -252,9 +402,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:28Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "web@malababa.com": {
@@ -265,9 +425,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:33Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "ventas@omnielectric.es": {
@@ -278,9 +448,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:42Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@vigilant.es": {
@@ -291,9 +471,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:47Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "pedidos@stockdecarns.com": {
@@ -304,9 +494,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:52Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "ventas@jimeca.com": {
@@ -317,9 +517,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:56Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "hola@secretosdelagua.com": {
@@ -330,9 +540,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:01Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "sales@rafanadalacademy.com": {
@@ -343,9 +563,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:10Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@dimalnox.com": {
@@ -356,9 +586,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:15Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "euromof@euromof.com": {
@@ -369,9 +609,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:19Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@egainsl.com": {
@@ -382,9 +632,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:23Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@conservascortizo.com": {
@@ -395,9 +655,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:28Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "administracion@coolgades.com": {
@@ -408,9 +678,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:33Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "administracion@hitraf.com": {
@@ -421,9 +701,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:38Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "web@inderen.es": {
@@ -434,9 +724,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:42Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "sieper@sieper.es": {
@@ -447,9 +747,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:47Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "almacen@feyherr.com": {
@@ -460,9 +770,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:52Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "masl@maderasaguilar.com": {
@@ -473,9 +793,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:56Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "sobrado@maderassobrado.es": {
@@ -486,9 +816,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:01Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@maquinariaagricola.net": {
@@ -499,9 +839,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:05Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "comercial@edigal.es": {
@@ -512,9 +862,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:10Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "prodelais@prodelais.es": {
@@ -525,9 +885,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:14Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "hola@rosita.beer": {
@@ -551,9 +921,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:19Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@serviclima.es": {
@@ -564,9 +944,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:24Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@comercialditex.com": {
@@ -590,9 +980,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:28Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@jocar.gal": {
@@ -603,9 +1003,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:33Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@bicimania.com": {
@@ -616,9 +1026,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:37Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "iberocel@iberocel.com": {
@@ -629,9 +1049,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:42Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "recursoshumanos@citromil.net": {
@@ -642,9 +1072,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:47Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@cafescamali.com": {
@@ -655,9 +1095,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:52Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@chatarrashernandez.com": {
@@ -668,9 +1118,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:58:56Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "seland@seland.com": {
@@ -681,9 +1141,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:59:01Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "elide.bergamini@aesys.com": {
@@ -694,9 +1164,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:59:05Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "infoescapes@donsilencioso.com": {
@@ -707,9 +1187,19 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:59:10Z",
+          "notas": ""
+        }
+      ],
       "notas": ""
     },
     "info@manuport-logistics.be": {
@@ -1291,6 +1781,144 @@
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "contacto@grupocyclus.com": {
+      "email": "contacto@grupocyclus.com",
+      "empresa": "Grupo Cyclus",
+      "dominio": "grupocyclus.com",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:54:59Z",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "web@lacorberana.com": {
+      "email": "web@lacorberana.com",
+      "empresa": "La Corberana",
+      "dominio": "lacorberana.com",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:04Z",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "info@paisajessostenibles.com": {
+      "email": "info@paisajessostenibles.com",
+      "empresa": "Paisajes Sostenibles",
+      "dominio": "paisajessostenibles.com",
+      "sector": "Servicios",
+      "signal": "Usuario MS Dynamics",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:08Z",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "info@arex.es": {
+      "email": "info@arex.es",
+      "empresa": "Aragón Exterior",
+      "dominio": "aragonexterior.es",
+      "sector": "Servicios",
+      "signal": "Usuario MS Dynamics",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:55:13Z",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "contacto@naturcid.com": {
+      "email": "contacto@naturcid.com",
+      "empresa": "Naturcid",
+      "dominio": "naturcid.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:56:37Z",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "reservaslume@luciafreitas.es": {
+      "email": "reservaslume@luciafreitas.es",
+      "empresa": "Luciafreitas",
+      "dominio": "luciafreitas.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-18T13:57:05Z",
+          "notas": ""
+        }
+      ],
+      "notas": ""
     }
   }
 }

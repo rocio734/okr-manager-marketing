@@ -1,12 +1,10 @@
 """
 Outreach a leads score 3 (usuarios DistritoK / TeamSystem / MS Dynamics).
-Envía desde victoria.miguez@smfconsulting.es via Gmail SMTP.
-Filtra duplicados por dominio usando un log local.
+Envía desde victoria.miguez@smfconsulting.es via n8n webhook.
+Filtra duplicados usando outreach_tracking.json.
 """
-import json, smtplib, os, time
+import json, os, time, requests
 from pathlib import Path
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from outreach_tracking_helper import load_tracking, save_tracking, update_stage, get_emails_sent, print_summary
 
 ROOT = Path(__file__).resolve().parent
@@ -18,16 +16,17 @@ if ENV.exists():
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
-GMAIL_USER = os.environ.get("GMAIL_USER", "")
-GMAIL_PASS = os.environ.get("GMAIL_PASSWORD", "")
-LOG_FILE   = ROOT / "outreach_sent_score3.json"
+GMAIL_USER  = os.environ.get("GMAIL_USER", "victoria.miguez@smfconsulting.es")
+N8N_WEBHOOK = "https://n8n.labs.etendo.cloud/webhook/a3f7c821-5d04-4b9e-8c31-0e72b49d6f15"
+LOG_FILE    = ROOT / "outreach_sent_score3.json"
 
 SUBJECT_DK = "Tu ERP actual tiene fecha de caducidad"
 SUBJECT_MS = "Una alternativa a Dynamics que tus equipos agradecerán"
 
+# {empresa} se reemplaza en tiempo de envío
 BODY_DK = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.7;color:#1a1a1a;max-width:560px;">
-<p>Hola,</p>
+<p>Hola {empresa},</p>
 
 <p>Detectamos que vuestra empresa trabaja con DistritoK o TeamSystem. Son herramientas que funcionan, pero tienen un techo claro: no están pensadas para conectarse con el resto del stack tecnológico ni para automatizar procesos con IA.</p>
 
@@ -44,7 +43,7 @@ Etendo — <a href="https://etendo.software" style="color:#E85D04;">etendo.softw
 
 BODY_MS = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.7;color:#1a1a1a;max-width:560px;">
-<p>Hola,</p>
+<p>Hola {empresa},</p>
 
 <p>Muchas empresas que trabajan con Microsoft Dynamics nos contactan porque el coste de licencias y la dependencia del partner se va haciendo insostenible a medida que crecen.</p>
 
@@ -58,6 +57,7 @@ Etendo — <a href="https://etendo.software" style="color:#E85D04;">etendo.softw
 </div>"""
 
 FAKE_EMAILS = {"su@email.com", "test@test.com", "example@example.com"}
+SKIP_DOMAINS = {"gmail.com", "hotmail.com", "yahoo.com", "outlook.com"}  # excluir emails personales
 
 
 def load_sent():
@@ -76,19 +76,19 @@ def save_sent(tracking: dict) -> None:
     save_tracking(tracking)
 
 
-def send_email(to_email, subject, html_body, dry_run=False):
+def send_email(to_email: str, subject: str, html_body: str, dry_run=False) -> bool:
     if dry_run:
         print(f"  [DRY RUN] → {to_email} | {subject}")
         return True
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"Victoria Miguez <{GMAIL_USER}>"
-    msg["To"]      = to_email
-    msg.attach(MIMEText(html_body, "html"))
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-            smtp.login(GMAIL_USER, GMAIL_PASS)
-            smtp.send_message(msg)
+        resp = requests.post(
+            N8N_WEBHOOK,
+            json={"to": to_email, "subject": subject, "html": html_body},
+            timeout=20,
+        )
+        if resp.status_code not in (200, 201):
+            print(f"  ✗ n8n {resp.status_code}: {resp.text[:120]}")
+            return False
         return True
     except Exception as e:
         print(f"  ✗ Error enviando a {to_email}: {e}")
@@ -105,6 +105,7 @@ def main(dry_run=False):
         if l.get("score", 0) == 3
         and l.get("email", "—") != "—"
         and l.get("email", "") not in FAKE_EMAILS
+        and l.get("email", "").split("@")[-1] not in SKIP_DOMAINS  # excluir emails personales
     ]
 
     # Dedup por email
@@ -129,24 +130,26 @@ def main(dry_run=False):
         signal = lead.get("signal_label", "")
         domain = lead.get("domain", "")
 
+        empresa_nombre = lead.get("company", domain).strip() or domain
+
         if "MS Dynamics" in signal:
             subject = SUBJECT_MS
-            body    = BODY_MS
+            body    = BODY_MS.replace("{empresa}", empresa_nombre)
         else:
             subject = SUBJECT_DK
-            body    = BODY_DK
+            body    = BODY_DK.replace("{empresa}", empresa_nombre)
 
-        print(f"  → {domain:35s} {email:40s} {'[DRY]' if dry_run else ''}")
+        print(f"  → {empresa_nombre[:35]:35s} | {email:42s} | {'[DRY]' if dry_run else subject[:35]}")
         success = send_email(email, subject, body, dry_run=dry_run)
         if success:
             ok += 1
             if not dry_run:
                 update_stage(
                     tracking, email, nueva_etapa=2,
-                    canal="email",
+                    canal="email_n8n",
                     subject=subject,
                     enviado_por=GMAIL_USER,
-                    empresa=lead.get("company", "—"),
+                    empresa=empresa_nombre,
                     dominio=domain,
                     sector=lead.get("sector", "—"),
                     signal=signal,
