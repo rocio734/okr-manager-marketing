@@ -1269,6 +1269,55 @@ Respondé SOLO con JSON: {{"subject": "...", "body_html": "..."}}"""
     return {"ok": True, "to": email, "subject": subject, "attempts": cf["attempts"]}
 
 
+# ── Auto-Reply Webhook (recibe desde n8n Workflow 2) ───────────────────────────
+@app.post("/autoreply")
+def register_autoreply(payload: dict):
+    """
+    Recibe auto-replies clasificados desde n8n (bounces y OOO).
+    Guarda en Supabase tabla outreach_autoreplies.
+    Payload esperado: { email, tipo, raw_subject, raw_from, fecha_vuelta }
+    """
+    email        = (payload.get("email") or "").lower().strip()
+    tipo         = (payload.get("tipo") or "bounce").lower().strip()
+    raw_subject  = payload.get("raw_subject", "")[:500]
+    raw_from     = payload.get("raw_from", "")[:200]
+    fecha_vuelta = payload.get("fecha_vuelta", "")[:50]
+
+    if not email:
+        raise HTTPException(status_code=400, detail="email requerido")
+    if tipo not in ("bounce", "vacaciones", "otro"):
+        tipo = "otro"
+
+    if not SUPABASE_URL:
+        # fallback: solo loguear
+        print(f"[autoreply] no Supabase — {email} | {tipo} | {raw_subject[:60]}")
+        return {"ok": True, "stored": False, "note": "Supabase not configured"}
+
+    try:
+        r = requests.post(
+            f"{SUPABASE_URL}/rest/v1/outreach_autoreplies",
+            headers={**_SB_HEADERS(), "Prefer": "return=representation"},
+            json={
+                "email":        email,
+                "tipo":         tipo,
+                "raw_subject":  raw_subject,
+                "raw_from":     raw_from,
+                "fecha_vuelta": fecha_vuelta,
+                "procesado":    False,
+            },
+            timeout=10,
+        )
+        if r.status_code in (200, 201):
+            row = r.json()[0] if r.json() else {}
+            print(f"✅ autoreply guardado: {email} → {tipo}")
+            return {"ok": True, "id": row.get("id"), "email": email, "tipo": tipo}
+        else:
+            print(f"⚠️  Supabase error {r.status_code}: {r.text[:200]}")
+            raise HTTPException(status_code=502, detail=f"Supabase error: {r.status_code}")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
 # ── Startup warmup ─────────────────────────────────────────────────────────────
 @app.on_event("startup")
 async def startup_warmup():
