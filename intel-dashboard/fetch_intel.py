@@ -1746,7 +1746,7 @@ def search_all_leads(data):
                      ("partner_scraping","partner_spider")}
     seen_90 = {l.get("domain","") for l in data["leads_history"]
                if l.get("domain","")
-               and l.get("source_type","") in ("brave_search","apollo","google_maps")
+               and l.get("source_type","") not in ("partner_scraping","partner_spider")
                and _parse_lead_date(l.get("date","")) >= cutoff_dt}
     seen = seen_partners | seen_90
     print(f"  Dominios en dedup — partners (total): {len(seen_partners)} | Brave/Apollo/Maps (90d): {len(seen_90)}")
