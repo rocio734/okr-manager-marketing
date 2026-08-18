@@ -1734,13 +1734,20 @@ def search_all_leads(data):
     #   - brave_search / apollo / google_maps: últimos 90 días
     #     (empresas reales — pueden reentrar en el próximo trimestre)
     from datetime import datetime, timedelta
-    cutoff_90 = (datetime.today() - timedelta(days=90)).strftime("%d/%m/%Y")
+    def _parse_lead_date(s):
+        """Parsea DD/MM/YYYY o YYYY-MM-DD; devuelve datetime.min si no puede."""
+        for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+            try: return datetime.strptime(s, fmt)
+            except: pass
+        return datetime.min
+    cutoff_dt = datetime.today() - timedelta(days=90)
     seen_partners = {l.get("domain","") for l in data["leads_history"]
                      if l.get("domain","") and l.get("source_type","") in
                      ("partner_scraping","partner_spider")}
     seen_90 = {l.get("domain","") for l in data["leads_history"]
-               if l.get("domain","") and l.get("date","") >= cutoff_90
-               and l.get("source_type","") in ("brave_search","apollo","google_maps")}
+               if l.get("domain","")
+               and l.get("source_type","") in ("brave_search","apollo","google_maps")
+               and _parse_lead_date(l.get("date","")) >= cutoff_dt}
     seen = seen_partners | seen_90
     print(f"  Dominios en dedup — partners (total): {len(seen_partners)} | Brave/Apollo/Maps (90d): {len(seen_90)}")
 
@@ -2548,7 +2555,7 @@ def main():
     html=inject(html,"engagement_total",str(len(engagement_posts)))
     html=inject(html,"engagement_ready",str(len([p for p in engagement_posts if p.get("comment_ready")])))
     print("→ Email digest...")
-    send_digest_email(today_leads)
+    send_digest_email(new_leads if new_leads else today_leads)
     open(HTML_FILE,"w",encoding="utf-8").write(html)
     print(f"\n✅ {NOW}")
     print(f"   Leads nuevos: {len(new_leads)} {by_src}")
