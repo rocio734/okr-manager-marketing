@@ -1,0 +1,1296 @@
+{
+  "version": 1,
+  "etapas": {
+    "0": "sin_contacto",
+    "1": "whatsapp_enviado",
+    "2": "email1_enviado",
+    "3": "followup_email_enviado",
+    "4": "reunión_agendada",
+    "5": "oportunidad_abierta",
+    "99": "descartado"
+  },
+  "contactos": {
+    "protecciondedatos@solvia.es": {
+      "email": "protecciondedatos@solvia.es",
+      "empresa": "Solvia",
+      "dominio": "solvia.es",
+      "sector": "Construcción",
+      "signal": "Usuario MS Dynamics",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "20global@grupogoncesco.com": {
+      "email": "20global@grupogoncesco.com",
+      "empresa": "Goncesco",
+      "dominio": "goncesco.es",
+      "sector": "Construcción",
+      "signal": "Usuario MS Dynamics",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "comercial@normicro.es": {
+      "email": "comercial@normicro.es",
+      "empresa": "Normicro",
+      "dominio": "normicro.es",
+      "sector": "Servicios",
+      "signal": "Usuario MS Dynamics",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@sasmak.com": {
+      "email": "info@sasmak.com",
+      "empresa": "Sasmak",
+      "dominio": "sasmak.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "atencionalcliente@scotta1985.com": {
+      "email": "atencionalcliente@scotta1985.com",
+      "empresa": "Scotta1985",
+      "dominio": "scotta1985.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@navarropintores.es": {
+      "email": "info@navarropintores.es",
+      "empresa": "Navarropintores",
+      "dominio": "navarropintores.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "office@nautipaints.com": {
+      "email": "office@nautipaints.com",
+      "empresa": "Nautipaints",
+      "dominio": "nautipaints.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "bayon@bayon.es": {
+      "email": "bayon@bayon.es",
+      "empresa": "Bayon",
+      "dominio": "bayon.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "administracion@reforvengalicia.com": {
+      "email": "administracion@reforvengalicia.com",
+      "empresa": "Reforvengalicia",
+      "dominio": "reforvengalicia.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "web@safetop.net": {
+      "email": "web@safetop.net",
+      "empresa": "Safetop",
+      "dominio": "safetop.net",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@carpa10.com": {
+      "email": "info@carpa10.com",
+      "empresa": "Carpa10",
+      "dominio": "carpa10.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "bigmatstores@bigmat.es": {
+      "email": "bigmatstores@bigmat.es",
+      "empresa": "Bigmat",
+      "dominio": "bigmat.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@costablancahomedesign.com": {
+      "email": "info@costablancahomedesign.com",
+      "empresa": "Carpinteriacostablanca",
+      "dominio": "carpinteriacostablanca.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "disiclin@disiclinsa.com": {
+      "email": "disiclin@disiclinsa.com",
+      "empresa": "Disiclin",
+      "dominio": "disiclin.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@yowup.com": {
+      "email": "info@yowup.com",
+      "empresa": "Yowup",
+      "dominio": "yowup.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@pavidols.com": {
+      "email": "info@pavidols.com",
+      "empresa": "Pavidols",
+      "dominio": "pavidols.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "comercial@verhal.com": {
+      "email": "comercial@verhal.com",
+      "empresa": "Verhal",
+      "dominio": "verhal.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@xardinova.es": {
+      "email": "info@xardinova.es",
+      "empresa": "Xardinova",
+      "dominio": "xardinova.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "comercial@frigodiz.com": {
+      "email": "comercial@frigodiz.com",
+      "empresa": "Frigodiz",
+      "dominio": "frigodiz.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "web@malababa.com": {
+      "email": "web@malababa.com",
+      "empresa": "Malababa",
+      "dominio": "malababa.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "ventas@omnielectric.es": {
+      "email": "ventas@omnielectric.es",
+      "empresa": "Omnielectric",
+      "dominio": "omnielectric.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@vigilant.es": {
+      "email": "info@vigilant.es",
+      "empresa": "Vigilant",
+      "dominio": "vigilant.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "pedidos@stockdecarns.com": {
+      "email": "pedidos@stockdecarns.com",
+      "empresa": "Stockdecarns",
+      "dominio": "stockdecarns.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "ventas@jimeca.com": {
+      "email": "ventas@jimeca.com",
+      "empresa": "Jimeca",
+      "dominio": "jimeca.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "hola@secretosdelagua.com": {
+      "email": "hola@secretosdelagua.com",
+      "empresa": "Secretosdelagua",
+      "dominio": "secretosdelagua.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "sales@rafanadalacademy.com": {
+      "email": "sales@rafanadalacademy.com",
+      "empresa": "Rafanadalacademy",
+      "dominio": "rafanadalacademy.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@dimalnox.com": {
+      "email": "info@dimalnox.com",
+      "empresa": "Dimalnox",
+      "dominio": "dimalnox.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "euromof@euromof.com": {
+      "email": "euromof@euromof.com",
+      "empresa": "Euromof",
+      "dominio": "euromof.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@egainsl.com": {
+      "email": "info@egainsl.com",
+      "empresa": "Egainsl",
+      "dominio": "egainsl.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@conservascortizo.com": {
+      "email": "info@conservascortizo.com",
+      "empresa": "Conservascortizo",
+      "dominio": "conservascortizo.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "administracion@coolgades.com": {
+      "email": "administracion@coolgades.com",
+      "empresa": "Coolgades",
+      "dominio": "coolgades.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "administracion@hitraf.com": {
+      "email": "administracion@hitraf.com",
+      "empresa": "Hitraf",
+      "dominio": "hitraf.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "web@inderen.es": {
+      "email": "web@inderen.es",
+      "empresa": "Inderen",
+      "dominio": "inderen.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "sieper@sieper.es": {
+      "email": "sieper@sieper.es",
+      "empresa": "Sieper",
+      "dominio": "sieper.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "almacen@feyherr.com": {
+      "email": "almacen@feyherr.com",
+      "empresa": "Feyherr",
+      "dominio": "feyherr.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "masl@maderasaguilar.com": {
+      "email": "masl@maderasaguilar.com",
+      "empresa": "Maderasaguilar",
+      "dominio": "maderasaguilar.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "sobrado@maderassobrado.es": {
+      "email": "sobrado@maderassobrado.es",
+      "empresa": "Maderassobrado",
+      "dominio": "maderassobrado.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@maquinariaagricola.net": {
+      "email": "info@maquinariaagricola.net",
+      "empresa": "Maquinariaagricola",
+      "dominio": "maquinariaagricola.net",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "comercial@edigal.es": {
+      "email": "comercial@edigal.es",
+      "empresa": "Edisongalicia",
+      "dominio": "edisongalicia.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "prodelais@prodelais.es": {
+      "email": "prodelais@prodelais.es",
+      "empresa": "Prodelais",
+      "dominio": "prodelais.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "hola@rosita.beer": {
+      "email": "hola@rosita.beer",
+      "empresa": "Rosita",
+      "dominio": "rosita.beer",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "seditesa@seditesa.es": {
+      "email": "seditesa@seditesa.es",
+      "empresa": "Seditesa",
+      "dominio": "seditesa.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@serviclima.es": {
+      "email": "info@serviclima.es",
+      "empresa": "Serviclima",
+      "dominio": "serviclima.es",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@comercialditex.com": {
+      "email": "info@comercialditex.com",
+      "empresa": "Comercialditex",
+      "dominio": "comercialditex.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "contacto@autoplomo.com": {
+      "email": "contacto@autoplomo.com",
+      "empresa": "Autoplomo",
+      "dominio": "autoplomo.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@jocar.gal": {
+      "email": "info@jocar.gal",
+      "empresa": "Cocinasjocar",
+      "dominio": "cocinasjocar.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@bicimania.com": {
+      "email": "info@bicimania.com",
+      "empresa": "Bicimania",
+      "dominio": "bicimania.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "iberocel@iberocel.com": {
+      "email": "iberocel@iberocel.com",
+      "empresa": "Iberocel",
+      "dominio": "iberocel.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "recursoshumanos@citromil.net": {
+      "email": "recursoshumanos@citromil.net",
+      "empresa": "Citromil",
+      "dominio": "citromil.net",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@cafescamali.com": {
+      "email": "info@cafescamali.com",
+      "empresa": "Cafescamali",
+      "dominio": "cafescamali.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@chatarrashernandez.com": {
+      "email": "info@chatarrashernandez.com",
+      "empresa": "Chatarrashernandez",
+      "dominio": "chatarrashernandez.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "seland@seland.com": {
+      "email": "seland@seland.com",
+      "empresa": "Seland",
+      "dominio": "seland.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "elide.bergamini@aesys.com": {
+      "email": "elide.bergamini@aesys.com",
+      "empresa": "Aesys",
+      "dominio": "aesys.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "infoescapes@donsilencioso.com": {
+      "email": "infoescapes@donsilencioso.com",
+      "empresa": "Donsilencioso",
+      "dominio": "donsilencioso.com",
+      "sector": "General",
+      "signal": "Usuario TeamSystem/DistritoK",
+      "score_intel": 3,
+      "fuente": "intel_dashboard",
+      "etapa": 0,
+      "etapa_label": "sin_contacto",
+      "contactos": [],
+      "notas": ""
+    },
+    "info@manuport-logistics.be": {
+      "email": "info@manuport-logistics.be",
+      "empresa": "—",
+      "dominio": "manuport-logistics.be",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "info@nybblegroup.com": {
+      "email": "info@nybblegroup.com",
+      "empresa": "—",
+      "dominio": "nybblegroup.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "info@kinsy.es": {
+      "email": "info@kinsy.es",
+      "empresa": "—",
+      "dominio": "kinsy.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "ventas@triiaslatam.com": {
+      "email": "ventas@triiaslatam.com",
+      "empresa": "—",
+      "dominio": "triiaslatam.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "logistica@sertradisexpress.com": {
+      "email": "logistica@sertradisexpress.com",
+      "empresa": "—",
+      "dominio": "sertradisexpress.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "oficina@construccionestellechea.com": {
+      "email": "oficina@construccionestellechea.com",
+      "empresa": "—",
+      "dominio": "construccionestellechea.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "info@escogrupo.es": {
+      "email": "info@escogrupo.es",
+      "empresa": "—",
+      "dominio": "escogrupo.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "nacional@celsaspain.com": {
+      "email": "nacional@celsaspain.com",
+      "empresa": "—",
+      "dominio": "celsaspain.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "ioan@studio73.es": {
+      "email": "ioan@studio73.es",
+      "empresa": "—",
+      "dominio": "studio73.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "jlopez@esgerencia.com": {
+      "email": "jlopez@esgerencia.com",
+      "empresa": "—",
+      "dominio": "esgerencia.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "jruiz@nanobytes.es": {
+      "email": "jruiz@nanobytes.es",
+      "empresa": "—",
+      "dominio": "nanobytes.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "calidad@qms-spain.com": {
+      "email": "calidad@qms-spain.com",
+      "empresa": "—",
+      "dominio": "qms-spain.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "info@stocklogistic.com": {
+      "email": "info@stocklogistic.com",
+      "empresa": "—",
+      "dominio": "stocklogistic.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "malaga@marsanlogistic.com": {
+      "email": "malaga@marsanlogistic.com",
+      "empresa": "—",
+      "dominio": "marsanlogistic.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "info@365studio.es": {
+      "email": "info@365studio.es",
+      "empresa": "—",
+      "dominio": "365studio.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "jcamacho@trey.es": {
+      "email": "jcamacho@trey.es",
+      "empresa": "—",
+      "dominio": "trey.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "jojeda@jumotech.com": {
+      "email": "jojeda@jumotech.com",
+      "empresa": "—",
+      "dominio": "jumotech.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "arodriguez@antana.es": {
+      "email": "arodriguez@antana.es",
+      "empresa": "—",
+      "dominio": "antana.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "comercial@scorpora.eu": {
+      "email": "comercial@scorpora.eu",
+      "empresa": "—",
+      "dominio": "scorpora.eu",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    },
+    "alfredo.lopez@avanguardiatech.com": {
+      "email": "alfredo.lopez@avanguardiatech.com",
+      "empresa": "—",
+      "dominio": "avanguardiatech.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "followup_manual",
+      "etapa": 2,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 1,
+          "canal": "whatsapp",
+          "fecha": "desconocida",
+          "enviado_por": "Victoria",
+          "notas": "Confirmado por estar en lista followup"
+        },
+        {
+          "etapa": 2,
+          "canal": "email",
+          "fecha": "desconocida",
+          "subject": "followup_contactados",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Confirmado via followup_sent_contactados.json"
+        }
+      ],
+      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+    }
+  }
+}
