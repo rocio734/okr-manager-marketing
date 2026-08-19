@@ -1310,6 +1310,24 @@ def register_reply(payload: dict):
     if not email:
         raise HTTPException(status_code=400, detail="email requerido")
 
+    # ── Validar que el email es un contacto de nuestra campaña outreach ──
+    # Si no está en Supabase contacts con fuente=intel_dashboard, ignorar.
+    if SUPABASE_URL:
+        try:
+            ck = requests.get(
+                f"{SUPABASE_URL}/rest/v1/contacts"
+                f"?email=eq.{urllib.parse.quote(email)}"
+                f"&fuente=eq.{OUTREACH_SOURCE}"
+                f"&select=id&limit=1",
+                headers=_SB_HEADERS(), timeout=8
+            )
+            found = ck.json() if ck.status_code == 200 else []
+            if not found:
+                print(f"[reply] ignorado — no es contacto de outreach: {email}")
+                return {"ok": True, "stored": False, "reason": "not_outreach_contact"}
+        except Exception as e:
+            print(f"[reply] warning validación contacto: {e} — procesando igual")
+
     # Clasificar sentimiento por keywords
     text = (raw_subject + " " + raw_body).lower()
     positivo_kw = ["interesa", "me gustaría", "podemos", "cuándo", "cuando", "más información",
@@ -1367,6 +1385,73 @@ def register_reply(payload: dict):
             raise HTTPException(status_code=502, detail=f"Supabase: {r.status_code}")
     except requests.RequestException as e:
         raise HTTPException(status_code=503, detail=str(e))
+
+
+# ── Replies — actualizar etapa desde dashboard ────────────────────────────────
+@app.patch("/api/replies/{reply_id}")
+def reply_update_stage(reply_id: int, stage: Optional[str] = None,
+                       sentimiento: Optional[str] = None):
+    """
+    Desde el dashboard: marcar una respuesta como procesada y opcionalmente
+    avanzar la etapa del lead asociado.
+    stage: nombre de etapa del STAGE_MAP (ej. 'Reunión Agendada', 'Cerrado Perdido')
+    sentimiento: override del sentimiento clasificado
+    """
+    if not SUPABASE_URL:
+        raise HTTPException(status_code=503, detail="Supabase not configured")
+
+    # 1. Obtener la reply para sacar el email
+    r = requests.get(
+        f"{SUPABASE_URL}/rest/v1/outreach_replies?id=eq.{reply_id}&select=*",
+        headers=_SB_HEADERS(), timeout=10)
+    rows = r.json() if r.status_code == 200 else []
+    if not rows:
+        raise HTTPException(status_code=404, detail="Reply no encontrada")
+    reply = rows[0]
+    email = reply.get("email", "").lower().strip()
+
+    result: dict = {"ok": True, "reply_id": reply_id, "email": email}
+
+    # 2. Actualizar etapa del deal si se pidió
+    if stage and stage in STAGE_MAP:
+        # Buscar contact por email
+        cr = requests.get(
+            f"{SUPABASE_URL}/rest/v1/contacts?email=eq.{email}&select=id",
+            headers=_SB_HEADERS(), timeout=10)
+        contacts = cr.json() if cr.status_code == 200 else []
+        if contacts:
+            contact_id = contacts[0]["id"]
+            # Buscar deal activo
+            dr = requests.get(
+                f"{SUPABASE_URL}/rest/v1/deals?contact_id=eq.{contact_id}&select=id&order=created_at.desc&limit=1",
+                headers=_SB_HEADERS(), timeout=10)
+            deals = dr.json() if dr.status_code == 200 else []
+            if deals:
+                deal_id = deals[0]["id"]
+                requests.patch(
+                    f"{SUPABASE_URL}/rest/v1/deals?id=eq.{deal_id}",
+                    headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+                    json={"stage_id": STAGE_MAP[stage]}, timeout=10)
+                result["stage_updated"] = stage
+                result["deal_id"] = deal_id
+            else:
+                result["stage_updated"] = None
+                result["note"] = "No deal found for this contact"
+        else:
+            result["stage_updated"] = None
+            result["note"] = "Contact not found by email"
+
+    # 3. Marcar reply como procesada en Supabase
+    patch_data: dict = {"procesado": True,
+                        "procesado_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")}
+    if sentimiento and sentimiento in ("positivo", "negativo", "neutro", "pendiente"):
+        patch_data["sentimiento"] = sentimiento
+    requests.patch(
+        f"{SUPABASE_URL}/rest/v1/outreach_replies?id=eq.{reply_id}",
+        headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+        json=patch_data, timeout=10)
+
+    return result
 
 
 # ── Auto-Replies — lectura para el dashboard ───────────────────────────────────
