@@ -2639,7 +2639,7 @@ function orCopyPixel(url, btn){
 
     tbody.innerHTML = rows.map(function (x) {
       var email = pick(x, 'email', 'from_email', 'contact_email');
-      var msg = pick(x, 'message', 'mensaje', 'body', 'snippet', 'body_text');
+      var msg = pick(x, 'raw_body', 'message', 'mensaje', 'body', 'snippet', 'body_text');
       var id = pick(x, 'id', 'reply_id');
       var acciones = id === '' ? '<span style="color:var(--fg4);font-size:12px">—</span>' :
         '<div class="rowacts">' +
@@ -2650,7 +2650,7 @@ function orCopyPixel(url, btn){
       return '<tr>' +
         '<td><b>' + esc(pick(x, 'empresa', 'company', 'company_name') || '—') + '</b></td>' +
         '<td>' + (email ? '<a class="lnk" href="mailto:' + esc(email) + '">' + esc(email) + '</a>' : '—') + '</td>' +
-        '<td>' + esc(pick(x, 'subject', 'asunto') || '—') + '</td>' +
+        '<td>' + esc(pick(x, 'raw_subject', 'subject', 'asunto') || '—') + '</td>' +
         '<td><div class="msgcell" title="Clic para ver completo">' + esc(msg || '—') + '</div></td>' +
         '<td>' + pill(pick(x, 'sentimiento', 'sentiment', 'tone')) + '</td>' +
         '<td style="color:var(--fg4);font-size:12px">' +
