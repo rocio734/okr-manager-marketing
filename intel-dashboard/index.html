@@ -985,7 +985,7 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     </div>
     <div class="tbl-wrap">
       <table class="tbl" id="rp-table">
-        <thead><tr><th>Empresa</th><th>Email</th><th>Asunto</th><th>Mensaje</th><th>Sentimiento</th><th>Detectado</th></tr></thead>
+        <thead><tr><th>Empresa</th><th>Email</th><th>Asunto</th><th>Mensaje</th><th>Sentimiento</th><th>Detectado</th><th>Acción</th></tr></thead>
         <tbody id="rp-tbody"><tr><td colspan="6" style="padding:16px;text-align:center;color:var(--gm)">Cargando respuestas…</td></tr></tbody>
       </table>
     </div>
@@ -1140,6 +1140,30 @@ function orScoreDot(s){
   return `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px"></span>${s}`;
 }
 
+async function replyAction(replyId, stage, btnEl){
+  btnEl.disabled = true;
+  btnEl.textContent = '…';
+  try {
+    const url = `${OR_API}/api/replies/${replyId}?stage=${encodeURIComponent(stage||'')}`;
+    const res = await fetch(url, {method:'PATCH'});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    // Feedback visual inmediato
+    const row = btnEl.closest('tr');
+    if(row){
+      row.style.opacity = '0.55';
+      row.querySelectorAll('button').forEach(b => { b.disabled = true; });
+      const actionCell = row.querySelector('.rp-actions');
+      if(actionCell) actionCell.innerHTML = '<span style="color:var(--gn);font-size:11px">✓ procesado</span>';
+    }
+    // Recargar tabla para reflejar estado actualizado
+    setTimeout(() => loadReplies(), 600);
+  } catch(e){
+    btnEl.disabled = false;
+    btnEl.textContent = '↺';
+    alert('Error al procesar: ' + e.message);
+  }
+}
+
 async function loadReplies(){
   const tbody = document.getElementById('rp-tbody');
   try {
@@ -1152,10 +1176,10 @@ async function loadReplies(){
     const neg  = data.negativos  || 0;
     const neu  = data.neutros    || 0;
     const pend = data.pendientes || 0;
-    const bp = document.getElementById('rp-badge-pos');
-    const bn = document.getElementById('rp-badge-neg');
-    const bne= document.getElementById('rp-badge-neu');
-    const bpd= document.getElementById('rp-badge-pend');
+    const bp  = document.getElementById('rp-badge-pos');
+    const bn  = document.getElementById('rp-badge-neg');
+    const bne = document.getElementById('rp-badge-neu');
+    const bpd = document.getElementById('rp-badge-pend');
     bp.textContent  = pos  + ' interesado' + (pos!==1?'s':'');
     bn.textContent  = neg  + ' no interesado' + (neg!==1?'s':'');
     bne.textContent = neu  + ' neutro' + (neu!==1?'s':'');
@@ -1166,33 +1190,48 @@ async function loadReplies(){
     bpd.style.display = pend ? 'inline' : 'none';
 
     if(!rows.length){
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--gm)">Sin respuestas registradas todavía</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--gm)">Sin respuestas registradas todavía</td></tr>';
       return;
     }
 
     const sentBadge = s => {
-      if(s==='positivo')  return '<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">✅ Interesado</span>';
-      if(s==='negativo')  return '<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">❌ No interesa</span>';
-      if(s==='neutro')    return '<span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:10px;font-size:11px">💬 Neutro</span>';
+      if(s==='positivo') return '<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">✅ Interesado</span>';
+      if(s==='negativo') return '<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">❌ No interesa</span>';
+      if(s==='neutro')   return '<span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:10px;font-size:11px">💬 Neutro</span>';
       return '<span style="background:#fff8e1;color:#e65100;padding:2px 8px;border-radius:10px;font-size:11px">⏳ Sin clasificar</span>';
     };
 
+    const actionBtns = (r) => {
+      if(r.procesado) return '<span style="color:var(--gn);font-size:11px">✓ procesado</span>';
+      const btnBase = 'style="font-size:10px;padding:3px 7px;border-radius:4px;cursor:pointer;border:1px solid;margin:1px;font-family:Inter,sans-serif"';
+      return `<div class="rp-actions" style="display:flex;flex-wrap:wrap;gap:2px">
+        <button ${btnBase} style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7"
+          onclick="replyAction(${r.id},'Reunión Agendada',this)">📅 Reunión</button>
+        <button ${btnBase} style="background:#e3f2fd;color:#1565c0;border-color:#90caf9"
+          onclick="replyAction(${r.id},'Contactado',this)">💬 En conv.</button>
+        <button ${btnBase} style="background:#ffebee;color:#c62828;border-color:#ef9a9a"
+          onclick="replyAction(${r.id},'Cerrado Perdido',this)">❌ No interesa</button>
+      </div>`;
+    };
+
     tbody.innerHTML = rows.map(r=>{
-      const fecha  = (r.detected_at||'').slice(0,10) || '—';
-      const subj   = (r.raw_subject||'—').slice(0,50) + ((r.raw_subject||'').length>50?'…':'');
-      const body   = (r.raw_body||'').slice(0,120) + ((r.raw_body||'').length>120?'…':'');
-      const emp    = r.empresa || r.email.split('@')[1] || '—';
-      return `<tr>
-        <td style="font-weight:600;max-width:140px">${emp}</td>
-        <td style="font-size:11px;color:var(--gm)">${r.email}</td>
-        <td style="max-width:160px;font-size:11px">${subj}</td>
-        <td style="max-width:220px;font-size:11px;color:var(--gm);line-height:1.4">${body}</td>
+      const fecha = (r.detected_at||'').slice(0,10) || '—';
+      const subj  = (r.raw_subject||'—').slice(0,45) + ((r.raw_subject||'').length>45?'…':'');
+      const body  = (r.raw_body||'').slice(0,100) + ((r.raw_body||'').length>100?'…':'');
+      const emp   = r.empresa || r.email.split('@')[1] || '—';
+      const opacity = r.procesado ? 'opacity:0.6' : '';
+      return `<tr style="${opacity}">
+        <td style="font-weight:600;max-width:120px">${emp}</td>
+        <td style="font-size:11px;color:var(--gm);max-width:150px">${r.email}</td>
+        <td style="max-width:140px;font-size:11px">${subj}</td>
+        <td style="max-width:200px;font-size:11px;color:var(--gm);line-height:1.4">${body}</td>
         <td>${sentBadge(r.sentimiento)}</td>
         <td style="font-size:11px;white-space:nowrap">${fecha}</td>
+        <td style="min-width:160px">${actionBtns(r)}</td>
       </tr>`;
     }).join('');
   } catch(e){
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--rd)">Error cargando respuestas: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--rd)">Error: ${e.message}</td></tr>`;
   }
 }
 
