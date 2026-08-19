@@ -1269,6 +1269,26 @@ Respondé SOLO con JSON: {{"subject": "...", "body_html": "..."}}"""
     return {"ok": True, "to": email, "subject": subject, "attempts": cf["attempts"]}
 
 
+# ── Auto-Replies — lectura para el dashboard ───────────────────────────────────
+@app.get("/api/autoreplies")
+def autoreplies_list():
+    """Devuelve todos los auto-replies registrados (Supabase outreach_autoreplies)."""
+    if not SUPABASE_URL:
+        return {"autoreplies": []}
+    try:
+        r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/outreach_autoreplies?select=*&order=id.desc&limit=200",
+            headers=_SB_HEADERS(), timeout=10,
+        )
+        rows = r.json() if r.status_code == 200 else []
+        return {"autoreplies": rows, "total": len(rows),
+                "bounces": sum(1 for x in rows if x.get("tipo")=="bounce"),
+                "vacaciones": sum(1 for x in rows if x.get("tipo")=="vacaciones"),
+                "pendientes": sum(1 for x in rows if not x.get("procesado"))}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
 # ── Auto-Reply Webhook (recibe desde n8n Workflow 2) ───────────────────────────
 @app.post("/autoreply")
 def register_autoreply(payload: dict):

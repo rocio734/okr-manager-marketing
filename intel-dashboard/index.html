@@ -972,6 +972,27 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <span id="or-page-info" style="font-size:12px;color:var(--gm)"></span>
     <button id="or-next-btn" onclick="orPageNext()" style="font-size:11px;padding:4px 14px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg);color:var(--bk)">Siguiente →</button>
   </div>
+
+  <!-- ── Auto-replies ───────────────────────────────────────── -->
+  <div style="margin-top:28px;border-top:1px solid var(--gb);padding-top:18px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:var(--bk)">📩 Auto-replies recibidos</span>
+      <span id="ar-badge-bounce" style="font-size:11px;padding:2px 8px;background:#ffebee;color:#c62828;border-radius:10px;display:none">0 rebotes</span>
+      <span id="ar-badge-ooo" style="font-size:11px;padding:2px 8px;background:#fff8e1;color:#e65100;border-radius:10px;display:none">0 vacaciones</span>
+      <span id="ar-badge-pending" style="font-size:11px;padding:2px 8px;background:#e8f5e9;color:#2e7d32;border-radius:10px;display:none">✓ todos procesados</span>
+      <button onclick="loadAutoreplies()" style="margin-left:auto;font-size:11px;padding:3px 10px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">↻</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="ar-table">
+        <thead><tr>
+          <th>Tipo</th><th>Email</th><th>Asunto</th><th>Vuelve</th><th>Detectado</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="ar-tbody">
+          <tr><td colspan="6" style="text-align:center;padding:16px;color:var(--gm)">Cargando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div class="foot">
@@ -1101,7 +1122,58 @@ function orScoreDot(s){
   return `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px"></span>${s}`;
 }
 
+async function loadAutoreplies(){
+  const tbody = document.getElementById('ar-tbody');
+  try {
+    const res = await fetch(OR_API + '/api/autoreplies');
+    const data = await res.json();
+    const rows = data.autoreplies || [];
+
+    // Badges
+    const bounces = rows.filter(r=>r.tipo==='bounce');
+    const ooo     = rows.filter(r=>r.tipo==='vacaciones');
+    const pending = rows.filter(r=>!r.procesado);
+    const bb = document.getElementById('ar-badge-bounce');
+    const bo = document.getElementById('ar-badge-ooo');
+    const bp = document.getElementById('ar-badge-pending');
+    bb.textContent = bounces.length + ' rebote' + (bounces.length!==1?'s':'');
+    bo.textContent = ooo.length + ' vacaciones';
+    bb.style.display = bounces.length ? 'inline' : 'none';
+    bo.style.display = ooo.length    ? 'inline' : 'none';
+    bp.style.display = pending.length === 0 && rows.length > 0 ? 'inline' : 'none';
+
+    if(!rows.length){
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--gm)">Sin auto-replies registrados</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(r=>{
+      const tipo = r.tipo==='bounce'
+        ? '<span style="background:#ffebee;color:#c62828;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600">📛 Rebote</span>'
+        : r.tipo==='vacaciones'
+        ? '<span style="background:#fff8e1;color:#e65100;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600">🏖 Vacaciones</span>'
+        : '<span style="background:var(--gb);color:var(--gm);padding:2px 7px;border-radius:10px;font-size:11px">Otro</span>';
+      const estado = r.procesado
+        ? '<span style="color:#2e7d32;font-size:11px">✓ procesado</span>'
+        : '<span style="color:#e65100;font-size:11px;font-weight:600">⏳ pendiente</span>';
+      const fecha = r.detected_at ? r.detected_at.slice(0,10) : '—';
+      const vuelta = r.fecha_vuelta || '—';
+      const subj = (r.raw_subject||'').slice(0,55) + ((r.raw_subject||'').length>55?'…':'');
+      return `<tr>
+        <td>${tipo}</td>
+        <td style="font-size:12px">${r.email}</td>
+        <td style="font-size:11px;color:var(--gm)">${subj}</td>
+        <td style="font-size:12px">${vuelta}</td>
+        <td style="font-size:11px;color:var(--gm)">${fecha}</td>
+        <td>${estado}</td>
+      </tr>`;
+    }).join('');
+  } catch(e){
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#c62828">Error cargando auto-replies</td></tr>';
+  }
+}
+
 async function loadOutreach(silent=false){
+  loadAutoreplies();
   // Show/hide user chip
   const creds = orGetCreds();
   const chip  = document.getElementById('or-user-chip');
