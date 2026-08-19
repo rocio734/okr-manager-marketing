@@ -1269,6 +1269,106 @@ Respondé SOLO con JSON: {{"subject": "...", "body_html": "..."}}"""
     return {"ok": True, "to": email, "subject": subject, "attempts": cf["attempts"]}
 
 
+# ── Respuestas reales — lectura para el dashboard ─────────────────────────────
+@app.get("/api/replies")
+def replies_list():
+    """Devuelve respuestas humanas reales a emails de outreach (Supabase outreach_replies)."""
+    if not SUPABASE_URL:
+        return {"replies": [], "total": 0}
+    try:
+        r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/outreach_replies?select=*&order=id.desc&limit=200",
+            headers=_SB_HEADERS(), timeout=10,
+        )
+        rows = r.json() if r.status_code == 200 else []
+        return {
+            "replies": rows,
+            "total": len(rows),
+            "positivos":  sum(1 for x in rows if x.get("sentimiento") == "positivo"),
+            "negativos":  sum(1 for x in rows if x.get("sentimiento") == "negativo"),
+            "neutros":    sum(1 for x in rows if x.get("sentimiento") == "neutro"),
+            "pendientes": sum(1 for x in rows if x.get("sentimiento") == "pendiente"),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
+@app.post("/reply")
+def register_reply(payload: dict):
+    """
+    Recibe respuestas humanas reales desde n8n (no auto-replies).
+    Clasifica el sentimiento y guarda en Supabase outreach_replies.
+    Solo guarda si el email del remitente está en la base de outreach.
+    Payload: { email, empresa, raw_subject, raw_from, raw_body }
+    """
+    email       = (payload.get("email") or "").lower().strip()
+    raw_subject = payload.get("raw_subject", "")[:500]
+    raw_from    = payload.get("raw_from", "")[:200]
+    raw_body    = payload.get("raw_body", "")[:1000]
+    empresa     = payload.get("empresa", "")[:200]
+
+    if not email:
+        raise HTTPException(status_code=400, detail="email requerido")
+
+    # Clasificar sentimiento por keywords
+    text = (raw_subject + " " + raw_body).lower()
+    positivo_kw = ["interesa", "me gustaría", "podemos", "cuándo", "cuando", "más información",
+                   "más info", "me llama", "quiero saber", "hablamos", "llamada", "reunión",
+                   "reunion", "demo", "presentación", "cuéntame", "cuéntanos", "adelante",
+                   "perfecto", "genial", "excelente", "muy bien"]
+    negativo_kw = ["no me interesa", "no gracias", "no estamos", "ya tenemos", "no somos",
+                   "baja", "elimina", "eliminar", "desuscrib", "unsubscribe", "no necesitamos",
+                   "no aplica", "no es el momento", "descarta"]
+    sentimiento = "pendiente"
+    for kw in positivo_kw:
+        if kw in text:
+            sentimiento = "positivo"
+            break
+    if sentimiento == "pendiente":
+        for kw in negativo_kw:
+            if kw in text:
+                sentimiento = "negativo"
+                break
+    if sentimiento == "pendiente":
+        sentimiento = "neutro"
+
+    etapa_sugerida = None
+    if sentimiento == "positivo":
+        etapa_sugerida = 4   # reunión agendada / interesado
+    elif sentimiento == "negativo":
+        etapa_sugerida = 99  # descartado
+
+    if not SUPABASE_URL:
+        print(f"[reply] no Supabase — {email} | {sentimiento} | {raw_subject[:60]}")
+        return {"ok": True, "stored": False, "sentimiento": sentimiento}
+
+    try:
+        r = requests.post(
+            f"{SUPABASE_URL}/rest/v1/outreach_replies",
+            headers={**_SB_HEADERS(), "Prefer": "return=representation"},
+            json={
+                "email":          email,
+                "empresa":        empresa,
+                "raw_subject":    raw_subject,
+                "raw_from":       raw_from,
+                "raw_body":       raw_body[:500],
+                "sentimiento":    sentimiento,
+                "etapa_sugerida": etapa_sugerida,
+                "procesado":      False,
+            },
+            timeout=10,
+        )
+        if r.status_code in (200, 201):
+            row = r.json()[0] if r.json() else {}
+            print(f"✅ reply guardado: {email} → {sentimiento}")
+            return {"ok": True, "id": row.get("id"), "email": email, "sentimiento": sentimiento}
+        else:
+            print(f"⚠️  Supabase error {r.status_code}: {r.text[:200]}")
+            raise HTTPException(status_code=502, detail=f"Supabase: {r.status_code}")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+
 # ── Auto-Replies — lectura para el dashboard ───────────────────────────────────
 @app.get("/api/autoreplies")
 def autoreplies_list():

@@ -973,6 +973,24 @@ body{font-family:'Inter',sans-serif;background:#F0F0F0;color:var(--bk);min-heigh
     <button id="or-next-btn" onclick="orPageNext()" style="font-size:11px;padding:4px 14px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg);color:var(--bk)">Siguiente →</button>
   </div>
 
+  <!-- ── Respuestas reales ─────────────────────────────────── -->
+  <div style="margin-top:28px;border-top:1px solid var(--gb);padding-top:18px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:600;color:var(--bk)">💬 Respuestas recibidas</span>
+      <span id="rp-badge-pos" style="font-size:11px;padding:2px 8px;background:#e8f5e9;color:#2e7d32;border-radius:10px;display:none">0 interesados</span>
+      <span id="rp-badge-neg" style="font-size:11px;padding:2px 8px;background:#ffebee;color:#c62828;border-radius:10px;display:none">0 no interesados</span>
+      <span id="rp-badge-neu" style="font-size:11px;padding:2px 8px;background:#e3f2fd;color:#1565c0;border-radius:10px;display:none">0 neutros</span>
+      <span id="rp-badge-pend" style="font-size:11px;padding:2px 8px;background:#fff8e1;color:#e65100;border-radius:10px;display:none">0 sin clasificar</span>
+      <button onclick="loadReplies()" style="font-size:11px;padding:3px 10px;border:1px solid var(--gb);border-radius:4px;cursor:pointer;background:var(--bg)">↻</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl" id="rp-table">
+        <thead><tr><th>Empresa</th><th>Email</th><th>Asunto</th><th>Mensaje</th><th>Sentimiento</th><th>Detectado</th></tr></thead>
+        <tbody id="rp-tbody"><tr><td colspan="6" style="padding:16px;text-align:center;color:var(--gm)">Cargando respuestas…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ── Auto-replies ───────────────────────────────────────── -->
   <div style="margin-top:28px;border-top:1px solid var(--gb);padding-top:18px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -1122,6 +1140,62 @@ function orScoreDot(s){
   return `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px"></span>${s}`;
 }
 
+async function loadReplies(){
+  const tbody = document.getElementById('rp-tbody');
+  try {
+    const res  = await fetch(OR_API + '/api/replies');
+    const data = await res.json();
+    const rows = data.replies || [];
+
+    // Badges
+    const pos  = data.positivos  || 0;
+    const neg  = data.negativos  || 0;
+    const neu  = data.neutros    || 0;
+    const pend = data.pendientes || 0;
+    const bp = document.getElementById('rp-badge-pos');
+    const bn = document.getElementById('rp-badge-neg');
+    const bne= document.getElementById('rp-badge-neu');
+    const bpd= document.getElementById('rp-badge-pend');
+    bp.textContent  = pos  + ' interesado' + (pos!==1?'s':'');
+    bn.textContent  = neg  + ' no interesado' + (neg!==1?'s':'');
+    bne.textContent = neu  + ' neutro' + (neu!==1?'s':'');
+    bpd.textContent = pend + ' sin clasificar';
+    bp.style.display  = pos  ? 'inline' : 'none';
+    bn.style.display  = neg  ? 'inline' : 'none';
+    bne.style.display = neu  ? 'inline' : 'none';
+    bpd.style.display = pend ? 'inline' : 'none';
+
+    if(!rows.length){
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--gm)">Sin respuestas registradas todavía</td></tr>';
+      return;
+    }
+
+    const sentBadge = s => {
+      if(s==='positivo')  return '<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">✅ Interesado</span>';
+      if(s==='negativo')  return '<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">❌ No interesa</span>';
+      if(s==='neutro')    return '<span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:10px;font-size:11px">💬 Neutro</span>';
+      return '<span style="background:#fff8e1;color:#e65100;padding:2px 8px;border-radius:10px;font-size:11px">⏳ Sin clasificar</span>';
+    };
+
+    tbody.innerHTML = rows.map(r=>{
+      const fecha  = (r.detected_at||'').slice(0,10) || '—';
+      const subj   = (r.raw_subject||'—').slice(0,50) + ((r.raw_subject||'').length>50?'…':'');
+      const body   = (r.raw_body||'').slice(0,120) + ((r.raw_body||'').length>120?'…':'');
+      const emp    = r.empresa || r.email.split('@')[1] || '—';
+      return `<tr>
+        <td style="font-weight:600;max-width:140px">${emp}</td>
+        <td style="font-size:11px;color:var(--gm)">${r.email}</td>
+        <td style="max-width:160px;font-size:11px">${subj}</td>
+        <td style="max-width:220px;font-size:11px;color:var(--gm);line-height:1.4">${body}</td>
+        <td>${sentBadge(r.sentimiento)}</td>
+        <td style="font-size:11px;white-space:nowrap">${fecha}</td>
+      </tr>`;
+    }).join('');
+  } catch(e){
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--rd)">Error cargando respuestas: ${e.message}</td></tr>`;
+  }
+}
+
 async function loadAutoreplies(){
   const tbody = document.getElementById('ar-tbody');
   try {
@@ -1173,6 +1247,7 @@ async function loadAutoreplies(){
 }
 
 async function loadOutreach(silent=false){
+  loadReplies();
   loadAutoreplies();
   // Show/hide user chip
   const creds = orGetCreds();
