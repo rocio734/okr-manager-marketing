@@ -16,11 +16,20 @@
       "dominio": "solvia.es",
       "sector": "Construcción",
       "signal": "Usuario MS Dynamics",
-      "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-20T12:30:21Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
       "notas": ""
     },
     "20global@grupogoncesco.com": {
@@ -29,11 +38,20 @@
       "dominio": "goncesco.es",
       "sector": "Construcción",
       "signal": "Usuario MS Dynamics",
-      "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-20T12:30:15Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
       "notas": ""
     },
     "comercial@normicro.es": {
@@ -42,11 +60,20 @@
       "dominio": "normicro.es",
       "sector": "Servicios",
       "signal": "Usuario MS Dynamics",
-      "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-20T12:30:27Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
       "notas": ""
     },
     "info@sasmak.com": {
@@ -923,11 +950,20 @@
       "dominio": "rosita.beer",
       "sector": "General",
       "signal": "Usuario TeamSystem/DistritoK",
-      "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-20T12:30:33Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
       "notas": ""
     },
     "seditesa@seditesa.es": {
@@ -982,11 +1018,20 @@
       "dominio": "comercialditex.com",
       "sector": "General",
       "signal": "Usuario TeamSystem/DistritoK",
-      "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 0,
-      "etapa_label": "sin_contacto",
-      "contactos": [],
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-20T12:30:39Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
       "notas": ""
     },
     "contacto@autoplomo.com": {
@@ -2254,6 +2299,50 @@
           "canal": "email_n8n",
           "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
           "fecha": "2026-08-19T19:53:56Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "reservas@laalmoraimahotel.com": {
+      "email": "reservas@laalmoraimahotel.com",
+      "empresa": "La Almoraima",
+      "dominio": "laalmoraima.es",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-20T12:30:03Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "info@liptosa.com": {
+      "email": "info@liptosa.com",
+      "empresa": "LIPTOSA",
+      "dominio": "liptosa.com",
+      "sector": "Fabricación",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-20T12:30:09Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
