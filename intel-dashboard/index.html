@@ -125,10 +125,13 @@ button{font-family:inherit}
 /* ── KPIs ───────────────────────────────────────────── */
 .krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin-bottom:8px}
 .kcard{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:16px 18px}
-#kcard-pending.has-pending{border-color:#f59e0b;background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%)}
-#kcard-pending.has-pending .kval{color:#b45309}
-#kcard-pending.is-clear{border-color:#16a34a33;background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%)}
-#kcard-pending.is-clear .kval{color:#15803d}
+#kcard-pending{border-left-width:4px!important;transition:border-color .3s,background .3s}
+#kcard-pending.has-pending{border-left-color:#f59e0b!important;background:#fffbeb!important}
+#kcard-pending.has-pending .kval{color:#b45309!important;font-weight:800}
+#kcard-pending.has-pending .klbl::after{content:" ⚡";color:#f59e0b}
+#kcard-pending.is-clear{border-left-color:#16a34a!important;background:#f0fdf4!important}
+#kcard-pending.is-clear .kval{color:#15803d!important;font-weight:800}
+#kcard-pending.is-clear .klbl::after{content:" ✓";color:#16a34a}
 .klbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);
   display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
 .klbl span{text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;color:var(--fg4)}
