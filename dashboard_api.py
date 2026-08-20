@@ -1396,6 +1396,14 @@ def register_reply(payload: dict):
     if not email:
         raise HTTPException(status_code=400, detail="email requerido")
 
+    # ── Rechazar emails internos (Rocío, equipo SMF/Etendo) ──────────────────
+    INTERNAL_DOMAINS = {"smfconsulting.es", "etendo.software", "etendo.cloud",
+                        "futit.com", "futit.es"}
+    sender_domain = email.split("@")[-1].lower() if "@" in email else ""
+    if sender_domain in INTERNAL_DOMAINS:
+        print(f"[reply] ignorado — remitente interno: {email}")
+        return {"ok": True, "stored": False, "reason": "internal_sender"}
+
     # ── Validar que el email es un contacto de nuestra campaña outreach ──
     # Si no está en Supabase contacts con fuente=intel_dashboard, ignorar.
     if SUPABASE_URL:
