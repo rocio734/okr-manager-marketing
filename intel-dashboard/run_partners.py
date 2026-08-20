@@ -94,35 +94,43 @@ def scrape_ahora_partners():
 
 
 def scrape_odoo_partners():
-    """Directorio público de Odoo España — 24 páginas × ~21 perfiles."""
+    """Directorio público de Odoo España — hasta 25 páginas × ~20 perfiles.
+
+    Requiere Session para que los perfiles devuelvan 200 (session_id cookie).
+    Website del partner: link con texto 'sitio web' o primer link externo real.
+    """
     partners = []
-    seen = set()
+    seen_urls = set()
+    seen_domains = set()
     base = "https://www.odoo.com/es/partners/country/spain-66"
+    ODOO_SKIP = {"odoo.com", "odoo.sh", "odoo.fm", "odoo.co", "github.com",
+                 "facebook.com", "twitter.com", "linkedin.com", "instagram.com",
+                 "youtube.com", "tiktok.com", "google.com", "apple.com"}
+
+    # Iniciar sesión con cookies del directorio
+    sess = requests.Session()
+    sess.headers.update(HEADERS)
 
     print("    Recolectando perfiles Odoo España...")
     profile_urls = []
     for page in range(1, 26):
         url = f"{base}?page={page}" if page > 1 else base
         try:
-            r = requests.get(url, headers=HEADERS, timeout=15)
+            r = sess.get(url, timeout=15)
             if r.status_code != 200:
                 break
             soup = BeautifulSoup(r.text, "html.parser")
-            links = soup.select("a.o_website_partner_search_partner_url, "
-                                ".o_partner_no_full_page a[href*='/partners/'], "
-                                "a[href*='/es/partners/']")
-            if not links:
-                links = soup.select("a[href*='/partners/']")
             page_urls = []
-            for a in links:
+            for a in soup.select("a[href]"):
                 href = a.get("href", "")
-                if "/partners/country/" in href or "/partners/page/" in href:
+                if not re.search(r"/partners/[^/]+-\d+", href):
                     continue
-                if re.search(r"/partners/[^/]+-\d+", href):
-                    full = "https://www.odoo.com" + href if href.startswith("/") else href
-                    if full not in seen:
-                        page_urls.append(full)
-                        seen.add(full)
+                if any(x in href for x in ("/country/", "/page/", "/grade/")):
+                    continue
+                full = "https://www.odoo.com" + href if href.startswith("/") else href
+                if full not in seen_urls:
+                    page_urls.append(full)
+                    seen_urls.add(full)
             if not page_urls:
                 break
             profile_urls.extend(page_urls)
@@ -132,23 +140,42 @@ def scrape_odoo_partners():
             break
 
     print(f"    → {len(profile_urls)} perfiles encontrados")
-    seen_domains = set()
+
     for i, pu in enumerate(profile_urls, 1):
         try:
-            rp = requests.get(pu, headers=HEADERS, timeout=12)
+            rp = sess.get(pu, timeout=12)
             if rp.status_code != 200:
                 continue
             sp = BeautifulSoup(rp.text, "html.parser")
-            name_el = sp.select_one("h1, .o_partner_name, [itemprop='name']")
-            name = name_el.get_text(strip=True)[:60] if name_el else ""
-            web_el = sp.select_one("a[href*='http']:not([href*='odoo.com'])")
+
+            # Nombre del partner (h1 puede venir con badge pegado: "ADHOCGold" → limpiar)
+            h1 = sp.select_one("h1")
+            name = h1.get_text(strip=True)[:60] if h1 else ""
+
+            # Website: link con texto "sitio web" o primer externo no-odoo/no-social
+            web_el = sp.find("a", string=re.compile(r"sitio web", re.I))
+            if not web_el:
+                web_el = sp.find("a", string=re.compile(r"visitar.*web|visit.*web", re.I))
+            if not web_el:
+                # Primer link externo real (no odoo, no social)
+                for a in sp.select("a[href]"):
+                    href = a.get("href", "")
+                    if not href.startswith("http"):
+                        continue
+                    d_tmp = fi.domain_from_url(href)
+                    if d_tmp and not any(sk in href for sk in ODOO_SKIP):
+                        web_el = a
+                        break
+
             if not web_el:
                 continue
             href = web_el.get("href", "")
             d = fi.domain_from_url(href)
             if d and d not in seen_domains and not fi.should_skip(d):
-                partners.append({"name": name or d, "competitor": "Odoo", "url": href, "domain": d})
+                partners.append({"name": name or d, "competitor": "Odoo",
+                                  "url": href, "domain": d})
                 seen_domains.add(d)
+
             if i % 50 == 0:
                 print(f"    [{i}/{len(profile_urls)}] encontrados: {len(partners)}")
             time.sleep(0.2)
