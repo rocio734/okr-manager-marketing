@@ -125,6 +125,10 @@ button{font-family:inherit}
 /* ── KPIs ───────────────────────────────────────────── */
 .krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin-bottom:8px}
 .kcard{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:16px 18px}
+#kcard-pending.has-pending{border-color:#f59e0b;background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%)}
+#kcard-pending.has-pending .kval{color:#b45309}
+#kcard-pending.is-clear{border-color:#16a34a33;background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%)}
+#kcard-pending.is-clear .kval{color:#15803d}
 .klbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);
   display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
 .klbl span{text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;color:var(--fg4)}
@@ -441,6 +445,11 @@ button{font-family:inherit}
       <p class="klbl">Con email <span>histórico</span></p>
       <p class="kval"><!-- WS:leads_email -->196<!-- /WS:leads_email --></p>
       <p class="ksub">Apollo · Hunter · Web scrape</p>
+    </div>
+    <div class="kcard" id="kcard-pending" title="Leads score-3 con email detectados que aún no recibieron el primer email de outreach">
+      <p class="klbl">Sin contactar <span>score-3</span></p>
+      <p class="kval" id="kval-pending"><!-- WS:leads_pending_contact -->0<!-- /WS:leads_pending_contact --></p>
+      <p class="ksub" id="ksub-pending">de los leads con email válido</p>
     </div>
     <div class="kcard" title="Leads actualmente en la tabla Outreach de Supabase — los que puedes contactar ahora">
       <p class="klbl">En outreach <span>Supabase</span></p>
@@ -2814,6 +2823,41 @@ function orCopyPixel(url, btn){
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+})();
+
+/* ── Kcard "Sin contactar" — color vivo según valor WS ───────────────────── */
+(function(){
+  function applyPendingStyle(){
+    var card  = document.getElementById('kcard-pending');
+    var kval  = document.getElementById('kval-pending');
+    var ksub  = document.getElementById('ksub-pending');
+    if(!card || !kval) return;
+    var n = parseInt(kval.textContent.trim(), 10) || 0;
+    card.classList.remove('has-pending','is-clear');
+    if(n > 0){
+      card.classList.add('has-pending');
+      ksub.textContent = 'pendientes · cron los envía mañana 09:30';
+    } else {
+      card.classList.add('is-clear');
+      ksub.textContent = 'todos contactados ✓';
+    }
+  }
+
+  /* Refresca el contador en vivo desde la API /api/pending-contact */
+  async function refreshPendingCount(){
+    try {
+      var r = await fetch('https://etendo-dashboard-api.onrender.com/api/pending-contact');
+      if(!r.ok) return;
+      var d = await r.json();
+      var kval = document.getElementById('kval-pending');
+      if(kval && typeof d.pending === 'number') kval.textContent = d.pending;
+      applyPendingStyle();
+    } catch(e){ /* silencioso — el WS marker ya tiene el último valor */ }
+  }
+
+  if(document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', function(){ applyPendingStyle(); refreshPendingCount(); });
+  else { applyPendingStyle(); refreshPendingCount(); }
 })();
 </script>
 </body>

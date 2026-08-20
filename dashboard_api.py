@@ -628,6 +628,45 @@ def health():
     cached = list(_cache.keys())
     return {"ok": True, "cached_periods": cached}
 
+@app.get("/api/pending-contact")
+def pending_contact():
+    """
+    Leads score-3 detectados que aún no recibieron el primer email.
+    Compara contacts de Supabase (fuente=intel_dashboard, etapa>=2)
+    contra el total de leads_email del último inject.
+    Devuelve {pending, contacted, total}.
+    """
+    if not SUPABASE_URL:
+        return {"pending": 0, "contacted": 0, "total": 0, "note": "no supabase"}
+    try:
+        # Total contactados: contacts en Supabase con fuente=intel_dashboard
+        r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/contacts"
+            f"?fuente=eq.{OUTREACH_SOURCE}&select=id",
+            headers={**_SB_HEADERS(), "Prefer": "count=exact"},
+            timeout=8,
+        )
+        contacted = int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0
+
+        # Total leads con email en el último inject (campo leads_email del HTML)
+        import re as _re
+        try:
+            html_path = __file__.replace("dashboard_api.py", "intel-dashboard/index.html")
+            with open(html_path, encoding="utf-8") as f:
+                html = f.read()
+            m = _re.search(r"<!-- WS:leads_pending_contact -->([\d]+)<!-- /WS:leads_pending_contact -->", html)
+            pending_ws = int(m.group(1)) if m else None
+        except Exception:
+            pending_ws = None
+
+        if pending_ws is not None:
+            return {"pending": pending_ws, "contacted": contacted, "source": "ws_marker"}
+
+        # Fallback: no tenemos total de leads_email desde la API, devolver solo contactados
+        return {"pending": None, "contacted": contacted, "source": "supabase_only"}
+    except Exception as e:
+        return {"pending": 0, "contacted": 0, "error": str(e)}
+
 @app.get("/api/metrics")
 def metrics(period: int = Query(default=30, ge=7, le=180)):
     cached = _cache_get(period)

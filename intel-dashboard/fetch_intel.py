@@ -2558,6 +2558,22 @@ def main():
     html=inject(html,"leads_high",str(len([l for l in data["leads_history"] if l["score"]==3])))
     html=inject(html,"leads_email",str(len([l for l in data["leads_history"] if l.get("email","—")!="—"])))
     html=inject(html,"outreach_total",str(outreach_total))
+
+    # ── Leads score-3 con email aún sin contactar ─────────────────────────────
+    tracking_file = REPO_DIR / "outreach_tracking.json"
+    sent_emails = set()
+    if tracking_file.exists():
+        try:
+            td = json.load(open(tracking_file, encoding="utf-8"))
+            tc = td.get("contactos", td)
+            sent_emails = {e for e, c in tc.items()
+                          if c.get("etapa", 0) >= 2 or c.get("etapa") == 99}
+        except Exception:
+            pass
+    score3_emails = [l for l in data["leads_history"]
+                     if l["score"] == 3 and l.get("email","—") not in ("—","")]
+    pending_contact = len([l for l in score3_emails if l["email"] not in sent_emails])
+    html=inject(html,"leads_pending_contact",str(pending_contact))
     html=inject(html,"changes_total",str(len(new_changes)))
     html=inject(html,"ALERTS",render_alerts(new_changes,new_leads))
     today_leads=[l for l in data["leads_history"] if l.get("date","")==TODAY]
