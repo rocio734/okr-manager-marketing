@@ -16,6 +16,9 @@ import urllib.request
 import urllib.parse
 import threading
 import time
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 from collections import Counter
 from typing import Optional
@@ -52,6 +55,50 @@ STAGE_MAP = {
     "Cerrado Ganado":    "50217db0-be0f-4ddc-9d92-25fca24cce7e",
     "Cerrado Perdido":   "18ac2275-509c-443d-8460-10b4f322ddd0",
 }
+
+# ── Alerta de respuestas positivas ────────────────────────────────────────────
+GMAIL_ALERT_FROM = os.environ.get("GMAIL_USER", "victoria.miguez@smfconsulting.es")
+GMAIL_ALERT_PASS = os.environ.get("GMAIL_PASSWORD", "")
+ALERT_RECIPIENTS = ["rocio.altamirano@smfconsulting.es", "victoria.miguez@smfconsulting.es"]
+
+def _send_positive_alert(email: str, empresa: str, raw_subject: str, raw_body: str):
+    """Envía alerta inmediata cuando una respuesta se clasifica como positiva."""
+    if not GMAIL_ALERT_PASS:
+        print(f"[alert] GMAIL_PASSWORD no configurada — no se envía alerta para {email}")
+        return
+    try:
+        body_preview = (raw_body or "")[:300].replace("\n", " ")
+        html = f"""\
+<div style="font-family:Arial,sans-serif;font-size:14px;color:#1a1a1a;">
+<h2 style="color:#16a34a;">✅ Respuesta positiva detectada</h2>
+<table style="border-collapse:collapse;width:100%;max-width:560px;">
+  <tr><td style="padding:6px 12px;font-weight:bold;width:120px;">Lead</td>
+      <td style="padding:6px 12px;">{email}</td></tr>
+  <tr style="background:#f9fafb;"><td style="padding:6px 12px;font-weight:bold;">Empresa</td>
+      <td style="padding:6px 12px;">{empresa or "—"}</td></tr>
+  <tr><td style="padding:6px 12px;font-weight:bold;">Asunto</td>
+      <td style="padding:6px 12px;">{raw_subject or "—"}</td></tr>
+  <tr style="background:#f9fafb;"><td style="padding:6px 12px;font-weight:bold;">Mensaje</td>
+      <td style="padding:6px 12px;">{body_preview}{"…" if len(raw_body or "") > 300 else ""}</td></tr>
+</table>
+<p style="margin-top:16px;">
+  <a href="https://etendo-dashboard-api.onrender.com" style="background:#E85D04;color:#fff;
+     padding:10px 20px;text-decoration:none;border-radius:6px;font-weight:bold;">
+    Abrir Dashboard
+  </a>
+</p>
+</div>"""
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"🔥 Respuesta positiva: {empresa or email}"
+        msg["From"]    = GMAIL_ALERT_FROM
+        msg["To"]      = ", ".join(ALERT_RECIPIENTS)
+        msg.attach(MIMEText(html, "html"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=15) as srv:
+            srv.login(GMAIL_ALERT_FROM, GMAIL_ALERT_PASS)
+            srv.sendmail(GMAIL_ALERT_FROM, ALERT_RECIPIENTS, msg.as_string())
+        print(f"🔔 alerta positivo enviada → {ALERT_RECIPIENTS} ({email})")
+    except Exception as e:
+        print(f"⚠️  alerta positivo error: {e}")
 
 # 1x1 transparent GIF
 _GIF = (
@@ -1379,6 +1426,12 @@ def register_reply(payload: dict):
         if r.status_code in (200, 201):
             row = r.json()[0] if r.json() else {}
             print(f"✅ reply guardado: {email} → {sentimiento}")
+            if sentimiento == "positivo":
+                threading.Thread(
+                    target=_send_positive_alert,
+                    args=(email, empresa, raw_subject, raw_body),
+                    daemon=True,
+                ).start()
             return {"ok": True, "id": row.get("id"), "email": email, "sentimiento": sentimiento}
         else:
             print(f"⚠️  Supabase error {r.status_code}: {r.text[:200]}")

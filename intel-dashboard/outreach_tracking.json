@@ -57,8 +57,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 2,
@@ -68,6 +68,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:17Z",
           "notas": ""
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Mail delivery failed: returning message to sender",
+          "enviado_por": "",
+          "fecha": "2026-08-18T14:50:17Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
         }
       ],
       "notas": ""
@@ -367,9 +376,17 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:19Z",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "autoreply_vacaciones",
+          "canal": "autoreply",
+          "subject": "Respuesta automática: Fuera de la oficina hasta el 25/08/2026",
+          "fecha": "2026-08-18T14:50:17Z",
+          "notas": "Out of office — vuelve: 25/08/2026"
         }
       ],
-      "notas": ""
+      "notas": "Out of office — vuelve: 25/08/2026"
     },
     "info@xardinova.es": {
       "email": "info@xardinova.es",
@@ -1012,11 +1029,19 @@
           "canal": "email_n8n",
           "subject": "Tu ERP actual tiene fecha de caducidad",
           "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-18T13:58:33Z",
+          "fecha": "2026-08-19T08:00:00Z",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "autoreply_vacaciones",
+          "canal": "autoreply",
+          "subject": "Fuera de oficina / Out of office",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Out of office — vuelve: 24 de agosto"
         }
       ],
-      "notas": ""
+      "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día."
     },
     "info@bicimania.com": {
       "email": "info@bicimania.com",
@@ -1058,11 +1083,11 @@
           "canal": "email_n8n",
           "subject": "Tu ERP actual tiene fecha de caducidad",
           "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-18T13:58:42Z",
+          "fecha": "2026-08-19T08:00:00Z",
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día."
     },
     "recursoshumanos@citromil.net": {
       "email": "recursoshumanos@citromil.net",
@@ -1175,9 +1200,17 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:59:05Z",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "autoreply_vacaciones",
+          "canal": "autoreply",
+          "subject": "Fuera de oficina / Out of office",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Out of office — vuelve: desconocida"
         }
       ],
-      "notas": ""
+      "notas": "Out of office — vuelve: desconocida"
     },
     "infoescapes@donsilencioso.com": {
       "email": "infoescapes@donsilencioso.com",
@@ -1210,7 +1243,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1227,6 +1260,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1239,7 +1281,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1256,6 +1298,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1268,7 +1319,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1285,6 +1336,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1297,7 +1357,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1314,6 +1374,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1326,7 +1395,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1343,6 +1412,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1355,7 +1433,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1372,6 +1450,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1384,7 +1471,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1401,6 +1488,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1413,7 +1509,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1430,6 +1526,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1442,7 +1547,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1459,6 +1564,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1471,8 +1585,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
-      "etapa_label": "followup_email_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 1,
@@ -1488,6 +1602,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Mail delivery failed",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1500,7 +1623,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "followup_manual",
-      "etapa": 2,
+      "etapa": 3,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -1517,6 +1640,15 @@
           "subject": "followup_contactados",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Confirmado via followup_sent_contactados.json"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-20T11:54:11Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Origen desconocido — solo sabemos que recibió followup email"
@@ -1859,8 +1991,8 @@
       "signal": "Usuario MS Dynamics",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 2,
@@ -1870,6 +2002,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:13Z",
           "notas": ""
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Mail delivery failed",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
         }
       ],
       "notas": ""
@@ -1891,11 +2032,19 @@
           "canal": "email_n8n",
           "subject": "Tu ERP actual tiene fecha de caducidad",
           "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-18T13:56:37Z",
+          "fecha": "2026-08-19T08:00:00Z",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "autoreply_vacaciones",
+          "canal": "autoreply",
+          "subject": "Fuera de oficina / Out of office",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Out of office — vuelve: 24 de agosto"
         }
       ],
-      "notas": ""
+      "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día."
     },
     "reservaslume@luciafreitas.es": {
       "email": "reservaslume@luciafreitas.es",
@@ -1916,6 +2065,197 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:05Z",
           "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "test-pipeline@ejemplo.com": {
+      "email": "test-pipeline@ejemplo.com",
+      "empresa": "—",
+      "dominio": "ejemplo.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "autoreply",
+          "subject": "Respuesta automática: Fuera de la oficina hasta el 01/09/2026",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Out of office — vuelve: 01/09/2026"
+        }
+      ],
+      "notas": ""
+    },
+    "vsanchez@vernegroup.com": {
+      "email": "vsanchez@vernegroup.com",
+      "empresa": "—",
+      "dominio": "vernegroup.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Mail delivery failed",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
+    },
+    "sergio@grupapunts.es": {
+      "email": "sergio@grupapunts.es",
+      "empresa": "—",
+      "dominio": "grupapunts.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Mail delivery failed",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
+    },
+    "berocel@iberocel.com": {
+      "email": "berocel@iberocel.com",
+      "empresa": "—",
+      "dominio": "iberocel.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "autoreply",
+          "subject": "Fuera de oficina / Out of office",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Out of office — vuelve: 24 de agosto"
+        }
+      ],
+      "notas": ""
+    },
+    "javier.rodriguez@lodisna.com": {
+      "email": "javier.rodriguez@lodisna.com",
+      "empresa": "—",
+      "dominio": "lodisna.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "autoreply",
+          "subject": "Fuera de oficina / Out of office",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:36:38Z",
+          "notas": "Out of office — vuelve: 19 de agosto"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-20T11:56:42Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up post-vacaciones — volvió 2026-08-19"
+        }
+      ],
+      "notas": ""
+    },
+    "comercial@dts.es": {
+      "email": "comercial@dts.es",
+      "empresa": "—",
+      "dominio": "dts.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Address not found",
+          "enviado_por": "",
+          "fecha": "2026-08-19T14:47:25Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
+    },
+    "info@huertajardin.com": {
+      "email": "info@huertajardin.com",
+      "empresa": "Huerta &amp; Jardín",
+      "dominio": "huertajardin.com",
+      "sector": "Servicios",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-19T19:53:50Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "marketing@gerimport.com": {
+      "email": "marketing@gerimport.com",
+      "empresa": "Gerimport",
+      "dominio": "gerimport.com",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-19T19:53:56Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
       ],
       "notas": ""
