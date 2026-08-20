@@ -1,4 +1,4 @@
-name: Partners — Spider semanal
+name: Partners — Spider semanal + outreach
 
 on:
   schedule:
@@ -33,10 +33,21 @@ jobs:
           HUNTER_API_KEY: ${{ secrets.HUNTER_API_KEY }}
         run: cd intel-dashboard && python run_partners.py
 
+      - name: Enriquecer emails de partners (scraping web)
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: cd intel-dashboard && python enrich_partner_emails.py
+
+      - name: Enviar outreach a partners nuevos con email
+        env:
+          PYTHONUNBUFFERED: "1"
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        run: cd intel-dashboard && python send_outreach_partners.py --limit 15
+
       - name: Commit y push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add intel-dashboard/index.html intel-dashboard/intel_data.json
-          git diff --staged --quiet || git commit -m "Partners $(date +'%Y-%m-%d') — spider semanal"
+          git add intel-dashboard/index.html intel-dashboard/intel_data.json intel-dashboard/outreach_tracking.json
+          git diff --staged --quiet || git commit -m "Partners $(date +'%Y-%m-%d') — spider + enriquecimiento + outreach"
           git push
