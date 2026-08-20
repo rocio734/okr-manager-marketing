@@ -185,61 +185,101 @@ def scrape_distrk_partners():
 # ═══════════════════════════════════════════════════════════════════════════════
 
 async def _pw_holded():
-    """Playwright: directorio de partners de Holded."""
+    """Playwright: directorio de partners de Holded.
+
+    Estrategia:
+    1. Cargar /directorio-solution-partners → extraer 45 URLs de perfil
+    2. Visitar cada perfil → sacar h1 (nombre) + 'Visitar web' (URL externa)
+    """
     partners = []
     seen = set()
+    base = "https://www.holded.com"
+
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         ctx = await browser.new_context(
             user_agent=HEADERS["User-Agent"],
             locale="es-ES",
         )
+        # ── Paso 1: extraer slugs del directorio ──────────────────────────────
         page = await ctx.new_page()
         try:
-            await page.goto("https://www.holded.com/es/directorio-solution-partners",
+            await page.goto(f"{base}/es/directorio-solution-partners",
                             timeout=30000, wait_until="networkidle")
-            # Esperar a que aparezcan tarjetas de partners
             await page.wait_for_timeout(4000)
-
-            # Holded renderiza cada partner como una card con un link externo
-            # Buscar todos los links que salen de holded.com
-            links = await page.query_selector_all("a[href]")
-            for link in links:
-                href = await link.get_attribute("href") or ""
-                if not href.startswith("http") or "holded.com" in href:
-                    continue
-                d = fi.domain_from_url(href)
-                if not d or d in seen or fi.should_skip(d):
-                    continue
-                # Intentar obtener nombre: texto del link, o el h3/h4 más cercano
-                name = (await link.inner_text()).strip()
-                if not name or len(name) < 3 or name.lower() in ("web", "website", "visitar"):
-                    # Subir un nivel a buscar el nombre de la empresa
-                    parent = await link.evaluate_handle("el => el.closest('[class*=card], [class*=partner], article, li, div')")
-                    if parent:
-                        heading = await parent.query_selector("h2,h3,h4,strong,[class*=name],[class*=title]")
-                        if heading:
-                            name = (await heading.inner_text()).strip()[:60]
-                if not name or len(name) < 3:
-                    name = d.split(".")[0].capitalize()
-                partners.append({"name": name[:60], "competitor": "Holded",
-                                  "url": href, "domain": d})
-                seen.add(d)
+            profile_links = await page.query_selector_all(
+                "a[href*='/directorio-solution-partners/']"
+            )
+            profile_urls = []
+            for a in profile_links:
+                href = await a.get_attribute("href") or ""
+                # Filtrar la propia página del directorio
+                if href and href != "/es/directorio-solution-partners":
+                    full = base + href if href.startswith("/") else href
+                    if full not in profile_urls:
+                        profile_urls.append(full)
+            print(f"    Holded: {len(profile_urls)} perfiles encontrados")
         except Exception as e:
-            print(f"    ⚠️  Holded Playwright: {e}")
+            print(f"    ⚠️  Holded directorio: {e}")
+            profile_urls = []
         finally:
-            await browser.close()
+            await page.close()
+
+        # ── Paso 2: visitar cada perfil ───────────────────────────────────────
+        for i, url in enumerate(profile_urls, 1):
+            prof = await ctx.new_page()
+            try:
+                await prof.goto(url, timeout=20000, wait_until="domcontentloaded")
+                await prof.wait_for_timeout(2000)
+
+                # Nombre: h1 de la página
+                name_el = await prof.query_selector("h1")
+                name = (await name_el.inner_text()).strip()[:60] if name_el else ""
+
+                # Website externo: link con texto "Visitar web" o primero que salga de holded.com
+                web_el = await prof.query_selector(
+                    "a:has-text('Visitar web'), a:has-text('Visitar página'), "
+                    "a[href^='http']:not([href*='holded.com']):not([href*='facebook']):not([href*='instagram'])"
+                    ":not([href*='linkedin']):not([href*='twitter']):not([href*='apple']):not([href*='google'])"
+                )
+                href = (await web_el.get_attribute("href") or "").strip() if web_el else ""
+                d = fi.domain_from_url(href)
+
+                if d and d not in seen and not fi.should_skip(d):
+                    if not name:
+                        name = d.split(".")[0].capitalize()
+                    partners.append({"name": name, "competitor": "Holded",
+                                     "url": href, "domain": d})
+                    seen.add(d)
+                    if i % 10 == 0:
+                        print(f"    [{i}/{len(profile_urls)}] partners: {len(partners)}")
+            except Exception as e:
+                print(f"    ⚠️  Holded perfil {i}: {e}")
+            finally:
+                await prof.close()
+            await asyncio.sleep(0.3)
+
+        await browser.close()
+    print(f"    Holded total: {len(partners)} partners con web")
     return partners
 
 
 async def _pw_sage():
-    """Playwright: formulario de búsqueda de partners Sage España."""
+    """Playwright: formulario de búsqueda de partners Sage España.
+
+    Estructura de resultados:
+    - <a class='website-opt' href='...'>  → URL externa del partner
+    - data-tracking='NOMBRE'              → nombre del partner (en botón hermano)
+    Requiere ciudad para devolver resultados; iteramos varias ciudades + tipos.
+    Extraemos con regex del HTML para acceder a elementos ocultos.
+    """
     partners = []
     seen = set()
-    # Buscar partners en varias ciudades españolas para cobertura amplia
+    types = ["Business Partner", "Tech Partner"]
+    # Sin ciudad el formulario no devuelve nada; con ciudades grandes cubrimos España
     locations = ["Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao",
                  "Zaragoza", "Málaga", "Murcia", "Valladolid", "Alicante"]
-    types = ["Business Partner", "Tech Partner"]
+    URL = "https://www.sage.com/es-es/encuentra-un-partner/"
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -247,75 +287,88 @@ async def _pw_sage():
             user_agent=HEADERS["User-Agent"],
             locale="es-ES",
         )
-        for loc in locations:
-            for ptype in types:
+        for ptype in types:
+            for loc in locations:
                 page = await ctx.new_page()
                 try:
-                    await page.goto("https://www.sage.com/es-es/encuentra-un-partner/",
-                                    timeout=25000, wait_until="domcontentloaded")
+                    await page.goto(URL, timeout=25000, wait_until="domcontentloaded")
                     await page.wait_for_timeout(2000)
 
-                    # Rellenar localización
-                    loc_input = await page.query_selector(
-                        "input[placeholder*='postal'], input[placeholder*='ciudad'], "
-                        "input[name*='location'], input[id*='location'], "
-                        ".sage-partner-search input[type='text']"
-                    )
+                    type_sel = await page.query_selector("#partner-search-partner-type")
+                    if type_sel:
+                        await type_sel.select_option(value=ptype)
+
+                    country_sel = await page.query_selector("#partner-search-country")
+                    if country_sel:
+                        await country_sel.select_option(value="Spain")
+
+                    loc_input = await page.query_selector("#partner-search-location")
                     if loc_input:
                         await loc_input.fill(loc)
-                        await page.wait_for_timeout(500)
 
-                    # Seleccionar tipo de partner (select o radio)
-                    type_sel = await page.query_selector("select[name*='type'], select[id*='type']")
-                    if type_sel:
-                        await type_sel.select_option(label=ptype)
-                    else:
-                        # Intentar como dropdown o radio
-                        radio = await page.query_selector(f"input[value='{ptype}']")
-                        if radio:
-                            await radio.click()
-
-                    # Enviar formulario
-                    submit = await page.query_selector(
-                        "button[type='submit'], input[type='submit'], "
-                        ".sage-partner-search button, [class*='search-btn']"
-                    )
+                    submit = await page.query_selector("#partner-search-submit")
                     if submit:
                         await submit.click()
-                        await page.wait_for_timeout(4000)
+                        await page.wait_for_timeout(6000)
 
-                    # Extraer resultados
-                    result_cards = await page.query_selector_all(
-                        ".sage-partner-search-results .partner, "
-                        "[class*='partner-result'], [class*='result-card'], "
-                        ".sage-partner-search-results li, "
-                        ".sage-partner-search-results article"
-                    )
-                    for card in result_cards:
-                        name_el = await card.query_selector("h2,h3,h4,[class*='name'],[class*='title']")
-                        web_el  = await card.query_selector("a[href*='http']:not([href*='sage.com'])")
-                        name = (await name_el.inner_text()).strip()[:60] if name_el else ""
-                        href = (await web_el.get_attribute("href") or "") if web_el else ""
+                    # JS evaluate para extraer pares nombre+URL de elementos ocultos
+                    JS = """
+                        () => {
+                            const out = [];
+                            document.querySelectorAll(".more-partner-details").forEach(detail => {
+                                const webLink = detail.querySelector("a.website-opt");
+                                if (!webLink) return;
+                                const href = webLink.href;
+                                const sibling = detail.previousElementSibling;
+                                let name = "";
+                                if (sibling) {
+                                    const btn = sibling.querySelector("[data-tracking]");
+                                    if (btn) name = btn.getAttribute("data-tracking") || "";
+                                }
+                                if (!name) {
+                                    const parent = detail.closest("li, .partner, article");
+                                    if (parent) {
+                                        const h = parent.querySelector("h2,h3,h4,.partner-name");
+                                        if (h) name = h.textContent.trim();
+                                    }
+                                }
+                                out.push({name: name, href: href});
+                            });
+                            return out;
+                        }
+                    """
+                    rows = await page.evaluate(JS)
+                    found = 0
+                    for row in rows:
+                        href = row.get("href", "")
                         d = fi.domain_from_url(href)
-                        if d and d not in seen and not fi.should_skip(d) and name:
+                        if d and d not in seen and not fi.should_skip(d):
+                            name = (row.get("name") or d.split(".")[0]).strip().title()[:60]
                             partners.append({"name": name, "competitor": "Sage",
                                              "url": href, "domain": d})
                             seen.add(d)
+                            found += 1
 
-                    if result_cards:
-                        print(f"    Sage {loc}/{ptype}: {len(result_cards)} resultados")
+                    if found:
+                        print(f"    Sage {ptype}/{loc}: {found} nuevos")
+
                 except Exception as e:
-                    print(f"    ⚠️  Sage {loc}/{ptype}: {e}")
+                    print(f"    ⚠️  Sage {ptype}/{loc}: {e}")
                 finally:
                     await page.close()
-                time.sleep(0.5)
+                await asyncio.sleep(0.5)
 
         await browser.close()
+    print(f"    Sage total: {len(partners)} partners con web")
     return partners
 
 
 async def _pw_sap():
-    """Playwright: directorio de partners SAP Latinoamérica/España."""
+    """Playwright: directorio de partners SAP España.
+
+    sap.com/spain/partners/find.html ya tiene los partners precargados.
+    Extraemos con JS evaluate todos los links externos que son webs de partners.
+    """
     partners = []
     seen = set()
     async with async_playwright() as p:
@@ -326,43 +379,46 @@ async def _pw_sap():
         )
         page = await ctx.new_page()
         try:
-            await page.goto("https://www.sap.com/latinamerica/partners/find.html",
-                            timeout=30000, wait_until="networkidle")
-            await page.wait_for_timeout(5000)
+            await page.goto("https://www.sap.com/spain/partners/find.html",
+                            timeout=25000, wait_until="domcontentloaded")
+            await page.wait_for_timeout(3000)
 
-            # Buscar el selector de país para filtrar España
-            country_sel = await page.query_selector(
-                "select[name*='country'], select[id*='country'], "
-                "[placeholder*='country'], [placeholder*='país']"
-            )
-            if country_sel:
-                await country_sel.select_option(label="Spain")
-                await page.wait_for_timeout(1000)
+            # Aceptar cookies si aparece el banner
+            btn = await page.query_selector("#truste-consent-button")
+            if btn:
+                await btn.click()
+                await page.wait_for_timeout(2000)
 
-            # Buscar tipo "Sell" o "Consulting" (los más relevantes)
-            for ptype in ["Sell", "Consulting", "Managed Services"]:
-                type_el = await page.query_selector(f"[value='{ptype}'], label:has-text('{ptype}')")
-                if type_el:
-                    await type_el.click()
-                    await page.wait_for_timeout(3000)
+            await page.wait_for_timeout(3000)
 
-                    # Extraer resultados
-                    cards = await page.query_selector_all(
-                        "[class*='partner-card'], [class*='partner-result'], "
-                        "[class*='result-item'], .partner, article"
-                    )
-                    for card in cards:
-                        name_el = await card.query_selector("h2,h3,h4,[class*='name']")
-                        web_el  = await card.query_selector("a[href*='http']:not([href*='sap.com'])")
-                        name = (await name_el.inner_text()).strip()[:60] if name_el else ""
-                        href = (await web_el.get_attribute("href") or "") if web_el else ""
-                        d = fi.domain_from_url(href)
-                        if d and d not in seen and not fi.should_skip(d) and name:
-                            partners.append({"name": name, "competitor": "SAP",
-                                             "url": href, "domain": d})
-                            seen.add(d)
-                    if cards:
-                        print(f"    SAP {ptype}: {len(cards)} resultados")
+            JS = """
+                () => {
+                    const skip = ["sap.com","facebook","twitter","linkedin","instagram",
+                                  "youtube","google","apple","microsoft","mailto","tel:","#"];
+                    const links = document.querySelectorAll("a[href]");
+                    const out = [];
+                    links.forEach(a => {
+                        const href = a.href;
+                        if (!href.startsWith("http")) return;
+                        if (skip.some(s => href.includes(s))) return;
+                        const card = a.closest("[class*=card],[class*=partner],li,article");
+                        const name = card?.querySelector("h2,h3,h4,[class*=name],[class*=title]")?.textContent?.trim()
+                                  || a.textContent.trim()
+                                  || "";
+                        out.push({href: href, name: name.substring(0, 60)});
+                    });
+                    return out;
+                }
+            """
+            rows = await page.evaluate(JS)
+            for row in rows:
+                d = fi.domain_from_url(row.get("href", ""))
+                if d and d not in seen and not fi.should_skip(d):
+                    name = (row.get("name") or d.split(".")[0]).strip()[:60] or d.split(".")[0].capitalize()
+                    partners.append({"name": name, "competitor": "SAP",
+                                     "url": row.get("href", ""), "domain": d})
+                    seen.add(d)
+            print(f"    SAP España: {len(partners)} partners encontrados")
 
         except Exception as e:
             print(f"    ⚠️  SAP Playwright: {e}")
