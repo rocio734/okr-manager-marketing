@@ -2213,20 +2213,41 @@ def _age_badge(lead_date_str):
 
 PARTNER_SOURCES = {"partner_scraping","partner_spider"}
 
-def render_leads(leads):
+def _outreach_badge(email, sent_map):
+    """Badge de estado outreach para la tabla de leads."""
+    if not email or email == "—":
+        return ""
+    info = sent_map.get(email)
+    if not info:
+        return ""
+    etapa = info.get("etapa", 0)
+    if etapa == 99:
+        return '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:#fee2e2;color:#991b1b;font-weight:600;margin-left:4px">✗ Descartado</span>'
+    if etapa >= 4:
+        return '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:#dcfce7;color:#166534;font-weight:600;margin-left:4px">💬 Respondió</span>'
+    if etapa == 3:
+        return '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:#dbeafe;color:#1e40af;font-weight:600;margin-left:4px">↩ Follow-up</span>'
+    if etapa == 2:
+        return '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:#e0f2fe;color:#0369a1;font-weight:600;margin-left:4px">✉ Enviado</span>'
+    return ""
+
+def render_leads(leads, sent_map=None):
+    if sent_map is None: sent_map = {}
     direct = [l for l in leads if l.get("source_type","") not in PARTNER_SOURCES]
     if not direct: return '<tr><td colspan="11" style="padding:16px;text-align:center;color:var(--text-muted)">Sin leads directos</td></tr>'
     rows=""
     for l in direct[:100]:
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l"); sc_txt="⭐ Alto" if sc==3 else("▲ Medio" if sc==2 else"▼ Bajo")
         em=l.get("email","—"); em_h=f'<a href="mailto:{em}" class="lnk">{em[:22]}{"…" if len(em)>22 else ""}</a>' if em!="—" else '<span style="color:var(--text-muted)">—</span>'
-        age=_age_badge(l.get("date",""))
+        ob = _outreach_badge(em, sent_map)
+        # Si ya está en outreach no mostrar badge de fecha — ya tiene el badge de estado
+        age = "" if ob else _age_badge(l.get("date",""))
         pais=l.get("pais_detectado","—") or "—"
         es_spain = "España" in pais
         pais_style = "font-size:11px" if es_spain else "font-size:11px;font-weight:700;color:#c0392b"
         pais_icon = "" if es_spain or pais=="—" else " ⚠️"
         rows+=f'<tr data-s="{l["signal"]}" data-q="{"h" if sc==3 else("m" if sc==2 else"l")}" data-src="{l.get("source_type","")}">'
-        rows+=f'<td><b>{l["company"]}</b>{age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
+        rows+=f'<td><b>{l["company"]}</b>{age}{ob}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
         rows+=f'<td style="color:var(--text-secondary);font-size:11px">{l["sector"]}</td>'
         rows+=f'<td><span class="sig {l["signal_class"]}">{l["signal_label"]}</span>{src_badge(l.get("source_type",""))}</td>'
         rows+=f'<td><span class="{sc_cls}">{sc_txt}</span></td>'
@@ -2241,7 +2262,7 @@ def render_leads(leads):
 
 def render_partner_leads(leads):
     partners = [l for l in leads if l.get("source_type","") in PARTNER_SOURCES]
-    if not partners: return '<tr><td colspan="7" style="padding:16px;text-align:center;color:var(--text-muted)">Sin partners detectados</td></tr>'
+    if not partners: return '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text-muted)"><div style="font-size:13px;margin-bottom:6px">Sin partners detectados aún</div><div style="font-size:11px;max-width:480px;margin:0 auto;line-height:1.6">Los partners son <b>consultoras IT e integradores</b> que implementan ERPs (Odoo, SAP, Holded, Sage) y podrían revender o implementar Etendo. El spider que los detecta scrapeará los directorios de partners de los competidores en la próxima ejecución completa.</div></td></tr>'
     rows=""
     for l in partners[:60]:
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l")
@@ -2582,7 +2603,17 @@ def main():
     html=inject(html,"CHANGES_HISTORY",render_changes(data))
     html=inject(html,"PRICES_ROWS",render_prices(data))
     html=inject(html,"FEATURES",render_features(data))
-    html=inject(html,"LEADS_ROWS",render_leads(data["leads_history"]))
+    # Cruzar leads con tracking para mostrar estado outreach en la tabla
+    _sent_map = {}
+    if tracking_file.exists():
+        try:
+            _td = json.load(open(tracking_file, encoding="utf-8"))
+            _tc = _td.get("contactos", _td)
+            _sent_map = {e: c for e, c in _tc.items()
+                         if c.get("etapa", 0) >= 2 or c.get("etapa") == 99}
+        except Exception:
+            pass
+    html=inject(html,"LEADS_ROWS",render_leads(data["leads_history"], _sent_map))
     html=inject(html,"PARTNER_ROWS",render_partner_leads(data["leads_history"]))
     engagement_posts = data.get("engagement_history",[])
     html=inject(html,"ENGAGEMENT_ROWS",render_engagement(data))
