@@ -1,0 +1,42 @@
+name: Partners — Spider semanal
+
+on:
+  schedule:
+    # Lunes 7:00 UTC = 9:00 España (verano)
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias Python
+        run: |
+          pip install requests beautifulsoup4 cryptography urllib3
+          pip install playwright
+
+      - name: Instalar Chromium para Playwright
+        run: playwright install chromium --with-deps
+
+      - name: Ejecutar spider de partners
+        env:
+          PYTHONUNBUFFERED: "1"
+          HUNTER_API_KEY: ${{ secrets.HUNTER_API_KEY }}
+        run: cd intel-dashboard && python run_partners.py
+
+      - name: Commit y push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add intel-dashboard/index.html intel-dashboard/intel_data.json
+          git diff --staged --quiet || git commit -m "Partners $(date +'%Y-%m-%d') — spider semanal"
+          git push

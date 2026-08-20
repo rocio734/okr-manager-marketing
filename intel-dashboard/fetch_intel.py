@@ -2264,7 +2264,7 @@ def render_partner_leads(leads):
     partners = [l for l in leads if l.get("source_type","") in PARTNER_SOURCES]
     if not partners: return '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text-muted)"><div style="font-size:13px;margin-bottom:6px">Sin partners detectados aún</div><div style="font-size:11px;max-width:480px;margin:0 auto;line-height:1.6">Los partners son <b>consultoras IT e integradores</b> que implementan ERPs (Odoo, SAP, Holded, Sage) y podrían revender o implementar Etendo. El spider que los detecta scrapeará los directorios de partners de los competidores en la próxima ejecución completa.</div></td></tr>'
     rows=""
-    for l in partners[:60]:
+    for l in partners:
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l")
         age=_age_badge(l.get("date",""))
         comp=l.get("snippet","").split("—")[0].replace("Partner ","").strip()[:30] or "—"
