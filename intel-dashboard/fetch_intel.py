@@ -2567,8 +2567,6 @@ def main():
         else: print("  ⚠️ Configura GOOGLE_SERVICE_ACCOUNT_JSON")
     print("→ Supabase Outreach...")
     save_to_supabase(new_leads)
-    outreach_total = count_supabase_outreach()
-    print(f"  → Total en Outreach Supabase: {outreach_total}")
     print("→ HTML...")
     html=open(HTML_FILE,encoding="utf-8").read()
     by_src={}
@@ -2578,19 +2576,26 @@ def main():
     html=inject(html,"leads_new_today",str(len(new_leads)))
     html=inject(html,"leads_high",str(len([l for l in data["leads_history"] if l["score"]==3])))
     html=inject(html,"leads_email",str(len([l for l in data["leads_history"] if l.get("email","—")!="—"])))
-    html=inject(html,"outreach_total",str(outreach_total))
 
-    # ── Leads score-3 con email aún sin contactar ─────────────────────────────
+    # ── Leads score-3 con email aún sin contactar + stats de outreach reales ──
     tracking_file = REPO_DIR / "outreach_tracking.json"
     sent_emails = set()
+    outreach_sent = 0
+    outreach_followups = 0
     if tracking_file.exists():
         try:
             td = json.load(open(tracking_file, encoding="utf-8"))
             tc = td.get("contactos", td)
             sent_emails = {e for e, c in tc.items()
                           if c.get("etapa", 0) >= 2 or c.get("etapa") == 99}
+            outreach_sent = sum(1 for c in tc.values()
+                                if c.get("etapa", 0) >= 2)
+            outreach_followups = sum(1 for c in tc.values()
+                                     if c.get("etapa", 0) == 3)
         except Exception:
             pass
+    html=inject(html,"outreach_sent",str(outreach_sent))
+    html=inject(html,"outreach_followups",str(outreach_followups))
     score3_emails = [l for l in data["leads_history"]
                      if l["score"] == 3 and l.get("email","—") not in ("—","")]
     pending_contact = len([l for l in score3_emails if l["email"] not in sent_emails])
