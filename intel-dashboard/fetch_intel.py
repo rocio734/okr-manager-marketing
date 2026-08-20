@@ -1092,8 +1092,8 @@ def scrape_empresite():
         ("INDUSTRIA-METALICA",               "Industrial"),
         ("MADERA-MUEBLE",                    "Madera/Mueble"),
         ("DISTRIBUCION",                     "Distribución"),
-        ("FARMACIA",                         "Farmacéutico"),
         ("OBRA-CIVIL",                       "Construcción"),
+        # FARMACIA eliminado — farmacias son B2C, no target de Etendo ERP
     ]
     _PROVINCES = [
         "MADRID","BARCELONA","VALENCIA","SEVILLA","MALAGA",
