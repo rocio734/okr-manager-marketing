@@ -1,5 +1,16 @@
 services:
   - type: web
+    name: intel-dashboard
+    env: static
+    staticPublishPath: ./intel-dashboard
+    plan: free
+    buildCommand: ""
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+
+  - type: web
     name: analytics-dashboard
     env: static
     staticPublishPath: ./analytics-dashboard
