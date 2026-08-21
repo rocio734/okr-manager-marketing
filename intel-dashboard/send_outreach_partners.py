@@ -43,7 +43,10 @@ DRY_RUN = "--dry-run" in sys.argv
 LIMIT   = int(next((sys.argv[sys.argv.index("--limit")+1]
                     for i, a in enumerate(sys.argv) if a == "--limit"), MAX_PER_DAY))
 
-FAKE_EMAILS  = {"su@email.com", "test@test.com", "example@example.com"}
+FAKE_EMAILS  = {"su@email.com", "test@test.com", "example@example.com",
+                "contacto@tuempresa.com", "info@tuempresa.com", "email@tudominio.com",
+                "johnsmith@example.com", "jeff@paige.black"}
+FAKE_DOMAINS = {"example.com", "mailinator.com", "guerrillamail.com"}
 SKIP_DOMAINS = {"gmail.com", "hotmail.com", "yahoo.com", "outlook.com",
                 "yahoo.es", "hotmail.es", "live.com"}
 
@@ -200,6 +203,7 @@ def main():
         if l.get("source_type", "") in fi.PARTNER_SOURCES
         and l.get("email", "—") not in ("—", "", None, "None")
         and l.get("email", "").split("@")[-1] not in SKIP_DOMAINS
+        and l.get("email", "").split("@")[-1] not in FAKE_DOMAINS
         and l.get("email", "") not in FAKE_EMAILS
         and l.get("email", "") not in already_sent
     ]
@@ -216,7 +220,18 @@ def main():
     enviados = 0
     for lead in candidates[:LIMIT]:
         email   = lead.get("email", "")
-        company = lead.get("company", "").strip() or lead.get("domain", "")
+        raw_company = lead.get("company", "").strip()
+        domain      = lead.get("domain", "")
+        # Limpiar nombres que son dominios (www.xxx.com) o direcciones físicas
+        if (raw_company.startswith("www.") or
+                (raw_company.count(".") >= 1 and " " not in raw_company)):
+            # Es un dominio — usar dominio limpio capitalizado
+            company = domain.replace("www.", "").split(".")[0].capitalize()
+        elif len(raw_company) > 80 or raw_company[:3].isdigit():
+            # Parece una dirección física
+            company = domain.replace("www.", "").split(".")[0].capitalize()
+        else:
+            company = raw_company or domain
         comp    = get_competitor(lead)
         body    = COPY_BY_COMPETITOR.get(comp, BODY_GENERICO)
 
