@@ -21,28 +21,34 @@ jobs:
 
       - name: Instalar dependencias Python
         run: |
-          pip install requests beautifulsoup4 cryptography urllib3
-          pip install playwright
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests beautifulsoup4 cryptography urllib3 playwright
 
       - name: Instalar Chromium para Playwright
-        run: playwright install chromium --with-deps
+        run: python3 -m playwright install chromium --with-deps
 
       - name: Ejecutar spider de partners
         env:
           PYTHONUNBUFFERED: "1"
           HUNTER_API_KEY: ${{ secrets.HUNTER_API_KEY }}
-        run: cd intel-dashboard && python run_partners.py
+        run: cd intel-dashboard && python3 run_partners.py
 
+      # Enriquecimiento: cap 30 min para no bloquear el job completo.
+      # Si hay muchos partners nuevos, la siguiente ejecución semanal continúa
+      # (el script es idempotente — salta los que ya tienen email).
       - name: Enriquecer emails de partners (scraping web)
+        continue-on-error: true
+        timeout-minutes: 30
         env:
           PYTHONUNBUFFERED: "1"
-        run: cd intel-dashboard && python enrich_partner_emails.py
+        run: cd intel-dashboard && python3 enrich_partner_emails.py
 
       - name: Enviar outreach a partners nuevos con email
+        continue-on-error: true
         env:
           PYTHONUNBUFFERED: "1"
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        run: cd intel-dashboard && python send_outreach_partners.py --limit 15
+        run: cd intel-dashboard && python3 send_outreach_partners.py --limit 15
 
       - name: Commit y push
         run: |

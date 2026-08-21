@@ -187,7 +187,7 @@ def main():
     data   = fi.load_data()
     leads  = data["leads_history"]
     tracking = load_tracking()
-    already_sent = get_emails_sent(tracking)
+    already_sent = get_emails_sent(tracking, etapa=2)
 
     # Partners con email no enviados aún
     candidates = [
@@ -222,8 +222,12 @@ def main():
         if not DRY_RUN:
             ok = send_via_n8n(email, SUBJECT, body_rendered, company)
             if ok:
-                update_stage(tracking, email, 2, empresa=company, domain=lead.get("domain",""),
-                             source="partner_outreach", fecha=datetime.now(timezone.utc).isoformat())
+                update_stage(tracking, email, 2,
+                             canal="email", subject=SUBJECT,
+                             enviado_por=GMAIL_USER,
+                             fecha=datetime.now(timezone.utc).isoformat(),
+                             empresa=company, dominio=lead.get("domain",""),
+                             fuente="partner_outreach")
                 enviados += 1
                 print(f"    ✓ enviado")
             else:
