@@ -53,6 +53,11 @@ SUBJECT = "Amplía tu portfolio con Etendo — ERP open source con IA"
 # {empresa} = nombre de la consultora partner
 # {competidor} = ERP que implementan (Holded, Sage, Odoo, etc.)
 
+UTM_BASE = "utm_source=email&utm_medium=outreach&utm_campaign=partners_reventa"
+
+def etendo_link(utm_content: str) -> str:
+    return f"https://etendo.software?{UTM_BASE}&utm_content={utm_content}"
+
 BODY_GENERICO = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
 <p>Hola {empresa},</p>
@@ -68,7 +73,7 @@ BODY_GENERICO = """\
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
 Etendo — Canal de partners<br>
-<a href="https://etendo.software" style="color:#E85D04;">etendo.software</a></p>
+<a href="{link_generico}" style="color:#E85D04;">etendo.software</a></p>
 </div>"""
 
 BODY_ODOO = """\
@@ -86,7 +91,7 @@ BODY_ODOO = """\
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
 Etendo — Canal de partners<br>
-<a href="https://etendo.software" style="color:#E85D04;">etendo.software</a></p>
+<a href="{link_odoo}" style="color:#E85D04;">etendo.software</a></p>
 </div>"""
 
 BODY_HOLDED = """\
@@ -104,7 +109,7 @@ BODY_HOLDED = """\
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
 Etendo — Canal de partners<br>
-<a href="https://etendo.software" style="color:#E85D04;">etendo.software</a></p>
+<a href="{link_holded}" style="color:#E85D04;">etendo.software</a></p>
 </div>"""
 
 BODY_SAGE = """\
@@ -122,7 +127,7 @@ BODY_SAGE = """\
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
 Etendo — Canal de partners<br>
-<a href="https://etendo.software" style="color:#E85D04;">etendo.software</a></p>
+<a href="{link_sage}" style="color:#E85D04;">etendo.software</a></p>
 </div>"""
 
 BODY_SAP = """\
@@ -140,7 +145,7 @@ BODY_SAP = """\
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
 Etendo — Canal de partners<br>
-<a href="https://etendo.software" style="color:#E85D04;">etendo.software</a></p>
+<a href="{link_sap}" style="color:#E85D04;">etendo.software</a></p>
 </div>"""
 
 COPY_BY_COMPETITOR = {
@@ -215,7 +220,16 @@ def main():
         comp    = get_competitor(lead)
         body    = COPY_BY_COMPETITOR.get(comp, BODY_GENERICO)
 
-        body_rendered = body.replace("{empresa}", company).replace("{competidor}", comp)
+        utm_content = comp.lower().replace(" ", "_")
+        body_rendered = (body
+            .replace("{empresa}", company)
+            .replace("{competidor}", comp)
+            .replace("{link_generico}", etendo_link(utm_content))
+            .replace("{link_holded}",  etendo_link("holded"))
+            .replace("{link_sage}",    etendo_link("sage"))
+            .replace("{link_sap}",     etendo_link("sap"))
+            .replace("{link_odoo}",    etendo_link("odoo"))
+        )
 
         print(f"  → {company[:40]:40s} | {email:35s} | [{comp}]")
 
