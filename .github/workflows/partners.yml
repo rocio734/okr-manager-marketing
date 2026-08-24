@@ -50,6 +50,13 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
         run: cd intel-dashboard && python3 send_outreach_partners.py --limit 15
 
+      - name: Followup vacaciones (recontacta quien ya volvió)
+        continue-on-error: true
+        env:
+          PYTHONUNBUFFERED: "1"
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        run: cd intel-dashboard && python3 followup_vacaciones.py
+
       - name: Commit y push
         run: |
           git config user.name  "github-actions[bot]"

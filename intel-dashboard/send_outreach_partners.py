@@ -160,6 +160,14 @@ COPY_BY_COMPETITOR = {
 }
 
 
+PIXEL_BASE = "https://etendo-dashboard-api.onrender.com/pixel"
+
+def pixel_tag(email: str) -> str:
+    """Pixel de apertura 1x1 — mismo endpoint que el outreach de leads."""
+    import urllib.parse
+    return f'<img src="{PIXEL_BASE}/{urllib.parse.quote(email)}.gif" width="1" height="1" style="display:none" alt="">'
+
+
 def get_competitor(lead: dict) -> str:
     """Extrae el nombre del competidor del snippet o source_type."""
     snippet = lead.get("snippet", "")
@@ -244,7 +252,7 @@ def main():
             .replace("{link_sage}",    etendo_link("sage"))
             .replace("{link_sap}",     etendo_link("sap"))
             .replace("{link_odoo}",    etendo_link("odoo"))
-        )
+        ) + pixel_tag(email)
 
         print(f"  → {company[:40]:40s} | {email:35s} | [{comp}]")
 
