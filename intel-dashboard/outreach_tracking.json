@@ -17,8 +17,8 @@
       "sector": "Construcción",
       "signal": "Usuario MS Dynamics",
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -28,6 +28,15 @@
           "fecha": "2026-08-20T12:30:21Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -61,8 +70,8 @@
       "sector": "Servicios",
       "signal": "Usuario MS Dynamics",
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -72,6 +81,15 @@
           "fecha": "2026-08-20T12:30:27Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -1362,8 +1380,8 @@
       "sector": "General",
       "signal": "Usuario TeamSystem/DistritoK",
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1373,6 +1391,15 @@
           "fecha": "2026-08-20T12:30:39Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -1417,8 +1444,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1436,6 +1463,15 @@
           "subject": "Fuera de oficina / Out of office",
           "fecha": "2026-08-19T14:36:38Z",
           "notas": "Out of office — vuelve: 24 de agosto"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día. | Fuera oficina agos, ya volvió"
@@ -1480,8 +1516,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1491,6 +1527,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-19T08:00:00Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día."
@@ -1535,8 +1580,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1546,6 +1591,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:52Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -1558,8 +1612,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1569,6 +1623,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:56Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -1581,8 +1644,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1592,6 +1655,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:59:01Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -1604,8 +1676,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1623,6 +1695,15 @@
           "subject": "Fuera de oficina / Out of office",
           "fecha": "2026-08-19T14:36:38Z",
           "notas": "Out of office — vuelve: desconocida"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Out of office — vuelve: desconocida | Fuera oficina agos, ya volvió"
@@ -1635,8 +1716,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1646,6 +1727,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:59:10Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2441,8 +2531,8 @@
       "signal": "Usuario MS Dynamics",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2452,6 +2542,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:04Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2464,8 +2563,8 @@
       "signal": "Usuario MS Dynamics",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2475,6 +2574,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:08Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2519,8 +2627,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2538,6 +2646,15 @@
           "subject": "Fuera de oficina / Out of office",
           "fecha": "2026-08-19T14:36:38Z",
           "notas": "Out of office — vuelve: 24 de agosto"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día. | Fuera oficina agos, ya volvió"
@@ -2550,8 +2667,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2561,6 +2678,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:05Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2573,8 +2699,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "manual",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2584,6 +2710,15 @@
           "enviado_por": "",
           "fecha": "2026-08-19T14:36:38Z",
           "notas": "Out of office — vuelve: 01/09/2026"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Respuesta automática: Fuera de la oficina hasta el 01/09/2026",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2642,8 +2777,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "manual",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2653,6 +2788,15 @@
           "enviado_por": "",
           "fecha": "2026-08-19T14:36:38Z",
           "notas": "Out of office — vuelve: 24 de agosto"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Fuera de oficina / Out of office",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": " | Fuera oficina agos, ya volvió"
@@ -2719,8 +2863,8 @@
       "sector": "Servicios",
       "signal": "Usuario MS Dynamics",
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2730,6 +2874,15 @@
           "fecha": "2026-08-19T19:53:50Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2741,8 +2894,8 @@
       "sector": "General",
       "signal": "Usuario MS Dynamics",
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2752,6 +2905,15 @@
           "fecha": "2026-08-19T19:53:56Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2763,8 +2925,8 @@
       "sector": "General",
       "signal": "Usuario MS Dynamics",
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2774,6 +2936,15 @@
           "fecha": "2026-08-20T12:30:03Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2785,8 +2956,8 @@
       "sector": "Fabricación",
       "signal": "Usuario MS Dynamics",
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2796,6 +2967,15 @@
           "fecha": "2026-08-20T12:30:09Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2808,8 +2988,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2819,6 +2999,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:30:33.714464+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2831,8 +3020,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2842,6 +3031,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:30:39.279935+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2854,8 +3052,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2865,6 +3063,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:30:44.836550+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2877,8 +3084,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2888,6 +3095,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:30:50.407065+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2900,8 +3116,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2911,6 +3127,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:30:55.936593+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2923,8 +3148,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2934,6 +3159,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:31:01.364333+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2946,8 +3180,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2957,6 +3191,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:31:06.893839+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2969,8 +3212,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -2980,6 +3223,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:31:12.527317+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -2992,8 +3244,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -3003,6 +3255,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:31:18.054389+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-24T19:23:08Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
