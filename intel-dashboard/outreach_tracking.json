@@ -445,8 +445,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -456,6 +456,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:09Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -468,8 +477,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -479,6 +488,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:14Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -491,8 +509,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -510,6 +528,15 @@
           "subject": "Respuesta automática: Fuera de la oficina hasta el 25/08/2026",
           "fecha": "2026-08-18T14:50:17Z",
           "notas": "Out of office — vuelve: 25/08/2026"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": "Out of office — vuelve: 25/08/2026"
@@ -522,8 +549,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -533,6 +560,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:23Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -545,8 +581,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -556,6 +592,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:28Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -568,8 +613,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -579,6 +624,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:33Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -591,8 +645,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -602,6 +656,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:42Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -614,8 +677,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -625,6 +688,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:47Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -637,8 +709,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -648,6 +720,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:52Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -660,8 +741,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -671,6 +752,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:56Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -683,8 +773,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -694,6 +784,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:01Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -706,8 +805,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -717,6 +816,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:10Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -729,8 +837,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -740,6 +848,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:15Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -752,8 +869,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -763,6 +880,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:19Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -799,8 +925,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -810,6 +936,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:28Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -822,8 +957,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -833,6 +968,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:33Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -845,8 +989,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -856,6 +1000,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:38Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -868,8 +1021,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -879,6 +1032,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:42Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -891,8 +1053,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -902,6 +1064,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:47Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -914,8 +1085,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -925,6 +1096,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:52Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -937,8 +1117,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -948,6 +1128,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:56Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -960,8 +1149,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -971,6 +1160,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:01Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -983,8 +1181,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -994,6 +1192,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:05Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -1006,8 +1213,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1017,6 +1224,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:10Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -1029,8 +1245,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1040,6 +1256,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:14Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -1074,8 +1299,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1085,6 +1310,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:19Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -1097,8 +1331,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1108,6 +1342,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:24Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -1142,8 +1385,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1153,6 +1396,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:28Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -1196,8 +1448,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1207,6 +1459,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:37Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
@@ -1242,8 +1503,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -1253,6 +1514,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:58:47Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: follow-up automático",
+          "fecha": "2026-08-24T19:22:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
         }
       ],
       "notas": ""
