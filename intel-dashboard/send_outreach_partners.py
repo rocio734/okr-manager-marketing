@@ -34,7 +34,7 @@ from outreach_tracking_helper import load_tracking, save_tracking, update_stage,
 import fetch_intel as fi
 
 # ── Config ────────────────────────────────────────────────────────────────────
-MAX_PER_DAY   = 15
+MAX_PER_DAY   = 50
 SLEEP_BETWEEN = 4
 N8N_WEBHOOK   = "https://n8n.labs.etendo.cloud/webhook/a3f7c821-5d04-4b9e-8c31-0e72b49d6f15"
 GMAIL_USER    = os.environ.get("GMAIL_USER", "victoria.miguez@smfconsulting.es")
@@ -45,12 +45,65 @@ LIMIT   = int(next((sys.argv[sys.argv.index("--limit")+1]
 
 FAKE_EMAILS  = {"su@email.com", "test@test.com", "example@example.com",
                 "contacto@tuempresa.com", "info@tuempresa.com", "email@tudominio.com",
-                "johnsmith@example.com", "jeff@paige.black"}
+                "johnsmith@example.com", "jeff@paige.black",
+                "nombre@example.com", "example@mail.com"}
 FAKE_DOMAINS = {"example.com", "mailinator.com", "guerrillamail.com"}
 SKIP_DOMAINS = {"gmail.com", "hotmail.com", "yahoo.com", "outlook.com",
                 "yahoo.es", "hotmail.es", "live.com"}
 
-SUBJECT = "Amplía tu portfolio con Etendo — ERP open source con IA"
+# Dominios de grandes empresas globales — no son partners reales de Etendo
+ENTERPRISE_DOMAINS = {
+    "bain.com", "bcg.com", "kearney.com", "accenture.com", "atos.net",
+    "capgemini.com", "cognizant.com", "deloitte.com", "dxc.com", "ey.com",
+    "fujitsu.com", "hcltech.com", "alibabacloud.com", "citrix.com", "dell.com",
+    "esri.com", "hitachivantara.com", "hpe.com", "huaweicloud.com", "intel.com",
+    "lenovo.com", "lg.com", "es.nec.com", "nec.com", "netapp.com", "nutanix.com",
+    "nvidia.com", "purestorage.com", "redhat.com", "supermicro.com", "vmware.com",
+    "ibm.com", "microsoft.com", "oracle.com", "sap.com", "salesforce.com",
+    "servicenow.com", "workday.com", "amazon.com", "google.com", "meta.com",
+}
+
+# Prefijos de email corporativo que no son la persona correcta para contactar
+SKIP_EMAIL_PREFIXES = {
+    "investor.relations", "investor", "pr@", "analystrelations", "inquiry@",
+    "beian@", "centrodecontacto", "sitemanager", "hclfederal",
+    "contact@", "contact.us", "info@nvidia", "name@",
+}
+
+def is_valid_partner_email(email: str, domain: str) -> bool:
+    """Descarta emails de grandes empresas o contactos no comerciales."""
+    if not email or "." not in email or "@" not in email:
+        return False
+    # Email que parece un nombre de archivo (ej: pro-new@2x.jpg)
+    local, at_domain = email.split("@", 1)
+    if any(at_domain.endswith(ext) for ext in (".jpg", ".png", ".gif", ".svg")):
+        return False
+    # Dominio de empresa gigante (comprobación exacta y subdominio)
+    root_domain = ".".join(at_domain.split(".")[-2:])
+    if root_domain in ENTERPRISE_DOMAINS or at_domain in ENTERPRISE_DOMAINS:
+        return False
+    # Dominio que termina en un fake domain (ej: yourcompany.example.com)
+    if any(at_domain.endswith("." + fd) or at_domain == fd for fd in FAKE_DOMAINS):
+        return False
+    # Prefijo de email corporativo genérico
+    email_lower = email.lower()
+    if any(email_lower.startswith(p) or f"@{p}" in email_lower for p in SKIP_EMAIL_PREFIXES):
+        return False
+    return True
+
+
+# Sufijos de tier de partner (Odoo, Holded, etc.) que se cuelan en el nombre
+_TIER_SUFFIXES = ("Gold", "Silver", "Bronze", "Platinum", "Ready", "Enterprise",
+                  "Partner", "Certified", "Official")
+
+def clean_company_name(raw: str) -> str:
+    """Elimina sufijos de tier pegados al nombre de empresa."""
+    for suffix in _TIER_SUFFIXES:
+        if raw.endswith(suffix):
+            raw = raw[:-len(suffix)].strip()
+    return raw
+
+SUBJECT = "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?"
 
 # ── Copy por competidor ───────────────────────────────────────────────────────
 # {empresa} = nombre de la consultora partner
@@ -65,13 +118,13 @@ BODY_GENERICO = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
 <p>Hola {empresa},</p>
 
-<p>He visto que trabajáis como partners de {competidor}. Os escribo porque hay un segmento de clientes que cada vez nos llega más: empresas que buscan una alternativa con más flexibilidad técnica y sin coste de licencias por usuario.</p>
+<p>Cada vez más clientes lo preguntan: ¿podemos conectar Claude — o GPT — directamente al ERP para que gestione pedidos, facturas o consultas de stock sin entrar al sistema?</p>
 
-<p>Etendo es un ERP de código abierto que varios integradores ya tienen en su portfolio junto a otros ERPs. Lo que lo hace diferente es que se conecta con agentes de IA externos — como Claude o GPT — para que operen dentro del ERP: crear pedidos, consultar stock, gestionar facturas desde lenguaje natural. No es una funcionalidad de marketing: es la arquitectura real del sistema.</p>
+<p>Etendo es un ERP Agéntico — diseñado desde la arquitectura para conectar agentes de IA externos directamente en los flujos del negocio. El cliente escribe en lenguaje natural y el agente opera dentro del ERP: crea documentos, consulta datos, gestiona procesos. Sin integraciones ad hoc ni desarrollo a medida.</p>
 
-<p>La idea es simple: si tenéis clientes que piden más integración con IA o que el coste de licencias se ha vuelto un problema, Etendo puede ser la respuesta que ya tenéis en portfolio.</p>
+<p>Si tenéis clientes que empiezan a pedir esto, Etendo es algo que podría encajar en vuestro portfolio sin desplazar lo que ya implementáis.</p>
 
-<p>¿Tendríais 20 minutos esta semana para ver si encaja con algún perfil de cliente vuestro?</p>
+<p>¿Tendríais 20 minutos para ver una demo real de cómo funciona?</p>
 
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
@@ -83,13 +136,13 @@ BODY_ODOO = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
 <p>Hola {empresa},</p>
 
-<p>He visto que trabajáis con Odoo. Os escribo porque hay un perfil de cliente que cada vez aparece más: empresas que quieren las capacidades de un ERP robusto pero sin los costes de licencia que escalan con el tamaño del equipo.</p>
+<p>Trabajáis con Odoo — y seguro que algún cliente ya os ha preguntado si puede conectar Claude o GPT directamente al ERP para gestionar procesos desde lenguaje natural sin entrar al sistema.</p>
 
-<p>Etendo es 100% open source — sin licencias por usuario — y está diseñado para conectarse con agentes de IA como Claude o GPT, que operan dentro del ERP en lenguaje natural. Varios partners de Odoo ya lo tienen en portfolio para ese segmento específico.</p>
+<p>Etendo es un ERP Agéntico diseñado específicamente para eso: conectar agentes de IA externos que operan dentro del ERP en tiempo real. No es una integración encima de Odoo — es una arquitectura diferente, pensada para los clientes que necesitan ese nivel de automatización.</p>
 
-<p>No es competencia directa con Odoo: es un complemento para los casos donde el cliente pide más control sobre el código o más integración nativa con IA.</p>
+<p>Varios partners lo tienen en portfolio junto a Odoo para ese segmento específico. No es sustituir lo que ya hacéis: es tener respuesta cuando el cliente pide más.</p>
 
-<p>Si os interesa explorar si hay clientes vuestros donde podría encajar, estoy disponible esta semana para una llamada corta.</p>
+<p>¿Tendríais 20 minutos para ver una demo de cómo funciona en la práctica?</p>
 
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
@@ -101,13 +154,13 @@ BODY_HOLDED = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
 <p>Hola {empresa},</p>
 
-<p>He visto que sois Solution Partners de Holded. Os escribo porque hay un perfil de cliente que Holded no siempre cubre bien: empresas medianas que necesitan más personalización en sus procesos o que quieren integrar IA directamente en el ERP.</p>
+<p>Sois partners de Holded — y hay un perfil de cliente que cada vez aparece más: empresas que quieren conectar Claude o GPT directamente al ERP para automatizar procesos desde lenguaje natural, algo que Holded no está diseñado para hacer.</p>
 
-<p>Etendo es un ERP de código abierto con una arquitectura diseñada para conectar agentes de IA externos — Claude, GPT, cualquier LLM — que operan dentro del sistema: crean documentos, consultan datos, gestionan flujos desde lenguaje natural. Sin licencias por usuario y con el código completamente accesible.</p>
+<p>Etendo es un ERP Agéntico — arquitectura pensada desde el principio para que agentes de IA externos operen dentro del sistema: crean pedidos, consultan stock, gestionan facturas sin que el usuario entre al ERP. Sin desarrollo a medida, sin integraciones frágiles.</p>
 
-<p>Algunos partners lo posicionan como la evolución natural para clientes que han crecido más allá de lo que Holded puede ofrecerles.</p>
+<p>Algunos partners lo posicionan para clientes que han crecido más allá de lo que Holded puede darles. No es reemplazar lo que ya hacéis: es tener respuesta para ese segmento.</p>
 
-<p>¿Tendríais 20 minutos para ver si hay algún cliente vuestro donde podría encajar?</p>
+<p>¿Tendríais 20 minutos para ver una demo real?</p>
 
 <p>Un saludo,<br>
 <strong>Victoria Miguez</strong><br>
@@ -119,11 +172,11 @@ BODY_SAGE = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
 <p>Hola {empresa},</p>
 
-<p>He visto que sois partners de Sage. Os escribo porque detectamos un patrón: hay clientes de Sage que en algún momento preguntan por alternativas sin coste de licencia o con más flexibilidad para integraciones.</p>
+<p>Sois partners de Sage — y hay clientes que en algún momento preguntan algo que Sage no resuelve fácil: ¿podemos conectar Claude o GPT al ERP para que gestione procesos desde lenguaje natural sin entrar al sistema?</p>
 
-<p>Etendo es un ERP de código abierto — sin royalties, sin licencias por usuario — que varios integradores tienen en su portfolio junto a Sage para ese segmento específico. Lo que lo diferencia técnicamente es que está diseñado para conectarse con agentes de IA externos que operan dentro del propio ERP.</p>
+<p>Etendo es un ERP Agéntico diseñado para eso. Los agentes de IA externos operan dentro del sistema directamente: crean documentos, consultan datos, gestionan flujos. Sin integraciones ad hoc ni desarrollo a medida.</p>
 
-<p>No es sustituir lo que ya hacéis con Sage. Es tener una respuesta para los clientes que os piden algo diferente.</p>
+<p>No es sustituir lo que ya hacéis con Sage. Es tener respuesta para los clientes que piden ese nivel de automatización.</p>
 
 <p>Si os interesa explorar, podemos hacer una llamada corta esta semana.</p>
 
@@ -137,11 +190,11 @@ BODY_SAP = """\
 <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
 <p>Hola {empresa},</p>
 
-<p>He visto que trabajáis con el ecosistema SAP. Os escribo porque hay clientes medianos que buscan la robustez de un ERP empresarial pero sin la estructura de costes de SAP — y es un segmento que está creciendo.</p>
+<p>Trabajáis con SAP — y hay clientes mid-market donde la pregunta no es solo el coste, sino la capacidad de conectar Claude o GPT directamente al ERP para automatizar procesos desde lenguaje natural. SAP no hace eso de forma nativa ni accesible.</p>
 
-<p>Etendo es un ERP de código abierto con arquitectura modular y conexión nativa con agentes de IA como Claude o GPT, que operan dentro del sistema en lenguaje natural. Sin licencias por usuario, con código accesible y con un modelo de partner que permite márgenes reales.</p>
+<p>Etendo es un ERP Agéntico con arquitectura modular pensada para eso: agentes de IA externos que operan dentro del sistema, crean documentos, consultan datos y gestionan flujos sin desarrollo a medida. Con un modelo de partner que permite márgenes reales.</p>
 
-<p>Si tenéis clientes mid-market donde SAP es demasiado para su momento actual, Etendo puede ser la alternativa que ya tenéis en portfolio.</p>
+<p>Si tenéis clientes donde SAP es demasiado para su momento, o donde la IA en el ERP es ya una conversación real, Etendo puede ser la respuesta que ya tenéis en portfolio.</p>
 
 <p>¿Tendríais 20 minutos esta semana para explorar si hay fit?</p>
 
@@ -214,6 +267,7 @@ def main():
         and l.get("email", "").split("@")[-1] not in FAKE_DOMAINS
         and l.get("email", "") not in FAKE_EMAILS
         and l.get("email", "") not in already_sent
+        and is_valid_partner_email(l.get("email", ""), l.get("domain", ""))
     ]
 
     print(f"Partners con email:      {sum(1 for l in leads if l.get('source_type','') in fi.PARTNER_SOURCES and l.get('email','—') not in ('—','',None,'None'))}")
@@ -228,15 +282,13 @@ def main():
     enviados = 0
     for lead in candidates[:LIMIT]:
         email   = lead.get("email", "")
-        raw_company = lead.get("company", "").strip()
+        raw_company = clean_company_name(lead.get("company", "").strip())
         domain      = lead.get("domain", "")
         # Limpiar nombres que son dominios (www.xxx.com) o direcciones físicas
         if (raw_company.startswith("www.") or
                 (raw_company.count(".") >= 1 and " " not in raw_company)):
-            # Es un dominio — usar dominio limpio capitalizado
             company = domain.replace("www.", "").split(".")[0].capitalize()
         elif len(raw_company) > 80 or raw_company[:3].isdigit():
-            # Parece una dirección física
             company = domain.replace("www.", "").split(".")[0].capitalize()
         else:
             company = raw_company or domain

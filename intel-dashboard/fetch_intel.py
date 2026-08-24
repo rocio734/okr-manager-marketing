@@ -2266,15 +2266,31 @@ def render_leads(leads, sent_map=None):
 def render_partner_leads(leads):
     partners = [l for l in leads if l.get("source_type","") in PARTNER_SOURCES]
     if not partners: return '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text-muted)"><div style="font-size:13px;margin-bottom:6px">Sin partners detectados aún</div><div style="font-size:11px;max-width:480px;margin:0 auto;line-height:1.6">Los partners son <b>consultoras IT e integradores</b> que implementan ERPs (Odoo, SAP, Holded, Sage) y podrían revender o implementar Etendo. El spider que los detecta scrapeará los directorios de partners de los competidores en la próxima ejecución completa.</div></td></tr>'
+    COMP_BADGE = {
+        "Odoo":      ("background:#8E44AD;color:#fff",   "Odoo"),
+        "Holded":    ("background:#FF8C00;color:#fff",   "Holded"),
+        "SAP":       ("background:#0070F3;color:#fff",   "SAP"),
+        "Ahora ERP": ("background:#2E7D32;color:#fff",   "Ahora ERP"),
+        "Sage":      ("background:#006F62;color:#fff",   "Sage"),
+        "DistritoK": ("background:#C0392B;color:#fff",   "DistritoK"),
+        "TeamSystem":("background:#5D4037;color:#fff",   "TeamSystem"),
+    }
     rows=""
     for l in partners:
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l")
         age=_age_badge(l.get("date",""))
-        comp=l.get("snippet","").split("—")[0].replace("Partner ","").strip()[:30] or "—"
+        snippet = l.get("snippet","") or ""
+        comp_key = next((k for k in COMP_BADGE if k.lower() in snippet.lower()), None)
+        if comp_key:
+            badge_style, badge_label = COMP_BADGE[comp_key]
+            comp_html = f'<span style="font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;{badge_style}">{badge_label}</span>'
+        else:
+            comp_raw = snippet.split("—")[0].replace("Partner ","").strip()[:20] or "—"
+            comp_html = f'<span style="font-size:10px;color:var(--text-muted)">{comp_raw}</span>'
         em=l.get("email","—"); em_h=f'<a href="mailto:{em}" class="lnk">{em[:22]}{"…" if len(em)>22 else ""}</a>' if em!="—" else '<span style="color:var(--text-muted)">—</span>'
         rows+=f'<tr>'
         rows+=f'<td><b>{l["company"]}</b>{age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
-        rows+=f'<td style="font-size:11px;color:var(--text-secondary)">{comp}</td>'
+        rows+=f'<td style="padding:6px 8px">{comp_html}</td>'
         rows+=f'<td style="font-size:11px">{l.get("sector","—")}</td>'
         rows+=f'<td><span class="{sc_cls}" style="font-size:10px">{"⭐" if sc==3 else "▲" if sc==2 else "▼"}</span></td>'
         rows+=f'<td style="font-size:11px">{em_h}</td>'
