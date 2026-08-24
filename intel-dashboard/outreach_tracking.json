@@ -39,7 +39,7 @@
       "sector": "Construcción",
       "signal": "Usuario MS Dynamics",
       "fuente": "intel_dashboard",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -52,7 +52,7 @@
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "comercial@normicro.es": {
       "email": "comercial@normicro.es",
@@ -1051,7 +1051,7 @@
       "sector": "General",
       "signal": "Usuario TeamSystem/DistritoK",
       "fuente": "intel_dashboard",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -1064,7 +1064,7 @@
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "seditesa@seditesa.es": {
       "email": "seditesa@seditesa.es",
@@ -2929,7 +2929,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -2942,7 +2942,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "info@dertochip.com": {
       "email": "info@dertochip.com",
@@ -3987,7 +3987,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -4000,7 +4000,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "contacto@studio73.es": {
       "email": "contacto@studio73.es",
@@ -4285,7 +4285,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -4298,7 +4298,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "ddiguipozkua@ddidistribucion.com": {
       "email": "ddiguipozkua@ddidistribucion.com",
@@ -4423,7 +4423,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -4436,7 +4436,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "info@elespecialistaab.com": {
       "email": "info@elespecialistaab.com",
@@ -4768,7 +4768,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -4781,7 +4781,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "madederaszubiaurre@telefonica.net": {
       "email": "madederaszubiaurre@telefonica.net",
@@ -4791,7 +4791,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -4804,7 +4804,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "layle@layle.com": {
       "email": "layle@layle.com",
@@ -4860,7 +4860,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -4873,7 +4873,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "o.garcia@maderasportu.com": {
       "email": "o.garcia@maderasportu.com",
@@ -5021,7 +5021,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -5034,7 +5034,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "info@metalicasmadul.com": {
       "email": "info@metalicasmadul.com",
@@ -5665,7 +5665,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -5678,7 +5678,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "info@articagency.com": {
       "email": "info@articagency.com",
@@ -5872,7 +5872,7 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
+      "etapa": 99,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
@@ -5885,7 +5885,7 @@
           "notas": ""
         }
       ],
-      "notas": ""
+      "notas": "Rebote confirmado 2026-08-24"
     },
     "info@aldara.eus": {
       "email": "info@aldara.eus",
