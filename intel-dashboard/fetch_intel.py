@@ -2245,11 +2245,14 @@ def render_leads(leads, sent_map=None):
         ob = _outreach_badge(em, sent_map)
         # Si ya está en outreach no mostrar badge de fecha — ya tiene el badge de estado
         age = "" if ob else _age_badge(l.get("date",""))
+        _info_l = sent_map.get(em) if em != "—" else None
+        _etapa_l = _info_l.get("etapa",0) if _info_l else 0
+        _etapa_key_l = "replied" if _etapa_l>=4 else ("followup" if _etapa_l==3 else ("sent" if _etapa_l==2 else ("discarded" if _etapa_l==99 else "none")))
         pais=l.get("pais_detectado","—") or "—"
         es_spain = "España" in pais
         pais_style = "font-size:11px" if es_spain else "font-size:11px;font-weight:700;color:#c0392b"
         pais_icon = "" if es_spain or pais=="—" else " ⚠️"
-        rows+=f'<tr data-s="{l["signal"]}" data-q="{"h" if sc==3 else("m" if sc==2 else"l")}" data-src="{l.get("source_type","")}">'
+        rows+=f'<tr data-s="{l["signal"]}" data-q="{"h" if sc==3 else("m" if sc==2 else"l")}" data-src="{l.get("source_type","")}" data-etapa="{_etapa_key_l}">'
         rows+=f'<td><b>{l["company"]}</b>{age}{ob}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
         rows+=f'<td style="color:var(--text-secondary);font-size:11px">{l["sector"]}</td>'
         rows+=f'<td><span class="sig {l["signal_class"]}">{l["signal_label"]}</span>{src_badge(l.get("source_type",""))}</td>'
@@ -2282,6 +2285,10 @@ def render_partner_leads(leads, sent_map=None):
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l")
         em=l.get("email","—")
         ob = _outreach_badge(em, sent_map)
+        # Calcular etapa para data-attr de filtrado
+        _info = sent_map.get(em) if em != "—" else None
+        _etapa = _info.get("etapa",0) if _info else 0
+        _etapa_key = "replied" if _etapa>=4 else ("followup" if _etapa==3 else ("sent" if _etapa==2 else ("discarded" if _etapa==99 else "none")))
         # Si ya está en outreach, el badge de estado reemplaza el de fecha
         age = "" if ob else _age_badge(l.get("date",""))
         snippet = l.get("snippet","") or ""
@@ -2296,7 +2303,7 @@ def render_partner_leads(leads, sent_map=None):
             comp_html = f'<span style="font-size:10px;color:var(--text-muted)">{comp_raw}</span>'
         em_h=f'<a href="mailto:{em}" class="lnk">{em[:22]}{"…" if len(em)>22 else ""}</a>' if em!="—" else '<span style="color:var(--text-muted)">—</span>'
         company_display = _tier_re.sub("", l["company"]).strip()
-        rows+=f'<tr>'
+        rows+=f'<tr data-etapa="{_etapa_key}">'
         rows+=f'<td><b>{company_display}</b>{ob or age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
         rows+=f'<td style="padding:6px 8px">{comp_html}</td>'
         rows+=f'<td style="font-size:11px">{l.get("sector","—")}</td>'
