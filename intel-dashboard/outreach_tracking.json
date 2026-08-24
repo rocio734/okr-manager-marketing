@@ -116,8 +116,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -127,6 +127,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:22Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -139,8 +148,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -150,6 +159,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:26Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -162,8 +180,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -173,6 +191,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:31Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -185,8 +212,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -196,6 +223,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:36Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -208,8 +244,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -219,6 +255,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:40Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -231,8 +276,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -242,9 +287,27 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:45Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_inbound",
+          "subject": "RE: Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "web@safetop.net",
+          "fecha": "2026-08-24T13:15:00Z",
+          "notas": "Respuesta de Alberto: no están en proceso de cambio de ERP ahora. Quedan como contacto para el futuro. Tono amable, no es un no definitivo."
         }
       ],
-      "notas": ""
+      "notas": "Respondió 24/08: no cambian ERP por ahora. Retomar en ~6 meses."
     },
     "info@carpa10.com": {
       "email": "info@carpa10.com",
@@ -254,8 +317,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -265,6 +328,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:49Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -277,8 +349,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -288,6 +360,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:54Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -300,8 +381,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -311,6 +392,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:55:59Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -323,8 +413,8 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -334,6 +424,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:56:04Z",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-24T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -4105,6 +4204,28 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:37:15.638840+00:00",
           "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "progando@progando.es": {
+      "email": "progando@progando.es",
+      "empresa": "Progando",
+      "dominio": "progando.es",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-24T12:30:03Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
       ],
       "notas": ""
