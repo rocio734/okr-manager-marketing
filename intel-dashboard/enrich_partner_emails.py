@@ -188,6 +188,10 @@ def main():
         if i % 50 == 0:
             print(f"\n  [{i}/{min(LIMIT, len(partners_sin_email))}] — {enriched} emails encontrados hasta ahora\n")
 
+        # Guardar cada 10 para no perder progreso si el proceso se interrumpe
+        if not DRY_RUN and i % 10 == 0 and enriched > 0:
+            fi.save_data(data)
+
         time.sleep(0.3)
 
     print(f"\n{'─'*60}")

@@ -2056,8 +2056,11 @@ def search_all_leads(data):
         if d and d not in sd:
             sd[d] = TODAY
 
-    # Acumular preservando histórico — límite 500 para display/dashboard
-    data["leads_history"]=(new+data["leads_history"])[:500]
+    # Acumular preservando histórico — límite 500 para leads regulares
+    # Los partners (source_type in PARTNER_SOURCES) se preservan siempre para no perder emails enriquecidos
+    regular = [l for l in data["leads_history"] if l.get("source_type","") not in PARTNER_SOURCES]
+    partners_existing = [l for l in data["leads_history"] if l.get("source_type","") in PARTNER_SOURCES]
+    data["leads_history"] = (new + regular)[:500] + partners_existing
     print(f"  Total acumulado en historial: {len(data['leads_history'])} | dominios vistos: {len(sd)}")
     return new + retried
 
