@@ -74,7 +74,7 @@ def build_body(empresa: str, sector: str, original_subject: str, email: str = ""
 
 <p><strong>{pain}</strong></p>
 
-<p>Etendo es un ERP Agéntico que resuelve exactamente eso: permite {solution}. Sin cambiar vuestro sistema actual, sin integraciones complejas.</p>
+<p>Etendo es el ERP Agéntico que resuelve exactamente eso: permite {solution}. Sin cambiar vuestro sistema actual, sin integraciones complejas.</p>
 
 <p>Esta semana tenemos hueco para una demo de 20 minutos con un caso real de vuestro sector. Sin presentación de ventas — vais a ver el sistema funcionando en directo.</p>
 
