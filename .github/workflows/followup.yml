@@ -6,11 +6,24 @@ on:
     - cron: '0 9 * * 1-5'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   send-followups:
     runs-on: ubuntu-latest
     steps:
-      - name: Get pending follow-ups
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: python3 -m pip install --upgrade pip requests
+
+      # ── Camino 1: intel_dashboard → Supabase via Render API ──────────────────
+      - name: Get pending follow-ups (Supabase/intel_dashboard)
         id: pending
         run: |
           RESPONSE=$(curl -s "https://etendo-dashboard-api.onrender.com/api/followup-pending")
@@ -18,9 +31,9 @@ jobs:
           IDS=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(' '.join([p['contact_id'] for p in d.get('pending',[])]))")
           echo "count=$COUNT" >> $GITHUB_OUTPUT
           echo "ids=$IDS" >> $GITHUB_OUTPUT
-          echo "Pendientes de follow-up: $COUNT"
+          echo "Pendientes intel_dashboard: $COUNT"
 
-      - name: Send follow-ups
+      - name: Send follow-ups (intel_dashboard)
         if: steps.pending.outputs.count != '0'
         run: |
           IDS="${{ steps.pending.outputs.ids }}"
@@ -38,4 +51,20 @@ jobs:
             fi
             sleep 3
           done
-          echo "=== Follow-ups enviados: $SENT | Errores: $ERRORS ==="
+          echo "=== Follow-ups enviados (intel_dashboard): $SENT | Errores: $ERRORS ==="
+
+      # ── Camino 2: partners + score2 → outreach_tracking.json ─────────────────
+      - name: Follow-ups automáticos (partners + score2, desde tracking.json)
+        continue-on-error: true
+        env:
+          PYTHONUNBUFFERED: "1"
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        run: cd intel-dashboard && python3 auto_followup_daily.py
+
+      - name: Commit y push tracking actualizado
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add intel-dashboard/outreach_tracking.json
+          git diff --staged --quiet || git commit -m "Follow-up automático $(date +'%Y-%m-%d') — batch diario"
+          git push

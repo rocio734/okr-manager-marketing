@@ -25,8 +25,8 @@ if ENV.exists():
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
-MAX_PER_DAY  = 10
-MIN_DAYS_WAIT = 5        # días mínimos desde el primer contacto
+MAX_PER_DAY  = 30
+MIN_DAYS_WAIT = 3        # días mínimos desde el primer contacto
 SLEEP_BETWEEN = 4
 N8N_WEBHOOK  = "https://n8n.labs.etendo.cloud/webhook/a3f7c821-5d04-4b9e-8c31-0e72b49d6f15"
 GMAIL_USER   = os.environ.get("GMAIL_USER", "victoria.miguez@smfconsulting.es")
