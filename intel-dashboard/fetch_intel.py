@@ -2276,20 +2276,24 @@ def render_partner_leads(leads):
         "TeamSystem":("background:#5D4037;color:#fff",   "TeamSystem"),
     }
     rows=""
+    _tier_re = re.compile(r'\s*(Gold|Silver|Ready|Learning)\s*$', re.IGNORECASE)
     for l in partners:
         sc=l["score"]; sc_cls="sc-h" if sc==3 else("sc-m" if sc==2 else"sc-l")
         age=_age_badge(l.get("date",""))
         snippet = l.get("snippet","") or ""
-        comp_key = next((k for k in COMP_BADGE if k.lower() in snippet.lower()), None)
+        sig_label = l.get("signal_label","") or ""
+        search_text = sig_label + " " + snippet
+        comp_key = next((k for k in COMP_BADGE if k.lower() in search_text.lower()), None)
         if comp_key:
             badge_style, badge_label = COMP_BADGE[comp_key]
             comp_html = f'<span style="font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;{badge_style}">{badge_label}</span>'
         else:
-            comp_raw = snippet.split("—")[0].replace("Partner ","").strip()[:20] or "—"
+            comp_raw = (sig_label or snippet.split("—")[0]).replace("Partner ","").strip()[:20] or "—"
             comp_html = f'<span style="font-size:10px;color:var(--text-muted)">{comp_raw}</span>'
         em=l.get("email","—"); em_h=f'<a href="mailto:{em}" class="lnk">{em[:22]}{"…" if len(em)>22 else ""}</a>' if em!="—" else '<span style="color:var(--text-muted)">—</span>'
+        company_display = _tier_re.sub("", l["company"]).strip()
         rows+=f'<tr>'
-        rows+=f'<td><b>{l["company"]}</b>{age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
+        rows+=f'<td><b>{company_display}</b>{age}<div style="font-size:10px;color:var(--text-muted)">{l["domain"]}</div></td>'
         rows+=f'<td style="padding:6px 8px">{comp_html}</td>'
         rows+=f'<td style="font-size:11px">{l.get("sector","—")}</td>'
         rows+=f'<td><span class="{sc_cls}" style="font-size:10px">{"⭐" if sc==3 else "▲" if sc==2 else "▼"}</span></td>'
