@@ -32,6 +32,7 @@ N8N_WEBHOOK  = "https://n8n.labs.etendo.cloud/webhook/a3f7c821-5d04-4b9e-8c31-0e
 GMAIL_USER   = os.environ.get("GMAIL_USER", "victoria.miguez@smfconsulting.es")
 PIXEL_BASE   = "https://etendo-dashboard-api.onrender.com/pixel"
 UTM_BASE     = "utm_source=email&utm_medium=followup&utm_campaign=followup_auto"
+UTM_PARTNER  = "utm_source=email&utm_medium=followup&utm_campaign=followup_partner"
 
 # Dolor concreto por sector → lo que se pierde sin actuar
 SECTOR_PAIN = {
@@ -62,6 +63,9 @@ def pixel_tag(email: str) -> str:
 def etendo_link(utm_content: str) -> str:
     return f"https://etendo.software?{UTM_BASE}&utm_content={urllib.parse.quote(utm_content, safe='')}"
 
+def etendo_link_partner(utm_content: str) -> str:
+    return f"https://etendo.software?{UTM_PARTNER}&utm_content={urllib.parse.quote(utm_content, safe='')}"
+
 def build_body(empresa: str, sector: str, original_subject: str, email: str = "") -> str:
     pain, solution = get_pain(sector)
     link = etendo_link(empresa)
@@ -83,6 +87,69 @@ def build_body(empresa: str, sector: str, original_subject: str, email: str = ""
 <p style="margin-top:24px">Un saludo,<br>
 <strong>Victoria</strong><br>
 <span style="color:#666;font-size:13px">Etendo — <a href="{link}" style="color:#E85D04;text-decoration:none">etendo.software</a></span></p>
+
+</div>
+{pixel_tag(email) if email else ""}"""
+
+def _get_partner_copy(signal_label: str) -> tuple:
+    """Devuelve (opening, core_html) según el ERP del partner (Odoo/Holded/SAP/genérico)."""
+    sl = (signal_label or "").lower()
+    if "odoo" in sl:
+        return (
+            "Os escribí hace unos días y quería volver porque creo que hay una oportunidad concreta para vuestro portfolio.",
+            "Vuestros clientes ya os preguntan cómo conectar Claude o ChatGPT a su Odoo. "
+            "La respuesta hoy es <strong>\"no se puede de forma nativa\"</strong>.<br><br>"
+            "Etendo es el ERP Agéntico — permite a cualquier empresa operar su ERP hablándole a Claude en lenguaje natural. "
+            "Lo interesante para vosotros: no reemplaza lo que ya hacéis con Odoo. "
+            "Es el paso siguiente para los clientes que piden IA real.<br><br>"
+            "Muchos de nuestros partners lo posicionan como <em>\"el ERP para cuando el cliente da el salto a IA Agéntica\"</em>."
+        )
+    elif "holded" in sl:
+        return (
+            "Os escribí hace unos días. Quería insistir porque veo muchos partners de Holded en la misma situación.",
+            "Holded funciona muy bien para facturación y gestión básica — pero "
+            "<strong>cuando el cliente crece y empieza a pedir IA que opere el ERP, no hay respuesta</strong>.<br><br>"
+            "Ahí es donde entra Etendo. Es el ERP Agéntico: el cliente le habla a Claude y el sistema actúa — "
+            "pedidos, compras, stock, aprobaciones. Todo en lenguaje natural.<br><br>"
+            "No tenéis que dejar Holded. Se trata de tener respuesta para los clientes que ya os preguntan por el siguiente nivel."
+        )
+    elif "sap" in sl:
+        return (
+            "Os escribí hace unos días sobre Etendo. Vuelvo porque es relevante para vuestra base de clientes SAP.",
+            "Los clientes de SAP Business One empiezan a pedir agentes de IA que operen el ERP. "
+            "<strong>SAP no tiene eso en el mid-market, y los integradores que llegan primero se quedan con esa conversación.</strong><br><br>"
+            "Etendo es el ERP Agéntico open-source: permite operar el ERP completo desde Claude en lenguaje natural. "
+            "El modelo de partner os da margen, soporte y formación."
+        )
+    else:  # Ahora ERP, Sage, TeamSystem, genérico
+        return (
+            "Os escribí hace unos días y quería volver a proponer la conversación.",
+            "Vuestros clientes cada vez preguntan más por IA que se conecte de verdad al ERP — no chatbots, sino "
+            "<strong>agentes que actúen: pedidos, compras, aprobaciones en lenguaje natural</strong>.<br><br>"
+            "Etendo es el ERP Agéntico. Lo interesante para vosotros: añadirlo al portfolio no significa dejar lo que ya hacéis — "
+            "es la respuesta para los clientes que piden dar el siguiente paso."
+        )
+
+def build_body_partner(empresa: str, signal_label: str, original_subject: str, email: str = "") -> str:
+    """Copy de follow-up específico para partners (IT consultores/integradores), no end-users."""
+    opening, core = _get_partner_copy(signal_label)
+    link = etendo_link_partner(empresa)
+    return f"""\
+<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
+
+<p>Hola,</p>
+
+<p>{opening}</p>
+
+<p>{core}</p>
+
+<p>¿Hablamos 20 minutos esta semana? Os enseño el modelo de partner y un caso real de un consultor que ya tiene clientes migrados.</p>
+
+<p>¿Miércoles o jueves por la mañana os viene bien? Respondedme y os mando la invitación.</p>
+
+<p style="margin-top:24px">Un saludo,<br>
+<strong>Victoria</strong><br>
+<span style="color:#666;font-size:13px">Etendo — Canal de partners &middot; <a href="{link}" style="color:#E85D04;text-decoration:none">etendo.software</a></span></p>
 
 </div>
 {pixel_tag(email) if email else ""}"""
@@ -147,6 +214,21 @@ def main():
     tracking = load_tracking()
     now_ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    # Lookup email→signal_label desde intel_data.json (para copy de partners)
+    signal_map = {}
+    intel_file = ROOT / "intel_data.json"
+    if intel_file.exists():
+        try:
+            intel = json.loads(intel_file.read_text(encoding="utf-8"))
+            for lead in intel.get("leads_history", []):
+                em = lead.get("email", "")
+                sl = lead.get("signal_label", "")
+                if em and em != "—" and sl:
+                    signal_map[em] = sl
+            print(f"Signal map cargado: {len(signal_map)} emails con señal")
+        except Exception as ex:
+            print(f"⚠️  intel_data.json no disponible para signal_map: {ex}")
+
     # Leads en etapa 2 con >= min_days desde el primer contacto
     candidatos = []
     for email, c in tracking.items():
@@ -163,6 +245,7 @@ def main():
                 "email":   email,
                 "empresa": c.get("empresa", ""),
                 "sector":  c.get("sector", ""),
+                "fuente":  c.get("fuente", ""),
                 "dias":    dias,
                 "subject": orig_subject,
             })
@@ -185,11 +268,19 @@ def main():
         email   = lead["email"]
         empresa = lead["empresa"] or email.split("@")[1]
         sector  = lead["sector"]
+        fuente  = lead.get("fuente", "")
         dias    = lead["dias"]
         subject = f"Re: {lead['subject']}"
-        body    = build_body(empresa, sector, lead["subject"], email=email)
 
-        print(f"  [{dias:3d}d] {empresa[:35]:35s} | {email}")
+        if fuente == "partner_outreach":
+            signal = signal_map.get(email, "")
+            body   = build_body_partner(empresa, signal, lead["subject"], email=email)
+            tipo   = f"[P/{(signal or '—').replace('Partner ','')[:8]}]"
+        else:
+            body   = build_body(empresa, sector, lead["subject"], email=email)
+            tipo   = f"[{sector[:8]}]" if sector else "[lead]"
+
+        print(f"  [{dias:3d}d] {empresa[:28]:28s} {tipo:12s} | {email}")
         success = send_email(email, subject, body, dry_run=dry_run)
 
         if success:
@@ -204,7 +295,7 @@ def main():
                     "subject":     subject,
                     "fecha":       now_ts,
                     "enviado_por": GMAIL_USER,
-                    "notas":       "Follow-up automático por auto_followup_daily.py",
+                    "notas":       f"Follow-up automático por auto_followup_daily.py" + (f" [partner/{signal_map.get(email,'—')}]" if fuente == "partner_outreach" else ""),
                 })
         else:
             fail += 1
