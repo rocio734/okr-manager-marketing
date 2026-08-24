@@ -12,7 +12,7 @@ Flags:
   --limit N    Cambia el cap diario (default: 10)
   --days N     Cambia el umbral de espera (default: 5)
 """
-import json, os, sys, time, requests
+import json, os, sys, time, requests, urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -30,38 +30,62 @@ MIN_DAYS_WAIT = 3        # días mínimos desde el primer contacto
 SLEEP_BETWEEN = 4
 N8N_WEBHOOK  = "https://n8n.labs.etendo.cloud/webhook/a3f7c821-5d04-4b9e-8c31-0e72b49d6f15"
 GMAIL_USER   = os.environ.get("GMAIL_USER", "victoria.miguez@smfconsulting.es")
+PIXEL_BASE   = "https://etendo-dashboard-api.onrender.com/pixel"
+UTM_BASE     = "utm_source=email&utm_medium=followup&utm_campaign=followup_auto"
 
-SECTOR_HOOK = {
-    "Consultoría": "Para consultoras como la vuestra, significa poder ofrecer a vuestros clientes un ERP que se opera desde Claude — sin formación extra, en lenguaje natural.",
-    "Logística":   "Para empresas de logística, significa gestionar pedidos, stock y expediciones diciéndole a Claude lo que necesitás — el sistema actúa solo.",
-    "Construcción": "Para empresas de construcción, significa aprobar pedidos de obra y gestionar subcontratas hablándole a Claude directamente.",
-    "Industrial":  "Para empresas industriales, significa controlar producción, compras y almacén con lenguaje natural — sin tocar la interfaz del ERP.",
-    "Servicios":   "Para empresas de servicios, el equipo ejecuta tareas en el ERP hablándole a Claude — menos fricción, menos errores.",
-    "Distribución": "Para empresas de distribución, significa gestionar pedidos y stock diciéndole a Claude lo que necesitás, sin abrir pantallas.",
-    "Fabricación": "Para empresas de fabricación, significa controlar órdenes de producción y compras con lenguaje natural — el sistema actúa solo.",
+# Dolor concreto por sector → lo que se pierde sin actuar
+SECTOR_PAIN = {
+    "Consultoría":  ("Vuestros consultores dedican horas a introducir datos en el ERP que el cliente ya tiene en otros sistemas.", "conectar esos flujos con IA y ejecutarlos desde lenguaje natural"),
+    "Logística":    ("Cada pedido urgente requiere abrir el ERP, buscar stock, aprobar salida — pasos manuales que frenan la operación.", "gestionar expediciones y stock diciéndole a Claude lo que necesitáis"),
+    "Construcción": ("Aprobar una orden de compra en obra depende de que alguien esté delante del ERP. Eso retrasa proyectos.", "aprobar pedidos y gestionar subcontratas desde el móvil, en lenguaje natural"),
+    "Industrial":   ("La producción para porque alguien tiene que actualizar órdenes en el ERP. Eso no debería depender de una persona.", "que el ERP actualice órdenes de producción y compras solo, sin intervención manual"),
+    "Servicios":    ("El equipo pierde tiempo navegando el ERP para tareas que podrían resolverse en segundos.", "que cualquier persona de vuestro equipo opere el ERP hablándole a Claude"),
+    "Distribución": ("Gestionar pedidos de múltiples canales en el ERP requiere demasiados clics y demasiado tiempo.", "centralizar pedidos y stock con agentes que actúan solos dentro del ERP"),
+    "Fabricación":  ("Sincronizar producción, compras y almacén manualmente en el ERP introduce errores y retrasos.", "que producción, compras y almacén se sincronicen solos a través de IA"),
+    "Alimentación": ("Los pedidos de distribución llegan por canales distintos y alguien tiene que pasarlos al ERP uno a uno.", "automatizar la entrada de pedidos y el control de stock con agentes de IA"),
+    "Madera":       ("Controlar inventario de madera y gestionar órdenes de corte manualmente en el ERP genera errores costosos.", "gestionar stock y órdenes de producción desde lenguaje natural"),
 }
-DEFAULT_HOOK = "Para vuestro equipo, significa operar el ERP desde Claude en lenguaje natural — sin tocar la interfaz, el sistema actúa solo."
+DEFAULT_PAIN = ("Vuestra operación depende de que alguien esté delante del ERP para cada tarea repetitiva.", "que esas tareas se ejecuten solas a través de agentes de IA conectados al ERP")
 
-def get_hook(sector: str) -> str:
+def get_pain(sector: str) -> tuple:
     if not sector:
-        return DEFAULT_HOOK
-    for key, hook in SECTOR_HOOK.items():
+        return DEFAULT_PAIN
+    for key, pain in SECTOR_PAIN.items():
         if key.lower() in sector.lower():
-            return hook
-    return DEFAULT_HOOK
+            return pain
+    return DEFAULT_PAIN
 
-def build_body(empresa: str, sector: str, original_subject: str) -> str:
-    hook = get_hook(sector)
+def pixel_tag(email: str) -> str:
+    enc = urllib.parse.quote(email, safe="")
+    return f'<img src="{PIXEL_BASE}/{enc}.gif?t=followup" width="1" height="1" style="display:none" alt="">'
+
+def etendo_link(utm_content: str) -> str:
+    return f"https://etendo.software?{UTM_BASE}&utm_content={urllib.parse.quote(utm_content, safe='')}"
+
+def build_body(empresa: str, sector: str, original_subject: str, email: str = "") -> str:
+    pain, solution = get_pain(sector)
+    link = etendo_link(empresa)
     return f"""\
-<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.7;color:#1a1a1a;max-width:560px;">
+<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.8;color:#1a1a1a;max-width:560px;">
+
 <p>Hola,</p>
-<p>Te escribí hace unos días sobre Etendo, el ERP de código abierto que permite conectar agentes de IA externos para operar dentro de vuestros procesos. {hook}</p>
-<p>Muchas empresas en vuestro sector nos preguntan cómo se vería esto en la práctica. La respuesta más sencilla es verlo: 20 minutos, sin presentación de ventas, con un caso de vuestro sector.</p>
-<p>¿Tiene sentido hablar esta semana?</p>
-<p>Un saludo,<br>
-<strong>Victoria Miguez</strong><br>
-Etendo — <a href="https://etendo.software" style="color:#E85D04;">etendo.software</a></p>
-</div>"""
+
+<p>Os escribí hace unos días y quería insistir porque creo que tiene sentido para vosotros.</p>
+
+<p><strong>{pain}</strong></p>
+
+<p>Etendo es un ERP de código abierto que resuelve exactamente eso: permite {solution}. Sin cambiar vuestro sistema actual, sin integraciones complejas.</p>
+
+<p>Esta semana tenemos hueco para una demo de 20 minutos con un caso real de vuestro sector. Sin presentación de ventas — vais a ver el sistema funcionando en directo.</p>
+
+<p>¿Os viene bien el miércoles o jueves por la mañana? Respondedme con el día que mejor os encaje y os mando la invitación.</p>
+
+<p style="margin-top:24px">Un saludo,<br>
+<strong>Victoria</strong><br>
+<span style="color:#666;font-size:13px">Etendo — <a href="{link}" style="color:#E85D04;text-decoration:none">etendo.software</a></span></p>
+
+</div>
+{pixel_tag(email) if email else ""}"""
 
 def send_email(to_email: str, subject: str, html_body: str, dry_run=False) -> bool:
     if dry_run:
@@ -163,7 +187,7 @@ def main():
         sector  = lead["sector"]
         dias    = lead["dias"]
         subject = f"Re: {lead['subject']}"
-        body    = build_body(empresa, sector, lead["subject"])
+        body    = build_body(empresa, sector, lead["subject"], email=email)
 
         print(f"  [{dias:3d}d] {empresa[:35]:35s} | {email}")
         success = send_email(email, subject, body, dry_run=dry_run)
