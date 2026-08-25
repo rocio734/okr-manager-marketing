@@ -153,6 +153,13 @@ def calc_classification(lead):
     if is_test_lead or email.endswith("@etendo.software") or "busca trabajo" in txt:
         return None, "lead de prueba o no comercial"
 
+    # Services SQL: señal explícita de servicios — migración o actualización
+    SERVICES_KEYWORDS = ["migracion","migración","actualizacion","actualización",
+                         "migrar","actualizar version","upgrade"]
+    if any(k in txt for k in SERVICES_KEYWORDS):
+        return "Services SQL", "señal de servicios (migración/actualización)"
+
+    # SQL: señal explícita de compra de producto ERP
     SQL_KEYWORDS = ["demo","presupuesto","urgente","quiero avanzar","implementar ya",
                     "quiero contratar","necesito erp","cuanto cuesta"]
     if any(k in txt for k in SQL_KEYWORDS):
