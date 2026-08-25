@@ -294,7 +294,7 @@
       "signal": "Usuario TeamSystem/DistritoK",
       "score_intel": 3,
       "fuente": "intel_dashboard",
-      "etapa": 3,
+      "etapa": 99,
       "etapa_label": "followup_email_enviado",
       "contactos": [
         {
@@ -325,7 +325,7 @@
           "notas": "Respuesta de Alberto: no están en proceso de cambio de ERP ahora. Quedan como contacto para el futuro. Tono amable, no es un no definitivo."
         }
       ],
-      "notas": "Respondió 24/08: no cambian ERP por ahora. Retomar en ~6 meses."
+      "notas": "Respondió 24/08: no cambian ERP por ahora. Retomar en ~6 meses. | Bounce/descartado manual 2026-08-25"
     },
     "info@carpa10.com": {
       "email": "info@carpa10.com",

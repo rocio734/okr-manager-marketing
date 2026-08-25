@@ -198,6 +198,8 @@ def process(dry_run: bool = False) -> None:
 
     bounces    = 0
     vacaciones = 0
+    positivos  = 0
+    negativos  = 0
     otros      = 0
 
     for reply in pendientes:
@@ -249,6 +251,26 @@ def process(dry_run: bool = False) -> None:
                 )
             vacaciones += 1
 
+        elif tipo == "positivo":
+            # Respondió con interés → etapa 4
+            update_stage(
+                tracking, email, nueva_etapa=4,
+                canal="reply",
+                subject=subject,
+                notas="✅ Respuesta positiva detectada automáticamente — en seguimiento",
+            )
+            positivos += 1
+
+        elif tipo == "negativo":
+            # No interesado → etapa 99 (descartado)
+            update_stage(
+                tracking, email, nueva_etapa=99,
+                canal="reply",
+                subject=subject,
+                notas="❌ Respuesta negativa — no interesado",
+            )
+            negativos += 1
+
         else:
             otros += 1
 
@@ -263,11 +285,15 @@ def process(dry_run: bool = False) -> None:
         if sb_ids_procesados:
             mark_supabase_processed(sb_ids_procesados)
         print(f"\n✅ Procesados: {bounces} bounces → descartados | "
-              f"{vacaciones} vacaciones → anotados | {otros} otros sin acción")
+              f"{vacaciones} vacaciones → anotados | "
+              f"{positivos} positivos → etapa 4 | "
+              f"{negativos} negativos → descartados | "
+              f"{otros} otros sin acción")
         print_summary(tracking)
     else:
         print(f"\n[DRY RUN] {len(pendientes)} auto-replies — "
-              f"{bounces} bounces, {vacaciones} vacaciones, {otros} otros")
+              f"{bounces} bounces, {vacaciones} vacaciones, "
+              f"{positivos} positivos, {negativos} negativos, {otros} otros")
 
 
 def add_autoreply(email: str, tipo: str, subject: str = "",
