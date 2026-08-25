@@ -31,8 +31,10 @@ RECIPIENTS    = ["rocio.altamirano@smfconsulting.es", "victoria.miguez@smfconsul
 
 GENERIC_DOMAINS = {"gmail.com","hotmail.com","yahoo.com","outlook.com","hotmail.es","yahoo.es","gmail.es"}
 
-SQL_ID = "4847D259D5D544778884865219753DB3"
-IQL_ID = "FBDED8EB276D4EC4B6C6A7AD6DA63BF1"
+SQL_ID          = "4847D259D5D544778884865219753DB3"
+MQL_ID          = "64EB895C7E014E4FAF36CD160120792A"
+IQL_ID          = "FBDED8EB276D4EC4B6C6A7AD6DA63BF1"
+SERVICES_SQL_ID = "1C2297939247407CAA05F9D3A5862AC7"
 
 # Rol Comercial — requerido para ETCRM_Lead sin depender del rol activo de Rocío
 _COMERCIAL_ROLE = "8351131DFF384725AB08E06773FE6144"
@@ -118,7 +120,18 @@ def update_lead(lead_id, payload, sid):
 
 # ── Classification ─────────────────────────────────────────────────────────────
 def calc_classification(lead):
-    """Determina SQL/IQL del lead según contenido. Devuelve ('SQL'|'IQL'|None, note)."""
+    """
+    Determina la clasificación del lead según el funnel IQL → MQL → SQL.
+
+    - IQL (Information Qualified Lead): top de funnel, sin señal de compra ni ICP fit claro.
+    - MQL (Marketing Qualified Lead): encaja con ICP (empresa real + email corporativo
+      o teléfono o keywords ERP), pero sin presupuesto/urgencia/decisor confirmado.
+    - SQL (Sales Qualified Lead): señal explícita de compra — presupuesto, urgencia o
+      decisor confirmado. Producto ERP.
+    - Services SQL: igual que SQL pero para servicios (no implementado automáticamente aún).
+
+    Devuelve ('SQL'|'MQL'|'IQL'|None, note).
+    """
     fn      = (lead.get("firstname") or lead.get("firstName") or "").strip()
     email   = (lead.get("email") or "").strip().lower()
     phone   = (lead.get("phone") or "").strip()
@@ -158,11 +171,16 @@ def calc_classification(lead):
                     "verifactu","almacen","gestion empresarial","facturacion","compras","ventas"]
     has_erp = any(k in txt for k in ERP_KEYWORDS)
 
+    # MQL: encaja con ICP — empresa real + email corporativo, o teléfono, o keywords ERP
     if has_erp or (has_company and corp_email) or phone:
         areas = [a for a in ["erp","inventario","finanzas","manufactura","contabilidad",
                               "mrp","bi","verifactu","almacen"] if a in txt]
-        note = "perfil IQL" + (" | áreas: " + ", ".join(areas) if areas else "")
-        return "IQL", note
+        note = "perfil MQL — ICP fit" + (" | áreas: " + ", ".join(areas) if areas else "")
+        return "MQL", note
+
+    # IQL: tiene empresa o email pero sin ICP fit claro — top de funnel
+    if has_company or corp_email:
+        return "IQL", "perfil IQL — sin ICP fit claro"
 
     return None, "sin datos suficientes"
 
@@ -240,7 +258,8 @@ def main():
             no_change += 1
             continue
 
-        target_id = SQL_ID if classification == "SQL" else IQL_ID
+        CLASS_ID_MAP = {"SQL": SQL_ID, "MQL": MQL_ID, "IQL": IQL_ID, "Services SQL": SERVICES_SQL_ID}
+        target_id = CLASS_ID_MAP.get(classification, IQL_ID)
         payload = {"id": lead_id, "classification": target_id}
         result, err = update_lead(lead_id, payload, sid)
         sid_uses += 1
