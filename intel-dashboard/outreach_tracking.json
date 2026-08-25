@@ -3692,8 +3692,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 3,
-      "etapa_label": "followup_email_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 2,
@@ -3712,6 +3712,15 @@
           "fecha": "2026-08-25T09:25:53Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "El mensaje no se ha podido enviar",
+          "enviado_por": "",
+          "fecha": "2026-08-25T14:27:41Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
         }
       ],
       "notas": ""
@@ -4236,8 +4245,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4247,6 +4256,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:11.830193+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4259,8 +4277,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4270,6 +4288,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:17.321556+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4282,8 +4309,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4293,6 +4320,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:22.992463+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4305,8 +4341,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4316,6 +4352,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:28.623154+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4328,8 +4373,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4339,6 +4384,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:34.255627+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4351,8 +4405,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4362,6 +4416,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:39.804259+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4374,8 +4437,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4385,6 +4448,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:45.254059+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4397,8 +4469,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4408,6 +4480,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:50.681595+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4420,8 +4501,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4431,6 +4512,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:34:56.244375+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4443,8 +4533,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4454,6 +4544,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:01.792566+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4466,8 +4565,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4477,6 +4576,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:07.268672+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4489,8 +4597,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4500,6 +4608,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:12.859325+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4512,8 +4629,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4523,6 +4640,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:18.492737+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4535,8 +4661,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4546,6 +4672,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:24.227271+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4558,8 +4693,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4569,6 +4704,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:29.905148+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4581,8 +4725,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4592,6 +4736,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:35.603325+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4604,8 +4757,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4615,6 +4768,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:41.122911+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4627,8 +4789,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4638,6 +4800,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:46.651283+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4650,8 +4821,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4661,6 +4832,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:52.161607+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4673,8 +4853,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4684,6 +4864,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:35:57.712177+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4696,8 +4885,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4707,6 +4896,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:03.240303+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4719,8 +4917,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4730,6 +4928,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:08.837973+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4742,8 +4949,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4753,6 +4960,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:14.403196+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4765,8 +4981,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4776,6 +4992,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:19.902358+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4811,8 +5036,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4822,6 +5047,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:31.095456+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4834,8 +5068,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4845,6 +5079,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:36.624023+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4857,8 +5100,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4868,6 +5111,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:42.266384+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4880,8 +5132,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4891,6 +5143,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:47.786646+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4903,8 +5164,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4914,6 +5175,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:53.418285+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -4926,8 +5196,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -4937,6 +5207,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-21T15:36:58.946652+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T13:00:01Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -7624,8 +7903,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 2,
@@ -7635,6 +7914,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-25T08:47:34.918171+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "No se ha encontrado la dirección",
+          "enviado_por": "",
+          "fecha": "2026-08-25T14:27:41Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
         }
       ],
       "notas": ""
@@ -7670,8 +7958,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 2,
@@ -7681,6 +7969,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-25T08:47:45.105397+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "No se ha encontrado la dirección",
+          "enviado_por": "",
+          "fecha": "2026-08-25T14:27:41Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
         }
       ],
       "notas": ""
@@ -8150,9 +8447,17 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-25T08:49:39.857033+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "autoreply_vacaciones",
+          "canal": "autoreply",
+          "subject": "SP Química — respuesta automática",
+          "fecha": "2026-08-25T14:27:41Z",
+          "notas": "Out of office — fecha de vuelta desconocida"
         }
       ],
-      "notas": ""
+      "notas": "Out of office — fecha de vuelta desconocida"
     },
     "tarragonaordes@solenis.com": {
       "email": "tarragonaordes@solenis.com",
