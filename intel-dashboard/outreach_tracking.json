@@ -555,6 +555,15 @@
           "fecha": "2026-08-24T19:22:16Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up enviado por auto_followup_daily.py (workflow 32767093342, push falló — marcado manualmente)"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email",
+          "subject": "Re: Etendo — te escribo ahora que volviste",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-26T15:29:19.349252+00:00",
+          "notas": "followup post-vacaciones"
         }
       ],
       "notas": "Out of office — vuelve: 25/08/2026"
@@ -8895,6 +8904,121 @@
           "fecha": "2026-08-26T12:30:10Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "support@articagency.com": {
+      "email": "support@articagency.com",
+      "empresa": "ARTIC",
+      "dominio": "articagency.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-26T15:28:53.938618+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "info@patterson.agency": {
+      "email": "info@patterson.agency",
+      "empresa": "Patterson Agency",
+      "dominio": "patterson.agency",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-26T15:28:58.997535+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "hola@gigsonsolutions.com": {
+      "email": "hola@gigsonsolutions.com",
+      "empresa": "Gigson Solutions",
+      "dominio": "gigsonsolutions.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-26T15:29:04.099514+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "contacto@interactivos.net": {
+      "email": "contacto@interactivos.net",
+      "empresa": "Interactivos",
+      "dominio": "interactivos.net",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-26T15:29:09.178637+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "contactsg@captivea.com": {
+      "email": "contactsg@captivea.com",
+      "empresa": "Captivea Luxembourg",
+      "dominio": "captivea.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-26T15:29:14.210643+00:00",
+          "notas": ""
         }
       ],
       "notas": ""
