@@ -4085,8 +4085,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 3,
-      "etapa_label": "followup_email_enviado",
+      "etapa": 4,
+      "etapa_label": "respondio_positivo",
       "contactos": [
         {
           "etapa": 2,
@@ -4105,9 +4105,19 @@
           "fecha": "2026-08-25T09:25:53Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
+        },
+        {
+          "etapa": 4,
+          "etapa_label": "respondio_positivo",
+          "canal": "reply",
+          "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
+          "fecha": "2026-08-25T18:58:16Z",
+          "reply_from": "phuelamo@newportal.es",
+          "notas": "✅ P. Huelamo respondió pidiendo reunión — miércoles entre 11:00 y 12:00"
         }
       ],
-      "notas": ""
+      "notas": "✅ Respondió (phuelamo@newportal.es) — quiere reunión miércoles 11-12h",
+      "updated_at": "2026-08-25T18:58:16Z"
     },
     "sensei@sensei.es": {
       "email": "sensei@sensei.es",
@@ -5245,7 +5255,7 @@
           "etapa_label": "followup_email_enviado",
           "canal": "email_n8n",
           "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
-          "fecha": "2026-08-26T09:31:44Z",
+          "fecha": "2026-08-26T13:00:01Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
@@ -5277,7 +5287,7 @@
           "etapa_label": "followup_email_enviado",
           "canal": "email_n8n",
           "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
-          "fecha": "2026-08-26T09:31:44Z",
+          "fecha": "2026-08-26T13:00:01Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
@@ -5309,7 +5319,7 @@
           "etapa_label": "followup_email_enviado",
           "canal": "email_n8n",
           "subject": "Re: Amplía tu portfolio con Etendo — ERP open source con IA",
-          "fecha": "2026-08-26T09:31:44Z",
+          "fecha": "2026-08-26T13:00:01Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
@@ -5863,9 +5873,18 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:05:28.210310+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "delay_bounce",
+          "canal": "autoreply",
+          "subject": "Delivery Status Notification (Delay)",
+          "fecha": "2026-08-25T19:49:11Z",
+          "notas": "Bounce temporal — Gmail reintentando (puede resolverse solo)"
         }
       ],
-      "notas": ""
+      "notas": "⚠️ Bounce temporal 25 ago — Gmail reintentando",
+      "updated_at": "2026-08-25T19:49:11Z"
     },
     "maderasleonet@euskaltel.net": {
       "email": "maderasleonet@euskaltel.net",
@@ -8005,9 +8024,18 @@
           "enviado_por": "",
           "fecha": "2026-08-25T14:27:41Z",
           "notas": "Email inválido — bounce detectado automáticamente"
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Delivery Status Notification (Failure)",
+          "fecha": "2026-08-25T19:49:11Z",
+          "notas": "Bounce permanente — dominio o usuario inexistente (reenviado por Vico)"
         }
       ],
-      "notas": ""
+      "notas": "Bounce permanente — email inválido",
+      "updated_at": "2026-08-25T19:49:11Z"
     },
     "info@construccionesogalla.com": {
       "email": "info@construccionesogalla.com",
@@ -8017,8 +8045,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 2,
@@ -8028,9 +8056,18 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-25T08:47:50.311852+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Delivery Status Notification (Failure)",
+          "fecha": "2026-08-25T19:49:11Z",
+          "notas": "Bounce permanente — dominio o usuario inexistente (reenviado por Vico)"
         }
       ],
-      "notas": ""
+      "notas": "Bounce permanente — email inválido",
+      "updated_at": "2026-08-25T19:49:11Z"
     },
     "mikel@gcinetw.com": {
       "email": "mikel@gcinetw.com",
@@ -8451,9 +8488,19 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-25T08:49:34.421041+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "ooo",
+          "canal": "autoreply",
+          "subject": "Resposta automàtica: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-25T19:55:18Z",
+          "reply_from": "administracion@spquimica.com",
+          "notas": "OOO — SP Química cerrada por vacaciones del 1 al 30 agosto. Vuelven el 31 agosto. (Bianca Lentino)"
         }
       ],
-      "notas": ""
+      "notas": "⏸ OOO hasta 31 ago — retomar semana del 1 sep",
+      "updated_at": "2026-08-25T19:55:18Z"
     },
     "planta@vallsquimica.com": {
       "email": "planta@vallsquimica.com",
@@ -8482,9 +8529,19 @@
           "subject": "SP Química — respuesta automática",
           "fecha": "2026-08-25T14:27:41Z",
           "notas": "Out of office — fecha de vuelta desconocida"
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "ooo",
+          "canal": "autoreply",
+          "subject": "Respuesta automática: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-25T19:55:18Z",
+          "reply_from": "tdearriba@vallsquimica.com",
+          "notas": "OOO de Tomas de Arriba (tdearriba@vallsquimica.com) — decía hasta 01/06, fecha ya vencida, probablemente activo"
         }
       ],
-      "notas": "Out of office — fecha de vuelta desconocida"
+      "notas": "📬 Email entregado — OOO recibido (fecha vencida, ya activos)",
+      "updated_at": "2026-08-25T19:55:18Z"
     },
     "tarragonaordes@solenis.com": {
       "email": "tarragonaordes@solenis.com",
@@ -8762,1152 +8819,46 @@
       ],
       "notas": ""
     },
-    "info@whunt.es": {
-      "email": "info@whunt.es",
-      "empresa": "W Hunt España",
-      "dominio": "whunt.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
+    "intedisa@intedisa.es": {
+      "email": "intedisa@intedisa.es",
+      "empresa": "Intedisa",
+      "dominio": "intedisa.es",
+      "sector": "Construcción",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
       "etapa": 2,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
           "etapa": 2,
           "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-26T12:30:04Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:47:37.548371+00:00",
-          "notas": ""
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
       ],
       "notas": ""
     },
-    "info@timup.es": {
-      "email": "info@timup.es",
-      "empresa": "Timup",
-      "dominio": "timup.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
+    "info@agrobalia.com": {
+      "email": "info@agrobalia.com",
+      "empresa": "Agrobalia",
+      "dominio": "agrobalia.com",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
       "etapa": 2,
       "etapa_label": "email1_enviado",
       "contactos": [
         {
           "etapa": 2,
           "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-08-26T12:30:10Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:47:42.710771+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "prensa@farmaindustria.es": {
-      "email": "prensa@farmaindustria.es",
-      "empresa": "FARMAINDUSTRIA",
-      "dominio": "farmaindustria.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:47:47.839242+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "technologyreview@opinno.com": {
-      "email": "technologyreview@opinno.com",
-      "empresa": "MIT Technology Review (ES)",
-      "dominio": "technologyreview.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:47:52.958599+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@vivienda25.com": {
-      "email": "info@vivienda25.com",
-      "empresa": "EDIFICACIONES Y PROYECTOS METROVIVIENDA SA",
-      "dominio": "www.vivienda25.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:47:58.126073+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "juanmiguel@gespime.es": {
-      "email": "juanmiguel@gespime.es",
-      "empresa": "FEIGLU SL",
-      "dominio": "www.construccionesfeiglu.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:03.392730+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "victorporras@edificacionesmalaga.es": {
-      "email": "victorporras@edificacionesmalaga.es",
-      "empresa": "EDIFICACIONES MALAGA SA",
-      "dominio": "www.edificacionesmalaga.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:08.512994+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@marvelconstruccion.es": {
-      "email": "info@marvelconstruccion.es",
-      "empresa": "MARVEL CONSTRUCCION Y CALIDAD SL.",
-      "dominio": "www.marvelconstruccion.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:13.654854+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@industriasvag.es": {
-      "email": "info@industriasvag.es",
-      "empresa": "INDUSTRIAS VAG SL",
-      "dominio": "www.industriasvag.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:18.770205+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "compras@syta.es": {
-      "email": "compras@syta.es",
-      "empresa": "INDUSTRIAS SYTA VILLARREAL SL",
-      "dominio": "www.syta.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:24.019656+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "contabilidad1@fores.es": {
-      "email": "contabilidad1@fores.es",
-      "empresa": "INDUSTRIAL MADERERA DEL AZAHAR SL",
-      "dominio": "www.fores.com.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:29.095258+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "indjaime@indjaime.es": {
-      "email": "indjaime@indjaime.es",
-      "empresa": "INDUSTRIAL JAIME SL",
-      "dominio": "www.indjaime.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:34.202599+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "inaupi@inaupi.com": {
-      "email": "inaupi@inaupi.com",
-      "empresa": "INDUSTRIAL AUTO PITARCH SL",
-      "dominio": "www.inaupi.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:39.290649+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "sukia@sukia.com": {
-      "email": "sukia@sukia.com",
-      "empresa": "CONSTRUCCIONES SUKIA ERAIKUNTZAK SA AZYSA OBRAS Y PROYECTOS SL UTE BALASTRAIN LEY 18-1982",
-      "dominio": "www.sukia.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:44.415456+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@alzolaconstrucion.com": {
-      "email": "info@alzolaconstrucion.com",
-      "empresa": "CONSTRUCCIONES ALZOLA SL",
-      "dominio": "www.alzolaconstruccion.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:49.502661+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "fcco@fcc.es": {
-      "email": "fcco@fcc.es",
-      "empresa": "UTE BERGARA-ANTZUOLA LEY 18 1982",
-      "dominio": "www.fccco.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:54.618484+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@construccionesluisrodriguez.com": {
-      "email": "info@construccionesluisrodriguez.com",
-      "empresa": "OBRAS Y PROYECTOS LUIS RODRIGUEZ SL",
-      "dominio": "www.construccionesluisrodriguez.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:48:59.737624+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "carminfloria@carminfloria.net": {
-      "email": "carminfloria@carminfloria.net",
-      "empresa": "INVERSION, TRABAJOS Y EXPLOTACIONES, S.L.",
-      "dominio": "www.carminfloria.net",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:04.867677+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "correo@oci.es": {
-      "email": "correo@oci.es",
-      "empresa": "OBRAS Y CONSTRUCCIONES INTEREGIONALES SL",
-      "dominio": "www.oci.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:09.969082+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "dquim@dquim.com": {
-      "email": "dquim@dquim.com",
-      "empresa": "DISTRIBUCIONS QUIM 98 SL",
-      "dominio": "www.dquim.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:15.097597+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@garciamoreno.cat": {
-      "email": "info@garciamoreno.cat",
-      "empresa": "DISTRIBUCIONES GARCIA MORENO SL",
-      "dominio": "www.garciamoreno.cat",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:20.191691+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "jordibarreno@dial2.es": {
-      "email": "jordibarreno@dial2.es",
-      "empresa": "DISTRIBUCIONES ALIMENTICIAS 2 SL",
-      "dominio": "www.dial2.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:25.340156+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "ardo@ardo-distribuciones.com": {
-      "email": "ardo@ardo-distribuciones.com",
-      "empresa": "ARDO DISTRIBUCION DE BEBIDAS SL",
-      "dominio": "www.ardo-distribuciones.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:30.402328+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "administraciones@bebidassur.com": {
-      "email": "administraciones@bebidassur.com",
-      "empresa": "BERROCAL RODRIGUEZ SL",
-      "dominio": "www.bebidassur.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:35.542886+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "jaguar@industriasjaguar.com": {
-      "email": "jaguar@industriasjaguar.com",
-      "empresa": "INDUSTRIAS JAGUAR SA",
-      "dominio": "www.industriasjaguar.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:40.633677+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "betiko@industriasbetiko.com": {
-      "email": "betiko@industriasbetiko.com",
-      "empresa": "INDUSTRIAS BETICO SA",
-      "dominio": "www.industriasbetiko.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:45.779443+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "mail@industriasmail.com": {
-      "email": "mail@industriasmail.com",
-      "empresa": "INDUSTRIAS MAIL SA",
-      "dominio": "www.industriasmail.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:50.880493+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "banat@industriasbanat.com": {
-      "email": "banat@industriasbanat.com",
-      "empresa": "INDUSTRIAS BANAT SL",
-      "dominio": "www.industriasbanat.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:49:55.999533+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "urcelay@industriasurcelay.com": {
-      "email": "urcelay@industriasurcelay.com",
-      "empresa": "INDUSTRIAS URCELAY SOCIEDAD LIMITADA",
-      "dominio": "www.industriasurcelay.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:01.124731+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@urdurimetal.com": {
-      "email": "info@urdurimetal.com",
-      "empresa": "INDUSTRIAS URDURI SL",
-      "dominio": "www.urdurimetal.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:06.464674+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "industrias@doje.com": {
-      "email": "industrias@doje.com",
-      "empresa": "INDUSTRIAS DOJE SL",
-      "dominio": "www.doje.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:11.567787+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "azkoin@azkoin.com": {
-      "email": "azkoin@azkoin.com",
-      "empresa": "INDUSTRIAS AZKOIN SL",
-      "dominio": "www.azkoin.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:16.720958+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "metala@metala.es": {
-      "email": "metala@metala.es",
-      "empresa": "INDUSTRIAS METALA SL",
-      "dominio": "www.metala.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:21.836815+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@cianco.com": {
-      "email": "info@cianco.com",
-      "empresa": "INDUSTRIAS DEL ACERO CIANCO S.L.",
-      "dominio": "www.cianco.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:26.984483+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "mdelgado@metalicasperona.es": {
-      "email": "mdelgado@metalicasperona.es",
-      "empresa": "INDUSTRIAS METALICAS PERONA SOCIEDAD LIMITADA.",
-      "dominio": "www.metalicasperona.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:32.051071+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "dumar@metalicadumar.com": {
-      "email": "dumar@metalicadumar.com",
-      "empresa": "METALICA DUMAR SL",
-      "dominio": "www.metalicadumar.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:37.423556+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@sibre.es": {
-      "email": "info@sibre.es",
-      "empresa": "SIBRE BRAKES SPAIN SL",
-      "dominio": "www.sibre.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:42.555792+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "ofc@metalurgiam.com": {
-      "email": "ofc@metalurgiam.com",
-      "empresa": "METALURGIA MANUFACTURADA SA",
-      "dominio": "www.metalurgiam.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:47.683254+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "ghi@ghifurnaces.com": {
-      "email": "ghi@ghifurnaces.com",
-      "empresa": "GHI HORNOS INDUSTRIALES SLU",
-      "dominio": "www.ghifurnaces.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:52.816223+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "administracion@cvcspring.com": {
-      "email": "administracion@cvcspring.com",
-      "empresa": "CVC SPRING SA",
-      "dominio": "www.cvcspring.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:50:58.003978+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "oficina@ondarlan.com": {
-      "email": "oficina@ondarlan.com",
-      "empresa": "ONDARLAN SL",
-      "dominio": "www.ondarlan.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:03.076640+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "conta@megusa.com": {
-      "email": "conta@megusa.com",
-      "empresa": "METALURGICA DEL GUADALQUIVIR SL",
-      "dominio": "www.megusa.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:08.283633+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "inma@plasticos-mernick.com": {
-      "email": "inma@plasticos-mernick.com",
-      "empresa": "PLASTICOS MERNICK SL",
-      "dominio": "www.plasticos-mernick.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:13.365200+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@quimsaitw.com": {
-      "email": "info@quimsaitw.com",
-      "empresa": "QUIMICA INDUSTRIAL MEDITERRANEA SL",
-      "dominio": "www.quimsaitw.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:18.569245+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "dalonso@quimicadefluidos.es": {
-      "email": "dalonso@quimicadefluidos.es",
-      "empresa": "QUIMICA DE FLUIDOS SL",
-      "dominio": "www.quimicadefluidos.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:23.708575+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@quimicaycontrol.es": {
-      "email": "info@quimicaycontrol.es",
-      "empresa": "QUIMICA Y CONTROL MALAGA SL.",
-      "dominio": "www.okplagas.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:28.851967+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@quimiur.com": {
-      "email": "info@quimiur.com",
-      "empresa": "QUIMICAS URBANEJA SL",
-      "dominio": "www.quimiur.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:33.890692+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "info@bioplasticoscenachero.com": {
-      "email": "info@bioplasticoscenachero.com",
-      "empresa": "BIOPLASTICOS CENACHERO SL.",
-      "dominio": "www.bioplasticoscenachero.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:39.026931+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "administracion@tuyper.es": {
-      "email": "administracion@tuyper.es",
-      "empresa": "PLASTICOS IMA SA",
-      "dominio": "www.tuyper.es",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:44.125056+00:00",
-          "notas": ""
-        }
-      ],
-      "notas": ""
-    },
-    "brochequimica@brochequimica.com": {
-      "email": "brochequimica@brochequimica.com",
-      "empresa": "BROCHE QUIMICA SL",
-      "dominio": "www.revimca.com",
-      "sector": "—",
-      "signal": "—",
-      "score_intel": "—",
-      "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
-      "contactos": [
-        {
-          "etapa": 2,
-          "etapa_label": "email1_enviado",
-          "canal": "email",
-          "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
-          "enviado_por": "victoria.miguez@smfconsulting.es",
-          "fecha": "2026-08-26T08:51:49.088342+00:00",
-          "notas": ""
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
       ],
       "notas": ""
