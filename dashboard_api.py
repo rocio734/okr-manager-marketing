@@ -22,6 +22,7 @@ from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 from collections import Counter
 from typing import Optional
+import re
 
 N8N_OUTREACH_WEBHOOK = "https://n8n.labs.etendo.cloud/webhook/a3f7c821-5d04-4b9e-8c31-0e72b49d6f15"
 
@@ -1320,12 +1321,23 @@ Respondé SOLO con JSON: {{"subject": "...", "body_html": "..."}}"""
             json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": prompt}],
                   "max_tokens": 400, "temperature": 0.7},
             timeout=30)
-        raw = ai.json()["choices"][0]["message"]["content"].strip()
-        parsed = json.loads(raw)
+        if ai.status_code != 200:
+            raise HTTPException(status_code=502,
+                detail=f"OpenAI HTTP {ai.status_code}: {ai.text[:300]}")
+        ai_data = ai.json()
+        raw = (ai_data.get("choices") or [{}])[0].get("message", {}).get("content", "").strip()
+        if not raw:
+            raise HTTPException(status_code=502,
+                detail=f"OpenAI devolvió contenido vacío. Keys: {list(ai_data.keys())}")
+        # Limpiar posible markdown code fence
+        raw_clean = re.sub(r'^```json\s*|\s*```$', '', raw, flags=re.DOTALL).strip()
+        parsed = json.loads(raw_clean)
         subject  = parsed.get("subject","Follow-up — Etendo ERP")
         body_txt = parsed.get("body_html","")
+    except (HTTPException):
+        raise
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Error IA: {e}")
+        raise HTTPException(status_code=502, detail=f"Error IA: {type(e).__name__}: {e}")
 
     pixel_url = f"https://etendo-dashboard-api.onrender.com/pixel/{urllib.parse.quote(email)}.gif"
     signature = """<div style="margin-top:24px;border-top:1px solid #e6e6e6;padding-top:14px;font-family:Arial,sans-serif;font-size:13px;line-height:1.4;color:#333">
