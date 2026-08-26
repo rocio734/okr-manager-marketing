@@ -15,7 +15,7 @@ Uso:
 import sys, json, re, time, os, requests
 from pathlib import Path
 from bs4 import BeautifulSoup
-import urllib3
+import urllib3, tempfile, shutil
 urllib3.disable_warnings()
 
 INTEL_DIR = Path(__file__).resolve().parent
@@ -32,8 +32,23 @@ if ENV_FILE.exists():
 
 import fetch_intel as fi
 
-DRY_RUN = "--dry-run" in sys.argv
-LIMIT   = int(next((sys.argv[sys.argv.index("--limit")+1] for i,a in enumerate(sys.argv) if a=="--limit"), 9999))
+DRY_RUN      = "--dry-run" in sys.argv
+LIMIT        = int(next((sys.argv[sys.argv.index("--limit")+1] for i,a in enumerate(sys.argv) if a=="--limit"), 9999))
+# Tiempo máximo en segundos. En GitHub Actions el job tiene 30 min; paramos a los 26 para guardar limpiamente.
+MAX_SECONDS  = int(next((sys.argv[sys.argv.index("--max-seconds")+1] for i,a in enumerate(sys.argv) if a=="--max-seconds"), 26*60))
+_START_TIME  = time.monotonic()
+
+
+def _atomic_save(data: dict, target: Path) -> None:
+    """Escribe JSON en un archivo temporal y lo mueve atómicamente al destino."""
+    tmp = target.with_suffix(".tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    shutil.move(str(tmp), str(target))
+
+
+def _time_left() -> float:
+    return MAX_SECONDS - (time.monotonic() - _START_TIME)
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0.0.0 Safari/537.36",
@@ -165,17 +180,27 @@ def main():
         and l.get("email", "—") in ("—", "", None, "None")
     ]
     print(f"Partners sin email: {len(partners_sin_email)}")
-    print(f"Procesando:         {min(LIMIT, len(partners_sin_email))}\n")
+    print(f"Procesando:         {min(LIMIT, len(partners_sin_email))}")
+    print(f"Tiempo máximo:      {MAX_SECONDS//60} min\n")
 
     enriched = 0
-    errors   = 0
+    processed = 0
+    stopped_early = False
+
     for i, lead in enumerate(partners_sin_email[:LIMIT], 1):
+        # Parar limpiamente si queda menos de 90 segundos
+        if _time_left() < 90:
+            print(f"\n⏱️  Tiempo casi agotado ({_time_left():.0f}s restantes) — parando limpiamente en [{i-1}/{min(LIMIT, len(partners_sin_email))}]")
+            stopped_early = True
+            break
+
         domain  = lead.get("domain", "")
         company = lead.get("company", domain)
         if not domain:
             continue
 
         email = fetch_emails_for_domain(domain)
+        processed += 1
 
         status = "✓" if email != "—" else "·"
         print(f"  [{i:3d}] {status} {company[:38]:38s} {domain:30s} {email}")
@@ -188,21 +213,23 @@ def main():
         if i % 50 == 0:
             print(f"\n  [{i}/{min(LIMIT, len(partners_sin_email))}] — {enriched} emails encontrados hasta ahora\n")
 
-        # Guardar cada 10 para no perder progreso si el proceso se interrumpe
-        if not DRY_RUN and i % 10 == 0 and enriched > 0:
-            fi.save_data(data)
+        # Guardar cada 5 con atomic write para no corromper el archivo
+        if not DRY_RUN and i % 5 == 0 and enriched > 0:
+            _atomic_save(data, fi.DATA_FILE)
 
         time.sleep(0.3)
 
     print(f"\n{'─'*60}")
-    print(f"  Procesados: {min(LIMIT, len(partners_sin_email))}")
+    print(f"  Procesados: {processed}")
     print(f"  Con email:  {enriched}")
-    print(f"  Sin email:  {min(LIMIT, len(partners_sin_email)) - enriched}")
+    print(f"  Pendientes: {len(partners_sin_email) - processed} (continuarán la próxima semana)")
+    if stopped_early:
+        print(f"  ⚠️  Parado antes del timeout — datos guardados correctamente")
     print(f"{'─'*60}\n")
 
     if not DRY_RUN and enriched > 0:
-        fi.save_data(data)
-        print(f"intel_data.json guardado")
+        _atomic_save(data, fi.DATA_FILE)
+        print(f"intel_data.json guardado (atomic)")
 
         # Regenerar tabla de partners en index.html
         html = fi.HTML_FILE.read_text(encoding="utf-8")

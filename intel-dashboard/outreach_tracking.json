@@ -1472,9 +1472,18 @@
           "fecha": "2026-08-24T19:23:08Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_vacaciones",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-26T14:30:20Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up de vuelta de vacaciones — auto"
         }
       ],
-      "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día. | Fuera oficina agos, ya volvió"
+      "notas": "Seguimiento vacaciones enviado"
     },
     "info@bicimania.com": {
       "email": "info@bicimania.com",
@@ -2664,9 +2673,18 @@
           "fecha": "2026-08-24T19:23:08Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_vacaciones",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "fecha": "2026-08-26T14:30:20Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up de vuelta de vacaciones — auto"
         }
       ],
-      "notas": "OOO detectado — vuelve 2026-08-24. Follow-up programado para ese día. | Fuera oficina agos, ya volvió"
+      "notas": "Seguimiento vacaciones enviado"
     },
     "reservaslume@luciafreitas.es": {
       "email": "reservaslume@luciafreitas.es",
@@ -2806,9 +2824,18 @@
           "fecha": "2026-08-24T19:23:08Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_vacaciones",
+          "canal": "email_n8n",
+          "subject": "Re: Fuera de oficina / Out of office",
+          "fecha": "2026-08-26T14:30:20Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up de vuelta de vacaciones — auto"
         }
       ],
-      "notas": " | Fuera oficina agos, ya volvió"
+      "notas": "Seguimiento vacaciones enviado"
     },
     "javier.rodriguez@lodisna.com": {
       "email": "javier.rodriguez@lodisna.com",
@@ -2838,9 +2865,18 @@
           "fecha": "2026-08-20T11:56:42Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up post-vacaciones — volvió 2026-08-19"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_vacaciones",
+          "canal": "email_n8n",
+          "subject": "Re: Fuera de oficina / Out of office",
+          "fecha": "2026-08-26T14:30:20Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up de vuelta de vacaciones — auto"
         }
       ],
-      "notas": " | Fuera oficina agos, ya volvió"
+      "notas": "Seguimiento vacaciones enviado"
     },
     "comercial@dts.es": {
       "email": "comercial@dts.es",

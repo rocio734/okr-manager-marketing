@@ -1646,7 +1646,12 @@ def load_data():
     return {"comp_hashes":{},"changes_history":[],"leads_history":[],"engagement_history":[],"prices":{},"features":{},"seen_domains":{}}
 
 def save_data(data):
-    with open(DATA_FILE,"w") as f: json.dump(data,f,ensure_ascii=False,indent=2)
+    """Escribe intel_data.json atómicamente para evitar corrupción por SIGKILL."""
+    import tempfile, shutil as _shutil
+    tmp = DATA_FILE.with_suffix(".tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    _shutil.move(str(tmp), str(DATA_FILE))
 
 # ── Búsqueda de posts interactuables para engagement ───────────────────────
 def search_engagement_posts(data):

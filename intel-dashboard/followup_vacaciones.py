@@ -96,12 +96,50 @@ def main():
     print(f"  dry_run: {DRY_RUN}")
     print(f"{'='*60}\n")
 
-    if not AUTOREPLIES_FILE.exists():
-        print("No existe outreach_autoreplies.json — nada que procesar.")
-        return
+    # ── Cargar auto-replies: archivo local + Supabase ────────────────────────
+    autoreplies = []
 
-    autoreplies = json.loads(AUTOREPLIES_FILE.read_text())
-    tracking    = load_tracking()
+    # 1. Archivo local (fallback / manual)
+    if AUTOREPLIES_FILE.exists():
+        autoreplies = json.loads(AUTOREPLIES_FILE.read_text())
+    else:
+        print("No existe outreach_autoreplies.json local — usando solo Supabase.")
+
+    # 2. Supabase (fuente principal desde n8n)
+    sb_url = os.environ.get("SUPABASE_URL", "")
+    sb_key = os.environ.get("SUPABASE_SERVICE_KEY", "")
+    if sb_url and sb_key:
+        try:
+            import urllib.request as _ureq
+            req = _ureq.Request(
+                f"{sb_url}/rest/v1/outreach_autoreplies?tipo=eq.vacaciones&select=*",
+                headers={
+                    "apikey": sb_key,
+                    "Authorization": f"Bearer {sb_key}",
+                }
+            )
+            with _ureq.urlopen(req, timeout=10) as resp:
+                sb_rows = json.loads(resp.read().decode())
+            # Normalizar al mismo formato que el JSON local
+            local_emails = {a.get("email","").lower() for a in autoreplies}
+            for row in sb_rows:
+                em = (row.get("email") or "").lower().strip()
+                if em and em not in local_emails:
+                    autoreplies.append({
+                        "email":        em,
+                        "tipo":         row.get("tipo", "vacaciones"),
+                        "fecha_vuelta": row.get("fecha_vuelta", ""),
+                        "raw_subject":  row.get("raw_subject", ""),
+                        "procesado":    row.get("procesado", False),
+                        "_sb_id":       row.get("id"),
+                    })
+            print(f"Supabase: {len(sb_rows)} OOO cargados ({len(autoreplies)} total tras merge)")
+        except Exception as e:
+            print(f"  ⚠️  Supabase no disponible: {e}")
+    else:
+        print("  ⚠️  SUPABASE_URL/KEY no configuradas — solo archivo local")
+
+    tracking = load_tracking()
 
     # Filtrar: tipo=vacaciones, fecha_vuelta ya pasó, no procesado aún como followup
     candidatos = []
@@ -110,7 +148,7 @@ def main():
             continue
         fecha_vuelta = parse_fecha_vuelta(ar.get("fecha_vuelta", ""))
         if not fecha_vuelta:
-            print(f"  ⚠️  Sin fecha parseable: {ar.get('email')} — {ar.get('fecha_vuelta')}")
+            print(f"  ⚠️  Sin fecha parseable: {ar.get('email')} — {ar.get('fecha_vuelta')!r}")
             continue
         if fecha_vuelta > today:
             print(f"  ⏳ {ar.get('email')} — vuelve el {fecha_vuelta} (aún no)")
@@ -118,9 +156,13 @@ def main():
 
         email = ar.get("email", "")
         lead  = tracking.get(email, {})
-        # Saltar si ya está en etapa 3+ (ya recibió followup)
-        if lead.get("etapa", 0) >= 3:
-            print(f"  ✓ {email} — ya tiene followup enviado, saltando")
+        # Saltar si ya tiene nota de followup_vacaciones en el historial
+        ya_enviado = any(
+            c.get("etapa_label") == "followup_vacaciones"
+            for c in lead.get("contactos", [])
+        )
+        if ya_enviado:
+            print(f"  ✓ {email} — followup vacaciones ya enviado, saltando")
             continue
 
         candidatos.append(ar)
