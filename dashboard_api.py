@@ -1228,13 +1228,23 @@ def followup_pending():
         headers=_SB_HEADERS(), timeout=15)
     contacts = cr.json() if cr.status_code == 200 else []
 
+    # Obtener emails que rebotaron — no reenviar nunca a un bounce
+    bounced_emails = set()
+    br = requests.get(
+        f"{SUPABASE_URL}/rest/v1/outreach_autoreplies?tipo=eq.bounce&select=email",
+        headers=_SB_HEADERS(), timeout=10)
+    if br.status_code == 200:
+        bounced_emails = {row["email"].lower().strip() for row in br.json() if row.get("email")}
+
     pending = []
     for c in contacts:
         cf = c.get("custom_fields") or {}
         last_sent = cf.get("last_sent_at") or cf.get("sent_at","")
         replied   = cf.get("replied_at","")
         attempts  = cf.get("attempts", 0)
-        if not last_sent or replied or attempts >= 3:
+        email_lc  = (c.get("email") or "").lower().strip()
+        # Excluir: sin sent_at, ya respondió, máx intentos, o rebotó
+        if not last_sent or replied or attempts >= 3 or email_lc in bounced_emails:
             continue
         if last_sent < cutoff:
             pending.append({
@@ -1248,7 +1258,7 @@ def followup_pending():
             })
 
     pending.sort(key=lambda x: x["last_sent"])
-    return {"count": len(pending), "pending": pending}
+    return {"count": len(pending), "pending": pending, "bounces_excluidos": len(bounced_emails)}
 
 
 @app.post("/api/send-followup/{contact_id}")
@@ -1615,6 +1625,28 @@ def register_autoreply(payload: dict):
         if r.status_code in (200, 201):
             row = r.json()[0] if r.json() else {}
             print(f"✅ autoreply guardado: {email} → {tipo}")
+
+            # Si es bounce, marcar también en contacts.custom_fields para evitar follow-ups
+            if tipo == "bounce":
+                try:
+                    # Buscar el contacto
+                    cr2 = requests.get(
+                        f"{SUPABASE_URL}/rest/v1/contacts"
+                        f"?email=eq.{email}&fuente=eq.{OUTREACH_SOURCE}&select=id,custom_fields",
+                        headers=_SB_HEADERS(), timeout=10)
+                    if cr2.status_code == 200 and cr2.json():
+                        contact = cr2.json()[0]
+                        cf2 = contact.get("custom_fields") or {}
+                        cf2["bounced_at"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+                        cf2["replied_at"] = cf2.get("bounced_at")  # bloquea follow-up
+                        requests.patch(
+                            f"{SUPABASE_URL}/rest/v1/contacts?id=eq.{contact['id']}",
+                            headers={**_SB_HEADERS(), "Prefer": "return=minimal"},
+                            json={"custom_fields": cf2}, timeout=10)
+                        print(f"🚫 Contacto {email} marcado como bounce (replied_at seteado)")
+                except Exception as be:
+                    print(f"⚠️  No se pudo marcar bounce en contacts: {be}")
+
             return {"ok": True, "id": row.get("id"), "email": email, "tipo": tipo}
         else:
             print(f"⚠️  Supabase error {r.status_code}: {r.text[:200]}")
