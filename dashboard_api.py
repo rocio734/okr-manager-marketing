@@ -1237,6 +1237,14 @@ def followup_pending():
     if br.status_code == 200:
         bounced_emails = {row["email"].lower().strip() for row in br.json() if row.get("email")}
 
+    # Obtener emails con respuesta humana real — no enviar follow-up genérico
+    replied_human = set()
+    rhr = requests.get(
+        f"{SUPABASE_URL}/rest/v1/outreach_replies?select=email",
+        headers=_SB_HEADERS(), timeout=10)
+    if rhr.status_code == 200:
+        replied_human = {row["email"].lower().strip() for row in rhr.json() if row.get("email")}
+
     pending = []
     for c in contacts:
         cf = c.get("custom_fields") or {}
@@ -1244,8 +1252,8 @@ def followup_pending():
         replied   = cf.get("replied_at","")
         attempts  = cf.get("attempts", 0)
         email_lc  = (c.get("email") or "").lower().strip()
-        # Excluir: sin sent_at, ya respondió, máx intentos, o rebotó
-        if not last_sent or replied or attempts >= 3 or email_lc in bounced_emails:
+        # Excluir: sin sent_at, ya respondió (Supabase o outreach_replies), máx intentos, o rebotó
+        if not last_sent or replied or attempts >= 3 or email_lc in bounced_emails or email_lc in replied_human:
             continue
         if last_sent < cutoff:
             pending.append({
@@ -1259,7 +1267,9 @@ def followup_pending():
             })
 
     pending.sort(key=lambda x: x["last_sent"])
-    return {"count": len(pending), "pending": pending, "bounces_excluidos": len(bounced_emails)}
+    return {"count": len(pending), "pending": pending,
+            "bounces_excluidos": len(bounced_emails),
+            "replies_excluidos": len(replied_human)}
 
 
 @app.post("/api/send-followup/{contact_id}")
@@ -1299,7 +1309,42 @@ def send_followup(contact_id: str):
 
     erp_ctx = f" (detectamos que usan {current_erp})" if current_erp and current_erp != "—" else ""
 
-    prompt = f"""Eres Victoria, encargada del área comercial de Etendo.
+    # Buscar respuesta previa en outreach_replies (por email o por dominio de la empresa)
+    prior_reply_snippet = ""
+    if SUPABASE_URL:
+        email_domain = email.split("@")[-1].lower() if "@" in email else ""
+        try:
+            rr = requests.get(
+                f"{SUPABASE_URL}/rest/v1/outreach_replies"
+                f"?email=ilike.*@{email_domain}&select=raw_body,sentimiento&order=id.desc&limit=1",
+                headers=_SB_HEADERS(), timeout=8)
+            if rr.status_code == 200 and rr.json():
+                row = rr.json()[0]
+                snippet = (row.get("raw_body") or "")[:200].strip()
+                sentimiento = row.get("sentimiento", "neutro")
+                if snippet:
+                    prior_reply_snippet = (
+                        f"\n\nIMPORTANTE: {empresa} ya respondió (sentimiento: {sentimiento}).\n"
+                        f'Su respuesta (fragmento): "{snippet}"\n'
+                        f"El follow-up DEBE reconocer su respuesta, no ignorarla."
+                    )
+        except Exception:
+            pass
+
+    if prior_reply_snippet:
+        prompt = f"""Eres Victoria, encargada del área comercial de Etendo.
+Enviaste un primer email a {empresa} ({sector}{erp_ctx}) y ELLOS RESPONDIERON.{prior_reply_snippet}
+
+Escribí un follow-up MUY corto (2-3 líneas máximo) en español (España) que:
+1. Agradezca o reconozca su respuesta anterior de forma natural
+2. Haga avanzar la conversación con una pregunta concreta (¿tienen 20 min para una demo? / ¿hay alguien del equipo con quien hablar?)
+3. Tono humano y cálido, sin presión
+4. Asunto: apropiado para continuar el hilo, puede empezar con "Re: {orig_subject}" o ser diferente
+5. NO incluyas firma
+
+Respondé SOLO con JSON: {{"subject": "...", "body_html": "..."}}"""
+    else:
+        prompt = f"""Eres Victoria, encargada del área comercial de Etendo.
 Ya enviaste un primer email a {empresa} ({sector}{erp_ctx}) hace varios días y no hubo respuesta.
 Escribí un follow-up MUY corto (2-3 líneas máximo) en español (España).
 
