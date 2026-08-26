@@ -53,7 +53,17 @@ jobs:
           done
           echo "=== Follow-ups enviados (intel_dashboard): $SENT | Errores: $ERRORS ==="
 
-      # ── Camino 2: partners + score2 → outreach_tracking.json ─────────────────
+      # ── Camino 2a: outreach inicial a partners nuevos con email ─────────────────
+      - name: Outreach partners nuevos (envía a los que aún no fueron contactados)
+        continue-on-error: true
+        env:
+          PYTHONUNBUFFERED: "1"
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: cd intel-dashboard && python3 send_outreach_partners.py --limit 15
+
+      # ── Camino 2b: partners + score2 → outreach_tracking.json ─────────────────
       - name: Follow-ups automáticos (partners + score2, desde tracking.json)
         continue-on-error: true
         env:
