@@ -9022,6 +9022,121 @@
         }
       ],
       "notas": ""
+    },
+    "info@bioplasticoscenachero.com": {
+      "email": "info@bioplasticoscenachero.com",
+      "empresa": "—",
+      "dominio": "bioplasticoscenachero.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "autoreply",
+          "subject": "Ausente por vacaciones Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "enviado_por": "",
+          "fecha": "2026-08-27T12:04:35Z",
+          "notas": "Out of office — vuelve: 2026-09-01"
+        }
+      ],
+      "notas": ""
+    },
+    "fcco@fcc.es": {
+      "email": "fcco@fcc.es",
+      "empresa": "—",
+      "dominio": "fcc.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Delivery Status Notification (Failure)",
+          "enviado_por": "",
+          "fecha": "2026-08-27T12:04:35Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
+    },
+    "info@alzolaconstrucion.com": {
+      "email": "info@alzolaconstrucion.com",
+      "empresa": "—",
+      "dominio": "alzolaconstrucion.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Delivery Status Notification (Failure)",
+          "enviado_por": "",
+          "fecha": "2026-08-27T12:04:35Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
+    },
+    "contabilidad1@fores.es": {
+      "email": "contabilidad1@fores.es",
+      "empresa": "—",
+      "dominio": "fores.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Delivery Status Notification (Failure)",
+          "enviado_por": "",
+          "fecha": "2026-08-27T12:04:35Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
+    },
+    "info@sibre.es": {
+      "email": "info@sibre.es",
+      "empresa": "—",
+      "dominio": "sibre.es",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Delivery Status Notification (Failure)",
+          "enviado_por": "",
+          "fecha": "2026-08-27T12:04:35Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
     }
   }
 }
