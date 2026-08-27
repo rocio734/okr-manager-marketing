@@ -36,4 +36,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add intel-dashboard/outreach_tracking.json
           git diff --staged --quiet || git commit -m "Score2 outreach $(date +'%Y-%m-%d') — batch diario"
+          git pull --rebase origin main
           git push
