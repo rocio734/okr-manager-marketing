@@ -2058,9 +2058,16 @@
           "fecha": "2026-08-20T11:54:11Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "email_cambiado",
+          "canal": "autoreply",
+          "fecha": "2026-08-27T12:05:49.641386+00:00",
+          "notas": "Nuevo email: sales.es@celsa.group"
         }
       ],
-      "notas": "Origen desconocido — solo sabemos que recibió followup email"
+      "notas": "Email cambiado — usar: sales.es@celsa.group"
     },
     "ioan@studio73.es": {
       "email": "ioan@studio73.es",
@@ -4159,9 +4166,16 @@
           "fecha": "2026-08-25T18:58:16Z",
           "reply_from": "phuelamo@newportal.es",
           "notas": "✅ P. Huelamo respondió pidiendo reunión — miércoles entre 11:00 y 12:00"
+        },
+        {
+          "etapa": 4,
+          "etapa_label": "respondio_positivo",
+          "canal": "reply",
+          "fecha": "2026-08-27T12:05:49.641386+00:00",
+          "notas": "Pedro Huélamo — respondió positivamente, reunion realizada 27/08"
         }
       ],
-      "notas": "✅ Respondió (phuelamo@newportal.es) — quiere reunión miércoles 11-12h",
+      "notas": "Reunión realizada 27/08 — en seguimiento",
       "updated_at": "2026-08-25T18:58:16Z"
     },
     "sensei@sensei.es": {

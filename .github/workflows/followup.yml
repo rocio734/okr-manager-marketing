@@ -20,7 +20,7 @@ jobs:
           python-version: '3.11'
 
       - name: Instalar dependencias
-        run: python3 -m pip install --upgrade pip requests
+        run: python3 -m pip install --upgrade pip requests beautifulsoup4 urllib3
 
       # ── Camino 1: intel_dashboard → Supabase via Render API ──────────────────
       - name: Get pending follow-ups (Supabase/intel_dashboard)
