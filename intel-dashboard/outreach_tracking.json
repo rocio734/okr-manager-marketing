@@ -6499,8 +6499,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6510,6 +6510,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:06:47.054707+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6522,8 +6531,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6533,6 +6542,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:06:52.871559+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6545,8 +6563,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6556,6 +6574,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:06:58.635042+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6568,8 +6595,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6579,6 +6606,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:04.441095+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6591,8 +6627,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6602,6 +6638,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:10.566441+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": "Vacaciones 31/07–31/08. Recontactar a partir del 1/9"
@@ -6614,8 +6659,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6625,6 +6670,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:16.318038+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6637,8 +6691,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6648,6 +6702,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:22.976616+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6660,8 +6723,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6671,6 +6734,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:28.761566+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6683,8 +6755,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6694,6 +6766,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:34.638776+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6706,8 +6787,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6717,6 +6798,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:40.488577+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6729,8 +6819,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6740,6 +6830,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:46.237944+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6752,8 +6851,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6763,6 +6862,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:52.481842+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6775,8 +6883,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6786,6 +6894,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:07:58.250853+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ],
       "notas": ""
@@ -6798,8 +6915,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6809,6 +6926,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:10.749515+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Ahora ERP]"
         }
       ],
       "notas": ""
@@ -6821,8 +6947,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6832,6 +6958,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:16.582566+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Ahora ERP]"
         }
       ],
       "notas": ""
@@ -6844,8 +6979,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6855,6 +6990,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:22.381843+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -6867,8 +7011,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6878,6 +7022,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:28.056608+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -6890,8 +7043,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6901,6 +7054,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:34.301786+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -6913,8 +7075,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6924,6 +7086,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:40.342744+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -6936,8 +7107,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6947,6 +7118,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:46.173456+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -6959,8 +7139,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6970,6 +7150,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:51.924821+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -6982,8 +7171,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -6993,6 +7182,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:43:57.750662+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7005,8 +7203,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7016,6 +7214,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:44:03.627956+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7028,8 +7235,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7039,6 +7246,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:44:09.460208+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7051,8 +7267,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7062,6 +7278,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:44:24.276583+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7074,8 +7299,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7085,6 +7310,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:44:30.350705+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7097,8 +7331,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7108,6 +7342,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:44:44.771455+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7143,8 +7386,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7154,6 +7397,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:44:56.530079+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -7166,8 +7418,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7177,6 +7429,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:02.435212+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7189,8 +7450,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7200,6 +7461,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:08.766583+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-28T20:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -12822,9 +13092,17 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-28T20:03:22.451867+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 2,
+          "etapa_label": "autoreply_vacaciones",
+          "canal": "autoreply",
+          "subject": "Fuera de oficina:  Cuántas horas pierde tu equipo haciendo lo mismo",
+          "fecha": "2026-08-28T20:32:38Z",
+          "notas": "Out of office — vuelve: 28/08/26"
         }
       ],
-      "notas": ""
+      "notas": "Out of office — vuelve: 28/08/26"
     },
     "grupojar@grimiserrallerr.com": {
       "email": "grupojar@grimiserrallerr.com",
@@ -12913,6 +13191,29 @@
           "subject": "Cuántas horas pierde tu equipo haciendo lo mismo",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-28T20:03:43.004433+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "sales@bistasolutions.com": {
+      "email": "sales@bistasolutions.com",
+      "empresa": "Bista Solutions Inc.",
+      "dominio": "bistasolutions.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-28T20:30:05.978663+00:00",
           "notas": ""
         }
       ],
