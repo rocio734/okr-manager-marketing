@@ -8486,12 +8486,22 @@
       "notas": ""
     },
     "comercial@transgesa.com": {
-      "etapa": 4,
+      "etapa": 99,
       "fuente": "intel_dashboard",
       "ultimo_envio": "2026-08-18",
       "fecha_reply": "2026-08-24",
-      "notas": "Auto-reply: \"en proceso de cambio de ERP ya iniciado\" — WARM LEAD, ya tienen proceso abierto",
-      "sector": "Transporte/Logística"
+      "notas": "Ya en proceso de cambio de ERP iniciado — no disponibles para nuevas evaluaciones",
+      "sector": "Transporte/Logística",
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "fecha": "2026-08-31T19:19:48Z",
+          "notas": "Auto-reply: 'en proceso de cambio de ERP ya iniciado' — descartado (no warm lead como se clasificó erróneamente)"
+        }
+      ]
     },
     "dpo@infocap.es": {
       "email": "dpo@infocap.es",
