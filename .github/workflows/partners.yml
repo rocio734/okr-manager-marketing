@@ -1,9 +1,10 @@
 name: Partners — Spider semanal + outreach
 
 on:
-  schedule:
+  # PAUSADO 2026-08-31 — revisión copy outreach (Holded MCP confirmado)
+  # schedule:
     # Lunes 7:00 UTC = 9:00 España (verano)
-    - cron: '0 7 * * 1'
+    # - cron: '0 7 * * 1'
   workflow_dispatch:
 
 permissions:

@@ -1,9 +1,10 @@
 name: Outreach Follow-up
 
 on:
-  schedule:
+  # PAUSADO 2026-08-31 — revisión copy outreach (Holded MCP confirmado)
+  # schedule:
     # 9:00 AM UTC = 11:00 AM España = 6:00 AM Argentina (lunes a viernes)
-    - cron: '0 9 * * 1-5'
+    # - cron: '0 9 * * 1-5'
   workflow_dispatch:
 
 permissions:

@@ -1,9 +1,10 @@
 name: Score 2 — Outreach diario
 
 on:
-  schedule:
+  # PAUSADO 2026-08-31 — revisión copy outreach (Holded MCP confirmado)
+  # schedule:
     # 8:00 UTC = 10:00 España (lunes a viernes)
-    - cron: '0 8 * * 1-5'
+    # - cron: '0 8 * * 1-5'
   workflow_dispatch:
 
 permissions:
