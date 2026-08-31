@@ -7521,8 +7521,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7532,6 +7532,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:20.791127+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7544,8 +7553,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7555,6 +7564,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:26.627566+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7567,8 +7585,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7578,6 +7596,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:32.589204+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7590,8 +7617,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7601,6 +7628,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:38.303365+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7636,8 +7672,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7647,6 +7683,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:51.579358+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7659,8 +7704,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7670,6 +7715,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:45:57.654336+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7682,8 +7736,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7693,6 +7747,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:03.365832+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7705,8 +7768,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7716,6 +7779,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:09.247892+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7728,8 +7800,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7739,6 +7811,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:15.273768+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -7751,8 +7832,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7762,6 +7843,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:26.130073+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7774,8 +7864,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7785,6 +7875,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:32.070942+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7797,8 +7896,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7808,6 +7907,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:38.217002+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7820,8 +7928,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7831,6 +7939,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:44.033444+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Holded]"
         }
       ],
       "notas": ""
@@ -7843,8 +7960,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7854,6 +7971,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:50.295297+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -7866,8 +7992,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7877,6 +8003,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:46:56.192609+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Odoo]"
         }
       ],
       "notas": ""
@@ -7889,8 +8024,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7900,6 +8035,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:02.072704+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Odoo]"
         }
       ],
       "notas": ""
@@ -7912,8 +8056,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7923,6 +8067,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:07.911749+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -7935,8 +8088,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7946,6 +8099,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:13.848320+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/Partner Odoo]"
         }
       ],
       "notas": ""
@@ -7958,8 +8120,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7969,6 +8131,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:19.610396+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -7981,8 +8152,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -7992,6 +8163,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:25.439342+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8004,8 +8184,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8015,6 +8195,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:31.262588+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8027,8 +8216,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8038,6 +8227,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:37.170342+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8050,8 +8248,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8061,6 +8259,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:42.996212+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8073,8 +8280,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8084,6 +8291,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:48.977430+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8096,8 +8312,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8107,6 +8323,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:47:54.945363+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8119,8 +8344,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8130,6 +8355,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:48:00.846830+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8142,8 +8376,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8153,6 +8387,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:48:06.593367+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -8165,8 +8408,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "partner_outreach",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
@@ -8176,6 +8419,15 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-24T15:48:12.452667+00:00",
           "notas": ""
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: ¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py [partner/—]"
         }
       ],
       "notas": ""
@@ -11303,14 +11555,23 @@
       "sector": "—",
       "signal": "—",
       "fuente": "pre_tracking",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
           "canal": "email_n8n",
           "fecha": "2026-08-14T00:00:00Z",
           "notas": "Enviado en período pre-tracking. 31/08: Delay pendiente — connection timeout, ventana expira ~16h UTC hoy"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ]
     },
@@ -11321,14 +11582,23 @@
       "sector": "—",
       "signal": "—",
       "fuente": "pre_tracking",
-      "etapa": 2,
-      "etapa_label": "email1_enviado",
+      "etapa": 3,
+      "etapa_label": "followup_email_enviado",
       "contactos": [
         {
           "etapa": 2,
           "canal": "email_n8n",
           "fecha": "2026-08-14T00:00:00Z",
           "notas": "Enviado en período pre-tracking. 31/08: Delay pendiente — DNS SERVFAIL, ventana expira ~16h UTC hoy"
+        },
+        {
+          "etapa": 3,
+          "etapa_label": "followup_email_enviado",
+          "canal": "email_n8n",
+          "subject": "Re: Etendo ERP",
+          "fecha": "2026-08-31T16:33:25Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Follow-up automático por auto_followup_daily.py"
         }
       ]
     },
@@ -12478,6 +12748,420 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-31T16:02:18.062008+00:00",
           "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "sales@bistasolutions.com": {
+      "email": "sales@bistasolutions.com",
+      "empresa": "Bista Solutions Inc.",
+      "dominio": "bistasolutions.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:09.272279+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "dcrocco@blueorange.com.ar": {
+      "email": "dcrocco@blueorange.com.ar",
+      "empresa": "Blueorange Group S.R.L.",
+      "dominio": "blueorange.com.ar",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:14.385641+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "mohamed.mansor@roayatec.com": {
+      "email": "mohamed.mansor@roayatec.com",
+      "empresa": "RoayaTec",
+      "dominio": "roayatec.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:19.461543+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "marko.happonen@sprintit.fi": {
+      "email": "marko.happonen@sprintit.fi",
+      "empresa": "SprintIT",
+      "dominio": "sprintit.fi",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:24.527792+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "mark.fitzpatrick@smart-ltd.co.uk": {
+      "email": "mark.fitzpatrick@smart-ltd.co.uk",
+      "empresa": "Smart Information Technologies Ltd",
+      "dominio": "smart-ltd.co.uk",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:29.697996+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "sales@dynapps.nl": {
+      "email": "sales@dynapps.nl",
+      "empresa": "Dynapps",
+      "dominio": "dynapps.nl",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:34.781656+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "ahmed@intelligent-experts.com": {
+      "email": "ahmed@intelligent-experts.com",
+      "empresa": "Intelligent Experts Technology (IET)",
+      "dominio": "intelligent-experts.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:39.976269+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "xavier@niboo.com": {
+      "email": "xavier@niboo.com",
+      "empresa": "Niboo SRL",
+      "dominio": "niboo.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:45.164539+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "ileana@aquih.com": {
+      "email": "ileana@aquih.com",
+      "empresa": "aquíH",
+      "dominio": "aquih.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:50.250298+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "munesh@portcities.net": {
+      "email": "munesh@portcities.net",
+      "empresa": "Portcities Indonesia",
+      "dominio": "portcities.net",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:32:55.339777+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "jay@emiprotechnologies.com": {
+      "email": "jay@emiprotechnologies.com",
+      "empresa": "Emipro Technologies Private Limited",
+      "dominio": "emiprotechnologies.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:33:00.483054+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "jae@open-net.ch": {
+      "email": "jae@open-net.ch",
+      "empresa": "Open Net Sàrl",
+      "dominio": "open-net.ch",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:33:05.695315+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "frank@360erp.com": {
+      "email": "frank@360erp.com",
+      "empresa": "360erp",
+      "dominio": "360erp.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:33:10.832166+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "charlotte.fontana@idealisconsulting.com": {
+      "email": "charlotte.fontana@idealisconsulting.com",
+      "empresa": "Idealis Consulting",
+      "dominio": "idealisconsulting.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:33:15.900218+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "manuel.guerrero@binauraldev.com": {
+      "email": "manuel.guerrero@binauraldev.com",
+      "empresa": "Binaural",
+      "dominio": "binauraldev.com",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "partner_outreach",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email",
+          "subject": "¿Tenéis clientes que piden poder hablar desde Claude a su ERP?",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-08-31T16:33:21.050725+00:00",
+          "notas": ""
+        }
+      ],
+      "notas": ""
+    },
+    "industrias echeiri <industrias@echeiri.com>": {
+      "email": "industrias echeiri <industrias@echeiri.com>",
+      "empresa": "—",
+      "dominio": "echeiri.com>",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "autoreply",
+          "subject": "Cerrado por vacaciones",
+          "enviado_por": "",
+          "fecha": "2026-08-31T16:35:59Z",
+          "notas": "Out of office — fecha de vuelta desconocida"
+        }
+      ],
+      "notas": ""
+    },
+    "<mariacb@mayasl.com>": {
+      "email": "<mariacb@mayasl.com>",
+      "empresa": "—",
+      "dominio": "mayasl.com>",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "autoreply",
+          "subject": "AUSENTE POR VACACIONES/ OUT OF OFFICE",
+          "enviado_por": "",
+          "fecha": "2026-08-31T16:35:59Z",
+          "notas": "Out of office — fecha de vuelta desconocida"
+        }
+      ],
+      "notas": ""
+    },
+    "mail delivery system <mailer-daemon@gazella.es>": {
+      "email": "mail delivery system <mailer-daemon@gazella.es>",
+      "empresa": "—",
+      "dominio": "gazella.es>",
+      "sector": "—",
+      "signal": "—",
+      "score_intel": "—",
+      "fuente": "manual",
+      "etapa": 99,
+      "etapa_label": "descartado",
+      "contactos": [
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "autoreply",
+          "subject": "Undelivered Mail Returned to Sender",
+          "enviado_por": "",
+          "fecha": "2026-08-31T16:35:59Z",
+          "notas": "Email inválido — bounce detectado automáticamente"
         }
       ],
       "notas": ""
