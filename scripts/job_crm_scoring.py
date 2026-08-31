@@ -121,16 +121,17 @@ def update_lead(lead_id, payload, sid):
 # ── Classification ─────────────────────────────────────────────────────────────
 def calc_classification(lead):
     """
-    Determina la clasificación del lead según el funnel IQL → MQL → SQL.
+    Determina la clasificación automática del lead: solo IQL o MQL.
 
-    - IQL (Information Qualified Lead): top de funnel, sin señal de compra ni ICP fit claro.
     - MQL (Marketing Qualified Lead): encaja con ICP (empresa real + email corporativo
       o teléfono o keywords ERP), pero sin presupuesto/urgencia/decisor confirmado.
-    - SQL (Sales Qualified Lead): señal explícita de compra — presupuesto, urgencia o
-      decisor confirmado. Producto ERP.
-    - Services SQL: igual que SQL pero para servicios (no implementado automáticamente aún).
+    - IQL (Information Qualified Lead): top de funnel, sin señal de compra ni ICP fit claro.
 
-    Devuelve ('SQL'|'MQL'|'IQL'|None, note).
+    IMPORTANTE: SQL y Services SQL NO se asignan automáticamente.
+    SQL requiere confirmación de presupuesto, que solo se obtiene después de una llamada.
+    Vico los sube a SQL/Services SQL manualmente tras calificar el lead.
+
+    Devuelve ('MQL'|'IQL'|None, note).
     """
     fn      = (lead.get("firstname") or lead.get("firstName") or "").strip()
     email   = (lead.get("email") or "").strip().lower()
@@ -152,21 +153,6 @@ def calc_classification(lead):
 
     if is_test_lead or email.endswith("@etendo.software") or "busca trabajo" in txt:
         return None, "lead de prueba o no comercial"
-
-    # Services SQL: señal explícita de servicios — migración o actualización
-    SERVICES_KEYWORDS = ["migracion","migración","actualizacion","actualización",
-                         "migrar","actualizar version","upgrade"]
-    if any(k in txt for k in SERVICES_KEYWORDS):
-        return "Services SQL", "señal de servicios (migración/actualización)"
-
-    # SQL: señal explícita de compra de producto ERP
-    SQL_KEYWORDS = ["demo","presupuesto","urgente","quiero avanzar","implementar ya",
-                    "quiero contratar","necesito erp","cuanto cuesta"]
-    if any(k in txt for k in SQL_KEYWORDS):
-        areas = [a for a in ["erp","inventario","finanzas","manufactura","contabilidad",
-                              "mrp","bi","verifactu","almacen"] if a in txt]
-        note = "señal de compra" + (" | áreas: " + ", ".join(areas) if areas else "")
-        return "SQL", note
 
     domain = email.split("@")[-1] if "@" in email else ""
     has_company = bool(company and company.lower() not in ("sin dato","sin empresa","test")
