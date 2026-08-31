@@ -1490,23 +1490,29 @@ def register_reply(payload: dict):
             print(f"[reply] warning validación contacto: {e} — procesando igual")
 
     # Clasificar sentimiento por keywords
+    # IMPORTANTE: evaluar negativos PRIMERO para evitar falsos positivos.
+    # Ej: "no estamos interesados" contiene "interesa" (positivo) pero el
+    # negativo "no estamos" debe ganar. Las negativas son más específicas.
     text = (raw_subject + " " + raw_body).lower()
-    positivo_kw = ["interesa", "me gustaría", "podemos", "cuándo", "cuando", "más información",
-                   "más info", "me llama", "quiero saber", "hablamos", "llamada", "reunión",
-                   "reunion", "demo", "presentación", "cuéntame", "cuéntanos", "adelante",
-                   "perfecto", "genial", "excelente", "muy bien"]
     negativo_kw = ["no me interesa", "no gracias", "no estamos", "ya tenemos", "no somos",
+                   "no interesa", "no nos interesa", "no estoy interesado", "no estamos interesados",
                    "baja", "elimina", "eliminar", "desuscrib", "unsubscribe", "no necesitamos",
-                   "no aplica", "no es el momento", "descarta"]
+                   "no aplica", "no es el momento", "descarta", "no queremos"]
+    positivo_kw = ["me interesa", "nos interesa", "me gustaría", "podemos hablar", "cuándo podemos",
+                   "más información", "más info", "me llama", "quiero saber", "hablamos",
+                   "llamada", "reunión", "reunion", "demo", "presentación", "cuéntame",
+                   "cuéntanos", "adelante", "perfecto", "genial", "excelente", "muy bien",
+                   "cuando tienes", "cuando podemos", "me parece interesante"]
     sentimiento = "pendiente"
-    for kw in positivo_kw:
+    # Negativos primero (más específicos, evitan falsos positivos)
+    for kw in negativo_kw:
         if kw in text:
-            sentimiento = "positivo"
+            sentimiento = "negativo"
             break
     if sentimiento == "pendiente":
-        for kw in negativo_kw:
+        for kw in positivo_kw:
             if kw in text:
-                sentimiento = "negativo"
+                sentimiento = "positivo"
                 break
     if sentimiento == "pendiente":
         sentimiento = "neutro"

@@ -6698,8 +6698,8 @@
       "signal": "—",
       "score_intel": "—",
       "fuente": "score2_outreach",
-      "etapa": 3,
-      "etapa_label": "followup_email_enviado",
+      "etapa": 99,
+      "etapa_label": "descartado",
       "contactos": [
         {
           "etapa": 2,
@@ -6718,6 +6718,13 @@
           "fecha": "2026-08-31T13:00:01Z",
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "notas": "Follow-up automático por auto_followup_daily.py"
+        },
+        {
+          "etapa": 99,
+          "etapa_label": "descartado",
+          "canal": "reply",
+          "fecha": "2026-08-31T16:39:17Z",
+          "notas": "Respuesta negativa: 'no estamos interesados en su ofrecimiento' (clasificado erróneamente como positivo — corregido 31/08)"
         }
       ],
       "notas": ""
