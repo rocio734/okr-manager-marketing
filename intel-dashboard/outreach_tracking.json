@@ -939,10 +939,20 @@
           "enviado_por": "victoria.miguez@smfconsulting.es",
           "fecha": "2026-08-18T13:57:23Z",
           "notas": ""
+        },
+        {
+          "etapa": 4,
+          "etapa_label": "reactivacion",
+          "canal": "email_n8n",
+          "subject": "Re: Tu ERP actual tiene fecha de caducidad",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "fecha": "2026-09-01T12:36:16Z",
+          "notas": "Reactivación post-vacaciones. Pedimos horario disponible y número de teléfono."
         }
       ],
-      "notas": "Pidió llamada: \"Podemos hablar hoy sobre las 9 o las 12h\" (19/08)",
-      "fecha_reply": "2026-08-24"
+      "notas": "Reactivación enviada 2026-09-01. Esperando respuesta con horario y teléfono para llamada.",
+      "fecha_reply": "2026-08-24",
+      "fecha_reactivacion": "2026-09-01T12:36:16Z"
     },
     "info@conservascortizo.com": {
       "email": "info@conservascortizo.com",
@@ -13179,6 +13189,160 @@
           "enviado_por": "",
           "fecha": "2026-08-31T16:35:59Z",
           "notas": "Email inválido — bounce detectado automáticamente"
+        }
+      ],
+      "notas": ""
+    },
+    "contact@bcdigitalservices.com": {
+      "email": "contact@bcdigitalservices.com",
+      "empresa": "Bc Digital Services",
+      "dominio": "bcdigitalservices.com",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-09-01T12:30:04Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "javiermene@frutasjaviermene.com": {
+      "email": "javiermene@frutasjaviermene.com",
+      "empresa": "Frutas Javier Mene",
+      "dominio": "frutasjaviermene.com",
+      "sector": "Logística",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-09-01T12:30:10Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "info@arceclima.com": {
+      "email": "info@arceclima.com",
+      "empresa": "Arce Clima",
+      "dominio": "arceclima.es",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-09-01T12:30:16Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "montse.pereira@grupovalora.es": {
+      "email": "montse.pereira@grupovalora.es",
+      "empresa": "Grupo Valora",
+      "dominio": "grupovalora.es",
+      "sector": "Logística",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-09-01T12:30:22Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "info@tuapetito.com": {
+      "email": "info@tuapetito.com",
+      "empresa": "TuApetito",
+      "dominio": "tuapetito.com",
+      "sector": "Fabricación",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-09-01T12:30:28Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "huesca@aliax.es": {
+      "email": "huesca@aliax.es",
+      "empresa": "Aliax",
+      "dominio": "aliax.es",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-09-01T12:30:35Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
+        }
+      ],
+      "notas": ""
+    },
+    "lydia.arto@nablawindhub.com": {
+      "email": "lydia.arto@nablawindhub.com",
+      "empresa": "Nabla Wind Hub",
+      "dominio": "nablawindhub.com",
+      "sector": "General",
+      "signal": "Usuario MS Dynamics",
+      "fuente": "intel_dashboard",
+      "etapa": 2,
+      "etapa_label": "email1_enviado",
+      "contactos": [
+        {
+          "etapa": 2,
+          "etapa_label": "email1_enviado",
+          "canal": "email_n8n",
+          "subject": "Una alternativa a Dynamics que tus equipos agradecerán",
+          "fecha": "2026-09-01T12:30:41Z",
+          "enviado_por": "victoria.miguez@smfconsulting.es",
+          "notas": "Enviado automáticamente por auto_outreach_daily.py"
         }
       ],
       "notas": ""
