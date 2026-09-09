@@ -294,14 +294,13 @@ def fetch_google_ads_weekly() -> dict:
     últimos 7 días vs semana anterior, con top 3 campañas por gasto."""
     token       = _google_access_token("GOOGLE_REFRESH_TOKEN_ADS")
     env_vars    = _load_env_google()
-    dev_token   = env_vars.get("GOOGLE_ADS_DEVELOPER_TOKEN", "")
-    mcc_id      = env_vars.get("GOOGLE_ADS_MCC_CUSTOMER_ID", "")
-    customer_id = env_vars.get("GOOGLE_ADS_CLIENT_CUSTOMER_ID", "")
-    # v20 es la única versión soportada hoy — GOOGLE_ADS_API_VERSION en
-    # .env.google puede quedar desactualizada (v16-v18 y v21 dan 404).
+    dev_token   = env_vars.get("GOOGLE_ADS_DEVELOPER_TOKEN", "")   or os.environ.get("GOOGLE_ADS_DEVELOPER_TOKEN", "")
+    mcc_id      = env_vars.get("GOOGLE_ADS_MCC_CUSTOMER_ID", "")   or os.environ.get("GOOGLE_ADS_MCC_CUSTOMER_ID", "")
+    customer_id = env_vars.get("GOOGLE_ADS_CLIENT_CUSTOMER_ID", "") or os.environ.get("GOOGLE_ADS_CLIENT_CUSTOMER_ID", "")
+    # v20 obligatorio — ignorar GOOGLE_ADS_API_VERSION del entorno (v21 da 404)
     api_version = "v20"
     if not all([dev_token, customer_id]):
-        raise RuntimeError("Faltan credenciales de Google Ads en .env.google")
+        raise RuntimeError("Faltan credenciales de Google Ads (GOOGLE_ADS_DEVELOPER_TOKEN / GOOGLE_ADS_CLIENT_CUSTOMER_ID)")
 
     headers = {
         "Authorization": f"Bearer {token}",
