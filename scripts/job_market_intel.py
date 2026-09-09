@@ -297,8 +297,8 @@ def fetch_google_ads_weekly() -> dict:
     dev_token   = env_vars.get("GOOGLE_ADS_DEVELOPER_TOKEN", "")   or os.environ.get("GOOGLE_ADS_DEVELOPER_TOKEN", "")
     mcc_id      = env_vars.get("GOOGLE_ADS_MCC_CUSTOMER_ID", "")   or os.environ.get("GOOGLE_ADS_MCC_CUSTOMER_ID", "")
     customer_id = env_vars.get("GOOGLE_ADS_CLIENT_CUSTOMER_ID", "") or os.environ.get("GOOGLE_ADS_CLIENT_CUSTOMER_ID", "")
-    # v20 obligatorio — ignorar GOOGLE_ADS_API_VERSION del entorno (v21 da 404)
-    api_version = "v20"
+    # v22+ obligatorio — v17-v21 están sunset (dan 404 HTML)
+    api_version = "v22"
     if not all([dev_token, customer_id]):
         raise RuntimeError("Faltan credenciales de Google Ads (GOOGLE_ADS_DEVELOPER_TOKEN / GOOGLE_ADS_CLIENT_CUSTOMER_ID)")
 
