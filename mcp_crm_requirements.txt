@@ -2,3 +2,5 @@ mcp>=1.2.0,<2.0.0
 starlette>=0.37.0
 uvicorn>=0.29.0
 anyio>=4.0.0
+cryptography>=3.4.0,<45.0.0
+cffi>=1.0.0,<2.2.0
