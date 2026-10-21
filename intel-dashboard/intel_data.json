@@ -1,11 +1,25 @@
 {
   "comp_hashes": {
-    "odoo": "a017521a0306",
+    "odoo": "843f39792445",
     "sap": "238ca16c7de6",
-    "holded": "95e1fe686694",
+    "holded": "35cdf4dfd8c1",
     "sage": "f81898f89dd8"
   },
   "changes_history": [
+    {
+      "date": "21/10/2026",
+      "competitor": "Holded",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.holded.com"
+    },
+    {
+      "date": "21/10/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "20/10/2026",
       "competitor": "Holded",
@@ -954,6 +968,46 @@
   ],
   "leads_history": [
     {
+      "company": "INDUSTRIAS METALURGICAS DE PATIÑO SL",
+      "domain": "www.impsl.com",
+      "sector": "Metalurgia",
+      "signal": "erp",
+      "signal_label": "Empresite Metalurgia",
+      "signal_class": "s-erp",
+      "source_url": "https://www.impsl.com",
+      "snippet": "Empresite · Librilla · MURCIA",
+      "score": 2,
+      "date": "21/10/2026",
+      "source_type": "empresite",
+      "email": "impsl@impsl.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34968344430",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "MADERAS ORNANDA, SOCIEDAD ANONIMA",
+      "domain": "www.maderasornanda.com",
+      "sector": "Madera/Mueble",
+      "signal": "erp",
+      "signal_label": "Empresite Madera/Mueble",
+      "signal_class": "s-erp",
+      "source_url": "https://www.maderasornanda.com",
+      "snippet": "Empresite · Porto · CORUNA",
+      "score": 2,
+      "date": "21/10/2026",
+      "source_type": "empresite",
+      "email": "info@maderasornanda.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34981766000",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
       "company": "IRIUM",
       "domain": "irium.es",
       "sector": "General",
@@ -971,7 +1025,7 @@
       "phone": "915701111",
       "linkedin_org": "—",
       "pais_detectado": "🇪🇸 España",
-      "enrich_attempts": 1,
+      "enrich_attempts": 2,
       "current_erp": "—"
     },
     {
@@ -10948,47 +11002,6 @@
       "current_erp": "—"
     },
     {
-      "company": "METALICAS JOSEMARI SL",
-      "domain": "www.metalicasjosemari.com",
-      "sector": "Industrial",
-      "signal": "erp",
-      "signal_label": "Empresite Industrial",
-      "signal_class": "s-erp",
-      "source_url": "https://www.metalicasjosemari.com",
-      "snippet": "Empresite · Romana · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "info@metalicasjosemari.es",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34965696838",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "Tempus Instalaciones",
-      "domain": "tempusinstalaciones.es",
-      "sector": "General",
-      "signal": "migrate",
-      "signal_label": "Usuario MS Dynamics",
-      "signal_class": "s-mig",
-      "source_url": "https://tempusinstalaciones.es",
-      "snippet": "Empresa usando MS Dynamics — potencial migración a Etendo",
-      "score": 3,
-      "date": "18/09/2026",
-      "source_type": "erp_user",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—",
-      "enrich_attempts": 3
-    },
-    {
       "company": "Odoo",
       "domain": "abconsultores.es",
       "sector": "Consultoría ERP",
@@ -13566,7 +13579,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Grupo Gomez Avanza, SL",
@@ -13878,7 +13891,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Foster the Market S.L",
@@ -14192,7 +14205,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Summum Marketing",
@@ -14254,7 +14267,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Bain and Company",
@@ -14293,7 +14306,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Kearney",
@@ -14313,7 +14326,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Accenture",
@@ -14333,7 +14346,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Atos",
@@ -14353,7 +14366,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Capgemini",
@@ -14411,7 +14424,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "DXC Technology",
@@ -14469,7 +14482,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "HCL",
@@ -14605,7 +14618,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Huawei",
@@ -14644,7 +14657,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Lenovo",
@@ -14704,7 +14717,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "NetApp",
@@ -14724,7 +14737,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Nutanix",
@@ -14801,7 +14814,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Supermicro",
@@ -14821,7 +14834,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "VMware",
@@ -14841,7 +14854,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "ADHOCGold",
@@ -30690,6 +30703,8 @@
     "www.lederma.es": "20/10/2026",
     "www.vehiculosconconductormallorca.es": "20/10/2026",
     "www.discomasl.es": "20/10/2026",
-    "www.dimmsl.es": "20/10/2026"
+    "www.dimmsl.es": "20/10/2026",
+    "www.impsl.com": "21/10/2026",
+    "www.maderasornanda.com": "21/10/2026"
   }
 }
