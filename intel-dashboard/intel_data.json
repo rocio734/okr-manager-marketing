@@ -1,11 +1,25 @@
 {
   "comp_hashes": {
-    "odoo": "843f39792445",
+    "odoo": "3dbd58df9d91",
     "sap": "238ca16c7de6",
-    "holded": "35cdf4dfd8c1",
+    "holded": "c30e4216ad52",
     "sage": "f81898f89dd8"
   },
   "changes_history": [
+    {
+      "date": "22/10/2026",
+      "competitor": "Holded",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.holded.com"
+    },
+    {
+      "date": "22/10/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "21/10/2026",
       "competitor": "Holded",
@@ -1025,7 +1039,7 @@
       "phone": "915701111",
       "linkedin_org": "—",
       "pais_detectado": "🇪🇸 España",
-      "enrich_attempts": 2,
+      "enrich_attempts": 3,
       "current_erp": "—"
     },
     {
@@ -14874,7 +14888,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Dynapps NVGold",
@@ -14894,7 +14908,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Apik by OCIGold",
@@ -14952,7 +14966,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "QubiQ 2010, S.LGold",
@@ -15010,7 +15024,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Bista Solutions Inc.Gold",
@@ -15298,7 +15312,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "STeSI ConsultingGold",
@@ -15356,7 +15370,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Gray Matter LogicGold",
@@ -15452,7 +15466,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "VAUXOO CONSULTORESGold",
@@ -15491,7 +15505,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "PUNT SISTEMES SLUGold",
@@ -15587,7 +15601,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "IT GRUPOGold",
@@ -15721,7 +15735,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "OERP CanadaGold",
@@ -15842,7 +15856,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Smart Information Technologies LtdGold",
@@ -16135,7 +16149,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "IT SYS CorporationGold",
@@ -16197,7 +16211,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Aardug - RMOGold",
