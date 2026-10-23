@@ -1,11 +1,25 @@
 {
   "comp_hashes": {
-    "odoo": "3dbd58df9d91",
+    "odoo": "a017521a0306",
     "sap": "238ca16c7de6",
-    "holded": "c30e4216ad52",
+    "holded": "4e9ea27b4095",
     "sage": "f81898f89dd8"
   },
   "changes_history": [
+    {
+      "date": "23/10/2026",
+      "competitor": "Holded",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.holded.com"
+    },
+    {
+      "date": "23/10/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "22/10/2026",
       "competitor": "Holded",
@@ -981,6 +995,227 @@
     }
   ],
   "leads_history": [
+    {
+      "company": "Marine Instruments",
+      "domain": "marineinstruments.es",
+      "sector": "General",
+      "signal": "migrate",
+      "signal_label": "Usuario MS Dynamics",
+      "signal_class": "s-mig",
+      "source_url": "https://marineinstruments.es",
+      "snippet": "Empresa usando MS Dynamics — potencial migración a Etendo",
+      "score": 3,
+      "date": "23/10/2026",
+      "source_type": "erp_user",
+      "email": "—",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "—",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—",
+      "enrich_attempts": 1
+    },
+    {
+      "company": "MADERAS JUAN MIGUEL SL.",
+      "domain": "www.maderasjm.es",
+      "sector": "Madera/Mueble",
+      "signal": "erp",
+      "signal_label": "Empresite Madera/Mueble",
+      "signal_class": "s-erp",
+      "source_url": "https://www.maderasjm.es",
+      "snippet": "Empresite · Fonelas · GRANADA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "—",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "—",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "MUEBLES GRUPO SEYS SA",
+      "domain": "www.gruposeys.com",
+      "sector": "Madera/Mueble",
+      "signal": "erp",
+      "signal_label": "Empresite Madera/Mueble",
+      "signal_class": "s-erp",
+      "source_url": "https://www.gruposeys.com",
+      "snippet": "Empresite · Lucena · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "nacional@gruposeys.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34957502697",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "ATRESVEGA EDIFICACION SL.",
+      "domain": "www.atresvega.com",
+      "sector": "Construcción",
+      "signal": "erp",
+      "signal_label": "Empresite Construcción",
+      "signal_class": "s-erp",
+      "source_url": "https://www.atresvega.com",
+      "snippet": "Empresite · Cordoba · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "info@atresvega.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34614118044",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "CONTEX EDIFICACION INTEGRAL SL.",
+      "domain": "www.grupocontex.com",
+      "sector": "Construcción",
+      "signal": "erp",
+      "signal_label": "Empresite Construcción",
+      "signal_class": "s-erp",
+      "source_url": "https://www.grupocontex.com",
+      "snippet": "Empresite · Cordoba · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "—",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34957722824",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "CONSTRUCCIONES NUEVA CREACION ESPEJO SL.",
+      "domain": "www.construccionesfuentesespejo.com",
+      "sector": "Construcción",
+      "signal": "erp",
+      "signal_label": "Empresite Construcción",
+      "signal_class": "s-erp",
+      "source_url": "https://www.construccionesfuentesespejo.com",
+      "snippet": "Empresite · Fuente · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "info@construccionescncespejo.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34957638325",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "ALJARO SL",
+      "domain": "www.construccionesaljaro.com",
+      "sector": "Construcción",
+      "signal": "erp",
+      "signal_label": "Empresite Construcción",
+      "signal_class": "s-erp",
+      "source_url": "https://www.construccionesaljaro.com",
+      "snippet": "Empresite · Carpio · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "aljaroslconstrucciones@gmail.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34957180486",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "MAQUINARIA ANDALUZA OCASION SL",
+      "domain": "www.maquinariaandaluza.com",
+      "sector": "Industrial",
+      "signal": "erp",
+      "signal_label": "Empresite Industrial",
+      "signal_class": "s-erp",
+      "source_url": "https://www.maquinariaandaluza.com",
+      "snippet": "Empresite · Sevilla · SEVILLA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "info@maquinariaandaluza.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34854628324",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "DISTRIBUCION FERRETERIA MAQUINARIA Y PINTURAS SA",
+      "domain": "www.disfer.es",
+      "sector": "Distribución",
+      "signal": "erp",
+      "signal_label": "Empresite Distribución",
+      "signal_class": "s-erp",
+      "source_url": "https://www.disfer.es",
+      "snippet": "Empresite · Lucena · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "info@disfer.net",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34957502023",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "DISTRIBUCIONES FARMACEUTICAS RAYAN SL",
+      "domain": "www.rayan.online",
+      "sector": "Distribución",
+      "signal": "erp",
+      "signal_label": "Empresite Distribución",
+      "signal_class": "s-erp",
+      "source_url": "https://www.rayan.online",
+      "snippet": "Empresite · Cordoba · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "—",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "—",
+      "linkedin_org": "—",
+      "pais_detectado": "—",
+      "current_erp": "—"
+    },
+    {
+      "company": "DISTRIBUCIONES DE BEBIDAS ESTRADA SL.",
+      "domain": "www.dibesl.es",
+      "sector": "Distribución",
+      "signal": "erp",
+      "signal_label": "Empresite Distribución",
+      "signal_class": "s-erp",
+      "source_url": "https://www.dibesl.es",
+      "snippet": "Empresite · Lucena · CORDOBA",
+      "score": 2,
+      "date": "23/10/2026",
+      "source_type": "empresite",
+      "email": "dibesl@yahoo.es",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34957111170",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
     {
       "company": "INDUSTRIAS METALURGICAS DE PATIÑO SL",
       "domain": "www.impsl.com",
@@ -10796,226 +11031,6 @@
       "current_erp": "—"
     },
     {
-      "company": "PLASTICOS ADE SL",
-      "domain": "www.plasticosadeplast.es",
-      "sector": "Química",
-      "signal": "erp",
-      "signal_label": "Empresite Química",
-      "signal_class": "s-erp",
-      "source_url": "https://www.plasticosadeplast.es",
-      "snippet": "Empresite · Aspe · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "adeplast.sl@gmail.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34965491880",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "PLASTICOS VALDES E HIJOS SL",
-      "domain": "www.plasticosvaldes.com",
-      "sector": "Química",
-      "signal": "erp",
-      "signal_label": "Empresite Química",
-      "signal_class": "s-erp",
-      "source_url": "https://www.plasticosvaldes.com",
-      "snippet": "Empresite · Biar · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "gestion@plasticosvaldes.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34965810743",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "MAYSAN PACK SL.",
-      "domain": "www.maysanpack.com",
-      "sector": "Química",
-      "signal": "erp",
-      "signal_label": "Empresite Química",
-      "signal_class": "s-erp",
-      "source_url": "https://www.maysanpack.com",
-      "snippet": "Empresite · Onil · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "info@maysanpack.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34965564042",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "PLASTICOS EL PLA SL",
-      "domain": "www.grupoglobalrec.com",
-      "sector": "Química",
-      "signal": "erp",
-      "signal_label": "Empresite Química",
-      "signal_class": "s-erp",
-      "source_url": "https://www.grupoglobalrec.com",
-      "snippet": "Empresite · Cocentaina · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "info@plasticoselpla.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34966516723",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "PLASTICOS RASPA SL",
-      "domain": "www.plasticosraspa.com",
-      "sector": "Química",
-      "signal": "erp",
-      "signal_label": "Empresite Química",
-      "signal_class": "s-erp",
-      "source_url": "https://www.plasticosraspa.com",
-      "snippet": "Empresite · Tibi · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "inyectados@plasticosraspa.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34965617096",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "PLASTICOS CASTAÑOS SL.",
-      "domain": "www.plasticoscastaños.com",
-      "sector": "Química",
-      "signal": "erp",
-      "signal_label": "Empresite Química",
-      "signal_class": "s-erp",
-      "source_url": "https://www.plasticoscastaños.com",
-      "snippet": "Empresite · Nucia · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "—",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "INDUSTRIAL DE PAN Y ALIMENTACION SL",
-      "domain": "www.pasteleriaortiz.com",
-      "sector": "Industrial",
-      "signal": "erp",
-      "signal_label": "Empresite Industrial",
-      "signal_class": "s-erp",
-      "source_url": "https://www.pasteleriaortiz.com",
-      "snippet": "Empresite · Velez · MALAGA",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "calidadortiz@gmail.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34952558779",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "INDUSTRIAS GRAFICAS SOLPRINT SL",
-      "domain": "www.solprint.com",
-      "sector": "Industrial",
-      "signal": "erp",
-      "signal_label": "Empresite Industrial",
-      "signal_class": "s-erp",
-      "source_url": "https://www.solprint.com",
-      "snippet": "Empresite · Mijas · MALAGA",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "administracion@solprint.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34952463646",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "INDUSTRIAS CARNICAS DE BENAOJAN SL",
-      "domain": "www.icarben.com",
-      "sector": "Industrial",
-      "signal": "erp",
-      "signal_label": "Empresite Industrial",
-      "signal_class": "s-erp",
-      "source_url": "https://www.icarben.com",
-      "snippet": "Empresite · Benaojan · MALAGA",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "info@icarben.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34952167325",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "METALICAS IDELLA SL.",
-      "domain": "www.aplistar.com",
-      "sector": "Industrial",
-      "signal": "erp",
-      "signal_label": "Empresite Industrial",
-      "signal_class": "s-erp",
-      "source_url": "https://www.aplistar.com",
-      "snippet": "Empresite · Elda · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "—",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34966965096",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "METALICAS VIYEC SL",
-      "domain": "www.metalicasviyec.com",
-      "sector": "Industrial",
-      "signal": "erp",
-      "signal_label": "Empresite Industrial",
-      "signal_class": "s-erp",
-      "source_url": "https://www.metalicasviyec.com",
-      "snippet": "Empresite · Villena · ALICANTE",
-      "score": 2,
-      "date": "21/09/2026",
-      "source_type": "empresite",
-      "email": "viyec@metalicasviyec.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34965343056",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
       "company": "Odoo",
       "domain": "abconsultores.es",
       "sector": "Consultoría ERP",
@@ -16357,7 +16372,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Flex OpsGold",
@@ -16377,7 +16392,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "manaTec GmbHGold",
@@ -16859,7 +16874,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "PSDC INC.Gold",
@@ -16942,7 +16957,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "ObycronGold",
@@ -16983,7 +16998,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Cubicsoft LLCGold",
@@ -17024,7 +17039,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Appness LLCGold",
@@ -17128,7 +17143,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Softprime Consulting Pvt LtdGold",
@@ -17169,7 +17184,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "AxcelereGold",
@@ -17210,7 +17225,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Intelldigit solutionsGold",
@@ -17251,7 +17266,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Odovia IntegrationGold",
@@ -17271,7 +17286,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Openforce srlGold",
@@ -17312,7 +17327,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Huroos SrlGold",
@@ -17332,7 +17347,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Odolution Private LimitedGold",
@@ -17373,7 +17388,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "贝思纳斯（上海）咨询管理有限公司Gold",
@@ -17393,7 +17408,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Centrics Business Solutions (Pvt) LtdGold",
@@ -17413,7 +17428,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "GW DIGITAL CONSULTING GROUPGold",
@@ -17475,7 +17490,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Odev SolutionsGold",
@@ -17537,7 +17552,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "twio.tech AGGold",
@@ -17557,7 +17572,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "AP Business SoftwareGold",
@@ -24093,15 +24108,15 @@
           "price": "€2/mes"
         },
         {
-          "label": "14 días gratis",
+          "label": "Básico",
           "price": "€5/mes"
         },
         {
-          "label": "14 días de prueba gratis",
+          "label": "Plan 3",
           "price": "€8/mes"
         },
         {
-          "label": "Básico",
+          "label": "Plan 4",
           "price": "€10/mes"
         }
       ],
@@ -30719,6 +30734,17 @@
     "www.discomasl.es": "20/10/2026",
     "www.dimmsl.es": "20/10/2026",
     "www.impsl.com": "21/10/2026",
-    "www.maderasornanda.com": "21/10/2026"
+    "www.maderasornanda.com": "21/10/2026",
+    "marineinstruments.es": "23/10/2026",
+    "www.maderasjm.es": "23/10/2026",
+    "www.gruposeys.com": "23/10/2026",
+    "www.atresvega.com": "23/10/2026",
+    "www.grupocontex.com": "23/10/2026",
+    "www.construccionesfuentesespejo.com": "23/10/2026",
+    "www.construccionesaljaro.com": "23/10/2026",
+    "www.maquinariaandaluza.com": "23/10/2026",
+    "www.disfer.es": "23/10/2026",
+    "www.rayan.online": "23/10/2026",
+    "www.dibesl.es": "23/10/2026"
   }
 }
