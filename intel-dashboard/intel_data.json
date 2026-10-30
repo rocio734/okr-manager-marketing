@@ -1,11 +1,25 @@
 {
   "comp_hashes": {
-    "odoo": "2759d27030ae",
+    "odoo": "2527bba01dc4",
     "sap": "238ca16c7de6",
-    "holded": "397ea48111a9",
+    "holded": "6b7f2a7319d6",
     "sage": "f81898f89dd8"
   },
   "changes_history": [
+    {
+      "date": "30/10/2026",
+      "competitor": "Holded",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.holded.com"
+    },
+    {
+      "date": "30/10/2026",
+      "competitor": "Odoo",
+      "section": "Web principal",
+      "type": "Contenido modificado",
+      "detail": "Cambios en https://www.odoo.com/es"
+    },
     {
       "date": "29/10/2026",
       "competitor": "Holded",
@@ -1052,6 +1066,106 @@
   ],
   "leads_history": [
     {
+      "company": "INDUSTRIA COOPERADORA DEL AZULEJO SL",
+      "domain": "www.icamoldes.com",
+      "sector": "Industrial",
+      "signal": "erp",
+      "signal_label": "Empresite Industrial",
+      "signal_class": "s-erp",
+      "source_url": "https://www.icamoldes.com",
+      "snippet": "Empresite · Villarreal · CASTELLON",
+      "score": 2,
+      "date": "30/10/2026",
+      "source_type": "empresite",
+      "email": "info@icamoldes.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34964520954",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "INDUSTRIA MILLARS 2010 SL.",
+      "domain": "www.amiab.com",
+      "sector": "Industrial",
+      "signal": "erp",
+      "signal_label": "Empresite Industrial",
+      "signal_class": "s-erp",
+      "source_url": "https://www.amiab.com",
+      "snippet": "Empresite · Almazora · CASTELLON",
+      "score": 2,
+      "date": "30/10/2026",
+      "source_type": "empresite",
+      "email": "amiab@amiab.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34964561694",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "INDUSTRIAL Y COMERCIAL MANUEL RAMON SL",
+      "domain": "www.incomarsa.com",
+      "sector": "Industrial",
+      "signal": "erp",
+      "signal_label": "Empresite Industrial",
+      "signal_class": "s-erp",
+      "source_url": "https://www.incomarsa.com",
+      "snippet": "Empresite · Burriana · CASTELLON",
+      "score": 2,
+      "date": "30/10/2026",
+      "source_type": "empresite",
+      "email": "incomar@incomarsa.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34964517134",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "INDUSTRIAS ULMEN EUROPA SL",
+      "domain": "www.ulmen.es",
+      "sector": "Industrial",
+      "signal": "erp",
+      "signal_label": "Empresite Industrial",
+      "signal_class": "s-erp",
+      "source_url": "https://www.ulmen.es",
+      "snippet": "Empresite · Villarreal · CASTELLON",
+      "score": 2,
+      "date": "30/10/2026",
+      "source_type": "empresite",
+      "email": "info@ulmen.es",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "—",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
+      "company": "AXE TRADING EUROPE AFRICA SOCIEDAD LIMITADA.",
+      "domain": "www.axtrea.com",
+      "sector": "Textil",
+      "signal": "erp",
+      "signal_label": "Empresite Textil",
+      "signal_class": "s-erp",
+      "source_url": "https://www.axtrea.com",
+      "snippet": "Empresite · Burriana · CASTELLON",
+      "score": 2,
+      "date": "30/10/2026",
+      "source_type": "empresite",
+      "email": "info@axtrea.com",
+      "contact_name": "—",
+      "contact_pos": "—",
+      "phone": "+34656731732",
+      "linkedin_org": "—",
+      "pais_detectado": "🇪🇸 España",
+      "current_erp": "—"
+    },
+    {
       "company": "DISTRIBUCIONES RG3 SL.",
       "domain": "www.rg3print.es",
       "sector": "Distribución",
@@ -1310,7 +1424,7 @@
       "linkedin_org": "—",
       "pais_detectado": "—",
       "current_erp": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "FABRICACION MAQUINARIA HOSTELERIA CAYSER SL",
@@ -10979,106 +11093,6 @@
       "contact_name": "—",
       "contact_pos": "—",
       "phone": "+34964251360",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "AUTOMOCION LA PISTA SA",
-      "domain": "www.aupisa.es",
-      "sector": "Automoción",
-      "signal": "erp",
-      "signal_label": "Empresite Automoción",
-      "signal_class": "s-erp",
-      "source_url": "https://www.aupisa.es",
-      "snippet": "Empresite · Almazora · CASTELLON",
-      "score": 2,
-      "date": "24/09/2026",
-      "source_type": "empresite",
-      "email": "aupisa@aupisa.es",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34964536688",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "MOGACAR DE AUTOMOCION SLU",
-      "domain": "www.m-automocion.com",
-      "sector": "Automoción",
-      "signal": "erp",
-      "signal_label": "Empresite Automoción",
-      "signal_class": "s-erp",
-      "source_url": "https://www.m-automocion.com",
-      "snippet": "Empresite · Castellon · CASTELLON",
-      "score": 2,
-      "date": "24/09/2026",
-      "source_type": "empresite",
-      "email": "serroascal@m-automocion.com",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34964342700",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "GIMENO AUTOMOCION SL",
-      "domain": "www.gimenoautomocionslu.es",
-      "sector": "Automoción",
-      "signal": "erp",
-      "signal_label": "Empresite Automoción",
-      "signal_class": "s-erp",
-      "source_url": "https://www.gimenoautomocionslu.es",
-      "snippet": "Empresite · Castellon · CASTELLON",
-      "score": 2,
-      "date": "24/09/2026",
-      "source_type": "empresite",
-      "email": "info@gimenoautomocionslu.es",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34964103330",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "MOTRIK AUTOMOCION SOCIEDAD LIMITADA.",
-      "domain": "www.motrikautomocion.com",
-      "sector": "Automoción",
-      "signal": "erp",
-      "signal_label": "Empresite Automoción",
-      "signal_class": "s-erp",
-      "source_url": "https://www.motrikautomocion.com",
-      "snippet": "Empresite · Castellon · CASTELLON",
-      "score": 2,
-      "date": "24/09/2026",
-      "source_type": "empresite",
-      "email": "info@motrik.es",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34964520062",
-      "linkedin_org": "—",
-      "pais_detectado": "🇪🇸 España",
-      "current_erp": "—"
-    },
-    {
-      "company": "BIOTECH RESEARCH AND INNOVATIVE NUTRACEUTICALS FOR ANIMALS SL.",
-      "domain": "www.brina-distribucion.com",
-      "sector": "Distribución",
-      "signal": "erp",
-      "signal_label": "Empresite Distribución",
-      "signal_class": "s-erp",
-      "source_url": "https://www.brina-distribucion.com",
-      "snippet": "Empresite · Alba · SALAMANCA",
-      "score": 2,
-      "date": "24/09/2026",
-      "source_type": "empresite",
-      "email": "brina@brina-distribucion.es",
-      "contact_name": "—",
-      "contact_pos": "—",
-      "phone": "+34923300427",
       "linkedin_org": "—",
       "pais_detectado": "🇪🇸 España",
       "current_erp": "—"
@@ -20999,7 +21013,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Garber Web Solutions SLSilver",
@@ -21040,7 +21054,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Online ERP Kft.Silver",
@@ -21060,7 +21074,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Consultoria HencaSilver",
@@ -21080,7 +21094,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "INTEGRATED PATH المسار المتكاملSilver",
@@ -21163,7 +21177,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "OmydooSilver",
@@ -21183,7 +21197,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Radical FanaticsSilver",
@@ -21266,7 +21280,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Hermes d.o.o.Silver",
@@ -21328,7 +21342,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Abstractive BVSilver",
@@ -21369,7 +21383,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "WilldooITSilver",
@@ -21515,7 +21529,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Optesis SénégalSilver",
@@ -21640,7 +21654,7 @@
       "phone": "—",
       "linkedin_org": "—",
       "pais_detectado": "—",
-      "enrich_attempts": 2
+      "enrich_attempts": 3
     },
     {
       "company": "Simplidoo SàrlSilver",
@@ -30880,6 +30894,11 @@
     "www.maquinarianavarra.com": "29/10/2026",
     "www.ecasal.com": "29/10/2026",
     "www.maquinariagraficadelnorte.es": "29/10/2026",
-    "www.maquinariahens.es": "29/10/2026"
+    "www.maquinariahens.es": "29/10/2026",
+    "www.icamoldes.com": "30/10/2026",
+    "www.amiab.com": "30/10/2026",
+    "www.incomarsa.com": "30/10/2026",
+    "www.ulmen.es": "30/10/2026",
+    "www.axtrea.com": "30/10/2026"
   }
 }
