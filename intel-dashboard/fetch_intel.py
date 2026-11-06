@@ -2671,6 +2671,29 @@ def main():
     print(f"   Con email: {len([l for l in new_leads if l.get('email','—')!='—'])}")
     print(f"   Alta calidad: {len([l for l in new_leads if l['score']==3])}")
     print(f"   Cambios: {len(new_changes)} · Histórico: {len(data['leads_history'])}")
+    _git_push_dashboard()
+
+def _git_push_dashboard():
+    """Commit y push de index.html para que Render redeploy."""
+    import subprocess
+    repo = str(REPO_DIR.parent)
+    ts   = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    cmds = [
+        ["git", "-C", repo, "add", "intel-dashboard/index.html"],
+        ["git", "-C", repo, "commit", "-m", f"Dashboard actualizado {ts}"],
+        ["git", "-C", repo, "push", "origin", "main"],
+    ]
+    for cmd in cmds:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            stderr = result.stderr.strip()
+            if "nothing to commit" in stderr or "nothing added" in stderr:
+                print(f"  git: sin cambios que commitear")
+            else:
+                print(f"  git warning ({' '.join(cmd[2:4])}): {stderr[:200]}")
+            break
+    else:
+        print(f"  ✓ Dashboard pushed to GitHub ({ts})")
 
 if __name__=="__main__":
     main()
