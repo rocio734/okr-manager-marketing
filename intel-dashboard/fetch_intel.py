@@ -1758,14 +1758,10 @@ def search_all_leads(data):
         if d and d not in sd:
             sd[d] = l.get("date", TODAY)
 
-    seen_partners = {d for d, dt in sd.items()
-                     if any(l.get("domain")==d and l.get("source_type","") in
-                            ("partner_scraping","partner_spider")
-                            for l in data["leads_history"])}
-    seen_90 = {d for d, dt in sd.items()
-               if d not in seen_partners and _parse_lead_date(dt) >= cutoff_dt}
-    seen = seen_partners | seen_90
-    print(f"  Dominios en dedup — partners (lifetime): {len(seen_partners)} | resto (90d): {len(seen_90)} | total bloqueados: {len(seen)}")
+    seen_partners = set()  # partners ya no se bloquean lifetime — ciclo 90d como el resto
+    seen_90 = {d for d, dt in sd.items() if _parse_lead_date(dt) >= cutoff_dt}
+    seen = seen_90
+    print(f"  Dominios en dedup — 90d bloqueados: {len(seen_90)} (partners reutilizables tras 90d)")
 
     # 1. Google Custom Search
     print(f"  [1/4] Brave Search... (ciudad hoy: {_CITY}, sector: {_SECTOR})")
@@ -1899,8 +1895,8 @@ def search_all_leads(data):
         if not d or d in seen or should_skip(d): continue
 
         # Lead básico
-        lead=make_lead(p["name"],d,"Consultoría ERP","partner",f"Partner {p['competitor']}","s-par",
-                       p.get("url",f"https://{d}"),f"Partner certificado de {p['competitor']} en España",2,"partner_scraping")
+        lead=make_lead(p["name"],d,"Consultoría ERP","partner",f"🤝 Posible Partner · {p['competitor']}","s-par",
+                       p.get("url",f"https://{d}"),f"Partner certificado de {p['competitor']} en España — posible partner Etendo",2,"partner_scraping")
         new.append(lead); seen.add(d)
 
         # Acumular URLs de perfil de partner para crawling profundo
@@ -1922,9 +1918,9 @@ def search_all_leads(data):
                 # Lead enriquecido con datos del Spider
                 lead = make_lead(
                     profile["name"], d, profile["sector"],
-                    "partner", f"Partner {comp_name} (deep)", "s-par",
-                    profile["web"], f"Partner {comp_name} — clientes: {', '.join(profile['clients_mentioned']) or 'N/A'}",
-                    2, "partner_spider"  # Score 2 — son partners de competidores, no leads directos
+                    "partner", f"🤝 Posible Partner · {comp_name}", "s-par",
+                    profile["web"], f"Partner {comp_name} — posible partner Etendo · clientes: {', '.join(profile['clients_mentioned']) or 'N/A'}",
+                    2, "partner_spider"  # Score 2 — son partners de competidores, posibles partners Etendo
                 )
                 lead["phone"] = profile.get("phone","—")
                 new.append(lead); seen.add(d)
